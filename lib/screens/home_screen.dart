@@ -9,6 +9,7 @@ import 'pesate/pesate_screen.dart';
 import 'storico/storico_misurazioni_screen.dart';
 import 'debug/calibration_screen.dart';
 import 'plicometry/method_selection_screen.dart';
+import 'progressi/progressi_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -63,6 +64,8 @@ class HomeScreen extends StatelessWidget {
             const _PesateCard(),
             const SizedBox(height: 16),
             const _StoricoCard(),
+            const SizedBox(height: 16),
+            const _ProgressiCard(),
           ],
         ),
       ),
@@ -321,7 +324,7 @@ class _StoricoCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('STORICO MISURAZIONI', style: TextStyle(color: p.textMuted, fontSize: 11, letterSpacing: 2)),
+                      Text('MISURAZIONI', style: TextStyle(color: p.textMuted, fontSize: 11, letterSpacing: 2)),
                       const SizedBox(height: 2),
                       Text(count == 0 ? 'Nessuna misurazione' : '$count giornate registrate',
                           style: TextStyle(color: p.textPrimary, fontSize: 15, fontWeight: FontWeight.w600)),
@@ -352,6 +355,60 @@ class _StatItem extends StatelessWidget {
         const SizedBox(height: 4),
         Text(label, style: TextStyle(color: p.textMuted, fontSize: 11)),
       ],
+    );
+  }
+}
+
+class _ProgressiCard extends StatelessWidget {
+  const _ProgressiCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return GestureDetector(
+      onTap: () => Navigator.push(
+          context, MaterialPageRoute(builder: (_) => const ProgressiScreen())),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+            color: p.surface,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: p.cardBorder)),
+        child: Row(
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                  color: p.accent.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: p.accent.withValues(alpha: 0.3))),
+              child:
+                  Icon(Icons.trending_up_rounded, color: p.accent, size: 20),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('PROGRESSI',
+                      style: TextStyle(
+                          color: p.textMuted,
+                          fontSize: 11,
+                          letterSpacing: 2)),
+                  const SizedBox(height: 2),
+                  Text('Composizione e misurazioni nel tempo',
+                      style: TextStyle(
+                          color: p.textPrimary,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600)),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right_rounded, color: p.textMuted, size: 20),
+          ],
+        ),
+      ),
     );
   }
 }

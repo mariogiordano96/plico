@@ -12,7 +12,7 @@ class StoricoMisurazioniScreen extends StatelessWidget {
     final p = context.palette;
     return Scaffold(
       appBar: AppBar(
-        title: Text('STORICO MISURAZIONI', style: TextStyle(color: p.accent, fontSize: 17, fontWeight: FontWeight.w600, letterSpacing: 1.5)),
+        title: Text('MISURAZIONI', style: TextStyle(color: p.accent, fontSize: 17, fontWeight: FontWeight.w600, letterSpacing: 1.5)),
         backgroundColor: p.background,
         elevation: 0,
         centerTitle: true,
