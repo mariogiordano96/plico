@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+    <defs>
+        <linearGradient id="pGreenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#40C057" />
+            <stop offset="100%" stop-color="#2B8A3E" />
+        </linearGradient>
+
+        <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#1B4D22" flood-opacity="0.15" />
+        </filter>
+    </defs>
+
+    <rect width="1024" height="1024" rx="230" fill="#FFFFFF" />
+
+    <path filter="url(#softShadow)" 
+          d="M 360,260 
+             L 560,260 
+             C 690,260 760,330 760,450 
+             C 760,570 690,640 560,640 
+             L 480,640 
+             L 480,764 
+             C 480,775 471,784 460,784 
+             L 360,784 
+             C 349,784 340,775 340,764 
+             L 340,280 
+             C 340,269 349,260 360,260 Z 
+             M 480,380 
+             L 480,520 
+             L 545,520 
+             C 610,520 640,490 640,450 
+             C 640,410 610,380 545,380 Z" 
+          fill="url(#pGreenGrad)" />
+</svg>
