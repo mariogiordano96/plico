@@ -139,6 +139,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
         await DatabaseService.instance.getLatestPlicometrySession();
     final livello = await DatabaseService.instance.getLivelloAttivita();
     final metodo = await DatabaseService.instance.getMetodoTdee();
+    final goal = await DatabaseService.instance.getObiettivo();
     if (!mounted) return;
     setState(() {
       _profile = profile;
@@ -146,6 +147,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
       _session = session;
       _livello = livello;
       _metodo = metodo;
+      _goal = goal;
       _loading = false;
     });
   }
@@ -158,6 +160,11 @@ class _TdeeScreenState extends State<TdeeScreen> {
   Future<void> _setMetodo(int v) async {
     setState(() => _metodo = v);
     await DatabaseService.instance.saveMetodoTdee(v);
+  }
+
+  Future<void> _setGoal(int v) async {
+    setState(() => _goal = v);
+    await DatabaseService.instance.saveObiettivo(v);
   }
 
   TdeeResult? get _result {
@@ -235,7 +242,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
                     _ObiettiviCard(
                       tdee: result.tdee,
                       selectedGoal: _goal,
-                      onSelectGoal: (g) => setState(() => _goal = g),
+                      onSelectGoal: _setGoal,
                       p: p,
                     ),
                     const SizedBox(height: 20),

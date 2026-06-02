@@ -31,6 +31,11 @@ const AppSettingsSchema = CollectionSchema(
       id: 2,
       name: r'metodoTdee',
       type: IsarType.long,
+    ),
+    r'obiettivo': PropertySchema(
+      id: 3,
+      name: r'obiettivo',
+      type: IsarType.long,
     )
   },
   estimateSize: _appSettingsEstimateSize,
@@ -65,6 +70,7 @@ void _appSettingsSerialize(
   writer.writeBool(offsets[0], object.isDarkMode);
   writer.writeLong(offsets[1], object.livelloAttivita);
   writer.writeLong(offsets[2], object.metodoTdee);
+  writer.writeLong(offsets[3], object.obiettivo);
 }
 
 AppSettings _appSettingsDeserialize(
@@ -78,6 +84,7 @@ AppSettings _appSettingsDeserialize(
   object.isDarkMode = reader.readBool(offsets[0]);
   object.livelloAttivita = reader.readLong(offsets[1]);
   object.metodoTdee = reader.readLong(offsets[2]);
+  object.obiettivo = reader.readLong(offsets[3]);
   return object;
 }
 
@@ -93,6 +100,8 @@ P _appSettingsDeserializeProp<P>(
     case 1:
       return (reader.readLong(offset)) as P;
     case 2:
+      return (reader.readLong(offset)) as P;
+    case 3:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -366,6 +375,62 @@ extension AppSettingsQueryFilter
       ));
     });
   }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      obiettivoEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'obiettivo',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      obiettivoGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'obiettivo',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      obiettivoLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'obiettivo',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      obiettivoBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'obiettivo',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
 }
 
 extension AppSettingsQueryObject
@@ -410,6 +475,18 @@ extension AppSettingsQuerySortBy
   QueryBuilder<AppSettings, AppSettings, QAfterSortBy> sortByMetodoTdeeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'metodoTdee', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> sortByObiettivo() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'obiettivo', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> sortByObiettivoDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'obiettivo', Sort.desc);
     });
   }
 }
@@ -464,6 +541,18 @@ extension AppSettingsQuerySortThenBy
       return query.addSortBy(r'metodoTdee', Sort.desc);
     });
   }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> thenByObiettivo() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'obiettivo', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> thenByObiettivoDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'obiettivo', Sort.desc);
+    });
+  }
 }
 
 extension AppSettingsQueryWhereDistinct
@@ -484,6 +573,12 @@ extension AppSettingsQueryWhereDistinct
   QueryBuilder<AppSettings, AppSettings, QDistinct> distinctByMetodoTdee() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'metodoTdee');
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QDistinct> distinctByObiettivo() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'obiettivo');
     });
   }
 }
@@ -511,6 +606,12 @@ extension AppSettingsQueryProperty
   QueryBuilder<AppSettings, int, QQueryOperations> metodoTdeeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'metodoTdee');
+    });
+  }
+
+  QueryBuilder<AppSettings, int, QQueryOperations> obiettivoProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'obiettivo');
     });
   }
 }

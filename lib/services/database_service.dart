@@ -6,6 +6,9 @@ import '../models/body_snapshot.dart';
 import '../models/plicometry_session.dart';
 import '../models/app_settings.dart';
 import '../models/measurement_snapshot.dart';
+import '../models/food_item.dart';
+import '../models/daily_log.dart';
+import '../models/meal_entry.dart';
 import '../models/enums.dart';
 
 class DatabaseService {
@@ -17,7 +20,7 @@ class DatabaseService {
   Future<void> init() async {
     final dir = await getApplicationDocumentsDirectory();
     _isar = await Isar.open(
-      [UserProfileSchema, BodySnapshotSchema, PlicometrySessionSchema, AppSettingsSchema, MeasurementSnapshotSchema],
+      [UserProfileSchema, BodySnapshotSchema, PlicometrySessionSchema, AppSettingsSchema, MeasurementSnapshotSchema, FoodItemSchema, DailyLogSchema],
       directory: dir.path,
     );
   }
@@ -248,6 +251,112 @@ class DatabaseService {
       settings.livelloAttivita = livello;
       await _isar.appSettings.put(settings);
     });
+  }
+
+  Future<int> getObiettivo() async {
+    final settings = await _isar.appSettings.get(1);
+    return settings?.obiettivo ?? 1;
+  }
+
+  Future<void> saveObiettivo(int obiettivo) async {
+    await _isar.writeTxn(() async {
+      final settings = await _isar.appSettings.get(1) ?? AppSettings();
+      settings.obiettivo = obiettivo;
+      await _isar.appSettings.put(settings);
+    });
+  }
+
+  // ──────────────────────────────────────────────
+  // FoodItem
+  // ──────────────────────────────────────────────
+
+  Future<List<FoodItem>> searchFoodItems(String query) async {
+    if (query.trim().isEmpty) {
+      return _isar.foodItems
+          .filter()
+          .isFavoriteEqualTo(true)
+          .or()
+          .isCustomEqualTo(true)
+          .sortByNome()
+          .findAll();
+    }
+    return _isar.foodItems
+        .filter()
+        .nomeContains(query, caseSensitive: false)
+        .sortByNome()
+        .findAll();
+  }
+
+  Future<FoodItem?> getFoodItemByOffCode(String offCode) async {
+    return _isar.foodItems
+        .filter()
+        .offCodeEqualTo(offCode)
+        .findFirst();
+  }
+
+  Future<Id> saveFoodItem(FoodItem item) async {
+    late Id id;
+    await _isar.writeTxn(() async {
+      id = await _isar.foodItems.put(item);
+    });
+    return id;
+  }
+
+  Future<void> toggleFavorite(Id foodId) async {
+    await _isar.writeTxn(() async {
+      final item = await _isar.foodItems.get(foodId);
+      if (item == null) return;
+      item.isFavorite = !item.isFavorite;
+      await _isar.foodItems.put(item);
+    });
+  }
+
+  Future<void> deleteFoodItem(Id foodId) async {
+    await _isar.writeTxn(() async {
+      await _isar.foodItems.delete(foodId);
+    });
+  }
+
+  // ──────────────────────────────────────────────
+  // DailyLog
+  // ──────────────────────────────────────────────
+
+  static DateTime _logDate(DateTime d) => DateTime(d.year, d.month, d.day);
+
+  Future<DailyLog?> getDailyLog(DateTime date) async {
+    final day = _logDate(date);
+    return _isar.dailyLogs.filter().dataEqualTo(day).findFirst();
+  }
+
+  Future<void> addMealEntry(DateTime date, MealEntry entry) async {
+    final day = _logDate(date);
+    await _isar.writeTxn(() async {
+      var log = await _isar.dailyLogs.filter().dataEqualTo(day).findFirst();
+      log ??= DailyLog()..data = day;
+      log.entries = [...log.entries, entry];
+      await _isar.dailyLogs.put(log);
+    });
+  }
+
+  Future<void> removeMealEntry(DateTime date, int entryIndex) async {
+    final day = _logDate(date);
+    await _isar.writeTxn(() async {
+      final log = await _isar.dailyLogs.filter().dataEqualTo(day).findFirst();
+      if (log == null) return;
+      final updated = [...log.entries];
+      updated.removeAt(entryIndex);
+      log.entries = updated;
+      await _isar.dailyLogs.put(log);
+    });
+  }
+
+  Stream<DailyLog?> watchDailyLog(DateTime date) {
+    final day = _logDate(date);
+    return _isar.dailyLogs
+        .filter()
+        .dataEqualTo(day)
+        .watch(fireImmediately: true)
+        .map((list) => list.isEmpty ? null : list.first);
   }
 
   // ──────────────────────────────────────────────

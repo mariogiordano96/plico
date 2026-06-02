@@ -11,6 +11,7 @@ import 'debug/calibration_screen.dart';
 import 'plicometry/method_selection_screen.dart';
 import 'progressi/progressi_screen.dart';
 import 'tdee/tdee_screen.dart';
+import 'diario/diario_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -63,6 +64,8 @@ class HomeScreen extends StatelessWidget {
             const _LastResultCard(),
             const SizedBox(height: 16),
             const _TdeeCard(),
+            const SizedBox(height: 16),
+            const _DiarioCard(),
             const SizedBox(height: 16),
             const _PesateCard(),
             const SizedBox(height: 16),
@@ -502,6 +505,143 @@ class _TdeeCardState extends State<_TdeeCard> {
                 ],
               ),
             ),
+            Icon(Icons.chevron_right_rounded, color: p.textMuted, size: 20),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DiarioCard extends StatefulWidget {
+  const _DiarioCard();
+
+  @override
+  State<_DiarioCard> createState() => _DiarioCardState();
+}
+
+class _DiarioCardState extends State<_DiarioCard> {
+  double? _kcalLogged;
+  int? _kcalTarget;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final today = DateTime.now();
+    final log = await DatabaseService.instance
+        .getDailyLog(DateTime(today.year, today.month, today.day));
+    final profile = await DatabaseService.instance.getUserProfile();
+    final snapshot = await DatabaseService.instance.getLatestBodySnapshot();
+    if (!mounted) return;
+    int? target;
+    if (profile != null && snapshot != null) {
+      final session =
+          await DatabaseService.instance.getLatestPlicometrySession();
+      final livello = await DatabaseService.instance.getLivelloAttivita();
+      final metodo = await DatabaseService.instance.getMetodoTdee();
+      final obiettivo = await DatabaseService.instance.getObiettivo();
+      const goalMult = [0.80, 1.0, 1.15];
+      final result = calcolaTdee(
+        sesso: profile.sesso,
+        eta: profile.etaCorrente,
+        altezzaCm: profile.altezzaCm,
+        pesoKg: snapshot.pesoKg,
+        livello: livello,
+        metodo: metodo,
+        massaMagraKg: session?.risultati.massaMagraKg,
+      );
+      if (result != null) {
+        target = (result.tdee * goalMult[obiettivo.clamp(0, 2)]).round();
+      }
+    }
+    if (mounted) {
+      setState(() {
+        _kcalLogged = log?.kcalTotali ?? 0;
+        _kcalTarget = target;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final logged = _kcalLogged ?? 0;
+    final pct = (_kcalTarget != null && _kcalTarget! > 0)
+        ? (logged / _kcalTarget!).clamp(0.0, 1.0)
+        : 0.0;
+    final over = _kcalTarget != null && logged > _kcalTarget!;
+
+    return GestureDetector(
+      onTap: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const DiarioScreen()),
+        );
+        _load();
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: p.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: p.cardBorder),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: p.accent.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: p.accent.withValues(alpha: 0.3)),
+              ),
+              child: Icon(Icons.restaurant_menu_rounded,
+                  color: p.accent, size: 20),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('DIARIO ALIMENTARE',
+                      style: TextStyle(
+                          color: p.textMuted,
+                          fontSize: 11,
+                          letterSpacing: 2)),
+                  const SizedBox(height: 4),
+                  Text(
+                    _kcalTarget != null
+                        ? '${logged.round()} / $_kcalTarget kcal'
+                        : '${logged.round()} kcal oggi',
+                    style: TextStyle(
+                        color: over
+                            ? const Color(0xFFE74C3C)
+                            : p.textPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600),
+                  ),
+                  if (_kcalTarget != null) ...[
+                    const SizedBox(height: 6),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(3),
+                      child: LinearProgressIndicator(
+                        value: pct,
+                        backgroundColor: p.accent.withValues(alpha: 0.15),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                            over ? const Color(0xFFE74C3C) : p.accent),
+                        minHeight: 4,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
             Icon(Icons.chevron_right_rounded, color: p.textMuted, size: 20),
           ],
         ),
