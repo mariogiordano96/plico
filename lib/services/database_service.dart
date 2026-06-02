@@ -218,7 +218,34 @@ class DatabaseService {
 
   Future<void> saveIsDarkMode(bool isDark) async {
     await _isar.writeTxn(() async {
-      final settings = AppSettings()..isDarkMode = isDark;
+      final settings = await _isar.appSettings.get(1) ?? AppSettings();
+      settings.isDarkMode = isDark;
+      await _isar.appSettings.put(settings);
+    });
+  }
+
+  Future<int> getMetodoTdee() async {
+    final settings = await _isar.appSettings.get(1);
+    return settings?.metodoTdee ?? 0;
+  }
+
+  Future<void> saveMetodoTdee(int metodo) async {
+    await _isar.writeTxn(() async {
+      final settings = await _isar.appSettings.get(1) ?? AppSettings();
+      settings.metodoTdee = metodo;
+      await _isar.appSettings.put(settings);
+    });
+  }
+
+  Future<int> getLivelloAttivita() async {
+    final settings = await _isar.appSettings.get(1);
+    return settings?.livelloAttivita ?? 2;
+  }
+
+  Future<void> saveLivelloAttivita(int livello) async {
+    await _isar.writeTxn(() async {
+      final settings = await _isar.appSettings.get(1) ?? AppSettings();
+      settings.livelloAttivita = livello;
       await _isar.appSettings.put(settings);
     });
   }

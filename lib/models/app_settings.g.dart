@@ -21,6 +21,16 @@ const AppSettingsSchema = CollectionSchema(
       id: 0,
       name: r'isDarkMode',
       type: IsarType.bool,
+    ),
+    r'livelloAttivita': PropertySchema(
+      id: 1,
+      name: r'livelloAttivita',
+      type: IsarType.long,
+    ),
+    r'metodoTdee': PropertySchema(
+      id: 2,
+      name: r'metodoTdee',
+      type: IsarType.long,
     )
   },
   estimateSize: _appSettingsEstimateSize,
@@ -53,6 +63,8 @@ void _appSettingsSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeBool(offsets[0], object.isDarkMode);
+  writer.writeLong(offsets[1], object.livelloAttivita);
+  writer.writeLong(offsets[2], object.metodoTdee);
 }
 
 AppSettings _appSettingsDeserialize(
@@ -64,6 +76,8 @@ AppSettings _appSettingsDeserialize(
   final object = AppSettings();
   object.id = id;
   object.isDarkMode = reader.readBool(offsets[0]);
+  object.livelloAttivita = reader.readLong(offsets[1]);
+  object.metodoTdee = reader.readLong(offsets[2]);
   return object;
 }
 
@@ -76,6 +90,10 @@ P _appSettingsDeserializeProp<P>(
   switch (propertyId) {
     case 0:
       return (reader.readBool(offset)) as P;
+    case 1:
+      return (reader.readLong(offset)) as P;
+    case 2:
+      return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -236,6 +254,118 @@ extension AppSettingsQueryFilter
       ));
     });
   }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      livelloAttivitaEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'livelloAttivita',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      livelloAttivitaGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'livelloAttivita',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      livelloAttivitaLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'livelloAttivita',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      livelloAttivitaBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'livelloAttivita',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      metodoTdeeEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'metodoTdee',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      metodoTdeeGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'metodoTdee',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      metodoTdeeLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'metodoTdee',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      metodoTdeeBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'metodoTdee',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
 }
 
 extension AppSettingsQueryObject
@@ -255,6 +385,31 @@ extension AppSettingsQuerySortBy
   QueryBuilder<AppSettings, AppSettings, QAfterSortBy> sortByIsDarkModeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isDarkMode', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> sortByLivelloAttivita() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'livelloAttivita', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByLivelloAttivitaDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'livelloAttivita', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> sortByMetodoTdee() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'metodoTdee', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> sortByMetodoTdeeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'metodoTdee', Sort.desc);
     });
   }
 }
@@ -284,6 +439,31 @@ extension AppSettingsQuerySortThenBy
       return query.addSortBy(r'isDarkMode', Sort.desc);
     });
   }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> thenByLivelloAttivita() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'livelloAttivita', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByLivelloAttivitaDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'livelloAttivita', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> thenByMetodoTdee() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'metodoTdee', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> thenByMetodoTdeeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'metodoTdee', Sort.desc);
+    });
+  }
 }
 
 extension AppSettingsQueryWhereDistinct
@@ -291,6 +471,19 @@ extension AppSettingsQueryWhereDistinct
   QueryBuilder<AppSettings, AppSettings, QDistinct> distinctByIsDarkMode() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'isDarkMode');
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QDistinct>
+      distinctByLivelloAttivita() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'livelloAttivita');
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QDistinct> distinctByMetodoTdee() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'metodoTdee');
     });
   }
 }
@@ -306,6 +499,18 @@ extension AppSettingsQueryProperty
   QueryBuilder<AppSettings, bool, QQueryOperations> isDarkModeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'isDarkMode');
+    });
+  }
+
+  QueryBuilder<AppSettings, int, QQueryOperations> livelloAttivitaProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'livelloAttivita');
+    });
+  }
+
+  QueryBuilder<AppSettings, int, QQueryOperations> metodoTdeeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'metodoTdee');
     });
   }
 }

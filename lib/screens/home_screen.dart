@@ -10,6 +10,7 @@ import 'storico/storico_misurazioni_screen.dart';
 import 'debug/calibration_screen.dart';
 import 'plicometry/method_selection_screen.dart';
 import 'progressi/progressi_screen.dart';
+import 'tdee/tdee_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -60,6 +61,8 @@ class HomeScreen extends StatelessWidget {
             _SectionTitle('PLICOMETRIA'),
             const SizedBox(height: 12),
             const _LastResultCard(),
+            const SizedBox(height: 16),
+            const _TdeeCard(),
             const SizedBox(height: 16),
             const _PesateCard(),
             const SizedBox(height: 16),
@@ -402,6 +405,100 @@ class _ProgressiCard extends StatelessWidget {
                           color: p.textPrimary,
                           fontSize: 15,
                           fontWeight: FontWeight.w600)),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right_rounded, color: p.textMuted, size: 20),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TdeeCard extends StatefulWidget {
+  const _TdeeCard();
+
+  @override
+  State<_TdeeCard> createState() => _TdeeCardState();
+}
+
+class _TdeeCardState extends State<_TdeeCard> {
+  int? _tdee;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final profile = await DatabaseService.instance.getUserProfile();
+    final snapshot = await DatabaseService.instance.getLatestBodySnapshot();
+    final session = await DatabaseService.instance.getLatestPlicometrySession();
+    final livello = await DatabaseService.instance.getLivelloAttivita();
+    final metodo = await DatabaseService.instance.getMetodoTdee();
+    if (!mounted || profile == null || snapshot == null) return;
+    final result = calcolaTdee(
+      sesso: profile.sesso,
+      eta: profile.etaCorrente,
+      altezzaCm: profile.altezzaCm,
+      pesoKg: snapshot.pesoKg,
+      livello: livello,
+      metodo: metodo,
+      massaMagraKg: session?.risultati.massaMagraKg,
+    );
+    if (mounted) setState(() => _tdee = result?.tdee);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return GestureDetector(
+      onTap: () async {
+        await Navigator.push(
+            context, MaterialPageRoute(builder: (_) => const TdeeScreen()));
+        _load();
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+            color: p.surface,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: p.cardBorder)),
+        child: Row(
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                  color: const Color(0xFFFF6B35).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                      color: const Color(0xFFFF6B35).withValues(alpha: 0.3))),
+              child: const Icon(Icons.local_fire_department_rounded,
+                  color: Color(0xFFFF6B35), size: 20),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('TDEE',
+                      style: TextStyle(
+                          color: p.textMuted,
+                          fontSize: 11,
+                          letterSpacing: 2)),
+                  const SizedBox(height: 2),
+                  Text(
+                    _tdee != null
+                        ? '${_tdee!.toString()} kcal/giorno'
+                        : 'Calcola il tuo fabbisogno',
+                    style: TextStyle(
+                        color: p.textPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600),
+                  ),
                 ],
               ),
             ),
