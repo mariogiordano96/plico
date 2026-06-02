@@ -6,6 +6,7 @@ import '../../models/food_item.dart';
 import '../../models/meal_entry.dart';
 import '../../services/database_service.dart';
 import '../../services/open_food_facts_service.dart';
+import 'barcode_scanner_screen.dart';
 
 const _pastoLabels = ['Colazione', 'Pranzo', 'Cena', 'Spuntino'];
 
@@ -97,6 +98,24 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
     );
   }
 
+  Future<void> _openScanner() async {
+    final food = await Navigator.push<OFFFood>(
+      context,
+      MaterialPageRoute(builder: (_) => const BarcodeScannerScreen()),
+    );
+    if (food != null && mounted) {
+      await _showQuantitySheet(
+        nome: food.nome,
+        brand: food.brand,
+        kcalPer100g: food.kcalPer100g,
+        proteinPer100g: food.proteinPer100g,
+        fatPer100g: food.fatPer100g,
+        carbsPer100g: food.carbsPer100g,
+        offCode: food.offCode,
+      );
+    }
+  }
+
   Future<void> _showQuantitySheet({
     required String nome,
     String? brand,
@@ -164,10 +183,31 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-            child: _SearchBar(
-              controller: _searchCtrl,
-              onChanged: _onChanged,
-              p: p,
+            child: Row(
+              children: [
+                Expanded(
+                  child: _SearchBar(
+                    controller: _searchCtrl,
+                    onChanged: _onChanged,
+                    p: p,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                GestureDetector(
+                  onTap: _openScanner,
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: p.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: p.cardBorder),
+                    ),
+                    child: Icon(Icons.qr_code_scanner_rounded,
+                        color: p.accent, size: 24),
+                  ),
+                ),
+              ],
             ),
           ),
           Expanded(
