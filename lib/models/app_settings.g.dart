@@ -17,23 +17,33 @@ const AppSettingsSchema = CollectionSchema(
   name: r'AppSettings',
   id: -5633561779022347008,
   properties: {
-    r'isDarkMode': PropertySchema(
+    r'creaSeeded': PropertySchema(
       id: 0,
+      name: r'creaSeeded',
+      type: IsarType.bool,
+    ),
+    r'goalSetDate': PropertySchema(
+      id: 1,
+      name: r'goalSetDate',
+      type: IsarType.dateTime,
+    ),
+    r'isDarkMode': PropertySchema(
+      id: 2,
       name: r'isDarkMode',
       type: IsarType.bool,
     ),
     r'livelloAttivita': PropertySchema(
-      id: 1,
+      id: 3,
       name: r'livelloAttivita',
       type: IsarType.long,
     ),
     r'metodoTdee': PropertySchema(
-      id: 2,
+      id: 4,
       name: r'metodoTdee',
       type: IsarType.long,
     ),
     r'obiettivo': PropertySchema(
-      id: 3,
+      id: 5,
       name: r'obiettivo',
       type: IsarType.long,
     )
@@ -67,10 +77,12 @@ void _appSettingsSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeBool(offsets[0], object.isDarkMode);
-  writer.writeLong(offsets[1], object.livelloAttivita);
-  writer.writeLong(offsets[2], object.metodoTdee);
-  writer.writeLong(offsets[3], object.obiettivo);
+  writer.writeBool(offsets[0], object.creaSeeded);
+  writer.writeDateTime(offsets[1], object.goalSetDate);
+  writer.writeBool(offsets[2], object.isDarkMode);
+  writer.writeLong(offsets[3], object.livelloAttivita);
+  writer.writeLong(offsets[4], object.metodoTdee);
+  writer.writeLong(offsets[5], object.obiettivo);
 }
 
 AppSettings _appSettingsDeserialize(
@@ -80,11 +92,13 @@ AppSettings _appSettingsDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = AppSettings();
+  object.creaSeeded = reader.readBool(offsets[0]);
+  object.goalSetDate = reader.readDateTimeOrNull(offsets[1]);
   object.id = id;
-  object.isDarkMode = reader.readBool(offsets[0]);
-  object.livelloAttivita = reader.readLong(offsets[1]);
-  object.metodoTdee = reader.readLong(offsets[2]);
-  object.obiettivo = reader.readLong(offsets[3]);
+  object.isDarkMode = reader.readBool(offsets[2]);
+  object.livelloAttivita = reader.readLong(offsets[3]);
+  object.metodoTdee = reader.readLong(offsets[4]);
+  object.obiettivo = reader.readLong(offsets[5]);
   return object;
 }
 
@@ -98,10 +112,14 @@ P _appSettingsDeserializeProp<P>(
     case 0:
       return (reader.readBool(offset)) as P;
     case 1:
-      return (reader.readLong(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 2:
-      return (reader.readLong(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 3:
+      return (reader.readLong(offset)) as P;
+    case 4:
+      return (reader.readLong(offset)) as P;
+    case 5:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -201,6 +219,90 @@ extension AppSettingsQueryWhere
 
 extension AppSettingsQueryFilter
     on QueryBuilder<AppSettings, AppSettings, QFilterCondition> {
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      creaSeededEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'creaSeeded',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      goalSetDateIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'goalSetDate',
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      goalSetDateIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'goalSetDate',
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      goalSetDateEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'goalSetDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      goalSetDateGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'goalSetDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      goalSetDateLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'goalSetDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      goalSetDateBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'goalSetDate',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition> idEqualTo(
       Id value) {
     return QueryBuilder.apply(this, (query) {
@@ -441,6 +543,30 @@ extension AppSettingsQueryLinks
 
 extension AppSettingsQuerySortBy
     on QueryBuilder<AppSettings, AppSettings, QSortBy> {
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> sortByCreaSeeded() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'creaSeeded', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> sortByCreaSeededDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'creaSeeded', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> sortByGoalSetDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'goalSetDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> sortByGoalSetDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'goalSetDate', Sort.desc);
+    });
+  }
+
   QueryBuilder<AppSettings, AppSettings, QAfterSortBy> sortByIsDarkMode() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isDarkMode', Sort.asc);
@@ -493,6 +619,30 @@ extension AppSettingsQuerySortBy
 
 extension AppSettingsQuerySortThenBy
     on QueryBuilder<AppSettings, AppSettings, QSortThenBy> {
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> thenByCreaSeeded() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'creaSeeded', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> thenByCreaSeededDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'creaSeeded', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> thenByGoalSetDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'goalSetDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> thenByGoalSetDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'goalSetDate', Sort.desc);
+    });
+  }
+
   QueryBuilder<AppSettings, AppSettings, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -557,6 +707,18 @@ extension AppSettingsQuerySortThenBy
 
 extension AppSettingsQueryWhereDistinct
     on QueryBuilder<AppSettings, AppSettings, QDistinct> {
+  QueryBuilder<AppSettings, AppSettings, QDistinct> distinctByCreaSeeded() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'creaSeeded');
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QDistinct> distinctByGoalSetDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'goalSetDate');
+    });
+  }
+
   QueryBuilder<AppSettings, AppSettings, QDistinct> distinctByIsDarkMode() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'isDarkMode');
@@ -588,6 +750,18 @@ extension AppSettingsQueryProperty
   QueryBuilder<AppSettings, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<AppSettings, bool, QQueryOperations> creaSeededProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'creaSeeded');
+    });
+  }
+
+  QueryBuilder<AppSettings, DateTime?, QQueryOperations> goalSetDateProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'goalSetDate');
     });
   }
 

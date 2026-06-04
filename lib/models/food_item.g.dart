@@ -27,38 +27,74 @@ const FoodItemSchema = CollectionSchema(
       name: r'carbsPer100g',
       type: IsarType.double,
     ),
-    r'fatPer100g': PropertySchema(
+    r'categoria': PropertySchema(
       id: 2,
+      name: r'categoria',
+      type: IsarType.string,
+    ),
+    r'creaCode': PropertySchema(
+      id: 3,
+      name: r'creaCode',
+      type: IsarType.string,
+    ),
+    r'fatPer100g': PropertySchema(
+      id: 4,
       name: r'fatPer100g',
       type: IsarType.double,
     ),
+    r'imageUrl': PropertySchema(
+      id: 5,
+      name: r'imageUrl',
+      type: IsarType.string,
+    ),
     r'isCustom': PropertySchema(
-      id: 3,
+      id: 6,
       name: r'isCustom',
       type: IsarType.bool,
     ),
     r'isFavorite': PropertySchema(
-      id: 4,
+      id: 7,
       name: r'isFavorite',
       type: IsarType.bool,
     ),
     r'kcalPer100g': PropertySchema(
-      id: 5,
+      id: 8,
       name: r'kcalPer100g',
       type: IsarType.double,
     ),
     r'nome': PropertySchema(
-      id: 6,
+      id: 9,
       name: r'nome',
       type: IsarType.string,
     ),
+    r'nomeInglese': PropertySchema(
+      id: 10,
+      name: r'nomeInglese',
+      type: IsarType.string,
+    ),
+    r'nutrizione': PropertySchema(
+      id: 11,
+      name: r'nutrizione',
+      type: IsarType.object,
+      target: r'NutrizioneCompleta',
+    ),
     r'offCode': PropertySchema(
-      id: 7,
+      id: 12,
       name: r'offCode',
       type: IsarType.string,
     ),
+    r'parteCommestibile': PropertySchema(
+      id: 13,
+      name: r'parteCommestibile',
+      type: IsarType.double,
+    ),
+    r'porzione': PropertySchema(
+      id: 14,
+      name: r'porzione',
+      type: IsarType.double,
+    ),
     r'proteinPer100g': PropertySchema(
-      id: 8,
+      id: 15,
       name: r'proteinPer100g',
       type: IsarType.double,
     )
@@ -70,7 +106,7 @@ const FoodItemSchema = CollectionSchema(
   idName: r'id',
   indexes: {},
   links: {},
-  embeddedSchemas: {},
+  embeddedSchemas: {r'NutrizioneCompleta': NutrizioneCompletaSchema},
   getId: _foodItemGetId,
   getLinks: _foodItemGetLinks,
   attach: _foodItemAttach,
@@ -89,7 +125,39 @@ int _foodItemEstimateSize(
       bytesCount += 3 + value.length * 3;
     }
   }
+  {
+    final value = object.categoria;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.creaCode;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.imageUrl;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   bytesCount += 3 + object.nome.length * 3;
+  {
+    final value = object.nomeInglese;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.nutrizione;
+    if (value != null) {
+      bytesCount += 3 +
+          NutrizioneCompletaSchema.estimateSize(
+              value, allOffsets[NutrizioneCompleta]!, allOffsets);
+    }
+  }
   {
     final value = object.offCode;
     if (value != null) {
@@ -107,13 +175,25 @@ void _foodItemSerialize(
 ) {
   writer.writeString(offsets[0], object.brand);
   writer.writeDouble(offsets[1], object.carbsPer100g);
-  writer.writeDouble(offsets[2], object.fatPer100g);
-  writer.writeBool(offsets[3], object.isCustom);
-  writer.writeBool(offsets[4], object.isFavorite);
-  writer.writeDouble(offsets[5], object.kcalPer100g);
-  writer.writeString(offsets[6], object.nome);
-  writer.writeString(offsets[7], object.offCode);
-  writer.writeDouble(offsets[8], object.proteinPer100g);
+  writer.writeString(offsets[2], object.categoria);
+  writer.writeString(offsets[3], object.creaCode);
+  writer.writeDouble(offsets[4], object.fatPer100g);
+  writer.writeString(offsets[5], object.imageUrl);
+  writer.writeBool(offsets[6], object.isCustom);
+  writer.writeBool(offsets[7], object.isFavorite);
+  writer.writeDouble(offsets[8], object.kcalPer100g);
+  writer.writeString(offsets[9], object.nome);
+  writer.writeString(offsets[10], object.nomeInglese);
+  writer.writeObject<NutrizioneCompleta>(
+    offsets[11],
+    allOffsets,
+    NutrizioneCompletaSchema.serialize,
+    object.nutrizione,
+  );
+  writer.writeString(offsets[12], object.offCode);
+  writer.writeDouble(offsets[13], object.parteCommestibile);
+  writer.writeDouble(offsets[14], object.porzione);
+  writer.writeDouble(offsets[15], object.proteinPer100g);
 }
 
 FoodItem _foodItemDeserialize(
@@ -125,14 +205,25 @@ FoodItem _foodItemDeserialize(
   final object = FoodItem();
   object.brand = reader.readStringOrNull(offsets[0]);
   object.carbsPer100g = reader.readDouble(offsets[1]);
-  object.fatPer100g = reader.readDouble(offsets[2]);
+  object.categoria = reader.readStringOrNull(offsets[2]);
+  object.creaCode = reader.readStringOrNull(offsets[3]);
+  object.fatPer100g = reader.readDouble(offsets[4]);
   object.id = id;
-  object.isCustom = reader.readBool(offsets[3]);
-  object.isFavorite = reader.readBool(offsets[4]);
-  object.kcalPer100g = reader.readDouble(offsets[5]);
-  object.nome = reader.readString(offsets[6]);
-  object.offCode = reader.readStringOrNull(offsets[7]);
-  object.proteinPer100g = reader.readDouble(offsets[8]);
+  object.imageUrl = reader.readStringOrNull(offsets[5]);
+  object.isCustom = reader.readBool(offsets[6]);
+  object.isFavorite = reader.readBool(offsets[7]);
+  object.kcalPer100g = reader.readDouble(offsets[8]);
+  object.nome = reader.readString(offsets[9]);
+  object.nomeInglese = reader.readStringOrNull(offsets[10]);
+  object.nutrizione = reader.readObjectOrNull<NutrizioneCompleta>(
+    offsets[11],
+    NutrizioneCompletaSchema.deserialize,
+    allOffsets,
+  );
+  object.offCode = reader.readStringOrNull(offsets[12]);
+  object.parteCommestibile = reader.readDoubleOrNull(offsets[13]);
+  object.porzione = reader.readDoubleOrNull(offsets[14]);
+  object.proteinPer100g = reader.readDouble(offsets[15]);
   return object;
 }
 
@@ -148,18 +239,36 @@ P _foodItemDeserializeProp<P>(
     case 1:
       return (reader.readDouble(offset)) as P;
     case 2:
-      return (reader.readDouble(offset)) as P;
-    case 3:
-      return (reader.readBool(offset)) as P;
-    case 4:
-      return (reader.readBool(offset)) as P;
-    case 5:
-      return (reader.readDouble(offset)) as P;
-    case 6:
-      return (reader.readString(offset)) as P;
-    case 7:
       return (reader.readStringOrNull(offset)) as P;
+    case 3:
+      return (reader.readStringOrNull(offset)) as P;
+    case 4:
+      return (reader.readDouble(offset)) as P;
+    case 5:
+      return (reader.readStringOrNull(offset)) as P;
+    case 6:
+      return (reader.readBool(offset)) as P;
+    case 7:
+      return (reader.readBool(offset)) as P;
     case 8:
+      return (reader.readDouble(offset)) as P;
+    case 9:
+      return (reader.readString(offset)) as P;
+    case 10:
+      return (reader.readStringOrNull(offset)) as P;
+    case 11:
+      return (reader.readObjectOrNull<NutrizioneCompleta>(
+        offset,
+        NutrizioneCompletaSchema.deserialize,
+        allOffsets,
+      )) as P;
+    case 12:
+      return (reader.readStringOrNull(offset)) as P;
+    case 13:
+      return (reader.readDoubleOrNull(offset)) as P;
+    case 14:
+      return (reader.readDoubleOrNull(offset)) as P;
+    case 15:
       return (reader.readDouble(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -464,6 +573,299 @@ extension FoodItemQueryFilter
     });
   }
 
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> categoriaIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'categoria',
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> categoriaIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'categoria',
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> categoriaEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'categoria',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> categoriaGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'categoria',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> categoriaLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'categoria',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> categoriaBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'categoria',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> categoriaStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'categoria',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> categoriaEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'categoria',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> categoriaContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'categoria',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> categoriaMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'categoria',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> categoriaIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'categoria',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition>
+      categoriaIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'categoria',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> creaCodeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'creaCode',
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> creaCodeIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'creaCode',
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> creaCodeEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'creaCode',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> creaCodeGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'creaCode',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> creaCodeLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'creaCode',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> creaCodeBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'creaCode',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> creaCodeStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'creaCode',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> creaCodeEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'creaCode',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> creaCodeContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'creaCode',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> creaCodeMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'creaCode',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> creaCodeIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'creaCode',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> creaCodeIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'creaCode',
+        value: '',
+      ));
+    });
+  }
+
   QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> fatPer100gEqualTo(
     double value, {
     double epsilon = Query.epsilon,
@@ -574,6 +976,152 @@ extension FoodItemQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> imageUrlIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'imageUrl',
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> imageUrlIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'imageUrl',
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> imageUrlEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'imageUrl',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> imageUrlGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'imageUrl',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> imageUrlLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'imageUrl',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> imageUrlBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'imageUrl',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> imageUrlStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'imageUrl',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> imageUrlEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'imageUrl',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> imageUrlContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'imageUrl',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> imageUrlMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'imageUrl',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> imageUrlIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'imageUrl',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> imageUrlIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'imageUrl',
+        value: '',
       ));
     });
   }
@@ -791,6 +1339,172 @@ extension FoodItemQueryFilter
     });
   }
 
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> nomeIngleseIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'nomeInglese',
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition>
+      nomeIngleseIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'nomeInglese',
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> nomeIngleseEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'nomeInglese',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition>
+      nomeIngleseGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'nomeInglese',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> nomeIngleseLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'nomeInglese',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> nomeIngleseBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'nomeInglese',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> nomeIngleseStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'nomeInglese',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> nomeIngleseEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'nomeInglese',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> nomeIngleseContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'nomeInglese',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> nomeIngleseMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'nomeInglese',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> nomeIngleseIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'nomeInglese',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition>
+      nomeIngleseIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'nomeInglese',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> nutrizioneIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'nutrizione',
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition>
+      nutrizioneIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'nutrizione',
+      ));
+    });
+  }
+
   QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> offCodeIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -937,6 +1651,168 @@ extension FoodItemQueryFilter
     });
   }
 
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition>
+      parteCommestibileIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'parteCommestibile',
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition>
+      parteCommestibileIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'parteCommestibile',
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition>
+      parteCommestibileEqualTo(
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'parteCommestibile',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition>
+      parteCommestibileGreaterThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'parteCommestibile',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition>
+      parteCommestibileLessThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'parteCommestibile',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition>
+      parteCommestibileBetween(
+    double? lower,
+    double? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'parteCommestibile',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> porzioneIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'porzione',
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> porzioneIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'porzione',
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> porzioneEqualTo(
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'porzione',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> porzioneGreaterThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'porzione',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> porzioneLessThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'porzione',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> porzioneBetween(
+    double? lower,
+    double? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'porzione',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
   QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> proteinPer100gEqualTo(
     double value, {
     double epsilon = Query.epsilon,
@@ -1003,7 +1879,14 @@ extension FoodItemQueryFilter
 }
 
 extension FoodItemQueryObject
-    on QueryBuilder<FoodItem, FoodItem, QFilterCondition> {}
+    on QueryBuilder<FoodItem, FoodItem, QFilterCondition> {
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> nutrizione(
+      FilterQuery<NutrizioneCompleta> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.object(q, r'nutrizione');
+    });
+  }
+}
 
 extension FoodItemQueryLinks
     on QueryBuilder<FoodItem, FoodItem, QFilterCondition> {}
@@ -1033,6 +1916,30 @@ extension FoodItemQuerySortBy on QueryBuilder<FoodItem, FoodItem, QSortBy> {
     });
   }
 
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByCategoria() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'categoria', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByCategoriaDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'categoria', Sort.desc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByCreaCode() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'creaCode', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByCreaCodeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'creaCode', Sort.desc);
+    });
+  }
+
   QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByFatPer100g() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'fatPer100g', Sort.asc);
@@ -1042,6 +1949,18 @@ extension FoodItemQuerySortBy on QueryBuilder<FoodItem, FoodItem, QSortBy> {
   QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByFatPer100gDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'fatPer100g', Sort.desc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByImageUrl() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'imageUrl', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByImageUrlDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'imageUrl', Sort.desc);
     });
   }
 
@@ -1093,6 +2012,18 @@ extension FoodItemQuerySortBy on QueryBuilder<FoodItem, FoodItem, QSortBy> {
     });
   }
 
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByNomeInglese() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'nomeInglese', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByNomeIngleseDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'nomeInglese', Sort.desc);
+    });
+  }
+
   QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByOffCode() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'offCode', Sort.asc);
@@ -1102,6 +2033,30 @@ extension FoodItemQuerySortBy on QueryBuilder<FoodItem, FoodItem, QSortBy> {
   QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByOffCodeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'offCode', Sort.desc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByParteCommestibile() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'parteCommestibile', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByParteCommestibileDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'parteCommestibile', Sort.desc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByPorzione() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'porzione', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByPorzioneDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'porzione', Sort.desc);
     });
   }
 
@@ -1144,6 +2099,30 @@ extension FoodItemQuerySortThenBy
     });
   }
 
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByCategoria() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'categoria', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByCategoriaDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'categoria', Sort.desc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByCreaCode() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'creaCode', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByCreaCodeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'creaCode', Sort.desc);
+    });
+  }
+
   QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByFatPer100g() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'fatPer100g', Sort.asc);
@@ -1165,6 +2144,18 @@ extension FoodItemQuerySortThenBy
   QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.desc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByImageUrl() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'imageUrl', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByImageUrlDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'imageUrl', Sort.desc);
     });
   }
 
@@ -1216,6 +2207,18 @@ extension FoodItemQuerySortThenBy
     });
   }
 
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByNomeInglese() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'nomeInglese', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByNomeIngleseDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'nomeInglese', Sort.desc);
+    });
+  }
+
   QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByOffCode() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'offCode', Sort.asc);
@@ -1225,6 +2228,30 @@ extension FoodItemQuerySortThenBy
   QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByOffCodeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'offCode', Sort.desc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByParteCommestibile() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'parteCommestibile', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByParteCommestibileDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'parteCommestibile', Sort.desc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByPorzione() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'porzione', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByPorzioneDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'porzione', Sort.desc);
     });
   }
 
@@ -1256,9 +2283,30 @@ extension FoodItemQueryWhereDistinct
     });
   }
 
+  QueryBuilder<FoodItem, FoodItem, QDistinct> distinctByCategoria(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'categoria', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QDistinct> distinctByCreaCode(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'creaCode', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<FoodItem, FoodItem, QDistinct> distinctByFatPer100g() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'fatPer100g');
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QDistinct> distinctByImageUrl(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'imageUrl', caseSensitive: caseSensitive);
     });
   }
 
@@ -1287,10 +2335,29 @@ extension FoodItemQueryWhereDistinct
     });
   }
 
+  QueryBuilder<FoodItem, FoodItem, QDistinct> distinctByNomeInglese(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'nomeInglese', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<FoodItem, FoodItem, QDistinct> distinctByOffCode(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'offCode', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QDistinct> distinctByParteCommestibile() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'parteCommestibile');
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QDistinct> distinctByPorzione() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'porzione');
     });
   }
 
@@ -1321,9 +2388,27 @@ extension FoodItemQueryProperty
     });
   }
 
+  QueryBuilder<FoodItem, String?, QQueryOperations> categoriaProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'categoria');
+    });
+  }
+
+  QueryBuilder<FoodItem, String?, QQueryOperations> creaCodeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'creaCode');
+    });
+  }
+
   QueryBuilder<FoodItem, double, QQueryOperations> fatPer100gProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'fatPer100g');
+    });
+  }
+
+  QueryBuilder<FoodItem, String?, QQueryOperations> imageUrlProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'imageUrl');
     });
   }
 
@@ -1351,9 +2436,35 @@ extension FoodItemQueryProperty
     });
   }
 
+  QueryBuilder<FoodItem, String?, QQueryOperations> nomeIngleseProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'nomeInglese');
+    });
+  }
+
+  QueryBuilder<FoodItem, NutrizioneCompleta?, QQueryOperations>
+      nutrizioneProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'nutrizione');
+    });
+  }
+
   QueryBuilder<FoodItem, String?, QQueryOperations> offCodeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'offCode');
+    });
+  }
+
+  QueryBuilder<FoodItem, double?, QQueryOperations>
+      parteCommestibileProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'parteCommestibile');
+    });
+  }
+
+  QueryBuilder<FoodItem, double?, QQueryOperations> porzioneProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'porzione');
     });
   }
 

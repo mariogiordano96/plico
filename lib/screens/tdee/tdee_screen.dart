@@ -47,7 +47,7 @@ const _metodi = [
       'Formula classica revisionata (Roza & Shizgal, 1984). Tende a sovrastimare leggermente.'),
 ];
 
-// ── Calcolo ─────────────────────────────────────────────────────
+// ── Calcolo TDEE ────────────────────────────────────────────────
 
 class TdeeResult {
   final int bmr;
@@ -72,7 +72,6 @@ TdeeResult? calcolaTdee({
   final double bmr;
   final String formula;
 
-  // Risolvi "auto"
   final int metodoEffettivo;
   if (metodo == 0) {
     metodoEffettivo =
@@ -82,16 +81,16 @@ TdeeResult? calcolaTdee({
   }
 
   switch (metodoEffettivo) {
-    case 1: // Katch-McArdle
+    case 1:
       if (massaMagraKg == null || massaMagraKg <= 0) return null;
       bmr = 370 + 21.6 * massaMagraKg;
       formula = 'Katch-McArdle';
-    case 2: // Mifflin-St Jeor
+    case 2:
       bmr = sesso == Sesso.maschio
           ? 10 * pesoKg + 6.25 * altezzaCm - 5 * eta + 5
           : 10 * pesoKg + 6.25 * altezzaCm - 5 * eta - 161;
       formula = 'Mifflin-St Jeor';
-    case 3: // Harris-Benedict (Roza & Shizgal 1984)
+    case 3:
       bmr = sesso == Sesso.maschio
           ? 88.362 + 13.397 * pesoKg + 4.799 * altezzaCm - 5.677 * eta
           : 447.593 + 9.247 * pesoKg + 3.098 * altezzaCm - 4.330 * eta;
@@ -108,6 +107,62 @@ TdeeResult? calcolaTdee({
   );
 }
 
+// ── Calcolo macro ───────────────────────────────────────────────
+
+const _proteinMatrix = [
+  [1.4, 1.8, 2.3, 2.6, 3.1],
+  [0.8, 1.2, 1.4, 1.8, 2.0],
+  [0.8, 1.2, 1.6, 1.8, 2.0],
+];
+
+class _MacroResult {
+  final int proteinG;
+  final int fatG;
+  final int carbsG;
+  final double proteinPct;
+  final double fatPct;
+  final double carbsPct;
+  const _MacroResult({
+    required this.proteinG,
+    required this.fatG,
+    required this.carbsG,
+    required this.proteinPct,
+    required this.fatPct,
+    required this.carbsPct,
+  });
+}
+
+_MacroResult _calcolaMacro(int kcal, double pesoKg, int goal, int livello) {
+  final proteinGPerKg = _proteinMatrix[goal.clamp(0, 2)][livello.clamp(0, 4)];
+  final proteinG = (pesoKg * proteinGPerKg).round();
+  final proteinKcal = proteinG * 4;
+
+  final fatGFromPct = (kcal * 0.25 / 9).round();
+  final fatGFromKg = (pesoKg * 0.8).round();
+  final fatG = fatGFromPct > fatGFromKg ? fatGFromPct : fatGFromKg;
+  final fatKcal = fatG * 9;
+
+  final remaining = kcal - proteinKcal - fatKcal;
+  final carbsG = remaining > 0 ? (remaining / 4).round() : 0;
+  final carbsKcal = carbsG * 4;
+
+  final total = (proteinKcal + fatKcal + carbsKcal).toDouble();
+  return _MacroResult(
+    proteinG: proteinG,
+    fatG: fatG,
+    carbsG: carbsG,
+    proteinPct: total > 0 ? proteinKcal / total * 100 : 0,
+    fatPct: total > 0 ? fatKcal / total * 100 : 0,
+    carbsPct: total > 0 ? carbsKcal / total * 100 : 0,
+  );
+}
+
+int _goalKcal(int tdee, int g) => switch (g) {
+      0 => (tdee * 0.80).round(),
+      2 => (tdee * 1.15).round(),
+      _ => tdee,
+    };
+
 // ── Screen ──────────────────────────────────────────────────────
 
 class TdeeScreen extends StatefulWidget {
@@ -121,10 +176,15 @@ class _TdeeScreenState extends State<TdeeScreen> {
   UserProfile? _profile;
   BodySnapshot? _snapshot;
   PlicometrySession? _session;
+
+  // Stato locale del wizard (non salvato finché non si preme "Attiva Piano")
   int _livello = 2;
   int _metodo = 0;
-  int _goal = 1; // 0=deficit 1=mantenimento 2=surplus
+  int _goal = 1;
+
+  DateTime? _goalSetDate;
   bool _loading = true;
+  bool _saving = false;
 
   @override
   void initState() {
@@ -135,11 +195,11 @@ class _TdeeScreenState extends State<TdeeScreen> {
   Future<void> _load() async {
     final profile = await DatabaseService.instance.getUserProfile();
     final snapshot = await DatabaseService.instance.getLatestBodySnapshot();
-    final session =
-        await DatabaseService.instance.getLatestPlicometrySession();
+    final session = await DatabaseService.instance.getLatestPlicometrySession();
     final livello = await DatabaseService.instance.getLivelloAttivita();
     final metodo = await DatabaseService.instance.getMetodoTdee();
     final goal = await DatabaseService.instance.getObiettivo();
+    final goalSetDate = await DatabaseService.instance.getGoalSetDate();
     if (!mounted) return;
     setState(() {
       _profile = profile;
@@ -148,27 +208,13 @@ class _TdeeScreenState extends State<TdeeScreen> {
       _livello = livello;
       _metodo = metodo;
       _goal = goal;
+      _goalSetDate = goalSetDate;
       _loading = false;
     });
   }
 
-  Future<void> _setLivello(int v) async {
-    setState(() => _livello = v);
-    await DatabaseService.instance.saveLivelloAttivita(v);
-  }
-
-  Future<void> _setMetodo(int v) async {
-    setState(() => _metodo = v);
-    await DatabaseService.instance.saveMetodoTdee(v);
-  }
-
-  Future<void> _setGoal(int v) async {
-    setState(() => _goal = v);
-    await DatabaseService.instance.saveObiettivo(v);
-  }
-
   TdeeResult? get _result {
-    if (_loading || _profile == null || _snapshot == null) return null;
+    if (_profile == null || _snapshot == null) return null;
     return calcolaTdee(
       sesso: _profile!.sesso,
       eta: _profile!.etaCorrente,
@@ -183,20 +229,79 @@ class _TdeeScreenState extends State<TdeeScreen> {
   bool get _hasLbm =>
       _session != null && (_session!.risultati.massaMagraKg) > 0;
 
-  int _goalKcal(int tdee, int g) => switch (g) {
-        0 => (tdee * 0.80).round(),
-        2 => (tdee * 1.15).round(),
-        _ => tdee,
-      };
+  bool get _pianAttivo => _goalSetDate != null;
+
+  int get _giorniDallaAttivazione {
+    if (_goalSetDate == null) return 0;
+    return DateTime.now().difference(_goalSetDate!).inDays;
+  }
+
+  Future<void> _attivaePiano() async {
+    if (_saving) return;
+    setState(() => _saving = true);
+    await DatabaseService.instance.activateGoal(
+      livello: _livello,
+      metodo: _metodo,
+      obiettivo: _goal,
+    );
+    await _load();
+    setState(() => _saving = false);
+  }
+
+  Future<void> _ricalcola() async {
+    final giorni = _giorniDallaAttivazione;
+    if (giorni < 30) {
+      final confirm = await showDialog<bool>(
+        context: context,
+        builder: (ctx) {
+          final p = ctx.palette;
+          return AlertDialog(
+            backgroundColor: p.surface,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Text('Ricalcola obiettivo',
+                style: TextStyle(color: p.textPrimary, fontSize: 16, fontWeight: FontWeight.w700)),
+            content: Text(
+              'Hai attivato il piano $giorni ${giorni == 1 ? 'giorno' : 'giorni'} fa.\n\n'
+              'Puoi ricalcolarlo in qualsiasi momento, ma ti consigliamo di farlo dopo almeno 30 giorni per valutare i progressi.',
+              style: TextStyle(color: p.textSecondary, fontSize: 14, height: 1.5),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text('Annulla',
+                    style: TextStyle(color: p.textMuted)),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text('Ricalcola',
+                    style: TextStyle(color: Color(0xFFFF6B35), fontWeight: FontWeight.w700)),
+              ),
+            ],
+          );
+        },
+      );
+      if (confirm != true) return;
+    }
+    await DatabaseService.instance.resetGoal();
+    await _load();
+  }
+
+  String _formatDate(DateTime d) {
+    const months = [
+      'gen', 'feb', 'mar', 'apr', 'mag', 'giu',
+      'lug', 'ago', 'set', 'ott', 'nov', 'dic'
+    ];
+    return '${d.day} ${months[d.month - 1]} ${d.year}';
+  }
 
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    final result = _result;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('TDEE',
+        title: Text('IL MIO PIANO',
             style: TextStyle(
                 color: p.accent,
                 fontSize: 17,
@@ -210,156 +315,588 @@ class _TdeeScreenState extends State<TdeeScreen> {
       backgroundColor: p.background,
       body: _loading
           ? Center(child: CircularProgressIndicator(color: p.accent))
-          : SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _MainCard(result: result, livello: _livello, p: p),
-                  const SizedBox(height: 20),
+          : _pianAttivo
+              ? _buildPianoAttivo(p)
+              : _buildWizard(p),
+    );
+  }
 
-                  _SectionLabel('METODO DI CALCOLO', p),
-                  const SizedBox(height: 12),
-                  _MetodoSelector(
-                    selected: _metodo,
-                    hasLbm: _hasLbm,
-                    onSelect: _setMetodo,
-                    p: p,
+  // ── Stato A: wizard ────────────────────────────────────────────
+
+  Widget _buildWizard(ColorPalette p) {
+    final result = _result;
+    final kcal = result != null ? _goalKcal(result.tdee, _goal) : null;
+    final macro =
+        (kcal != null && _snapshot != null)
+            ? _calcolaMacro(kcal, _snapshot!.pesoKg, _goal, _livello)
+            : null;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Intro
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: p.accent.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: p.accent.withValues(alpha: 0.2)),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline_rounded, color: p.accent, size: 20),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Configura il tuo piano nutrizionale. Una volta attivato, i valori verranno usati nel diario alimentare.',
+                    style: TextStyle(color: p.textSecondary, fontSize: 13, height: 1.4),
                   ),
-                  const SizedBox(height: 20),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
 
-                  _SectionLabel('LIVELLO DI ATTIVITÀ', p),
-                  const SizedBox(height: 12),
-                  _AttivitaSelector(
-                      selected: _livello,
-                      onSelect: _setLivello,
-                      p: p),
-                  const SizedBox(height: 20),
+          _SectionLabel('OBIETTIVO', p),
+          const SizedBox(height: 12),
+          _ObiettivoSelector(
+            selected: _goal,
+            tdee: result?.tdee,
+            onSelect: (v) => setState(() => _goal = v),
+            p: p,
+          ),
+          const SizedBox(height: 20),
 
-                  if (result != null) ...[
-                    _SectionLabel('OBIETTIVI CALORICI', p),
-                    const SizedBox(height: 12),
-                    _ObiettiviCard(
-                      tdee: result.tdee,
-                      selectedGoal: _goal,
-                      onSelectGoal: _setGoal,
-                      p: p,
+          _SectionLabel('LIVELLO DI ATTIVITÀ', p),
+          const SizedBox(height: 12),
+          _AttivitaSelector(
+            selected: _livello,
+            onSelect: (v) => setState(() => _livello = v),
+            p: p,
+          ),
+          const SizedBox(height: 20),
+
+          _SectionLabel('METODO DI CALCOLO', p),
+          const SizedBox(height: 12),
+          _MetodoSelector(
+            selected: _metodo,
+            hasLbm: _hasLbm,
+            onSelect: (v) => setState(() => _metodo = v),
+            p: p,
+          ),
+          const SizedBox(height: 20),
+
+          // Anteprima risultato
+          if (result != null && macro != null) ...[
+            _SectionLabel('ANTEPRIMA PIANO', p),
+            const SizedBox(height: 12),
+            _PreviewCard(
+              result: result,
+              kcal: kcal!,
+              macro: macro,
+              goal: _goal,
+              livello: _livello,
+              p: p,
+            ),
+            const SizedBox(height: 24),
+          ] else ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: p.surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: p.cardBorder),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.warning_amber_rounded, color: p.textMuted, size: 20),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Registra una pesata per calcolare il piano.',
+                      style: TextStyle(color: p.textMuted, fontSize: 13),
                     ),
-                    const SizedBox(height: 20),
-                    _SectionLabel('RIPARTIZIONE MACRO', p),
-                    const SizedBox(height: 12),
-                    _MacroCard(
-                      kcal: _goalKcal(result.tdee, _goal),
-                      pesoKg: _snapshot!.pesoKg,
-                      goal: _goal,
-                      livello: _livello,
-                      p: p,
-                    ),
-                    const SizedBox(height: 20),
-                  ],
+                  ),
                 ],
               ),
             ),
+            const SizedBox(height: 24),
+          ],
+
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: (result == null || _saving) ? null : _attivaePiano,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: p.accent,
+                disabledBackgroundColor: p.cardBorder,
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
+              ),
+              child: _saving
+                  ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                          color: Colors.black, strokeWidth: 2))
+                  : const Text('ATTIVA PIANO',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                          letterSpacing: 1.5)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Stato B: piano attivo ──────────────────────────────────────
+
+  Widget _buildPianoAttivo(ColorPalette p) {
+    final result = _result;
+    final kcal = result != null ? _goalKcal(result.tdee, _goal) : null;
+    final macro =
+        (kcal != null && _snapshot != null)
+            ? _calcolaMacro(kcal, _snapshot!.pesoKg, _goal, _livello)
+            : null;
+    final giorni = _giorniDallaAttivazione;
+    final scaduto = giorni >= 30;
+
+    final obiettivoLabel = ['Deficit −20%', 'Mantenimento', 'Surplus +15%'][_goal.clamp(0, 2)];
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Banner 30 giorni
+          if (scaduto) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: p.accent.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: p.accent.withValues(alpha: 0.3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.calendar_today_rounded,
+                          color: p.accent, size: 18),
+                      const SizedBox(width: 8),
+                      Text('Sono passati $giorni giorni',
+                          style: TextStyle(
+                              color: p.accent,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700)),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Potrebbe essere il momento di aggiornare il tuo piano in base ai progressi.',
+                    style: TextStyle(
+                        color: p.textSecondary, fontSize: 13, height: 1.4),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _ricalcola,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: p.accent,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                      ),
+                      child: const Text('AGGIORNA PIANO',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700, letterSpacing: 1.2)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+
+          // Card piano attivo
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: p.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: p.cardBorder),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  p.surface,
+                  const Color(0xFFFF6B35).withValues(alpha: 0.05)
+                ],
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF00C48C).withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF00C48C),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          const Text('PIANO ATTIVO',
+                              style: TextStyle(
+                                  color: Color(0xFF00C48C),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 1)),
+                        ],
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      'dal ${_formatDate(_goalSetDate!)}',
+                      style: TextStyle(color: p.textMuted, fontSize: 12),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                if (result == null || kcal == null)
+                  Text('Dati insufficienti',
+                      style: TextStyle(color: p.textMuted, fontSize: 14))
+                else ...[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Icon(Icons.local_fire_department_rounded,
+                          color: const Color(0xFFFF6B35), size: 24),
+                      const SizedBox(width: 8),
+                      Text(
+                        '$kcal',
+                        style: TextStyle(
+                            color: p.textPrimary,
+                            fontSize: 38,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -1),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 5, left: 4),
+                        child: Text('kcal/giorno',
+                            style:
+                                TextStyle(color: p.textMuted, fontSize: 13)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    '$obiettivoLabel  ·  ${_attivitaLabels[_livello.clamp(0, 4)]}',
+                    style: TextStyle(
+                        color: p.textSecondary,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500),
+                  ),
+                ],
+
+                const SizedBox(height: 16),
+                Divider(height: 1, color: p.cardBorder),
+                const SizedBox(height: 16),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _InfoPill(label: 'BMR', value: '${result?.bmr ?? '--'} kcal', p: p),
+                    Container(width: 1, height: 32, color: p.cardBorder),
+                    _InfoPill(label: 'Formula', value: result?.nomeFormula ?? '--', p: p),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Macro breakdown
+          if (macro != null) ...[
+            _SectionLabel('RIPARTIZIONE MACRO', p),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: p.surface,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: p.cardBorder),
+              ),
+              child: Column(
+                children: [
+                  _MacroRow(
+                    label: 'Proteine',
+                    grams: macro.proteinG,
+                    pct: macro.proteinPct,
+                    color: const Color(0xFF3B9FF2),
+                    note:
+                        '${_proteinMatrix[_goal.clamp(0, 2)][_livello.clamp(0, 4)]}g/kg · ISSN/ACSM',
+                    p: p,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    child: Divider(height: 1, color: p.cardBorder),
+                  ),
+                  _MacroRow(
+                    label: 'Grassi',
+                    grams: macro.fatG,
+                    pct: macro.fatPct,
+                    color: const Color(0xFFFFB800),
+                    note: 'min(25% kcal, 0.8g/kg)',
+                    p: p,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    child: Divider(height: 1, color: p.cardBorder),
+                  ),
+                  _MacroRow(
+                    label: 'Carboidrati',
+                    grams: macro.carbsG,
+                    pct: macro.carbsPct,
+                    color: const Color(0xFF4CAF8E),
+                    note: 'calorie rimanenti',
+                    p: p,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 28),
+          ],
+
+          // Ricalcola (solo se < 30 giorni, secondario)
+          if (!scaduto)
+            Center(
+              child: TextButton(
+                onPressed: _ricalcola,
+                child: Text(
+                  'Ricalcola obiettivo',
+                  style: TextStyle(
+                      color: p.textMuted,
+                      fontSize: 13,
+                      decoration: TextDecoration.underline),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
 
-// ── Main card ──────────────────────────────────────────────────
+// ── Obiettivo selector (wizard) ────────────────────────────────
 
-class _MainCard extends StatelessWidget {
-  final TdeeResult? result;
-  final int livello;
+class _ObiettivoSelector extends StatelessWidget {
+  final int selected;
+  final int? tdee;
+  final ValueChanged<int> onSelect;
   final ColorPalette p;
-  const _MainCard(
-      {required this.result, required this.livello, required this.p});
+  const _ObiettivoSelector({
+    required this.selected,
+    required this.tdee,
+    required this.onSelect,
+    required this.p,
+  });
 
-  String _fmt(int v) => v.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
+  static const _items = [
+    (label: 'Deficit', sub: '−20%', color: Color(0xFF3B9FF2), id: 0),
+    (label: 'Mantenimento', sub: 'TDEE', color: Color(0xFF00C48C), id: 1),
+    (label: 'Surplus', sub: '+15%', color: Color(0xFFFF8C42), id: 2),
+  ];
+
+  int _kcal(int tdee, int id) => switch (id) {
+        0 => (tdee * 0.80).round(),
+        2 => (tdee * 1.15).round(),
+        _ => tdee,
+      };
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: p.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: p.cardBorder),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [p.surface, const Color(0xFFFF6B35).withValues(alpha: 0.05)],
-        ),
       ),
-      child: result == null
-          ? Column(
-              children: [
-                Icon(Icons.local_fire_department_rounded,
-                    color: p.textMuted, size: 40),
-                const SizedBox(height: 12),
-                Text('Dati insufficienti',
-                    style: TextStyle(
-                        color: p.textSecondary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600)),
-                const SizedBox(height: 4),
-                Text(
-                    'Registra una pesata per calcolare il TDEE.\n'
-                    'Per Katch-McArdle è necessaria anche una plicometria.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: p.textMuted, fontSize: 13)),
-              ],
-            )
-          : Column(
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.center,
+      child: Row(
+        children: _items.map((item) {
+          final isSelected = selected == item.id;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => onSelect(item.id),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                margin: EdgeInsets.only(
+                    left: item.id == 0 ? 0 : 6,
+                    right: item.id == 2 ? 0 : 6),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? item.color.withValues(alpha: 0.12)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                  border: isSelected
+                      ? Border.all(color: item.color.withValues(alpha: 0.4))
+                      : null,
+                ),
+                child: Column(
                   children: [
-                    const Icon(Icons.local_fire_department_rounded,
-                        color: Color(0xFFFF6B35), size: 28),
-                    const SizedBox(width: 8),
-                    Text(
-                      _fmt(result!.tdee),
-                      style: TextStyle(
-                          color: p.textPrimary,
-                          fontSize: 42,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -1),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 6, left: 4),
-                      child: Text('kcal/giorno',
-                          style:
-                              TextStyle(color: p.textMuted, fontSize: 14)),
-                    ),
+                    Text(item.label,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: isSelected ? item.color : p.textMuted,
+                            fontSize: 12,
+                            fontWeight: isSelected
+                                ? FontWeight.w700
+                                : FontWeight.w500)),
+                    const SizedBox(height: 4),
+                    if (tdee != null)
+                      Text('${_kcal(tdee!, item.id)} kcal',
+                          style: TextStyle(
+                              color: isSelected ? item.color : p.textSecondary,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800))
+                    else
+                      Text(item.sub,
+                          style: TextStyle(
+                              color: isSelected ? item.color : p.textMuted,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600)),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Text(_attivitaLabels[livello.clamp(0, 4)],
-                    style: TextStyle(
-                        color: p.textSecondary,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500)),
-                const SizedBox(height: 16),
-                Container(height: 1, color: p.cardBorder),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _InfoPill(
-                        label: 'BMR',
-                        value: '${_fmt(result!.bmr)} kcal',
-                        p: p),
-                    Container(width: 1, height: 32, color: p.cardBorder),
-                    _InfoPill(
-                        label: 'Formula',
-                        value: result!.nomeFormula,
-                        p: p),
-                  ],
-                ),
-              ],
+              ),
             ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
+
+// ── Preview card (wizard) ──────────────────────────────────────
+
+class _PreviewCard extends StatelessWidget {
+  final TdeeResult result;
+  final int kcal;
+  final _MacroResult macro;
+  final int goal;
+  final int livello;
+  final ColorPalette p;
+  const _PreviewCard({
+    required this.result,
+    required this.kcal,
+    required this.macro,
+    required this.goal,
+    required this.livello,
+    required this.p,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: p.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: p.cardBorder),
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Icon(Icons.local_fire_department_rounded,
+                  color: const Color(0xFFFF6B35), size: 22),
+              const SizedBox(width: 6),
+              Text('$kcal',
+                  style: TextStyle(
+                      color: p.textPrimary,
+                      fontSize: 32,
+                      fontWeight: FontWeight.w800)),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4, left: 4),
+                child: Text('kcal/giorno',
+                    style: TextStyle(color: p.textMuted, fontSize: 13)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _MacroChip(
+                  label: 'P',
+                  grams: macro.proteinG,
+                  color: const Color(0xFF3B9FF2)),
+              _MacroChip(
+                  label: 'G',
+                  grams: macro.fatG,
+                  color: const Color(0xFFFFB800)),
+              _MacroChip(
+                  label: 'C',
+                  grams: macro.carbsG,
+                  color: const Color(0xFF4CAF8E)),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'Formula: ${result.nomeFormula}  ·  TDEE: ${result.tdee} kcal',
+            style: TextStyle(color: p.textMuted, fontSize: 11),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MacroChip extends StatelessWidget {
+  final String label;
+  final int grams;
+  final Color color;
+  const _MacroChip(
+      {required this.label, required this.grams, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text('${grams}g',
+            style: TextStyle(
+                color: color, fontSize: 18, fontWeight: FontWeight.w800)),
+        Text(label,
+            style: TextStyle(color: color.withValues(alpha: 0.7), fontSize: 11)),
+      ],
     );
   }
 }
@@ -397,16 +934,15 @@ class _MetodoSelector extends StatelessWidget {
             child: Opacity(
               opacity: disabled ? 0.4 : 1.0,
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? const Color(0xFFFF6B35).withValues(alpha: 0.08)
                       : Colors.transparent,
                   border: isLast
                       ? null
-                      : Border(
-                          bottom: BorderSide(color: p.cardBorder)),
+                      : Border(bottom: BorderSide(color: p.cardBorder)),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -453,16 +989,15 @@ class _MetodoSelector extends StatelessWidget {
                                   ),
                                   child: Text('richiede plicometria',
                                       style: TextStyle(
-                                          color: p.textMuted,
-                                          fontSize: 10)),
+                                          color: p.textMuted, fontSize: 10)),
                                 ),
                               ],
                             ],
                           ),
                           const SizedBox(height: 2),
                           Text(m.descrizione,
-                              style: TextStyle(
-                                  color: p.textMuted, fontSize: 12)),
+                              style:
+                                  TextStyle(color: p.textMuted, fontSize: 12)),
                         ],
                       ),
                     ),
@@ -484,9 +1019,7 @@ class _AttivitaSelector extends StatelessWidget {
   final ValueChanged<int> onSelect;
   final ColorPalette p;
   const _AttivitaSelector(
-      {required this.selected,
-      required this.onSelect,
-      required this.p});
+      {required this.selected, required this.onSelect, required this.p});
 
   @override
   Widget build(BuildContext context) {
@@ -511,8 +1044,7 @@ class _AttivitaSelector extends StatelessWidget {
                     : Colors.transparent,
                 border: isLast
                     ? null
-                    : Border(
-                        bottom: BorderSide(color: p.cardBorder)),
+                    : Border(bottom: BorderSide(color: p.cardBorder)),
               ),
               child: Row(
                 children: [
@@ -543,8 +1075,8 @@ class _AttivitaSelector extends StatelessWidget {
                                     ? FontWeight.w700
                                     : FontWeight.w500)),
                         Text(_attivitaDescrizioni[i],
-                            style: TextStyle(
-                                color: p.textMuted, fontSize: 12)),
+                            style:
+                                TextStyle(color: p.textMuted, fontSize: 12)),
                       ],
                     ),
                   ),
@@ -562,122 +1094,6 @@ class _AttivitaSelector extends StatelessWidget {
             ),
           );
         }),
-      ),
-    );
-  }
-}
-
-// ── Obiettivi calorici ─────────────────────────────────────────
-
-class _ObiettiviCard extends StatelessWidget {
-  final int tdee;
-  final int selectedGoal;
-  final ValueChanged<int> onSelectGoal;
-  final ColorPalette p;
-  const _ObiettiviCard({
-    required this.tdee,
-    required this.selectedGoal,
-    required this.onSelectGoal,
-    required this.p,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: p.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: p.cardBorder),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: () => onSelectGoal(0),
-              child: _ObiettivoCol(
-                label: 'Deficit',
-                sub: '−20%',
-                kcal: (tdee * 0.80).round(),
-                color: const Color(0xFF3B9FF2),
-                isSelected: selectedGoal == 0,
-                p: p,
-              ),
-            ),
-          ),
-          Container(width: 1, height: 52, color: p.cardBorder),
-          Expanded(
-            child: GestureDetector(
-              onTap: () => onSelectGoal(1),
-              child: _ObiettivoCol(
-                label: 'Mantenimento',
-                sub: 'TDEE',
-                kcal: tdee,
-                color: p.accent,
-                isSelected: selectedGoal == 1,
-                p: p,
-              ),
-            ),
-          ),
-          Container(width: 1, height: 52, color: p.cardBorder),
-          Expanded(
-            child: GestureDetector(
-              onTap: () => onSelectGoal(2),
-              child: _ObiettivoCol(
-                label: 'Surplus',
-                sub: '+15%',
-                kcal: (tdee * 1.15).round(),
-                color: const Color(0xFFFF8C42),
-                isSelected: selectedGoal == 2,
-                p: p,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ObiettivoCol extends StatelessWidget {
-  final String label;
-  final String sub;
-  final int kcal;
-  final Color color;
-  final bool isSelected;
-  final ColorPalette p;
-  const _ObiettivoCol({
-    required this.label,
-    required this.sub,
-    required this.kcal,
-    required this.color,
-    required this.isSelected,
-    required this.p,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-      decoration: isSelected
-          ? BoxDecoration(
-              color: color.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(8),
-            )
-          : null,
-      child: Column(
-        children: [
-          Text(label,
-              style: TextStyle(
-                  color: isSelected ? color : p.textMuted,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600)),
-          const SizedBox(height: 2),
-          Text('$kcal',
-              style: TextStyle(
-                  color: color, fontSize: 18, fontWeight: FontWeight.w800)),
-          Text(sub, style: TextStyle(color: p.textMuted, fontSize: 11)),
-        ],
       ),
     );
   }
@@ -720,125 +1136,6 @@ class _InfoPill extends StatelessWidget {
         const SizedBox(height: 2),
         Text(label, style: TextStyle(color: p.textMuted, fontSize: 11)),
       ],
-    );
-  }
-}
-
-// ── Macro ──────────────────────────────────────────────────────
-
-// Fonte: ISSN 2017 + ACSM/AND/DC — g/kg per [goal][livello]
-// goal: 0=deficit 1=mantenimento 2=surplus | livello: 0=sed. … 4=atleta
-const _proteinMatrix = [
-  [1.4, 1.8, 2.3, 2.6, 3.1], // deficit
-  [0.8, 1.2, 1.4, 1.8, 2.0], // mantenimento
-  [0.8, 1.2, 1.6, 1.8, 2.0], // surplus
-];
-
-class _MacroResult {
-  final int proteinG;
-  final int fatG;
-  final int carbsG;
-  final double proteinPct;
-  final double fatPct;
-  final double carbsPct;
-  const _MacroResult({
-    required this.proteinG,
-    required this.fatG,
-    required this.carbsG,
-    required this.proteinPct,
-    required this.fatPct,
-    required this.carbsPct,
-  });
-}
-
-_MacroResult _calcolaMacro(int kcal, double pesoKg, int goal, int livello) {
-  final proteinGPerKg = _proteinMatrix[goal.clamp(0, 2)][livello.clamp(0, 4)];
-  final proteinG = (pesoKg * proteinGPerKg).round();
-  final proteinKcal = proteinG * 4;
-
-  // Grassi: floor massimo tra 25% delle kcal target e 0.8g/kg
-  final fatGFromPct = (kcal * 0.25 / 9).round();
-  final fatGFromKg = (pesoKg * 0.8).round();
-  final fatG = fatGFromPct > fatGFromKg ? fatGFromPct : fatGFromKg;
-  final fatKcal = fatG * 9;
-
-  // Carboidrati: calorie rimanenti
-  final remaining = kcal - proteinKcal - fatKcal;
-  final carbsG = remaining > 0 ? (remaining / 4).round() : 0;
-  final carbsKcal = carbsG * 4;
-
-  final total = (proteinKcal + fatKcal + carbsKcal).toDouble();
-  return _MacroResult(
-    proteinG: proteinG,
-    fatG: fatG,
-    carbsG: carbsG,
-    proteinPct: total > 0 ? proteinKcal / total * 100 : 0,
-    fatPct: total > 0 ? fatKcal / total * 100 : 0,
-    carbsPct: total > 0 ? carbsKcal / total * 100 : 0,
-  );
-}
-
-class _MacroCard extends StatelessWidget {
-  final int kcal;
-  final double pesoKg;
-  final int goal;
-  final int livello;
-  final ColorPalette p;
-  const _MacroCard({
-    required this.kcal,
-    required this.pesoKg,
-    required this.goal,
-    required this.livello,
-    required this.p,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final gPerKg = _proteinMatrix[goal.clamp(0, 2)][livello.clamp(0, 4)];
-    final m = _calcolaMacro(kcal, pesoKg, goal, livello);
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: p.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: p.cardBorder),
-      ),
-      child: Column(
-        children: [
-          _MacroRow(
-            label: 'Proteine',
-            grams: m.proteinG,
-            pct: m.proteinPct,
-            color: const Color(0xFF3B9FF2),
-            note: '${gPerKg}g/kg · ISSN/ACSM',
-            p: p,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            child: Divider(height: 1, color: p.cardBorder),
-          ),
-          _MacroRow(
-            label: 'Grassi',
-            grams: m.fatG,
-            pct: m.fatPct,
-            color: const Color(0xFFFFB800),
-            note: 'min(25% kcal, 0.8g/kg)',
-            p: p,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            child: Divider(height: 1, color: p.cardBorder),
-          ),
-          _MacroRow(
-            label: 'Carboidrati',
-            grams: m.carbsG,
-            pct: m.carbsPct,
-            color: const Color(0xFF4CAF8E),
-            note: 'calorie rimanenti',
-            p: p,
-          ),
-        ],
-      ),
     );
   }
 }

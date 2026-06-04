@@ -27,7 +27,7 @@ class StoricoMisurazioniScreen extends StatelessWidget {
           return ListView.separated(
             padding: const EdgeInsets.all(20),
             itemCount: items.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            separatorBuilder: (_, _) => const SizedBox(height: 10),
             itemBuilder: (context, i) => _SnapshotCard(
               snapshot: items[i],
               onDelete: () => _confirmDelete(context, items[i].id),

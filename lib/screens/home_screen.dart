@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../models/body_snapshot.dart';
@@ -428,11 +430,19 @@ class _TdeeCard extends StatefulWidget {
 
 class _TdeeCardState extends State<_TdeeCard> {
   int? _tdee;
+  StreamSubscription? _settingsSub;
 
   @override
   void initState() {
     super.initState();
     _load();
+    _settingsSub = DatabaseService.instance.watchAppSettings().listen((_) => _load());
+  }
+
+  @override
+  void dispose() {
+    _settingsSub?.cancel();
+    super.dispose();
   }
 
   Future<void> _load() async {
@@ -523,11 +533,19 @@ class _DiarioCard extends StatefulWidget {
 class _DiarioCardState extends State<_DiarioCard> {
   double? _kcalLogged;
   int? _kcalTarget;
+  StreamSubscription? _settingsSub;
 
   @override
   void initState() {
     super.initState();
     _load();
+    _settingsSub = DatabaseService.instance.watchAppSettings().listen((_) => _load());
+  }
+
+  @override
+  void dispose() {
+    _settingsSub?.cancel();
+    super.dispose();
   }
 
   Future<void> _load() async {

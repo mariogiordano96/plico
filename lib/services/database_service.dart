@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:flutter/services.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -7,9 +10,12 @@ import '../models/plicometry_session.dart';
 import '../models/app_settings.dart';
 import '../models/measurement_snapshot.dart';
 import '../models/food_item.dart';
+import '../models/nutrizione_completa.dart';
 import '../models/daily_log.dart';
 import '../models/meal_entry.dart';
 import '../models/enums.dart';
+import '../models/user_food_preferences.dart';
+import '../models/meal_plan.dart';
 
 class DatabaseService {
   static final DatabaseService instance = DatabaseService._();
@@ -20,7 +26,11 @@ class DatabaseService {
   Future<void> init() async {
     final dir = await getApplicationDocumentsDirectory();
     _isar = await Isar.open(
-      [UserProfileSchema, BodySnapshotSchema, PlicometrySessionSchema, AppSettingsSchema, MeasurementSnapshotSchema, FoodItemSchema, DailyLogSchema],
+      [
+        UserProfileSchema, BodySnapshotSchema, PlicometrySessionSchema,
+        AppSettingsSchema, MeasurementSnapshotSchema, FoodItemSchema,
+        DailyLogSchema, UserFoodPreferencesSchema, MealPlanSchema,
+      ],
       directory: dir.path,
     );
   }
@@ -214,6 +224,10 @@ class DatabaseService {
   // AppSettings
   // ──────────────────────────────────────────────
 
+  Stream<AppSettings?> watchAppSettings() {
+    return _isar.appSettings.watchObject(1);
+  }
+
   Future<bool> getIsDarkMode() async {
     final settings = await _isar.appSettings.get(1);
     return settings?.isDarkMode ?? false;
@@ -262,6 +276,34 @@ class DatabaseService {
     await _isar.writeTxn(() async {
       final settings = await _isar.appSettings.get(1) ?? AppSettings();
       settings.obiettivo = obiettivo;
+      await _isar.appSettings.put(settings);
+    });
+  }
+
+  Future<DateTime?> getGoalSetDate() async {
+    final settings = await _isar.appSettings.get(1);
+    return settings?.goalSetDate;
+  }
+
+  Future<void> activateGoal({
+    required int livello,
+    required int metodo,
+    required int obiettivo,
+  }) async {
+    await _isar.writeTxn(() async {
+      final settings = await _isar.appSettings.get(1) ?? AppSettings();
+      settings.livelloAttivita = livello;
+      settings.metodoTdee = metodo;
+      settings.obiettivo = obiettivo;
+      settings.goalSetDate = DateTime.now();
+      await _isar.appSettings.put(settings);
+    });
+  }
+
+  Future<void> resetGoal() async {
+    await _isar.writeTxn(() async {
+      final settings = await _isar.appSettings.get(1) ?? AppSettings();
+      settings.goalSetDate = null;
       await _isar.appSettings.put(settings);
     });
   }
@@ -315,6 +357,212 @@ class DatabaseService {
     await _isar.writeTxn(() async {
       await _isar.foodItems.delete(foodId);
     });
+  }
+
+  Future<void> seedCreaFoods() async {
+    final settings = await _isar.appSettings.get(1);
+    if (settings?.creaSeeded == true) return;
+
+    final raw = await rootBundle.loadString('assets/data/crea_seed.json');
+    final list = jsonDecode(raw) as List<dynamic>;
+
+    final items = list.map((e) => _foodFromJson(e as Map<String, dynamic>)).toList();
+
+    await _isar.writeTxn(() async {
+      await _isar.foodItems.putAll(items);
+      final s = await _isar.appSettings.get(1) ?? AppSettings();
+      s.creaSeeded = true;
+      await _isar.appSettings.put(s);
+    });
+  }
+
+  FoodItem _foodFromJson(Map<String, dynamic> j) {
+    final item = FoodItem()
+      ..nome = j['nome'] as String
+      ..creaCode = j['creaCode'] as String?
+      ..categoria = j['categoria'] as String?
+      ..nomeInglese = j['nomeInglese'] as String?
+      ..imageUrl = (j['imageUrl'] as String?)?.isNotEmpty == true ? j['imageUrl'] as String : null
+      ..porzione = (j['porzione'] as num?)?.toDouble()
+      ..parteCommestibile = (j['parteCommestibile'] as num?)?.toDouble()
+      ..kcalPer100g = (j['kcalPer100g'] as num?)?.toDouble() ?? 0
+      ..proteinPer100g = (j['proteinPer100g'] as num?)?.toDouble() ?? 0
+      ..fatPer100g = (j['fatPer100g'] as num?)?.toDouble() ?? 0
+      ..carbsPer100g = (j['carbsPer100g'] as num?)?.toDouble() ?? 0;
+
+    item.nutrizione = NutrizioneCompleta()
+      ..acqua = (j['acqua'] as num?)?.toDouble()
+      ..energiaKj = (j['energiaKj'] as num?)?.toDouble()
+      ..colesterolo = (j['colesterolo'] as num?)?.toDouble()
+      ..amido = (j['amido'] as num?)?.toDouble()
+      ..zuccheriSolubili = (j['zuccheriSolubili'] as num?)?.toDouble()
+      ..alcol = (j['alcol'] as num?)?.toDouble()
+      ..fibreTotali = (j['fibreTotali'] as num?)?.toDouble()
+      ..fibreSolubili = (j['fibreSolubili'] as num?)?.toDouble()
+      ..fibreInsolubili = (j['fibreInsolubili'] as num?)?.toDouble()
+      ..saccarosio = (j['saccarosio'] as num?)?.toDouble()
+      ..glucosio = (j['glucosio'] as num?)?.toDouble()
+      ..fruttosio = (j['fruttosio'] as num?)?.toDouble()
+      ..lattosio = (j['lattosio'] as num?)?.toDouble()
+      ..galattosio = (j['galattosio'] as num?)?.toDouble()
+      ..maltosio = (j['maltosio'] as num?)?.toDouble()
+      ..maltotriosio = (j['maltotriosio'] as num?)?.toDouble()
+      ..raffinosio = (j['raffinosio'] as num?)?.toDouble()
+      ..fluoro = (j['fluoro'] as num?)?.toDouble()
+      ..sodio = (j['sodio'] as num?)?.toDouble()
+      ..magnesio = (j['magnesio'] as num?)?.toDouble()
+      ..fosforo = (j['fosforo'] as num?)?.toDouble()
+      ..cloro = (j['cloro'] as num?)?.toDouble()
+      ..potassio = (j['potassio'] as num?)?.toDouble()
+      ..calcio = (j['calcio'] as num?)?.toDouble()
+      ..cromo = (j['cromo'] as num?)?.toDouble()
+      ..manganese = (j['manganese'] as num?)?.toDouble()
+      ..ferro = (j['ferro'] as num?)?.toDouble()
+      ..nichel = (j['nichel'] as num?)?.toDouble()
+      ..rame = (j['rame'] as num?)?.toDouble()
+      ..zinco = (j['zinco'] as num?)?.toDouble()
+      ..selenio = (j['selenio'] as num?)?.toDouble()
+      ..iodio = (j['iodio'] as num?)?.toDouble()
+      ..carotenoidiTotali = (j['carotenoidiTotali'] as num?)?.toDouble()
+      ..alfaCarotene = (j['alfaCarotene'] as num?)?.toDouble()
+      ..betaCarotene = (j['betaCarotene'] as num?)?.toDouble()
+      ..criptoxantina = (j['criptoxantina'] as num?)?.toDouble()
+      ..licopene = (j['licopene'] as num?)?.toDouble()
+      ..luteina = (j['luteina'] as num?)?.toDouble()
+      ..retinolo = (j['retinolo'] as num?)?.toDouble()
+      ..zeaxantina = (j['zeaxantina'] as num?)?.toDouble()
+      ..vitaminaA = (j['vitaminaA'] as num?)?.toDouble()
+      ..tiamina = (j['tiamina'] as num?)?.toDouble()
+      ..riboflavina = (j['riboflavina'] as num?)?.toDouble()
+      ..niacina = (j['niacina'] as num?)?.toDouble()
+      ..acidoPantotenico = (j['acidoPantotenico'] as num?)?.toDouble()
+      ..vitaminaB6 = (j['vitaminaB6'] as num?)?.toDouble()
+      ..biotina = (j['biotina'] as num?)?.toDouble()
+      ..folati = (j['folati'] as num?)?.toDouble()
+      ..vitaminaB12 = (j['vitaminaB12'] as num?)?.toDouble()
+      ..vitaminaC = (j['vitaminaC'] as num?)?.toDouble()
+      ..vitaminaD = (j['vitaminaD'] as num?)?.toDouble()
+      ..vitaminaE = (j['vitaminaE'] as num?)?.toDouble()
+      ..alfaTocoferolo = (j['alfaTocoferolo'] as num?)?.toDouble()
+      ..betaTocoferolo = (j['betaTocoferolo'] as num?)?.toDouble()
+      ..gammaTocoferolo = (j['gammaTocoferolo'] as num?)?.toDouble()
+      ..deltaTocoferolo = (j['deltaTocoferolo'] as num?)?.toDouble()
+      ..vitaminaK = (j['vitaminaK'] as num?)?.toDouble()
+      ..acidiGrassiSaturi = (j['acidiGrassiSaturi'] as num?)?.toDouble()
+      ..acidiGrassiMonoinsaturi = (j['acidiGrassiMonoinsaturi'] as num?)?.toDouble()
+      ..acidiGrassiPolinsaturi = (j['acidiGrassiPolinsaturi'] as num?)?.toDouble()
+      ..rapportoPolinsaturiSaturi = (j['rapportoPolinsaturiSaturi'] as num?)?.toDouble()
+      ..acidiGrassiC4C10 = (j['acidiGrassiC4C10'] as num?)?.toDouble()
+      ..acidoButirrico = (j['acidoButirrico'] as num?)?.toDouble()
+      ..acidoCapronico = (j['acidoCapronico'] as num?)?.toDouble()
+      ..acidoEnanterico = (j['acidoEnanterico'] as num?)?.toDouble()
+      ..acidoCaprilico = (j['acidoCaprilico'] as num?)?.toDouble()
+      ..acidoCaprinico = (j['acidoCaprinico'] as num?)?.toDouble()
+      ..acidoLaurico = (j['acidoLaurico'] as num?)?.toDouble()
+      ..acidoTridecanoico = (j['acidoTridecanoico'] as num?)?.toDouble()
+      ..acidoMiristico = (j['acidoMiristico'] as num?)?.toDouble()
+      ..acidoPentadecanoico = (j['acidoPentadecanoico'] as num?)?.toDouble()
+      ..acidoPalmitico = (j['acidoPalmitico'] as num?)?.toDouble()
+      ..acidoEptadecanoico = (j['acidoEptadecanoico'] as num?)?.toDouble()
+      ..acidoStearico = (j['acidoStearico'] as num?)?.toDouble()
+      ..acidoArachidico = (j['acidoArachidico'] as num?)?.toDouble()
+      ..acidoBenico = (j['acidoBenico'] as num?)?.toDouble()
+      ..acidoLignocerico = (j['acidoLignocerico'] as num?)?.toDouble()
+      ..acidoCaproleico = (j['acidoCaproleico'] as num?)?.toDouble()
+      ..acidoLauroleico = (j['acidoLauroleico'] as num?)?.toDouble()
+      ..acidoTridecenoico = (j['acidoTridecenoico'] as num?)?.toDouble()
+      ..acidoMiristoleico = (j['acidoMiristoleico'] as num?)?.toDouble()
+      ..acidoPentadecenoico = (j['acidoPentadecenoico'] as num?)?.toDouble()
+      ..acidoPalmitoleico = (j['acidoPalmitoleico'] as num?)?.toDouble()
+      ..acidoEptadecenoicoMono = (j['acidoEptadecenoicoMono'] as num?)?.toDouble()
+      ..acidoOleico = (j['acidoOleico'] as num?)?.toDouble()
+      ..acidoEicosenoico = (j['acidoEicosenoico'] as num?)?.toDouble()
+      ..acidoErucico = (j['acidoErucico'] as num?)?.toDouble()
+      ..acidoLinoleico = (j['acidoLinoleico'] as num?)?.toDouble()
+      ..acidoLinolenico = (j['acidoLinolenico'] as num?)?.toDouble()
+      ..acidoArachidonico = (j['acidoArachidonico'] as num?)?.toDouble()
+      ..epa = (j['epa'] as num?)?.toDouble()
+      ..dha = (j['dha'] as num?)?.toDouble()
+      ..alanina = (j['alanina'] as num?)?.toDouble()
+      ..cisteina = (j['cisteina'] as num?)?.toDouble()
+      ..acidoAspartico = (j['acidoAspartico'] as num?)?.toDouble()
+      ..acidoGlutammico = (j['acidoGlutammico'] as num?)?.toDouble()
+      ..fenilalanina = (j['fenilalanina'] as num?)?.toDouble()
+      ..glicina = (j['glicina'] as num?)?.toDouble()
+      ..istidina = (j['istidina'] as num?)?.toDouble()
+      ..isoleucina = (j['isoleucina'] as num?)?.toDouble()
+      ..lisina = (j['lisina'] as num?)?.toDouble()
+      ..leucina = (j['leucina'] as num?)?.toDouble()
+      ..metionina = (j['metionina'] as num?)?.toDouble()
+      ..prolina = (j['prolina'] as num?)?.toDouble()
+      ..arginina = (j['arginina'] as num?)?.toDouble()
+      ..serina = (j['serina'] as num?)?.toDouble()
+      ..treonina = (j['treonina'] as num?)?.toDouble()
+      ..valina = (j['valina'] as num?)?.toDouble()
+      ..triptofano = (j['triptofano'] as num?)?.toDouble()
+      ..tirosina = (j['tirosina'] as num?)?.toDouble()
+      ..indiceChimico = (j['indiceChimico'] as num?)?.toDouble()
+      ..aminoacidoLimitante = j['aminoacidoLimitante'] as String?
+      ..acidoCaffeico = (j['acidoCaffeico'] as num?)?.toDouble()
+      ..acidoCitrico = (j['acidoCitrico'] as num?)?.toDouble()
+      ..acidoFitico = (j['acidoFitico'] as num?)?.toDouble()
+      ..acidoMalico = (j['acidoMalico'] as num?)?.toDouble()
+      ..apigenina = (j['apigenina'] as num?)?.toDouble()
+      ..attivitaAntiossidante = (j['attivitaAntiossidante'] as num?)?.toDouble()
+      ..campferolo = (j['campferolo'] as num?)?.toDouble()
+      ..fitosteroli = (j['fitosteroli'] as num?)?.toDouble()
+      ..fruttooligosaccaridi = (j['fruttooligosaccaridi'] as num?)?.toDouble()
+      ..miricetina = (j['miricetina'] as num?)?.toDouble()
+      ..polifenoli = (j['polifenoli'] as num?)?.toDouble()
+      ..quercetina = (j['quercetina'] as num?)?.toDouble()
+      ..violaxantina = (j['violaxantina'] as num?)?.toDouble();
+
+    return item;
+  }
+
+  // ──────────────────────────────────────────────
+  // UserFoodPreferences
+  // ──────────────────────────────────────────────
+
+  Future<UserFoodPreferences?> getUserFoodPreferences() async {
+    return _isar.userFoodPreferences.get(1);
+  }
+
+  Future<void> saveUserFoodPreferences(UserFoodPreferences prefs) async {
+    await _isar.writeTxn(() async {
+      await _isar.userFoodPreferences.put(prefs);
+    });
+  }
+
+  // ──────────────────────────────────────────────
+  // MealPlan
+  // ──────────────────────────────────────────────
+
+  Future<MealPlan?> getMealPlan() async {
+    return _isar.mealPlans.get(1);
+  }
+
+  Future<void> saveMealPlan(MealPlan plan) async {
+    await _isar.writeTxn(() async {
+      await _isar.mealPlans.put(plan);
+    });
+  }
+
+  Stream<MealPlan?> watchMealPlan() {
+    return _isar.mealPlans.watchObject(1);
+  }
+
+  Future<void> markPlanObsoleto(bool obsoleto) async {
+    await _isar.writeTxn(() async {
+      final plan = await _isar.mealPlans.get(1);
+      if (plan == null) return;
+      plan.obsoleto = obsoleto;
+      await _isar.mealPlans.put(plan);
+    });
+  }
+
+  Future<List<FoodItem>> getAllCreaFoods() async {
+    return _isar.foodItems.filter().creaCodeIsNotNull().findAll();
   }
 
   // ──────────────────────────────────────────────

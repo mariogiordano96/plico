@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../models/daily_log.dart';
@@ -5,6 +7,7 @@ import '../../models/enums.dart';
 import '../../services/database_service.dart';
 import '../tdee/tdee_screen.dart' show calcolaTdee;
 import 'aggiunta_alimento_screen.dart';
+import 'piano_tab.dart';
 
 const _pastoLabels = ['COLAZIONE', 'PRANZO', 'CENA', 'SPUNTINO'];
 const _pastoIcons = [
@@ -28,7 +31,10 @@ class _DiarioScreenState extends State<DiarioScreen> {
   DailyLog? _log;
   int? _kcalTarget;
   int? _proteinTarget;
+  int? _fatTarget;
+  int? _carbsTarget;
   bool _loading = true;
+  StreamSubscription? _settingsSub;
 
   static DateTime _dayStart(DateTime d) => DateTime(d.year, d.month, d.day);
 
@@ -36,6 +42,15 @@ class _DiarioScreenState extends State<DiarioScreen> {
   void initState() {
     super.initState();
     _load();
+    _settingsSub = DatabaseService.instance
+        .watchAppSettings()
+        .listen((_) => _reloadTargets());
+  }
+
+  @override
+  void dispose() {
+    _settingsSub?.cancel();
+    super.dispose();
   }
 
   Future<void> _load() async {
@@ -47,14 +62,27 @@ class _DiarioScreenState extends State<DiarioScreen> {
       _log = log;
       _kcalTarget = target.$1;
       _proteinTarget = target.$2;
+      _fatTarget = target.$3;
+      _carbsTarget = target.$4;
       _loading = false;
     });
   }
 
-  Future<(int?, int?)> _computeTargets() async {
+  Future<void> _reloadTargets() async {
+    final target = await _computeTargets();
+    if (!mounted) return;
+    setState(() {
+      _kcalTarget = target.$1;
+      _proteinTarget = target.$2;
+      _fatTarget = target.$3;
+      _carbsTarget = target.$4;
+    });
+  }
+
+  Future<(int?, int?, int?, int?)> _computeTargets() async {
     final profile = await DatabaseService.instance.getUserProfile();
     final snapshot = await DatabaseService.instance.getLatestBodySnapshot();
-    if (profile == null || snapshot == null) return (null, null);
+    if (profile == null || snapshot == null) return (null, null, null, null);
     final session = await DatabaseService.instance.getLatestPlicometrySession();
     final livello = await DatabaseService.instance.getLivelloAttivita();
     final metodo = await DatabaseService.instance.getMetodoTdee();
@@ -68,9 +96,8 @@ class _DiarioScreenState extends State<DiarioScreen> {
       metodo: metodo,
       massaMagraKg: session?.risultati.massaMagraKg,
     );
-    if (result == null) return (null, null);
+    if (result == null) return (null, null, null, null);
     final kcalTarget = (result.tdee * _goalMult[obiettivo.clamp(0, 2)]).round();
-    // Protein target from ISSN matrix (same logic as TdeeScreen)
     const protMatrix = [
       [1.4, 1.8, 2.3, 2.6, 3.1],
       [0.8, 1.2, 1.4, 1.8, 2.0],
@@ -78,7 +105,10 @@ class _DiarioScreenState extends State<DiarioScreen> {
     ];
     final protTarget =
         (snapshot.pesoKg * protMatrix[obiettivo.clamp(0, 2)][livello.clamp(0, 4)]).round();
-    return (kcalTarget, protTarget);
+    // Fat: 25% delle kcal totali; Carbs: kcal rimanenti dopo prot e grassi
+    final fatTarget = (kcalTarget * 0.25 / 9).round();
+    final carbsTarget = ((kcalTarget - protTarget * 4 - fatTarget * 9) / 4).round().clamp(0, 9999);
+    return (kcalTarget, protTarget, fatTarget, carbsTarget);
   }
 
   Future<void> _removeEntry(int index) async {
@@ -114,94 +144,117 @@ class _DiarioScreenState extends State<DiarioScreen> {
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
+
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: p.background,
+        appBar: AppBar(
+          title: Text('DIARIO',
+              style: TextStyle(
+                  color: p.accent,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1.5)),
+          backgroundColor: p.background,
+          elevation: 0,
+          centerTitle: true,
+          iconTheme: IconThemeData(color: p.accent),
+          bottom: TabBar(
+            indicatorColor: p.accent,
+            labelColor: p.accent,
+            unselectedLabelColor: p.textMuted,
+            labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 0.8),
+            unselectedLabelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+            tabs: const [
+              Tab(text: 'DIARIO'),
+              Tab(text: 'PIANO'),
+            ],
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            _buildDiarioTab(p),
+            PianoTab(currentDate: _date),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDiarioTab(ColorPalette p) {
     final log = _log;
     final kcalLogged = log?.kcalTotali ?? 0;
     final protLogged = log?.proteinTotali ?? 0;
     final fatLogged = log?.fatTotali ?? 0;
     final carbsLogged = log?.carbsTotali ?? 0;
 
-    return Scaffold(
-      backgroundColor: p.background,
-      appBar: AppBar(
-        title: Text('DIARIO',
-            style: TextStyle(
-                color: p.accent,
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 1.5)),
-        backgroundColor: p.background,
-        elevation: 0,
-        centerTitle: true,
-        iconTheme: IconThemeData(color: p.accent),
-      ),
-      body: _loading
-          ? Center(child: CircularProgressIndicator(color: p.accent))
-          : Column(
+    if (_loading) return Center(child: CircularProgressIndicator(color: p.accent));
+
+    return Column(
+      children: [
+        _DateNav(
+          date: _date,
+          label: _formatDate(_date),
+          onPrev: () {
+            setState(() => _date = _date.subtract(const Duration(days: 1)));
+            _load();
+          },
+          onNext: _date == _dayStart(DateTime.now())
+              ? null
+              : () {
+                  setState(() => _date = _date.add(const Duration(days: 1)));
+                  _load();
+                },
+          p: p,
+        ),
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+            child: Column(
               children: [
-                // Date navigation
-                _DateNav(
-                  date: _date,
-                  label: _formatDate(_date),
-                  onPrev: () {
-                    setState(() => _date = _date.subtract(const Duration(days: 1)));
-                    _load();
-                  },
-                  onNext: _date == _dayStart(DateTime.now())
-                      ? null
-                      : () {
-                          setState(() => _date = _date.add(const Duration(days: 1)));
-                          _load();
-                        },
+                _RiepilogoCard(
+                  kcalLogged: kcalLogged,
+                  kcalTarget: _kcalTarget,
+                  protLogged: protLogged,
+                  protTarget: _proteinTarget,
+                  fatLogged: fatLogged,
+                  fatTarget: _fatTarget,
+                  carbsLogged: carbsLogged,
+                  carbsTarget: _carbsTarget,
                   p: p,
                 ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-                    child: Column(
-                      children: [
-                        // Riepilogo
-                        _RiepilogoCard(
-                          kcalLogged: kcalLogged,
-                          kcalTarget: _kcalTarget,
-                          protLogged: protLogged,
-                          protTarget: _proteinTarget,
-                          fatLogged: fatLogged,
-                          carbsLogged: carbsLogged,
-                          p: p,
-                        ),
-                        const SizedBox(height: 20),
-                        // Pasti
-                        ...List.generate(PastoTipo.values.length, (i) {
-                          final entries = (log?.entries ?? [])
-                              .where((e) => e.pastoTipo == i)
-                              .toList();
-                          final globalIndices = <int>[];
-                          if (log != null) {
-                            for (int j = 0; j < log.entries.length; j++) {
-                              if (log.entries[j].pastoTipo == i) {
-                                globalIndices.add(j);
-                              }
-                            }
-                          }
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: _PastoSection(
-                              label: _pastoLabels[i],
-                              icon: _pastoIcons[i],
-                              entries: entries,
-                              globalIndices: globalIndices,
-                              onAdd: () => _openAdd(i),
-                              onRemove: _removeEntry,
-                              p: p,
-                            ),
-                          );
-                        }),
-                      ],
+                const SizedBox(height: 20),
+                ...List.generate(PastoTipo.values.length, (i) {
+                  final entries = (log?.entries ?? [])
+                      .where((e) => e.pastoTipo == i)
+                      .toList();
+                  final globalIndices = <int>[];
+                  if (log != null) {
+                    for (int j = 0; j < log.entries.length; j++) {
+                      if (log.entries[j].pastoTipo == i) {
+                        globalIndices.add(j);
+                      }
+                    }
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: _PastoSection(
+                      label: _pastoLabels[i],
+                      icon: _pastoIcons[i],
+                      entries: entries,
+                      globalIndices: globalIndices,
+                      onAdd: () => _openAdd(i),
+                      onRemove: _removeEntry,
+                      p: p,
                     ),
-                  ),
-                ),
+                  );
+                }),
               ],
             ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -256,7 +309,9 @@ class _RiepilogoCard extends StatelessWidget {
   final double protLogged;
   final int? protTarget;
   final double fatLogged;
+  final int? fatTarget;
   final double carbsLogged;
+  final int? carbsTarget;
   final ColorPalette p;
   const _RiepilogoCard({
     required this.kcalLogged,
@@ -264,7 +319,9 @@ class _RiepilogoCard extends StatelessWidget {
     required this.protLogged,
     required this.protTarget,
     required this.fatLogged,
+    required this.fatTarget,
     required this.carbsLogged,
+    required this.carbsTarget,
     required this.p,
   });
 
@@ -345,6 +402,7 @@ class _RiepilogoCard extends StatelessWidget {
               _MacroStat(
                 label: 'Grassi',
                 logged: fatLogged,
+                target: fatTarget?.toDouble(),
                 color: const Color(0xFFFFB800),
                 p: p,
               ),
@@ -352,6 +410,7 @@ class _RiepilogoCard extends StatelessWidget {
               _MacroStat(
                 label: 'Carbo',
                 logged: carbsLogged,
+                target: carbsTarget?.toDouble(),
                 color: const Color(0xFF4CAF8E),
                 p: p,
               ),
@@ -503,12 +562,21 @@ class _PastoSection extends StatelessWidget {
                                   fontWeight: FontWeight.w500),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis),
+                          const SizedBox(height: 2),
                           Text(
                             [
                               if (entry.foodBrand != null)
                                 entry.foodBrand!,
                               '${entry.quantitaG.round()}g',
                             ].join(' · '),
+                            style: TextStyle(
+                                color: p.textMuted, fontSize: 11),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'P ${entry.proteinG.toStringAsFixed(1)}g'
+                            '  G ${entry.fatG.toStringAsFixed(1)}g'
+                            '  C ${entry.carbsG.toStringAsFixed(1)}g',
                             style: TextStyle(
                                 color: p.textMuted, fontSize: 11),
                           ),

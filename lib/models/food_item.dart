@@ -1,5 +1,7 @@
 import 'package:isar/isar.dart';
 
+import 'nutrizione_completa.dart';
+
 part 'food_item.g.dart';
 
 @collection
@@ -13,7 +15,18 @@ class FoodItem {
   double fatPer100g = 0;
   double carbsPer100g = 0;
 
-  String? offCode; // Open Food Facts product code (null per alimenti custom)
+  String? offCode;
   bool isCustom = false;
   bool isFavorite = false;
+
+  // Metadati CREA
+  String? creaCode;
+  String? categoria;
+  String? nomeInglese;
+  String? imageUrl;
+  double? porzione;
+  double? parteCommestibile;
+
+  // Dati nutrizionali completi (presenti solo per alimenti CREA)
+  NutrizioneCompleta? nutrizione;
 }

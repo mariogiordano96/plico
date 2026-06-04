@@ -263,7 +263,7 @@ class _MeasurementGuideSheetState extends State<_MeasurementGuideSheet>
                   Center(
                     child: AnimatedBuilder(
                       animation: _pulse,
-                      builder: (_, __) => _BodyWithIndicator(
+                      builder: (_, _) => _BodyWithIndicator(
                         site: widget.site,
                         sesso: widget.sesso,
                         scaleValue: _scaleAnim.value,

@@ -9,6 +9,7 @@ final themeNotifier = ValueNotifier<ThemeMode>(ThemeMode.light);
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DatabaseService.instance.init();
+  await DatabaseService.instance.seedCreaFoods();
   final isDark = await DatabaseService.instance.getIsDarkMode();
   themeNotifier.value = isDark ? ThemeMode.dark : ThemeMode.light;
   runApp(const PlicoApp());
