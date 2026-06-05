@@ -32,6 +32,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _formKey3 = GlobalKey<FormState>();
 
   ThemeMode _selectedTheme = ThemeMode.light;
+  int _goal = 1;
+  int _livello = 2;
 
   @override
   void dispose() {
@@ -108,6 +110,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ? null : double.tryParse(_bodyFatController.text.trim())
         ..note = 'Peso iniziale';
       await DatabaseService.instance.addBodySnapshot(snapshot);
+      await DatabaseService.instance.activateGoal(
+        livello: _livello, metodo: 0, obiettivo: _goal);
+    } else {
+      await DatabaseService.instance.saveLivelloAttivita(_livello);
+      await DatabaseService.instance.saveObiettivo(_goal);
     }
 
     final isDark = _selectedTheme == ThemeMode.dark;
@@ -125,7 +132,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            _ProgressBar(current: _currentPage, total: 4),
+            _ProgressBar(current: _currentPage, total: 6),
             Expanded(
               child: PageView(
                 controller: _pageController,
@@ -142,6 +149,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   _Step3(formKey: _formKey3, altezzaController: _altezzaController,
                       pesoController: _pesoController, bodyFatController: _bodyFatController,
                       onNext: () { if (_validateStep3()) _nextPage(); },
+                      onBack: _prevPage),
+                  _StepObiettivo(
+                      selected: _goal,
+                      onSelect: (v) => setState(() => _goal = v),
+                      onNext: _nextPage,
+                      onBack: _prevPage),
+                  _StepAttivita(
+                      selected: _livello,
+                      onSelect: (v) => setState(() => _livello = v),
+                      onNext: _nextPage,
                       onBack: _prevPage),
                   _Step4(selectedTheme: _selectedTheme,
                       onThemeChanged: (t) {
@@ -576,6 +593,232 @@ class _ThemeCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ──────────────────────────────────────────────
+// Step 4 — Obiettivo
+// ──────────────────────────────────────────────
+
+class _StepObiettivo extends StatelessWidget {
+  final int selected;
+  final ValueChanged<int> onSelect;
+  final VoidCallback onNext;
+  final VoidCallback onBack;
+
+  const _StepObiettivo({
+    required this.selected,
+    required this.onSelect,
+    required this.onNext,
+    required this.onBack,
+  });
+
+  static const _items = [
+    (id: 0, label: 'Perdere peso', sub: 'Deficit −20%',
+        desc: 'Riduzione graduale del grasso corporeo mantenendo la massa muscolare',
+        icon: Icons.trending_down_rounded, color: Color(0xFF3B9FF2)),
+    (id: 1, label: 'Mantenermi', sub: 'Mantenimento',
+        desc: 'Ottimizza la composizione corporea senza cambiare il peso',
+        icon: Icons.balance_rounded, color: Color(0xFF00C48C)),
+    (id: 2, label: 'Aumentare massa', sub: 'Surplus +15%',
+        desc: 'Massimizza la crescita muscolare con un apporto calorico superiore',
+        icon: Icons.trending_up_rounded, color: Color(0xFFFF8C42)),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(28),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 32),
+          Text('Qual è il tuo\nobiettivo?',
+              style: TextStyle(color: p.textPrimary, fontSize: 28,
+                  fontWeight: FontWeight.w700, height: 1.3)),
+          const SizedBox(height: 40),
+          ..._items.map((item) {
+            final sel = selected == item.id;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: GestureDetector(
+                onTap: () => onSelect(item.id),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: sel ? item.color.withValues(alpha: 0.08) : p.surfaceVariant,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                        color: sel ? item.color : p.cardBorder,
+                        width: sel ? 1.5 : 1),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 48, height: 48,
+                        decoration: BoxDecoration(
+                          color: item.color.withValues(alpha: sel ? 0.15 : 0.08),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(item.icon,
+                            color: sel ? item.color : item.color.withValues(alpha: 0.6),
+                            size: 24),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(item.label,
+                                style: TextStyle(
+                                    color: sel ? item.color : p.textPrimary,
+                                    fontSize: 15, fontWeight: FontWeight.w700)),
+                            const SizedBox(height: 2),
+                            Text(item.sub,
+                                style: TextStyle(
+                                    color: sel ? item.color.withValues(alpha: 0.8) : p.accent,
+                                    fontSize: 12, fontWeight: FontWeight.w600)),
+                            const SizedBox(height: 4),
+                            Text(item.desc,
+                                style: TextStyle(color: p.textMuted, fontSize: 12, height: 1.4)),
+                          ],
+                        ),
+                      ),
+                      if (sel)
+                        Icon(Icons.check_circle_rounded, color: item.color, size: 20),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
+          const SizedBox(height: 24),
+          ElevatedButton(onPressed: onNext, child: const Text('CONTINUA')),
+          const SizedBox(height: 12),
+          TextButton(onPressed: onBack,
+              child: Text('Indietro', style: TextStyle(color: p.textMuted))),
+        ],
+      ),
+    );
+  }
+}
+
+// ──────────────────────────────────────────────
+// Step 5 — Livello di attività
+// ──────────────────────────────────────────────
+
+class _StepAttivita extends StatelessWidget {
+  final int selected;
+  final ValueChanged<int> onSelect;
+  final VoidCallback onNext;
+  final VoidCallback onBack;
+
+  const _StepAttivita({
+    required this.selected,
+    required this.onSelect,
+    required this.onNext,
+    required this.onBack,
+  });
+
+  static const _labels = [
+    'Sedentario', 'Legg. attivo', 'Mod. attivo', 'Molto attivo', 'Atleta',
+  ];
+  static const _descs = [
+    'Lavoro sedentario, poco o nessun esercizio',
+    'Esercizio leggero 1–3 giorni/settimana',
+    'Esercizio moderato 3–5 giorni/settimana',
+    'Esercizio intenso 6–7 giorni/settimana',
+    'Lavoro fisico intenso o doppio allenamento',
+  ];
+  static const _multipli = ['×1.2', '×1.375', '×1.55', '×1.725', '×1.9'];
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(28),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 32),
+          Text('Quanto sei attivo?',
+              style: TextStyle(color: p.textPrimary, fontSize: 28,
+                  fontWeight: FontWeight.w700)),
+          const SizedBox(height: 8),
+          Text('Considera la tua attività media settimanale.',
+              style: TextStyle(color: p.textMuted, fontSize: 13, height: 1.5)),
+          const SizedBox(height: 32),
+          Container(
+            decoration: BoxDecoration(
+              color: p.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: p.cardBorder),
+            ),
+            child: Column(
+              children: List.generate(_labels.length, (i) {
+                final sel = selected == i;
+                final isLast = i == _labels.length - 1;
+                return GestureDetector(
+                  onTap: () => onSelect(i),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: sel
+                          ? const Color(0xFFFF6B35).withValues(alpha: 0.07)
+                          : Colors.transparent,
+                      border: isLast
+                          ? null
+                          : Border(bottom: BorderSide(color: p.cardBorder)),
+                    ),
+                    child: Row(
+                      children: [
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 150),
+                          width: 18, height: 18,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                                color: sel ? const Color(0xFFFF6B35) : p.cardBorder,
+                                width: sel ? 5 : 2),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(_labels[i],
+                                  style: TextStyle(
+                                      color: sel ? const Color(0xFFFF6B35) : p.textPrimary,
+                                      fontSize: 14,
+                                      fontWeight: sel ? FontWeight.w700 : FontWeight.w500)),
+                              Text(_descs[i],
+                                  style: TextStyle(color: p.textMuted, fontSize: 12)),
+                            ],
+                          ),
+                        ),
+                        Text(_multipli[i],
+                            style: TextStyle(
+                                color: sel ? const Color(0xFFFF6B35) : p.textMuted,
+                                fontSize: 12, fontWeight: FontWeight.w600)),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+          const SizedBox(height: 32),
+          ElevatedButton(onPressed: onNext, child: const Text('CONTINUA')),
+          const SizedBox(height: 12),
+          TextButton(onPressed: onBack,
+              child: Text('Indietro', style: TextStyle(color: p.textMuted))),
+        ],
       ),
     );
   }
