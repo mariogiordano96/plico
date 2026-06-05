@@ -77,6 +77,17 @@ class PianoService {
     'Crackers, integrali',
   ];
 
+  // Solo frutta secca per lo spuntino: olio EVO e avocado non hanno
+  // senso come snack standalone.
+  static const curatedFruttaSeccaSnack = [
+    'Mandorle dolci, secche',
+    'Noci, secche',
+    'Nocciole, secche',
+    'Pistacchi',
+    'Arachidi, tostate',
+    "Burro d'arachidi",
+  ];
+
   // Leguminose: contengono già ~50-60g di carboidrati per 100g secchi,
   // quindi quando vengono usate come proteina si esclude lo slot carbo.
   static const _leguminoseNames = <String>{
@@ -472,10 +483,25 @@ class PianoService {
       );
       if (sSnkProt != null) snkSlots.add(sSnkProt);
 
+      // Frutta: copre la quota carbs dello spuntino (10% del target giornaliero)
+      final sSnkFrutta = buildSlot(
+        tipo: kFrutta,
+        foods: poolByNames(curatedFruttaColazione, exclude: usedFruttaIds),
+        gramsFn: (_) => 150.0,
+        scoreFn: (_) => 1.0,
+        maxGrams: 150, minGrams: 150,
+      );
+      if (sSnkFrutta != null) {
+        trackPrincipal(sSnkFrutta, usedFruttaIds);
+        snkSlots.add(sSnkFrutta);
+      }
+
+      // Solo frutta secca per lo spuntino: olio EVO e avocado non hanno
+      // senso come snack standalone
       final sSnkGrasso = buildSlot(
         tipo: kGrasso,
-        foods: pool(['Grassi'], exclude: usedGrassoIds),
-        altFoods: pool(['Grassi']),
+        foods: poolByNames(curatedFruttaSeccaSnack, exclude: usedGrassoIds),
+        altFoods: poolByNames(curatedFruttaSeccaSnack),
         gramsFn: (f) => f.fatPer100g > 0 ? (fatTarget * snkShare) / (f.fatPer100g / 100) : 0,
         scoreFn: (f) => f.fatPer100g,
         maxGrams: 35, minGrams: 10,
