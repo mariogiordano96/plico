@@ -31,6 +31,26 @@ class PianoService {
   static const pastoLabels = ['Colazione', 'Pranzo', 'Cena', 'Spuntino', 'Post-WO'];
   static const pastoEmoji = ['☀️', '🍽️', '🌙', '🍎', '💪'];
 
+  static const curatedCerealiColazione = [
+    "Fiocchi d'avena",
+    'Pane di tipo integrale',
+  ];
+
+  static const curatedLatticiniColazione = [
+    'Yogurt greco, 0% lipidi',
+    'Ricotta di vacca',
+    'Latte di vacca, pastorizzato, scremato',
+  ];
+
+  // versione salata
+  static const curatedProteineSalataColazione = [
+    'Uova di gallina, intero',
+    'Ricotta di vacca',
+  ];
+  static const curatedCerealiSalata = [
+    'Pane di tipo integrale',
+  ];
+
   static const curatedNames = <String, List<String>>{
     'Proteine animali': [
       'Pollo, petto, crudo',
@@ -199,6 +219,7 @@ class PianoService {
     PlanSlot? buildSlot({
       required int tipo,
       required List<FoodItem> foods,
+      List<FoodItem>? altFoods,
       required double Function(FoodItem) gramsFn,
       required double Function(FoodItem) scoreFn,
       required double maxGrams,
@@ -207,6 +228,7 @@ class PianoService {
         _buildSlot(
           tipo: tipo,
           foods: foods,
+          altFoods: altFoods,
           likedIds: likedIds,
           gramsFn: gramsFn,
           scoreFn: scoreFn,
@@ -225,6 +247,7 @@ class PianoService {
       final sProt = buildSlot(
         tipo: kProteina,
         foods: pool(['Proteine animali', 'Proteine vegetali'], exclude: usedProtIds),
+        altFoods: pool(['Proteine animali', 'Proteine vegetali']),
         gramsFn: (f) => f.proteinPer100g > 0 ? (protTarget * share) / (f.proteinPer100g / 100) : 0,
         scoreFn: (f) => f.proteinPer100g,
         maxGrams: 350, minGrams: 50,
@@ -235,6 +258,7 @@ class PianoService {
       final sCarbo = buildSlot(
         tipo: kCarboidrato,
         foods: pool(['Cereali'], exclude: usedCarboIds),
+        altFoods: pool(['Cereali']),
         gramsFn: (f) => f.carbsPer100g > 0 ? (carbsTarget * share) / (f.carbsPer100g / 100) : 0,
         scoreFn: (f) => f.carbsPer100g,
         maxGrams: 250, minGrams: 20,
@@ -245,9 +269,10 @@ class PianoService {
       final sVerd = buildSlot(
         tipo: kVerdura,
         foods: pool(['Verdure'], exclude: usedVerduraIds),
-        gramsFn: (f) => f.kcalPer100g > 0 ? 75.0 / (f.kcalPer100g / 100) : 0,
+        altFoods: pool(['Verdure']),
+        gramsFn: (_) => 150.0,
         scoreFn: (f) => f.kcalPer100g > 0 ? 1000 / f.kcalPer100g : 0,
-        maxGrams: 400, minGrams: 80,
+        maxGrams: 150, minGrams: 150,
       );
       trackPrincipal(sVerd, usedVerduraIds);
       if (sVerd != null) slots.add(sVerd);
@@ -255,6 +280,7 @@ class PianoService {
       final sGrasso = buildSlot(
         tipo: kGrasso,
         foods: pool(['Grassi'], exclude: usedGrassoIds),
+        altFoods: pool(['Grassi']),
         gramsFn: (f) => f.fatPer100g > 0 ? (fatTarget * share) / (f.fatPer100g / 100) : 0,
         scoreFn: (f) => f.fatPer100g,
         maxGrams: 50, minGrams: 3,
@@ -265,35 +291,64 @@ class PianoService {
       return slots;
     }
 
+    List<FoodItem> poolByNames(List<String> names, {Set<int> exclude = const {}}) => names
+        .map((n) => byName[n])
+        .whereType<FoodItem>()
+        .where((f) => f.categoria == null || !excluded.contains(f.categoria))
+        .where((f) => !exclude.contains(f.id))
+        .toList();
+
     final pasti = <PlanMeal>[];
 
     // ── Colazione ──────────────────────────────────────────────
     {
       final slots = <PlanSlot>[];
+
+
       final sCarbo = buildSlot(
         tipo: kCarboidrato,
-        foods: pool(['Cereali']),
+        foods: poolByNames(curatedCerealiColazione),
         gramsFn: (f) => f.carbsPer100g > 0 ? (carbsTarget * colShare) / (f.carbsPer100g / 100) : 0,
         scoreFn: (f) => f.carbsPer100g,
-        maxGrams: 120, minGrams: 20,
+        maxGrams: 100, minGrams: 20,
       );
       trackPrincipal(sCarbo, usedCarboIds);
       if (sCarbo != null) slots.add(sCarbo);
 
       final sExtra = buildSlot(
         tipo: kExtra,
-        foods: pool(['Latticini']),
+        foods: poolByNames(curatedLatticiniColazione),
         gramsFn: (f) => f.proteinPer100g > 0 ? (protTarget * colShare) / (f.proteinPer100g / 100) : 0,
         scoreFn: (f) => f.proteinPer100g,
-        maxGrams: 300, minGrams: 50,
+        maxGrams: 300, minGrams: 80,
       );
       trackPrincipal(sExtra, usedExtraIds);
       if (sExtra != null) slots.add(sExtra);
 
+      // versione salata (uova + pane)
+      final slotsAltColazione = <PlanSlot>[];
+      final sProtSal = buildSlot(
+        tipo: kProteina,
+        foods: poolByNames(curatedProteineSalataColazione),
+        gramsFn: (f) => f.proteinPer100g > 0 ? (protTarget * colShare) / (f.proteinPer100g / 100) : 0,
+        scoreFn: (f) => f.proteinPer100g,
+        maxGrams: 300, minGrams: 50,
+      );
+      if (sProtSal != null) slotsAltColazione.add(sProtSal);
+      final sCarboSal = buildSlot(
+        tipo: kCarboidrato,
+        foods: poolByNames(curatedCerealiSalata),
+        gramsFn: (f) => f.carbsPer100g > 0 ? (carbsTarget * colShare) / (f.carbsPer100g / 100) : 0,
+        scoreFn: (f) => f.carbsPer100g,
+        maxGrams: 80, minGrams: 20,
+      );
+      if (sCarboSal != null) slotsAltColazione.add(sCarboSal);
+
       if (slots.isNotEmpty) {
         pasti.add(PlanMeal()
           ..tipo = kPastoColazione
-          ..slots = slots);
+          ..slots = slots
+          ..slotsAlternativa = slotsAltColazione);
       }
     }
 
@@ -309,18 +364,52 @@ class PianoService {
 
     // ── Spuntino pomeridiano (numPasti >= 4) ───────────────────
     if (snackCount >= 1) {
-      final sSnk = buildSlot(
+      final snkSlots = <PlanSlot>[];
+
+      final sSnkProt = buildSlot(
         tipo: kExtra,
-        foods: pool(['Latticini'], exclude: usedExtraIds),
+        foods: poolByNames(curatedLatticiniColazione),
         gramsFn: (f) => f.proteinPer100g > 0 ? (protTarget * snkShare) / (f.proteinPer100g / 100) : 0,
         scoreFn: (f) => f.proteinPer100g,
-        maxGrams: 250, minGrams: 30,
+        maxGrams: 250, minGrams: 80,
       );
-      trackPrincipal(sSnk, usedExtraIds);
-      if (sSnk != null) {
+      if (sSnkProt != null) snkSlots.add(sSnkProt);
+
+      final sSnkGrasso = buildSlot(
+        tipo: kGrasso,
+        foods: pool(['Grassi'], exclude: usedGrassoIds),
+        altFoods: pool(['Grassi']),
+        gramsFn: (f) => f.fatPer100g > 0 ? (fatTarget * snkShare) / (f.fatPer100g / 100) : 0,
+        scoreFn: (f) => f.fatPer100g,
+        maxGrams: 35, minGrams: 10,
+      );
+      trackPrincipal(sSnkGrasso, usedGrassoIds);
+      if (sSnkGrasso != null) snkSlots.add(sSnkGrasso);
+
+      // versione salata (pane + ricotta)
+      final slotsAltSnk1 = <PlanSlot>[];
+      final sSnkCarboSal = buildSlot(
+        tipo: kCarboidrato,
+        foods: poolByNames(curatedCerealiSalata),
+        gramsFn: (f) => f.carbsPer100g > 0 ? (carbsTarget * snkShare) / (f.carbsPer100g / 100) : 0,
+        scoreFn: (f) => f.carbsPer100g,
+        maxGrams: 60, minGrams: 20,
+      );
+      if (sSnkCarboSal != null) slotsAltSnk1.add(sSnkCarboSal);
+      final sSnkExtraSal = buildSlot(
+        tipo: kExtra,
+        foods: poolByNames(['Ricotta di vacca']),
+        gramsFn: (f) => f.proteinPer100g > 0 ? (protTarget * snkShare) / (f.proteinPer100g / 100) : 0,
+        scoreFn: (f) => f.proteinPer100g,
+        maxGrams: 200, minGrams: 50,
+      );
+      if (sSnkExtraSal != null) slotsAltSnk1.add(sSnkExtraSal);
+
+      if (snkSlots.isNotEmpty) {
         pasti.add(PlanMeal()
           ..tipo = kPastoSpuntino
-          ..slots = [sSnk]);
+          ..slots = snkSlots
+          ..slotsAlternativa = slotsAltSnk1);
       }
     }
 
@@ -338,15 +427,23 @@ class PianoService {
     if (snackCount >= 2) {
       final sSnk2 = buildSlot(
         tipo: kExtra,
-        foods: pool(['Latticini', 'Grassi'], exclude: usedExtraIds),
+        foods: poolByNames(curatedLatticiniColazione),
         gramsFn: (f) => f.proteinPer100g > 0 ? (protTarget * snkShare) / (f.proteinPer100g / 100) : 0,
         scoreFn: (f) => f.proteinPer100g,
-        maxGrams: 200, minGrams: 20,
+        maxGrams: 200, minGrams: 80,
+      );
+      final sSnk2Sal = buildSlot(
+        tipo: kExtra,
+        foods: poolByNames(['Ricotta di vacca']),
+        gramsFn: (f) => f.proteinPer100g > 0 ? (protTarget * snkShare) / (f.proteinPer100g / 100) : 0,
+        scoreFn: (f) => f.proteinPer100g,
+        maxGrams: 200, minGrams: 80,
       );
       if (sSnk2 != null) {
         pasti.add(PlanMeal()
           ..tipo = kPastoSpuntino
-          ..slots = [sSnk2]);
+          ..slots = [sSnk2]
+          ..slotsAlternativa = [?sSnk2Sal]);
       }
     }
 
@@ -355,6 +452,7 @@ class PianoService {
       final sPostWo = buildSlot(
         tipo: kProteina,
         foods: pool(['Proteine animali', 'Latticini'], exclude: usedProtIds),
+        altFoods: pool(['Proteine animali', 'Latticini']),
         gramsFn: (f) => f.proteinPer100g > 0 ? (protTarget * 0.10) / (f.proteinPer100g / 100) : 0,
         scoreFn: (f) => f.proteinPer100g,
         maxGrams: 150, minGrams: 20,
@@ -371,7 +469,7 @@ class PianoService {
     double kcalTot = 0, protTot = 0, fatTot = 0, carbTot = 0;
     for (final pasto in pasti) {
       for (final s in pasto.slots) {
-        if (s.principale == null) continue;
+        if (s.principale == null || s.tipo == kVerdura) continue;
         kcalTot += s.principale!.kcal;
         protTot += s.principale!.proteine;
         fatTot += s.principale!.grassi;
@@ -394,9 +492,12 @@ class PianoService {
     return plan;
   }
 
+  static double _round5(double g) => (g / 5).round() * 5.0;
+
   static PlanSlot? _buildSlot({
     required int tipo,
     required List<FoodItem> foods,
+    List<FoodItem>? altFoods,
     required List<int> likedIds,
     required double Function(FoodItem) gramsFn,
     required double Function(FoodItem) scoreFn,
@@ -405,15 +506,14 @@ class PianoService {
   }) {
     if (foods.isEmpty) return null;
 
-    final sorted = [...foods]..sort((a, b) {
-        final sa = scoreFn(a) + (likedIds.contains(a.id) ? 10000 : 0);
-        final sb = scoreFn(b) + (likedIds.contains(b.id) ? 10000 : 0);
-        return sb.compareTo(sa);
-      });
+    double score(FoodItem f) =>
+        scoreFn(f) + (likedIds.contains(f.id) ? 10000 : 0);
+
+    final sorted = [...foods]..sort((a, b) => score(b).compareTo(score(a)));
 
     PlanFood? buildFood(FoodItem f, double grams) {
       if (grams <= 0 || !grams.isFinite) return null;
-      final g = grams.clamp(minGrams, maxGrams);
+      final g = _round5(grams.clamp(minGrams, maxGrams));
       return PlanFood()
         ..nome = f.nome
         ..foodItemId = f.id
@@ -427,9 +527,18 @@ class PianoService {
     final principale = buildFood(sorted.first, gramsFn(sorted.first));
     if (principale == null) return null;
 
+    final principaleId = sorted.first.id;
     final targetKcal = principale.kcal;
+
+    // Alternative dal pool completo (senza esclusioni), escluso solo il principale scelto
+    final altPool = altFoods != null
+        ? ([...altFoods]..sort((a, b) => score(b).compareTo(score(a))))
+            .where((f) => f.id != principaleId)
+            .toList()
+        : sorted.skip(1).toList();
+
     final alts = <PlanFood>[];
-    for (final f in sorted.skip(1).take(4)) {
+    for (final f in altPool.take(4)) {
       if (f.kcalPer100g <= 0) continue;
       final g = targetKcal / (f.kcalPer100g / 100);
       final alt = buildFood(f, g);

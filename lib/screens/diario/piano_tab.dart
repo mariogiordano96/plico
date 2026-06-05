@@ -31,6 +31,7 @@ class _PianoTabState extends State<PianoTab> {
   bool _loading = true;
   bool _generating = false;
   final Set<String> _expandedSlots = {};
+  final Map<int, bool> _salatoByMeal = {};
   StreamSubscription? _settingsSub;
 
   @override
@@ -228,11 +229,48 @@ class _PianoTabState extends State<PianoTab> {
           ...plan.pasti.asMap().entries.expand((mealEntry) {
             final mealIdx = mealEntry.key;
             final meal = mealEntry.value;
-            final validSlots = meal.slots.where((s) => s.principale != null).toList();
+
+            final toggleable = (meal.tipo == PianoService.kPastoColazione ||
+                    meal.tipo == PianoService.kPastoSpuntino) &&
+                meal.slotsAlternativa.isNotEmpty;
+            final isSalato = _salatoByMeal[mealIdx] ?? false;
+            final activeSlots = (isSalato && toggleable)
+                ? meal.slotsAlternativa
+                : meal.slots;
+            final validSlots =
+                activeSlots.where((s) => s.principale != null).toList();
             if (validSlots.isEmpty) return <Widget>[];
 
             return [
               _MealHeader(tipo: meal.tipo, p: p),
+              if (toggleable) ...[
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    _StileChip(
+                      label: '🍯 Dolce',
+                      selected: !isSalato,
+                      onTap: () => setState(() {
+                        _salatoByMeal[mealIdx] = false;
+                        _expandedSlots.removeWhere(
+                            (k) => k.startsWith('$mealIdx-'));
+                      }),
+                      p: p,
+                    ),
+                    const SizedBox(width: 8),
+                    _StileChip(
+                      label: '🧀 Salata',
+                      selected: isSalato,
+                      onTap: () => setState(() {
+                        _salatoByMeal[mealIdx] = true;
+                        _expandedSlots.removeWhere(
+                            (k) => k.startsWith('$mealIdx-'));
+                      }),
+                      p: p,
+                    ),
+                  ],
+                ),
+              ],
               const SizedBox(height: 8),
               ...validSlots.asMap().entries.map((slotEntry) {
                 final slotIdx = slotEntry.key;
@@ -529,15 +567,22 @@ class _SlotCard extends StatelessWidget {
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis),
                             const SizedBox(height: 3),
-                            Text(
-                              '${food.quantitaG.round()}g  ·  ${food.kcal.round()} kcal',
-                              style: TextStyle(color: p.textMuted, fontSize: 12),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'P ${food.proteine.toStringAsFixed(1)}  G ${food.grassi.toStringAsFixed(1)}  C ${food.carboidrati.toStringAsFixed(1)}',
-                              style: TextStyle(color: p.textMuted, fontSize: 11),
-                            ),
+                            if (slot.tipo == PianoService.kVerdura) ...[
+                              Text(
+                                'q.b.  ·  ~${food.quantitaG.round()} g come riferimento',
+                                style: TextStyle(color: p.textMuted, fontSize: 12),
+                              ),
+                            ] else ...[
+                              Text(
+                                '${food.quantitaG.round()}g  ·  ${food.kcal.round()} kcal',
+                                style: TextStyle(color: p.textMuted, fontSize: 12),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'P ${food.proteine.toStringAsFixed(1)}  G ${food.grassi.toStringAsFixed(1)}  C ${food.carboidrati.toStringAsFixed(1)}',
+                                style: TextStyle(color: p.textMuted, fontSize: 11),
+                              ),
+                            ],
                           ],
                         ),
                       ),
@@ -612,10 +657,16 @@ class _SlotCard extends StatelessWidget {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis),
                                 const SizedBox(height: 2),
-                                Text(
-                                  '${alt.quantitaG.round()}g  ·  ${alt.kcal.round()} kcal  ·  P ${alt.proteine.toStringAsFixed(1)}  G ${alt.grassi.toStringAsFixed(1)}  C ${alt.carboidrati.toStringAsFixed(1)}',
-                                  style: TextStyle(color: p.textMuted, fontSize: 11),
-                                ),
+                                if (slot.tipo == PianoService.kVerdura)
+                                  Text(
+                                    'q.b.  ·  ~${alt.quantitaG.round()} g',
+                                    style: TextStyle(color: p.textMuted, fontSize: 11),
+                                  )
+                                else
+                                  Text(
+                                    '${alt.quantitaG.round()}g  ·  ${alt.kcal.round()} kcal  ·  P ${alt.proteine.toStringAsFixed(1)}  G ${alt.grassi.toStringAsFixed(1)}  C ${alt.carboidrati.toStringAsFixed(1)}',
+                                    style: TextStyle(color: p.textMuted, fontSize: 11),
+                                  ),
                               ],
                             ),
                           ),
@@ -636,6 +687,48 @@ class _SlotCard extends StatelessWidget {
                     )),
             ],
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StileChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  final ColorPalette p;
+  const _StileChip(
+      {required this.label,
+      required this.selected,
+      required this.onTap,
+      required this.p});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: selected
+              ? p.accent.withValues(alpha: 0.15)
+              : p.surfaceVariant,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: selected
+                ? p.accent.withValues(alpha: 0.5)
+                : p.cardBorder,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: selected ? p.accent : p.textMuted,
+            fontSize: 12,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+          ),
         ),
       ),
     );

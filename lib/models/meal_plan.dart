@@ -24,6 +24,7 @@ class PlanSlot {
 class PlanMeal {
   int tipo = 0; // 0=colazione 1=pranzo 2=cena 3=spuntino 4=spuntino_postWo
   List<PlanSlot> slots = [];
+  List<PlanSlot> slotsAlternativa = [];
 }
 
 @collection

@@ -2121,8 +2121,14 @@ const PlanMealSchema = Schema(
       type: IsarType.objectList,
       target: r'PlanSlot',
     ),
-    r'tipo': PropertySchema(
+    r'slotsAlternativa': PropertySchema(
       id: 1,
+      name: r'slotsAlternativa',
+      type: IsarType.objectList,
+      target: r'PlanSlot',
+    ),
+    r'tipo': PropertySchema(
+      id: 2,
       name: r'tipo',
       type: IsarType.long,
     )
@@ -2147,6 +2153,14 @@ int _planMealEstimateSize(
       bytesCount += PlanSlotSchema.estimateSize(value, offsets, allOffsets);
     }
   }
+  bytesCount += 3 + object.slotsAlternativa.length * 3;
+  {
+    final offsets = allOffsets[PlanSlot]!;
+    for (var i = 0; i < object.slotsAlternativa.length; i++) {
+      final value = object.slotsAlternativa[i];
+      bytesCount += PlanSlotSchema.estimateSize(value, offsets, allOffsets);
+    }
+  }
   return bytesCount;
 }
 
@@ -2162,7 +2176,13 @@ void _planMealSerialize(
     PlanSlotSchema.serialize,
     object.slots,
   );
-  writer.writeLong(offsets[1], object.tipo);
+  writer.writeObjectList<PlanSlot>(
+    offsets[1],
+    allOffsets,
+    PlanSlotSchema.serialize,
+    object.slotsAlternativa,
+  );
+  writer.writeLong(offsets[2], object.tipo);
 }
 
 PlanMeal _planMealDeserialize(
@@ -2179,7 +2199,14 @@ PlanMeal _planMealDeserialize(
         PlanSlot(),
       ) ??
       [];
-  object.tipo = reader.readLong(offsets[1]);
+  object.slotsAlternativa = reader.readObjectList<PlanSlot>(
+        offsets[1],
+        PlanSlotSchema.deserialize,
+        allOffsets,
+        PlanSlot(),
+      ) ??
+      [];
+  object.tipo = reader.readLong(offsets[2]);
   return object;
 }
 
@@ -2199,6 +2226,14 @@ P _planMealDeserializeProp<P>(
           ) ??
           []) as P;
     case 1:
+      return (reader.readObjectList<PlanSlot>(
+            offset,
+            PlanSlotSchema.deserialize,
+            allOffsets,
+            PlanSlot(),
+          ) ??
+          []) as P;
+    case 2:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -2292,6 +2327,95 @@ extension PlanMealQueryFilter
     });
   }
 
+  QueryBuilder<PlanMeal, PlanMeal, QAfterFilterCondition>
+      slotsAlternativaLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'slotsAlternativa',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlanMeal, PlanMeal, QAfterFilterCondition>
+      slotsAlternativaIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'slotsAlternativa',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlanMeal, PlanMeal, QAfterFilterCondition>
+      slotsAlternativaIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'slotsAlternativa',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlanMeal, PlanMeal, QAfterFilterCondition>
+      slotsAlternativaLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'slotsAlternativa',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<PlanMeal, PlanMeal, QAfterFilterCondition>
+      slotsAlternativaLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'slotsAlternativa',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<PlanMeal, PlanMeal, QAfterFilterCondition>
+      slotsAlternativaLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'slotsAlternativa',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
+
   QueryBuilder<PlanMeal, PlanMeal, QAfterFilterCondition> tipoEqualTo(
       int value) {
     return QueryBuilder.apply(this, (query) {
@@ -2352,6 +2476,13 @@ extension PlanMealQueryObject
       FilterQuery<PlanSlot> q) {
     return QueryBuilder.apply(this, (query) {
       return query.object(q, r'slots');
+    });
+  }
+
+  QueryBuilder<PlanMeal, PlanMeal, QAfterFilterCondition>
+      slotsAlternativaElement(FilterQuery<PlanSlot> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.object(q, r'slotsAlternativa');
     });
   }
 }
