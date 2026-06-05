@@ -1,8 +1,8 @@
 # Plico — Documentazione Database
 
 **Engine:** Isar (NoSQL embedded, Flutter-native)  
-**Versione schema:** 1.0  
-**Ultimo aggiornamento:** 2026-06-02  
+**Versione schema:** 2.0  
+**Ultimo aggiornamento:** 2026-06-05  
 **Service layer:** `lib/services/database_service.dart`  
 **Tipo app:** Standalone, single-user, offline-first
 
@@ -10,10 +10,11 @@
 
 ## Principi di progettazione
 
-- **Single-user**: non esiste un concetto di account o autenticazione. Il profilo utente è sempre e solo uno (id = 1).
-- **Storicizzazione**: peso, altezza e body fat vengono registrati come snapshot temporali, non sovrascritti, per consentire l'analisi dell'evoluzione nel tempo.
-- **Separazione tra dati anagrafici e misurazioni**: i dati statici (nome, sesso, data di nascita) vivono in `UserProfile`; i dati che cambiano nel tempo vivono in `BodySnapshot` e `PlicometrySession`.
-- **Embedded objects**: i valori delle pliche e i risultati calcolati sono embedded direttamente nella sessione, evitando join inutili su dati che non vengono mai letti separatamente.
+- **Single-user**: nessun account o autenticazione. I record singoli usano id fisso = 1.
+- **Storicizzazione**: peso, plicometria e misurazioni sono snapshot temporali, mai sovrascritti, per consentire l'analisi dell'evoluzione nel tempo.
+- **Separazione dati anagrafici / misurazioni**: dati statici in `UserProfile`; dati temporali in `BodySnapshot` e `PlicometrySession`.
+- **Embedded objects**: valori nested (pliche, risultati, slot piano, voci diario) sono embedded nella collezione padre per evitare join su dati sempre letti insieme.
+- **Offline-first**: nessuna dipendenza da rete. Il DB vive interamente sul device.
 
 ---
 
@@ -21,90 +22,227 @@
 
 ### 1. `UserProfile`
 
-Dati anagrafici e baseline dell'utente. Record singolo (id fisso = 1).
+Dati anagrafici dell'utente. Record singolo (id = 1).
 
-| Campo          | Tipo       | Obbligatorio | Note                                      |
-|----------------|------------|:------------:|-------------------------------------------|
-| `id`           | `Id`       | ✓            | Sempre 1 (single-user)                    |
-| `nome`         | `String`   | ✓            |                                           |
-| `cognome`      | `String`   | ✓            |                                           |
-| `dataNascita`  | `DateTime` | ✓            | Usata per calcolare l'età nelle formule   |
-| `sesso`        | `Sesso`    | ✓            | Enum: `maschio` / `femmina`               |
-| `altezzaCm`    | `double`   | ✓            | Altezza di riferimento in cm              |
-| `bodyFatIniziale` | `double?` |            | BF% noto a priori (opzionale)            |
-| `createdAt`    | `DateTime` | ✓            | Data di prima configurazione              |
+| Campo             | Tipo       | Obbligatorio | Note                                    |
+|-------------------|------------|:------------:|-----------------------------------------|
+| `id`              | `Id`       | ✓            | Sempre 1                                |
+| `nome`            | `String`   | ✓            |                                         |
+| `cognome`         | `String`   | ✓            |                                         |
+| `dataNascita`     | `DateTime` | ✓            | Usata per calcolare l'età corrente      |
+| `sesso`           | `Sesso`    | ✓            | Enum: `maschio` / `femmina`             |
+| `altezzaCm`       | `double`   | ✓            | Altezza di riferimento per i calcoli    |
+| `bodyFatIniziale` | `double?`  |              | BF% di partenza (pre-plicometria)       |
+| `createdAt`       | `DateTime` | ✓            | Data prima configurazione               |
 
-**Note:** `altezzaCm` è il valore di default usato nei calcoli. Se l'altezza cambia nel tempo può essere aggiornata qui oppure indicata puntualmente nel `BodySnapshot`.
-
----
-
-### 2. `BodySnapshot`
-
-Storico delle misurazioni antropometriche manuali (peso, altezza, BF noto).  
-Ogni record rappresenta una rilevazione in un dato momento.
-
-| Campo             | Tipo       | Obbligatorio | Note                                            |
-|-------------------|------------|:------------:|-------------------------------------------------|
-| `id`              | `Id`       | ✓            | Auto-increment                                  |
-| `data`            | `DateTime` | ✓            | Data e ora della rilevazione                    |
-| `pesoKg`          | `double`   | ✓            | Peso in kg                                      |
-| `altezzaCm`       | `double?`  |              | Compilare solo se diversa dal profilo           |
-| `bodyFatManuale`  | `double?`  |              | BF% inserito manualmente (es. bilancia impedenziometrica) |
-| `note`            | `String?`  |              | Annotazioni libere                              |
-
-**Indici:** `data` (ordinamento cronologico).
+**Campo calcolato:** `etaCorrente` (getter, non persistito) — calcola l'età dall'anno corrente.
 
 ---
 
-### 3. `PlicometrySession`
+### 2. `AppSettings`
 
-Sessione completa di plicometria: contiene il metodo usato, i valori delle pliche rilevate e i risultati calcolati.
+Impostazioni applicative e configurazione del piano nutrizionale. Record singolo (id = 1).
 
-| Campo        | Tipo                    | Obbligatorio | Note                                        |
-|--------------|-------------------------|:------------:|---------------------------------------------|
-| `id`         | `Id`                    | ✓            | Auto-increment                              |
-| `data`       | `DateTime`              | ✓            | Data e ora della sessione                   |
-| `metodo`     | `MetodoPlicometria`     | ✓            | Enum (vedi sotto)                           |
-| `etaAnni`    | `int`                   | ✓            | Età calcolata al momento della sessione     |
-| `pesoKg`     | `double`                | ✓            | Peso usato per i calcoli                    |
-| `altezzaCm`  | `double`                | ✓            | Altezza usata per i calcoli                 |
-| `pliche`     | `Pliche` (embedded)     | ✓            | Valori in mm dei siti rilevati              |
-| `risultati`  | `RisultatiPlico` (embedded) | ✓        | Output calcolati della sessione             |
-| `note`       | `String?`               |              | Annotazioni libere                          |
+| Campo             | Tipo       | Default | Note                                          |
+|-------------------|------------|:-------:|-----------------------------------------------|
+| `id`              | `Id`       | 1       | Sempre 1                                      |
+| `isDarkMode`      | `bool`     | false   | Tema dell'interfaccia                         |
+| `livelloAttivita` | `int`      | 2       | 0=sedentario · 1=legg. attivo · 2=mod. attivo · 3=molto attivo · 4=atleta |
+| `metodoTdee`      | `int`      | 0       | 0=auto · 1=Katch-McArdle · 2=Mifflin-St Jeor · 3=Harris-Benedict |
+| `obiettivo`       | `int`      | 1       | 0=deficit (−20%) · 1=mantenimento · 2=surplus (+15%) |
+| `creaSeeded`      | `bool`     | false   | Flag: DB alimenti CREA già popolato           |
+| `goalSetDate`     | `DateTime?`|         | Data attivazione piano; `null` = piano non attivo |
+
+**Nota:** `goalSetDate != null` indica che il piano è attivo. Dopo 30 giorni l'app suggerisce di ricalcolarlo.
+
+---
+
+### 3. `UserFoodPreferences`
+
+Preferenze alimentari dell'utente, raccolte tramite il questionario. Record singolo (id = 1).
+
+| Campo                   | Tipo          | Default | Note                                         |
+|-------------------------|---------------|:-------:|----------------------------------------------|
+| `id`                    | `Id`          | 1       | Sempre 1                                     |
+| `restrizioni`           | `List<String>`| []      | Es. `"vegetariano"`, `"vegano"`, `"no_lattosio"`, `"no_glutine"`, `"no_pesce"`, `"no_fruttaSecca"` |
+| `foodLikedIds`          | `List<int>`   | []      | Id Isar degli alimenti marcati come preferiti |
+| `numPasti`              | `int`         | 3       | 3 / 4 / 5 pasti al giorno                   |
+| `haSpuntinoPostWo`      | `bool`        | false   | Se true, il piano include uno spuntino post-allenamento |
+| `questionarioCompletato`| `bool`        | false   | Flag UI: mostra il piano o il CTA questionario |
+
+---
+
+### 4. `FoodItem`
+
+Alimento dal database nutrizionale CREA. Valori per 100g.
+
+| Campo         | Tipo     | Note                                              |
+|---------------|----------|---------------------------------------------------|
+| `id`          | `Id`     | Auto-increment                                    |
+| `nome`        | `String` | Nome canonico italiano (es. "Petto di pollo")     |
+| `kcalPer100g` | `double` |                                                   |
+| `protPer100g` | `double` |                                                   |
+| `fatPer100g`  | `double` |                                                   |
+| `carbsPer100g`| `double` |                                                   |
+| `fibraPer100g`| `double?`| Opzionale                                         |
+| `fonte`       | `String` | `"crea"` per i dati ufficiali, `"custom"` per voci aggiuntive |
+
+**Indici:** `nome` (ricerca testuale), `fonte`.  
+**Seed:** il file `assets/data/crea_seed.json` popola questa collezione al primo avvio via `seedCreaFoods()`. Contiene ~80 voci CREA + 6 voci custom (CUSTOM001–006: skyr, gallette di riso, fiocchi di latte, tofu, tempeh, seitan).
+
+---
+
+### 5. `BodySnapshot`
+
+Storico delle pesate. Ogni record è una misurazione in un dato momento.
+
+| Campo            | Tipo      | Obbligatorio | Note                                              |
+|------------------|-----------|:------------:|---------------------------------------------------|
+| `id`             | `Id`      | ✓            | Auto-increment                                    |
+| `data`           | `DateTime`| ✓            | Data e ora della rilevazione                      |
+| `pesoKg`         | `double`  | ✓            |                                                   |
+| `altezzaCm`      | `double?` |              | Solo se diversa dal profilo                       |
+| `bodyFatManuale` | `double?` |              | BF% da bilancia impedenziometrica                 |
+| `note`           | `String?` |              |                                                   |
+
+**Indici:** `data` (desc).  
+**Uso:** la pesata più recente è usata per calcolare TDEE e macro target. Il grafico peso in `ProgressiScreen` visualizza la serie storica.
+
+---
+
+### 6. `PlicometrySession`
+
+Sessione di plicometria con misure, metodo e risultati calcolati.
+
+| Campo       | Tipo                    | Obbligatorio | Note                                  |
+|-------------|-------------------------|:------------:|---------------------------------------|
+| `id`        | `Id`                    | ✓            | Auto-increment                        |
+| `data`      | `DateTime`              | ✓            |                                       |
+| `metodo`    | `MetodoPlicometria`     | ✓            | Enum (vedi sotto)                     |
+| `etaAnni`   | `int`                   | ✓            | Età al momento della sessione         |
+| `pesoKg`    | `double`                | ✓            | Copiato dalla pesata corrente         |
+| `altezzaCm` | `double`                | ✓            | Copiato dal profilo                   |
+| `pliche`    | `Pliche` (embedded)     | ✓            | Valori mm dei siti rilevati           |
+| `risultati` | `RisultatiPlico` (emb.) | ✓            | BF%, MG, MM calcolati                 |
+| `note`      | `String?`               |              |                                       |
 
 **Indici:** `data`, `metodo`.
 
+#### Embedded: `Pliche`
+Valori mm per sito. Solo i campi richiesti dal metodo vengono compilati.
+
+| Campo              | Metodi                                     |
+|--------------------|--------------------------------------------|
+| `tricipiteMm`      | D&W, J&P-3 (F), J&P-7, Faulkner           |
+| `bicipiteMm`       | D&W                                        |
+| `pettoraleMm`      | J&P-3 (M), J&P-7                           |
+| `ascelllareMm`     | J&P-7                                      |
+| `sottoscapolareMm` | D&W, J&P-7, Faulkner                       |
+| `sovrailiachMm`    | D&W, J&P-3 (F), J&P-7, Faulkner           |
+| `addomineMm`       | J&P-3 (M), J&P-7, Faulkner                |
+| `cosciaMm`         | J&P-3, J&P-7                               |
+| `polpaccioMm`      | US Navy (circonferenza)                    |
+
+#### Embedded: `RisultatiPlico`
+
+| Campo             | Tipo      | Descrizione                           |
+|-------------------|-----------|---------------------------------------|
+| `bodyFatPercent`  | `double`  | % massa grassa                        |
+| `massaGrassaKg`   | `double`  | Massa grassa in kg                    |
+| `massaMagraKg`    | `double`  | Massa magra (FFM) in kg               |
+| `sommaPlicheMm`   | `double`  | Somma delle pliche usate              |
+| `densitaCorporea` | `double?` | Densità corporea (se calcolata)       |
+
 ---
 
-### Embedded: `Pliche`
+### 7. `MeasurementSnapshot`
 
-Valori in millimetri dei siti di rilevazione. Solo i campi richiesti dal metodo scelto vengono compilati.
+Misurazioni corporee manuali (pliche aggregate + circonferenze). Un record per giorno.
 
-| Campo            | Tipo      | Metodi che lo usano                              |
-|------------------|-----------|--------------------------------------------------|
-| `tricipiteMm`    | `double?` | D&W, J&P-3 (F), J&P-7, Faulkner                 |
-| `bicipiteMm`     | `double?` | D&W                                              |
-| `pettoralleMm`   | `double?` | J&P-3 (M), J&P-7                                |
-| `ascelllareMm`   | `double?` | J&P-7                                            |
-| `sottoscapolareMm` | `double?` | D&W, J&P-7, Faulkner                          |
-| `sovrailiachMm`  | `double?` | D&W, J&P-3 (F), J&P-7, Faulkner                 |
-| `addomineMm`     | `double?` | J&P-3 (M), J&P-7, Faulkner                      |
-| `cosciaMm`       | `double?` | J&P-3, J&P-7                                     |
-| `polpacciomm`    | `double?` | Metodi opzionali futuri                          |
+| Sezione       | Campi                                                                    |
+|---------------|--------------------------------------------------------------------------|
+| **Pliche (mm)**| `tricipiteMm`, `bicipiteMm`, `pettoraleMm`, `ascelllareMm`, `sottoscapolareMm`, `sovrailiachMm`, `addomineMm`, `cosciaMm`, `polpaccioMm` |
+| **Circonferenze (cm)** | `colloCm`, `vitaCm`, `fianchiCm`, `braccioCm`, `cosciaCm`, `polpaccioCm`, `toraceCm`, `spalleCm` |
+| **Meta**      | `fonti: List<String>` — es. `["manuale", "jacksonPollock3"]`             |
+
+**Indici:** `data` (normalizzata a mezzanotte, un record per giorno).  
+**Uso:** i dati aggregati sono visualizzati in `ProgressiScreen` → sezione "Misurazioni".
 
 ---
 
-### Embedded: `RisultatiPlico`
+### 8. `DailyLog`
 
-Risultati calcolati a partire dai valori delle pliche e dai dati antropometrici.
+Diario alimentare giornaliero. Un record per giorno (normalizzato a mezzanotte).
 
-| Campo             | Tipo     | Descrizione                                    |
-|-------------------|----------|------------------------------------------------|
-| `bodyFatPercent`  | `double` | % di massa grassa                              |
-| `massaGrassaKg`   | `double` | Massa grassa in kg                             |
-| `massaMapraKg`    | `double` | Massa magra (FFM) in kg                        |
-| `sommaPlicheMm`   | `double` | Somma totale delle pliche usate (mm)           |
-| `densitaCorporea` | `double?`| Densità corporea (se calcolata dalla formula)  |
+| Campo     | Tipo              | Note                                        |
+|-----------|-------------------|---------------------------------------------|
+| `id`      | `Id`              | Auto-increment                              |
+| `data`    | `DateTime`        | Normalizzata a mezzanotte; indice univoco   |
+| `entries` | `List<MealEntry>` | Voci alimentari della giornata (embedded)   |
+
+**Getter calcolati:** `kcalTotali`, `proteinTotali`, `fatTotali`, `carbsTotali`.
+
+#### Embedded: `MealEntry`
+
+| Campo           | Tipo     | Note                                          |
+|-----------------|----------|-----------------------------------------------|
+| `foodNome`      | `String` | Nome alimento                                 |
+| `foodBrand`     | `String?`| Brand (da Open Food Facts, se presente)       |
+| `kcalPer100g`   | `double` |                                               |
+| `proteinPer100g`| `double` |                                               |
+| `fatPer100g`    | `double` |                                               |
+| `carbsPer100g`  | `double` |                                               |
+| `quantitaG`     | `double` | Quantità in grammi                            |
+| `pastoTipo`     | `int`    | Indice `PastoTipo` (vedi enum sotto)          |
+
+**Getter calcolati:** `kcal`, `proteinG`, `fatG`, `carbsG` (quantitaG × valore/100).
+
+---
+
+### 9. `MealPlan`
+
+Piano alimentare giornaliero generato. Record singolo (id = 1), sovrascritto ad ogni rigenerazione.
+
+| Campo                    | Tipo             | Note                                         |
+|--------------------------|------------------|----------------------------------------------|
+| `id`                     | `Id`             | Sempre 1                                     |
+| `dataCreazione`          | `DateTime`       |                                              |
+| `pasti`                  | `List<PlanMeal>` | Pasti del piano (embedded)                   |
+| `kcalTotali`             | `double`         | Totale piano                                 |
+| `proteineTotali`         | `double`         |                                              |
+| `grassiTotali`           | `double`         |                                              |
+| `carbsTotali`            | `double`         |                                              |
+| `obsoleto`               | `bool`           | True se peso/obiettivo cambiati dopo la generazione |
+| `livelloAtGenerazione`   | `int`            | Snapshot livello attività al momento della generazione |
+| `obiettivoAtGenerazione` | `int`            | Snapshot obiettivo al momento della generazione |
+
+#### Embedded: `PlanMeal`
+
+| Campo            | Tipo            | Note                                              |
+|------------------|-----------------|---------------------------------------------------|
+| `tipo`           | `int`           | Indice `PastoTipo` (0–5)                          |
+| `slots`          | `List<PlanSlot>`| Slot alimentari del pasto (principale)            |
+| `slotsAlternativa`| `List<PlanSlot>`| Slot per la versione alternativa del pasto (es. colazione salata vs dolce) |
+
+#### Embedded: `PlanSlot`
+
+| Campo         | Tipo            | Note                                              |
+|---------------|-----------------|---------------------------------------------------|
+| `tipo`        | `int`           | 0=proteina · 1=carboidrato · 2=verdura · 3=grasso · 4=extra · 5=frutta |
+| `principale`  | `PlanFood?`     | Alimento principale per lo slot                   |
+| `alternative` | `List<PlanFood>`| Alternative equivalenti (prima i preferiti dall'utente, poi max 3 non-preferiti) |
+
+#### Embedded: `PlanFood`
+
+| Campo         | Tipo     | Note                                |
+|---------------|----------|-------------------------------------|
+| `nome`        | `String` |                                     |
+| `foodItemId`  | `int`    | Id del `FoodItem` sorgente          |
+| `quantitaG`   | `double` | Arrotondata a multipli di 5g        |
+| `kcal`        | `double` |                                     |
+| `proteine`    | `double` |                                     |
+| `grassi`      | `double` |                                     |
+| `carboidrati` | `double` |                                     |
 
 ---
 
@@ -112,16 +250,26 @@ Risultati calcolati a partire dai valori delle pliche e dai dati antropometrici.
 
 ### `Sesso`
 ```
-maschio
-femmina
+maschio · femmina
+```
+
+### `PastoTipo`
+```
+0 = colazione
+1 = pranzo
+2 = cena
+3 = spuntino
+4 = postWo          ← aggiunto; mostrato solo se haSpuntinoPostWo = true
+5 = spuntinoSerale  ← aggiunto; mostrato solo se numPasti = 5
 ```
 
 ### `MetodoPlicometria`
 ```
-durninWomersley    → 4 pliche, uomo e donna
-jacksonPollock3    → 3 pliche, dipende dal sesso
-jacksonPollock7    → 7 pliche, alta precisione
-faulkner           → 4 pliche, pensato per atleti
+durninWomersley  → 4 pliche, uomo e donna
+jacksonPollock3  → 3 pliche, dipende dal sesso
+jacksonPollock7  → 7 pliche, alta precisione
+faulkner         → 4 pliche, pensato per atleti
+usNavy           → circonferenze (collo, vita, fianchi)
 ```
 
 ---
@@ -129,56 +277,166 @@ faulkner           → 4 pliche, pensato per atleti
 ## Diagramma ER (logico)
 
 ```
-┌─────────────────────┐
-│     UserProfile     │  ← record singolo (id = 1)
-│─────────────────────│
-│ id                  │
-│ nome                │
-│ cognome             │
-│ dataNascita         │
-│ sesso               │
-│ altezzaCm           │
-│ bodyFatIniziale?    │
-│ createdAt           │
-└─────────────────────┘
+┌─────────────────┐   ┌──────────────────┐   ┌──────────────────────┐
+│   UserProfile   │   │   AppSettings    │   │ UserFoodPreferences  │
+│  (id = 1)       │   │  (id = 1)        │   │  (id = 1)            │
+│─────────────────│   │──────────────────│   │──────────────────────│
+│ nome, cognome   │   │ isDarkMode       │   │ restrizioni[]        │
+│ dataNascita     │   │ livelloAttivita  │   │ foodLikedIds[]       │
+│ sesso           │   │ metodoTdee       │   │ numPasti             │
+│ altezzaCm       │   │ obiettivo        │   │ haSpuntinoPostWo     │
+│ bodyFatIniziale?│   │ creaSeeded       │   │ questionarioCompletato│
+│ createdAt       │   │ goalSetDate?     │   └──────────────────────┘
+└─────────────────┘   └──────────────────┘
 
-┌─────────────────────┐
-│    BodySnapshot     │  ← N record nel tempo
-│─────────────────────│
-│ id (auto)           │
-│ data                │
-│ pesoKg              │
-│ altezzaCm?          │
-│ bodyFatManuale?     │
-│ note?               │
-└─────────────────────┘
+┌─────────────────┐   ┌──────────────────────────────────────────────┐
+│  BodySnapshot   │   │              PlicometrySession               │
+│  (N record)     │   │              (N record)                      │
+│─────────────────│   │──────────────────────────────────────────────│
+│ data            │   │ data, metodo, etaAnni, pesoKg, altezzaCm    │
+│ pesoKg          │   │ ┌──────────────┐  ┌───────────────────────┐ │
+│ altezzaCm?      │   │ │    Pliche    │  │   RisultatiPlico      │ │
+│ bodyFatManuale? │   │ │  (mm × sito) │  │ bodyFat%, MG, MM      │ │
+│ note?           │   │ └──────────────┘  └───────────────────────┘ │
+└─────────────────┘   └──────────────────────────────────────────────┘
 
-┌──────────────────────────────────────────┐
-│           PlicometrySession              │  ← N record nel tempo
-│──────────────────────────────────────────│
-│ id (auto)                                │
-│ data                                     │
-│ metodo                                   │
-│ etaAnni                                  │
-│ pesoKg                                   │
-│ altezzaCm                                │
-│ note?                                    │
-│                                          │
-│  ┌─────────────────┐  ┌───────────────┐  │
-│  │     Pliche      │  │  Risultati    │  │
-│  │─────────────────│  │───────────────│  │
-│  │ tricipiteMm?    │  │ bodyFat%      │  │
-│  │ bicipiteMm?     │  │ massaGrassaKg │  │
-│  │ pettoralleMm?   │  │ massaMagraKg  │  │
-│  │ ascelllareMm?   │  │ sommaPliche   │  │
-│  │ sottoscapolareMm│  │ densita?      │  │
-│  │ sovrailiachMm?  │  └───────────────┘  │
-│  │ addomineMm?     │                     │
-│  │ cosciaMm?       │                     │
-│  │ polpaccioMm?    │                     │
-│  └─────────────────┘                     │
-└──────────────────────────────────────────┘
+┌────────────────────────┐   ┌────────────────────────────────────────┐
+│  MeasurementSnapshot   │   │              DailyLog                  │
+│  (N record, 1/giorno)  │   │         (N record, 1/giorno)           │
+│────────────────────────│   │────────────────────────────────────────│
+│ data                   │   │ data                                   │
+│ fonti[]                │   │ entries[]:                             │
+│ pliche (mm) × 9        │   │   MealEntry {                         │
+│ circonferenze (cm) × 8 │   │     foodNome, quantitaG               │
+└────────────────────────┘   │     pastoTipo (0–5)                   │
+                             │     macro per 100g                    │
+                             │   }                                   │
+                             └────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────┐
+│                           MealPlan                                 │
+│                          (id = 1)                                  │
+│────────────────────────────────────────────────────────────────────│
+│ dataCreazione, kcalTotali, macro totali, obsoleto                  │
+│ livelloAtGenerazione, obiettivoAtGenerazione                       │
+│                                                                    │
+│ pasti[]: PlanMeal {                                                │
+│   tipo (PastoTipo 0–5)                                             │
+│   slots[]: PlanSlot {                                              │
+│     tipo (0=prot · 1=carbo · 2=verd · 3=grasso · 4=extra · 5=frut)│
+│     principale: PlanFood { nome, quantitaG, macro }               │
+│     alternative[]: PlanFood[]                                      │
+│   }                                                                │
+│   slotsAlternativa[]: PlanSlot[]  (es. colazione salata)          │
+│ }                                                                  │
+└────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│               FoodItem                  │
+│           (~80 voci CREA)               │
+│─────────────────────────────────────────│
+│ nome                                    │
+│ kcal / prot / fat / carbs per 100g      │
+│ fibra? (opzionale)                      │
+│ fonte ("crea" | "custom")               │
+└─────────────────────────────────────────┘
 ```
+
+---
+
+## Architettura navigazione
+
+```
+main.dart
+  └── hasUserProfile?
+        ├── NO  → OnboardingScreen (6 step)
+        │           └── completamento → MainScreen
+        └── SÌ  → MainScreen
+                    ├── Tab 0: HomeScreen
+                    ├── Tab 1: DiarioScreen (DIARIO | PIANO tabs)
+                    ├── Tab 2: ProgressiScreen
+                    └── Tab 3: TdeeScreen
+```
+
+`MainScreen` usa `IndexedStack` + `BottomNavigationBar`. Le schermate secondarie (PesateScreen, MethodSelectionScreen, StoricoMisurazioniScreen, ecc.) sono pushate via `Navigator.push` sopra il MainScreen.
+
+---
+
+## Service Layer — `DatabaseService`
+
+Singleton accessibile via `DatabaseService.instance`.  
+Inizializzato in `main()` prima di `runApp()`.
+
+### UserProfile
+| Metodo | Ritorna | Descrizione |
+|--------|---------|-------------|
+| `hasUserProfile()` | `Future<bool>` | Routing onboarding/home |
+| `getUserProfile()` | `Future<UserProfile?>` | Legge il profilo |
+| `saveUserProfile(p)` | `Future<void>` | Crea o aggiorna |
+| `watchUserProfile()` | `Stream<UserProfile?>` | Reattivo per la UI |
+
+### AppSettings
+| Metodo | Ritorna | Descrizione |
+|--------|---------|-------------|
+| `getIsDarkMode()` / `saveIsDarkMode(bool)` | — | Tema |
+| `getLivelloAttivita()` / `saveLivelloAttivita(int)` | — | Livello attività |
+| `getMetodoTdee()` / `saveMetodoTdee(int)` | — | Metodo calcolo TDEE |
+| `getObiettivo()` / `saveObiettivo(int)` | — | Obiettivo calorico |
+| `getGoalSetDate()` | `Future<DateTime?>` | Data attivazione piano |
+| `activateGoal(livello, metodo, obiettivo)` | `Future<void>` | Attiva il piano (imposta goalSetDate) |
+| `resetGoal()` | `Future<void>` | Deattiva il piano |
+| `watchAppSettings()` | `Stream<AppSettings?>` | Reattivo per TDEE/Diario |
+
+### UserFoodPreferences
+| Metodo | Ritorna | Descrizione |
+|--------|---------|-------------|
+| `getUserFoodPreferences()` | `Future<UserFoodPreferences?>` | Legge le preferenze |
+| `saveUserFoodPreferences(p)` | `Future<void>` | Salva questionario |
+
+### FoodItem
+| Metodo | Ritorna | Descrizione |
+|--------|---------|-------------|
+| `seedCreaFoods()` | `Future<void>` | Popola il DB al primo avvio |
+| `getAllCreaFoods()` | `Future<List<FoodItem>>` | Tutti gli alimenti |
+| `searchFoods(query)` | `Future<List<FoodItem>>` | Ricerca testuale |
+
+### BodySnapshot
+| Metodo | Ritorna | Descrizione |
+|--------|---------|-------------|
+| `addBodySnapshot(s)` | `Future<void>` | Aggiunge pesata |
+| `deleteBodySnapshot(id)` | `Future<void>` | Elimina pesata |
+| `getLatestBodySnapshot()` | `Future<BodySnapshot?>` | Ultima pesata |
+| `watchBodySnapshots()` | `Stream<List<BodySnapshot>>` | Reattivo per grafici e HomeScreen |
+
+### PlicometrySession
+| Metodo | Ritorna | Descrizione |
+|--------|---------|-------------|
+| `addPlicometrySession(s)` | `Future<void>` | Salva sessione |
+| `deletePlicometrySession(id)` | `Future<void>` | Elimina |
+| `getLatestPlicometrySession()` | `Future<PlicometrySession?>` | Ultima sessione |
+| `watchPlicometrySessions()` | `Stream<List<...>>` | Reattivo per HomeScreen/Progressi |
+
+### DailyLog
+| Metodo | Ritorna | Descrizione |
+|--------|---------|-------------|
+| `getDailyLog(date)` | `Future<DailyLog?>` | Log di un giorno |
+| `watchDailyLog(date)` | `Stream<DailyLog?>` | Reattivo per DiarioScreen/HomeScreen |
+| `addMealEntry(date, entry)` | `Future<void>` | Aggiunge voce al diario |
+| `removeMealEntry(date, index)` | `Future<void>` | Rimuove voce |
+
+### MealPlan
+| Metodo | Ritorna | Descrizione |
+|--------|---------|-------------|
+| `getMealPlan()` | `Future<MealPlan?>` | Piano corrente |
+| `saveMealPlan(plan)` | `Future<void>` | Salva/sovrascrive piano |
+| `watchMealPlan()` | `Stream<MealPlan?>` | Reattivo per PianoTab |
+
+### MeasurementSnapshot
+| Metodo | Ritorna | Descrizione |
+|--------|---------|-------------|
+| `addMeasurementSnapshot(s)` | `Future<void>` | Aggiunge misurazione |
+| `deleteMeasurementSnapshot(id)` | `Future<void>` | Elimina |
+| `watchMeasurementSnapshots()` | `Stream<List<...>>` | Reattivo per Progressi/Storico |
 
 ---
 
@@ -186,49 +444,10 @@ faulkner           → 4 pliche, pensato per atleti
 
 | Decisione | Motivazione |
 |-----------|-------------|
-| `BodySnapshot` separato da `PlicometrySession` | Il peso può essere registrato anche senza fare una sessione di plicometria (es. pesata mattutina) |
-| `etaAnni` e `pesoKg` copiati nella sessione | I calcoli dipendono dai valori al momento della misurazione; se in futuro il profilo cambia, i risultati storici restano corretti |
-| `altezzaCm` duplicata nella sessione | Stessa motivazione del punto sopra |
-| Nessuna relazione esplicita tra collezioni | Isar non supporta foreign key; il collegamento implicito è sempre con l'unico `UserProfile` (id=1) |
-| `bodyFatIniziale` opzionale nel profilo | Permette di avere un punto di partenza anche prima della prima sessione di plicometria |
-
----
-
-## Service Layer — `DatabaseService`
-
-Singleton accessibile ovunque via `DatabaseService.instance`.  
-Inizializzato in `main()` prima di `runApp()`.
-
-### API pubblica
-
-#### UserProfile
-| Metodo | Ritorna | Descrizione |
-|--------|---------|-------------|
-| `hasUserProfile()` | `Future<bool>` | Usato per decidere se mostrare l'onboarding |
-| `getUserProfile()` | `Future<UserProfile?>` | Legge il profilo utente |
-| `saveUserProfile(profile)` | `Future<void>` | Crea o aggiorna il profilo |
-| `watchUserProfile()` | `Stream<UserProfile?>` | Stream reattivo per la UI |
-
-#### BodySnapshot
-| Metodo | Ritorna | Descrizione |
-|--------|---------|-------------|
-| `addBodySnapshot(snapshot)` | `Future<void>` | Aggiunge una nuova pesata |
-| `deleteBodySnapshot(id)` | `Future<void>` | Elimina una pesata |
-| `getBodySnapshots()` | `Future<List<...>>` | Tutte le pesate, ordinate per data desc |
-| `getLatestBodySnapshot()` | `Future<BodySnapshot?>` | L'ultima pesata registrata |
-| `watchBodySnapshots()` | `Stream<List<...>>` | Stream reattivo per grafici |
-
-#### PlicometrySession
-| Metodo | Ritorna | Descrizione |
-|--------|---------|-------------|
-| `addPlicometrySession(session)` | `Future<void>` | Salva una sessione di plicometria |
-| `deletePlicometrySession(id)` | `Future<void>` | Elimina una sessione |
-| `getPlicometrySessions()` | `Future<List<...>>` | Tutte le sessioni, ordinate per data desc |
-| `getLatestPlicometrySession()` | `Future<PlicometrySession?>` | L'ultima sessione |
-| `getSessionsByMethod(metodo)` | `Future<List<...>>` | Filtra per metodo di calcolo |
-| `watchPlicometrySessions()` | `Stream<List<...>>` | Stream reattivo per grafici/storico |
-
-#### Utility
-| Metodo | Descrizione |
-|--------|-------------|
-| `clearAll()` | Cancella tutti i dati (usato per reset/debug) |
+| `BodySnapshot` separato da `PlicometrySession` | Il peso può essere registrato senza plicometria |
+| `etaAnni`/`pesoKg`/`altezzaCm` copiati nella sessione | I calcoli storici devono restare corretti anche se il profilo cambia |
+| `MealPlan` record singolo (id=1) | Il piano è sempre uno solo; la rigenerazione sovrascrive |
+| `PlanFood.quantitaG` arrotondata a multipli di 5g | Usabilità pratica: grammature realistiche da pesare |
+| `PastoTipo` come `int` in `MealEntry` | Flessibilità: aggiungere nuovi tipi senza migrazioni Isar |
+| `slotsAlternativa` in `PlanMeal` | Permette la versione alternativa del pasto (es. colazione salata) senza duplicare il record |
+| `goalSetDate` in `AppSettings` | Unica fonte di verità per lo stato del piano; usata da TdeeScreen, DiarioScreen e HomeScreen |
