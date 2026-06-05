@@ -448,6 +448,17 @@ class _PlanHeaderCard extends StatelessWidget {
               _MiniMacro(label: 'C', value: plan.carbsTotali.round(), color: const Color(0xFF4CAF8E), p: p),
             ],
           ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Icon(Icons.info_outline_rounded, size: 12, color: p.textMuted),
+              const SizedBox(width: 4),
+              Text(
+                'Grammature da pesare a crudo',
+                style: TextStyle(color: p.textMuted, fontSize: 11),
+              ),
+            ],
+          ),
         ],
       ),
     );
