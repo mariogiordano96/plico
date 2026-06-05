@@ -17,9 +17,10 @@ class PianoService {
   static const kVerdura = 2;
   static const kGrasso = 3;
   static const kExtra = 4;
+  static const kFrutta = 5;
 
-  static const slotLabels = ['Proteina', 'Carboidrati', 'Verdura', 'Grassi', 'Extra'];
-  static const slotEmoji = ['🥩', '🍚', '🥦', '🫒', '🧀'];
+  static const slotLabels = ['Proteina', 'Carboidrati', 'Verdura', 'Grassi', 'Extra', 'Frutta'];
+  static const slotEmoji = ['🥩', '🍚', '🥦', '🫒', '🧀', '🍓'];
 
   // Meal types
   static const kPastoColazione = 0;
@@ -33,23 +34,60 @@ class PianoService {
 
   static const curatedCerealiColazione = [
     "Fiocchi d'avena",
+    'Gallette di riso',
+    'Muesli',
+    'Fette biscottate, integrali',
     'Pane di tipo integrale',
   ];
 
   static const curatedLatticiniColazione = [
     'Yogurt greco, 0% lipidi',
+    'Skyr, naturale',
+    'Fiocchi di latte',
     'Ricotta di vacca',
+    'Fiocchi di formaggio magro',
     'Latte di vacca, pastorizzato, scremato',
+  ];
+
+  static const curatedFruttaColazione = [
+    'Banane, fresche',
+    'Mele, fresche, golden',
+    'Pere, fresche, Abate Fetel',
+    'Arance, fresche',
+    'Fragole, fresche',
+    'Mirtilli, freschi',
+    'Kiwi, freschi',
+    'Lamponi, freschi',
   ];
 
   // versione salata
   static const curatedProteineSalataColazione = [
+    'Bresaola della Valtellina IGP',
+    'Prosciutto cotto, sgrassato',
+    'Prosciutto crudo, disossato, sgrassato',
+    'Speck dell\'Alto Adige IGP',
+    'Salmone, affumicato',
     'Uova di gallina, intero',
     'Ricotta di vacca',
   ];
   static const curatedCerealiSalata = [
     'Pane di tipo integrale',
+    'Fette biscottate, integrali',
+    'Crackers, integrali',
   ];
+
+  // Leguminose: contengono già ~50-60g di carboidrati per 100g secchi,
+  // quindi quando vengono usate come proteina si esclude lo slot carbo.
+  static const _leguminoseNames = <String>{
+    'Lenticchie, secche',
+    'Ceci, secchi',
+    'Fagioli, Borlotti, secchi',
+    'Fagioli, Cannellini, secchi',
+    "Fagioli dall'occhio, secchi",
+    'Fave, secche',
+    'Piselli, secchi',
+    'Lupini, ammollati',
+  };
 
   static const curatedNames = <String, List<String>>{
     'Proteine animali': [
@@ -62,6 +100,7 @@ class PianoService {
       'Salmone, fresco',
       'Tonno in salamoia, sgocciolato',
       'Merluzzo o nasello',
+      'Gamberi sgusciati, surgelati',
       'Uova di gallina, intero',
     ],
     'Proteine vegetali': [
@@ -73,6 +112,9 @@ class PianoService {
       'Fave, secche',
       'Piselli, secchi',
       'Lupini, ammollati',
+      'Tofu, sodo',
+      'Tempeh',
+      'Seitan',
     ],
     'Cereali': [
       'Riso Basmati, crudo',
@@ -83,8 +125,12 @@ class PianoService {
       'Orzo perlato',
       'Farro perlato, crudo',
       "Fiocchi d'avena",
+      'Gallette di riso',
+      'Muesli',
+      'Fette biscottate, integrali',
       'Quinoa, cruda',
       'Pane di tipo integrale',
+      'Crackers, integrali',
     ],
     'Verdure': [
       'Spinaci, crudi',
@@ -100,7 +146,10 @@ class PianoService {
     ],
     'Latticini': [
       'Yogurt greco, 0% lipidi',
+      'Skyr, naturale',
+      'Fiocchi di latte',
       'Ricotta di vacca',
+      'Fiocchi di formaggio magro',
       'Mozzarella di vacca',
       'Fior di latte',
       'Scamorza',
@@ -241,7 +290,7 @@ class PianoService {
       if (id != null && id != 0) used.add(id);
     }
 
-    List<PlanSlot> buildMainMealSlots(double share) {
+    List<PlanSlot> buildMainMealSlots(double share, {double carbsShareFactor = 1.0}) {
       final slots = <PlanSlot>[];
 
       final sProt = buildSlot(
@@ -255,16 +304,20 @@ class PianoService {
       trackPrincipal(sProt, usedProtIds);
       if (sProt != null) slots.add(sProt);
 
-      final sCarbo = buildSlot(
-        tipo: kCarboidrato,
-        foods: pool(['Cereali'], exclude: usedCarboIds),
-        altFoods: pool(['Cereali']),
-        gramsFn: (f) => f.carbsPer100g > 0 ? (carbsTarget * share) / (f.carbsPer100g / 100) : 0,
-        scoreFn: (f) => f.carbsPer100g,
-        maxGrams: 250, minGrams: 20,
-      );
-      trackPrincipal(sCarbo, usedCarboIds);
-      if (sCarbo != null) slots.add(sCarbo);
+      // Se la proteina è una leguminosa, i carbs sono già coperti dal legume stesso
+      final isLegume = _leguminoseNames.contains(sProt?.principale?.nome ?? '');
+      if (!isLegume) {
+        final sCarbo = buildSlot(
+          tipo: kCarboidrato,
+          foods: pool(['Cereali'], exclude: usedCarboIds),
+          altFoods: pool(['Cereali']),
+          gramsFn: (f) => f.carbsPer100g > 0 ? (carbsTarget * share * carbsShareFactor) / (f.carbsPer100g / 100) : 0,
+          scoreFn: (f) => f.carbsPer100g,
+          maxGrams: 250, minGrams: 20,
+        );
+        trackPrincipal(sCarbo, usedCarboIds);
+        if (sCarbo != null) slots.add(sCarbo);
+      }
 
       final sVerd = buildSlot(
         tipo: kVerdura,
@@ -320,10 +373,23 @@ class PianoService {
         foods: poolByNames(curatedLatticiniColazione),
         gramsFn: (f) => f.proteinPer100g > 0 ? (protTarget * colShare) / (f.proteinPer100g / 100) : 0,
         scoreFn: (f) => f.proteinPer100g,
-        maxGrams: 300, minGrams: 80,
+        maxGrams: 200, minGrams: 80,
       );
       trackPrincipal(sExtra, usedExtraIds);
       if (sExtra != null) slots.add(sExtra);
+
+      // Il muesli contiene già frutta/frutta secca: non aggiungere slot frutta
+      final isMuesli = sCarbo?.principale?.nome == 'Muesli';
+      if (!isMuesli) {
+        final sFrutta = buildSlot(
+          tipo: kFrutta,
+          foods: poolByNames(curatedFruttaColazione),
+          gramsFn: (_) => 150.0,
+          scoreFn: (_) => 1.0,
+          maxGrams: 150, minGrams: 150,
+        );
+        if (sFrutta != null) slots.add(sFrutta);
+      }
 
       // versione salata (uova + pane)
       final slotsAltColazione = <PlanSlot>[];
@@ -386,7 +452,7 @@ class PianoService {
       trackPrincipal(sSnkGrasso, usedGrassoIds);
       if (sSnkGrasso != null) snkSlots.add(sSnkGrasso);
 
-      // versione salata (pane + ricotta)
+      // versione salata (pane + affettato/ricotta)
       final slotsAltSnk1 = <PlanSlot>[];
       final sSnkCarboSal = buildSlot(
         tipo: kCarboidrato,
@@ -397,11 +463,11 @@ class PianoService {
       );
       if (sSnkCarboSal != null) slotsAltSnk1.add(sSnkCarboSal);
       final sSnkExtraSal = buildSlot(
-        tipo: kExtra,
-        foods: poolByNames(['Ricotta di vacca']),
+        tipo: kProteina,
+        foods: poolByNames(curatedProteineSalataColazione),
         gramsFn: (f) => f.proteinPer100g > 0 ? (protTarget * snkShare) / (f.proteinPer100g / 100) : 0,
         scoreFn: (f) => f.proteinPer100g,
-        maxGrams: 200, minGrams: 50,
+        maxGrams: 120, minGrams: 30,
       );
       if (sSnkExtraSal != null) slotsAltSnk1.add(sSnkExtraSal);
 
@@ -415,7 +481,7 @@ class PianoService {
 
     // ── Cena ───────────────────────────────────────────────────
     {
-      final slots = buildMainMealSlots(mainShare);
+      final slots = buildMainMealSlots(mainShare, carbsShareFactor: 0.70);
       if (slots.isNotEmpty) {
         pasti.add(PlanMeal()
           ..tipo = kPastoCena
@@ -433,11 +499,11 @@ class PianoService {
         maxGrams: 200, minGrams: 80,
       );
       final sSnk2Sal = buildSlot(
-        tipo: kExtra,
-        foods: poolByNames(['Ricotta di vacca']),
+        tipo: kProteina,
+        foods: poolByNames(curatedProteineSalataColazione),
         gramsFn: (f) => f.proteinPer100g > 0 ? (protTarget * snkShare) / (f.proteinPer100g / 100) : 0,
         scoreFn: (f) => f.proteinPer100g,
-        maxGrams: 200, minGrams: 80,
+        maxGrams: 120, minGrams: 30,
       );
       if (sSnk2 != null) {
         pasti.add(PlanMeal()
@@ -449,7 +515,9 @@ class PianoService {
 
     // ── Spuntino post-WO ───────────────────────────────────────
     if (haSpuntinoPostWo) {
-      final sPostWo = buildSlot(
+      final postWoSlots = <PlanSlot>[];
+
+      final sPostWoProt = buildSlot(
         tipo: kProteina,
         foods: pool(['Proteine animali', 'Latticini'], exclude: usedProtIds),
         altFoods: pool(['Proteine animali', 'Latticini']),
@@ -457,10 +525,22 @@ class PianoService {
         scoreFn: (f) => f.proteinPer100g,
         maxGrams: 150, minGrams: 20,
       );
-      if (sPostWo != null) {
+      if (sPostWoProt != null) postWoSlots.add(sPostWoProt);
+
+      // Carbo rapido post-allenamento per recupero glicogeno
+      final sPostWoFrutta = buildSlot(
+        tipo: kFrutta,
+        foods: poolByNames(curatedFruttaColazione),
+        gramsFn: (_) => 150.0,
+        scoreFn: (_) => 1.0,
+        maxGrams: 150, minGrams: 150,
+      );
+      if (sPostWoFrutta != null) postWoSlots.add(sPostWoFrutta);
+
+      if (postWoSlots.isNotEmpty) {
         pasti.add(PlanMeal()
           ..tipo = kPastoSpuntinoPostWo
-          ..slots = [sPostWo]);
+          ..slots = postWoSlots);
       }
     }
 

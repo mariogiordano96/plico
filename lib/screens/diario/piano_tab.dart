@@ -520,8 +520,8 @@ class _SlotCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final food = slot.principale!;
-    final slotLabel = PianoService.slotLabels[slot.tipo.clamp(0, 4)];
-    final slotEmoji = PianoService.slotEmoji[slot.tipo.clamp(0, 4)];
+    final slotLabel = PianoService.slotLabels[slot.tipo.clamp(0, 5)];
+    final slotEmoji = PianoService.slotEmoji[slot.tipo.clamp(0, 5)];
 
     return Opacity(
       opacity: dimmed ? 0.5 : 1.0,

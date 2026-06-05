@@ -62,6 +62,8 @@ class _QuestionarioScreenState extends State<QuestionarioScreen> {
       _FoodGroup('Verdure', '🥦', byNames(cn['Verdure']!)),
       _FoodGroup('Latticini', '🧀', byNames(cn['Latticini']!)),
       _FoodGroup('Grassi', '🫒', byNames(cn['Grassi']!)),
+      _FoodGroup('Affettati', '🥩', byNames(PianoService.curatedProteineSalataColazione)),
+      _FoodGroup('Frutta', '🍓', byNames(PianoService.curatedFruttaColazione)),
     ];
 
     if (!mounted) return;
