@@ -480,8 +480,8 @@ class _MealHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label = PianoService.pastoLabels[tipo.clamp(0, 4)];
-    final emoji = PianoService.pastoEmoji[tipo.clamp(0, 4)];
+    final label = PianoService.pastoLabels[tipo.clamp(0, 5)];
+    final emoji = PianoService.pastoEmoji[tipo.clamp(0, 5)];
     return Row(
       children: [
         Text(emoji, style: const TextStyle(fontSize: 16)),

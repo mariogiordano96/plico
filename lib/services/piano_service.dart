@@ -28,9 +28,10 @@ class PianoService {
   static const kPastoCena = 2;
   static const kPastoSpuntino = 3;
   static const kPastoSpuntinoPostWo = 4;
+  static const kPastoSpuntinoSerale = 5;
 
-  static const pastoLabels = ['Colazione', 'Pranzo', 'Cena', 'Spuntino', 'Post-WO'];
-  static const pastoEmoji = ['☀️', '🍽️', '🌙', '🍎', '💪'];
+  static const pastoLabels = ['Colazione', 'Pranzo', 'Cena', 'Spuntino', 'Post-WO', 'Spuntino serale'];
+  static const pastoEmoji = ['☀️', '🍽️', '🌙', '🍎', '💪', '⭐'];
 
   static const curatedCerealiColazione = [
     "Fiocchi d'avena",
@@ -264,6 +265,7 @@ class PianoService {
     final usedVerduraIds = <int>{};
     final usedGrassoIds = <int>{};
     final usedExtraIds = <int>{};
+    final usedFruttaIds = <int>{};
 
     PlanSlot? buildSlot({
       required int tipo,
@@ -290,7 +292,7 @@ class PianoService {
       if (id != null && id != 0) used.add(id);
     }
 
-    List<PlanSlot> buildMainMealSlots(double share, {double carbsShareFactor = 1.0}) {
+    List<PlanSlot> buildMainMealSlots(double share, {double carbsShareFactor = 1.0, double fruttaCarbs = 0.0}) {
       final slots = <PlanSlot>[];
 
       final sProt = buildSlot(
@@ -307,13 +309,16 @@ class PianoService {
       // Se la proteina è una leguminosa, i carbs sono già coperti dal legume stesso
       final isLegume = _leguminoseNames.contains(sProt?.principale?.nome ?? '');
       if (!isLegume) {
+        // Sottrae i carbs della frutta già allocata per evitare di sforare il target
+        final effectiveCarbTarget = (carbsTarget * share * carbsShareFactor - fruttaCarbs)
+            .clamp(0.0, double.infinity);
         final sCarbo = buildSlot(
           tipo: kCarboidrato,
           foods: pool(['Cereali'], exclude: usedCarboIds),
           altFoods: pool(['Cereali']),
-          gramsFn: (f) => f.carbsPer100g > 0 ? (carbsTarget * share * carbsShareFactor) / (f.carbsPer100g / 100) : 0,
+          gramsFn: (f) => f.carbsPer100g > 0 ? effectiveCarbTarget / (f.carbsPer100g / 100) : 0,
           scoreFn: (f) => f.carbsPer100g,
-          maxGrams: 250, minGrams: 20,
+          maxGrams: 150, minGrams: 20,
         );
         trackPrincipal(sCarbo, usedCarboIds);
         if (sCarbo != null) slots.add(sCarbo);
@@ -357,11 +362,23 @@ class PianoService {
     {
       final slots = <PlanSlot>[];
 
+      // Frutta selezionata prima: i suoi carbs vengono sottratti al cereale
+      // così la somma cerale + frutta = target colazione senza sforare
+      final sFruttaCol = buildSlot(
+        tipo: kFrutta,
+        foods: poolByNames(curatedFruttaColazione, exclude: usedFruttaIds),
+        gramsFn: (_) => 150.0,
+        scoreFn: (_) => 1.0,
+        maxGrams: 150, minGrams: 150,
+      );
+      final fruttaCarbsCol = sFruttaCol?.principale?.carboidrati ?? 0.0;
 
       final sCarbo = buildSlot(
         tipo: kCarboidrato,
         foods: poolByNames(curatedCerealiColazione),
-        gramsFn: (f) => f.carbsPer100g > 0 ? (carbsTarget * colShare) / (f.carbsPer100g / 100) : 0,
+        gramsFn: (f) => f.carbsPer100g > 0
+            ? (carbsTarget * colShare - fruttaCarbsCol).clamp(0.0, double.infinity) / (f.carbsPer100g / 100)
+            : 0,
         scoreFn: (f) => f.carbsPer100g,
         maxGrams: 100, minGrams: 20,
       );
@@ -380,15 +397,9 @@ class PianoService {
 
       // Il muesli contiene già frutta/frutta secca: non aggiungere slot frutta
       final isMuesli = sCarbo?.principale?.nome == 'Muesli';
-      if (!isMuesli) {
-        final sFrutta = buildSlot(
-          tipo: kFrutta,
-          foods: poolByNames(curatedFruttaColazione),
-          gramsFn: (_) => 150.0,
-          scoreFn: (_) => 1.0,
-          maxGrams: 150, minGrams: 150,
-        );
-        if (sFrutta != null) slots.add(sFrutta);
+      if (!isMuesli && sFruttaCol != null) {
+        trackPrincipal(sFruttaCol, usedFruttaIds);
+        slots.add(sFruttaCol);
       }
 
       // versione salata (uova + pane)
@@ -420,7 +431,27 @@ class PianoService {
 
     // ── Pranzo ─────────────────────────────────────────────────
     {
-      final slots = buildMainMealSlots(mainShare);
+      // Frutta selezionata prima per sottrarne i carbs al cereale
+      final sFruttaPranzo = buildSlot(
+        tipo: kFrutta,
+        foods: poolByNames(curatedFruttaColazione, exclude: usedFruttaIds),
+        gramsFn: (_) => 150.0,
+        scoreFn: (_) => 1.0,
+        maxGrams: 150, minGrams: 150,
+      );
+      final fruttaCarbsPranzo = sFruttaPranzo?.principale?.carboidrati ?? 0.0;
+
+      final slots = buildMainMealSlots(mainShare, fruttaCarbs: fruttaCarbsPranzo);
+
+      // Non aggiungere frutta se il pasto è a base di legumi (già ricchi di carbs)
+      final isLegumeMeal = slots.any(
+        (s) => s.tipo == kProteina && _leguminoseNames.contains(s.principale?.nome ?? ''),
+      );
+      if (sFruttaPranzo != null && !isLegumeMeal) {
+        trackPrincipal(sFruttaPranzo, usedFruttaIds);
+        slots.add(sFruttaPranzo);
+      }
+
       if (slots.isNotEmpty) {
         pasti.add(PlanMeal()
           ..tipo = kPastoPranzo
@@ -507,7 +538,7 @@ class PianoService {
       );
       if (sSnk2 != null) {
         pasti.add(PlanMeal()
-          ..tipo = kPastoSpuntino
+          ..tipo = kPastoSpuntinoSerale
           ..slots = [sSnk2]
           ..slotsAlternativa = [?sSnk2Sal]);
       }
@@ -530,12 +561,15 @@ class PianoService {
       // Carbo rapido post-allenamento per recupero glicogeno
       final sPostWoFrutta = buildSlot(
         tipo: kFrutta,
-        foods: poolByNames(curatedFruttaColazione),
+        foods: poolByNames(curatedFruttaColazione, exclude: usedFruttaIds),
         gramsFn: (_) => 150.0,
         scoreFn: (_) => 1.0,
         maxGrams: 150, minGrams: 150,
       );
-      if (sPostWoFrutta != null) postWoSlots.add(sPostWoFrutta);
+      if (sPostWoFrutta != null) {
+        trackPrincipal(sPostWoFrutta, usedFruttaIds);
+        postWoSlots.add(sPostWoFrutta);
+      }
 
       if (postWoSlots.isNotEmpty) {
         pasti.add(PlanMeal()
