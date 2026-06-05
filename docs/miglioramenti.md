@@ -8,24 +8,16 @@ Grafico kcal (e macros) degli ultimi 7/14 giorni. È la feature che trasforma l'
 ### Peso corporeo
 Tracciamento del peso nel tempo con grafico. Attualmente il peso è statico nel profilo — chi è in deficit o surplus vuole vedere la curva. Collegare l'andamento del peso al bilancio calorico sarebbe molto motivante.
 
-### Swap alimento nel piano
-Possibilità di sostituire un singolo alimento nel piano generato senza rigenerare tutto. L'utente tappa su un cibo e sceglie un'alternativa dalla stessa categoria (es. swap pollo → tacchino). Le alternative sono già presenti nel modello `PlanSlot.alternative` — manca solo l'UI.
 
 ### Lista della spesa dal piano
 Genera una lista della spesa aggregando tutti gli alimenti del piano settimanale con le quantità. Riduce il friction tra il piano e la spesa reale.
 
-### Rigenera singolo pasto
-Pulsante per rigenerare solo un pasto (es. pranzo) senza toccare il resto del piano. Utile quando un cibo non è disponibile o non va.
 
 ### Pasti ricorrenti / preferiti
 - Salvataggio di un "pasto" composto da più alimenti (es. colazione standard)
 - "Ripeti pasto di ieri" per un dato slot (colazione, pranzo, ecc.)
 - Riduci il friction dell'inserimento quotidiano, che è il motivo principale per cui le persone abbandonano le app di tracciamento
 
-## Priorità media
-
-### Barcode scanner
-Scansione barcode per aggiungere alimenti confezionati tramite Open Food Facts API. Aumenta drasticamente la velocità di inserimento per chi mangia cibi industriali.
 
 ### Onboarding al primo avvio
 Flusso guidato per chi installa l'app la prima volta: inserimento peso, altezza, età, sesso, livello attività, obiettivo. Senza questo, arrivare alla home senza dati non ha senso.
@@ -36,16 +28,12 @@ Schermata o badge che mostra quanto l'utente sta seguendo il piano generato (% d
 ### Feedback sul raggiungimento obiettivo
 Piccola celebrazione (animazione, colore, messaggio) quando l'utente chiude la giornata entro il target calorico e macro. Rinforzo positivo = retention.
 
-### Stagionalità degli alimenti
-Filtrare o evidenziare nel piano gli alimenti di stagione. Aumenta la rilevanza pratica e riduce il costo della spesa.
 
 ### Notifiche promemoria pasti
 Notifica opzionale a orari configurabili (es. 13:00 "hai inserito il pranzo?"). Aiuta a non dimenticare il tracciamento a metà giornata.
 
 ## Priorità bassa
 
-### Piano settimanale variato
-Generare 7 piani giornalieri diversi (uno per giorno della settimana) invece di uno solo ripetuto. Aumenta la varietà e la sostenibilità a lungo termine.
 
 ### Integrazione Apple Health / Google Fit
 Lettura dell'attività fisica (passi, calorie bruciate) per aggiustare dinamicamente il TDEE. Richiede platform channel nativo.

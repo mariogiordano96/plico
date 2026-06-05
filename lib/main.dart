@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
-import 'screens/home_screen.dart';
+import 'screens/main_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'services/database_service.dart';
 
@@ -39,7 +39,7 @@ class PlicoApp extends StatelessWidget {
                   ),
                 );
               }
-              return snapshot.data! ? const HomeScreen() : const OnboardingScreen();
+              return snapshot.data! ? const MainScreen() : const OnboardingScreen();
             },
           ),
         );

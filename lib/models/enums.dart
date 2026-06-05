@@ -1,6 +1,6 @@
 enum Sesso { maschio, femmina }
 
-enum PastoTipo { colazione, pranzo, cena, spuntino }
+enum PastoTipo { colazione, pranzo, cena, spuntino, postWo, spuntinoSerale }
 
 enum MetodoPlicometria {
   durninWomersley,

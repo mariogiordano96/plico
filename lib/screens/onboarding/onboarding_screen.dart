@@ -5,7 +5,7 @@ import '../../models/user_profile.dart';
 import '../../models/body_snapshot.dart';
 import '../../models/enums.dart';
 import '../../services/database_service.dart';
-import '../home_screen.dart';
+import '../main_screen.dart';
 import '../../main.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -123,7 +123,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const HomeScreen()));
+        MaterialPageRoute(builder: (_) => const MainScreen()));
   }
 
   @override

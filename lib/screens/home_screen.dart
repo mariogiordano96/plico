@@ -10,12 +10,11 @@ import '../services/database_service.dart';
 import '../main.dart';
 import 'pesate/pesate_screen.dart';
 import 'plicometry/method_selection_screen.dart';
-import 'progressi/progressi_screen.dart';
-import 'tdee/tdee_screen.dart' show calcolaTdee, TdeeScreen;
-import 'diario/diario_screen.dart';
+import 'tdee/tdee_screen.dart' show calcolaTdee;
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  final void Function(int)? onSwitchTab;
+  const HomeScreen({super.key, this.onSwitchTab});
 
   @override
   Widget build(BuildContext context) {
@@ -59,20 +58,20 @@ class HomeScreen extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            _GreetingHeader(),
-            SizedBox(height: 20),
-            _DiarioHeroCard(),
-            SizedBox(height: 16),
-            _PianoCard(),
-            SizedBox(height: 16),
-            _TdeeCard(),
-            SizedBox(height: 16),
-            _PesateCard(),
-            SizedBox(height: 16),
-            _PlicometriaCard(),
-            SizedBox(height: 16),
-            _ProgressiCard(),
+          children: [
+            const _GreetingHeader(),
+            const SizedBox(height: 20),
+            _DiarioHeroCard(onSwitchTab: onSwitchTab),
+            const SizedBox(height: 16),
+            _PianoCard(onSwitchTab: onSwitchTab),
+            const SizedBox(height: 16),
+            _TdeeCard(onSwitchTab: onSwitchTab),
+            const SizedBox(height: 16),
+            const _PesateCard(),
+            const SizedBox(height: 16),
+            const _PlicometriaCard(),
+            const SizedBox(height: 16),
+            _ProgressiCard(onSwitchTab: onSwitchTab),
           ],
         ),
       ),
@@ -141,7 +140,8 @@ class _GreetingHeader extends StatelessWidget {
 // ── Diario hero card ──────────────────────────────────────────────
 
 class _DiarioHeroCard extends StatefulWidget {
-  const _DiarioHeroCard();
+  final void Function(int)? onSwitchTab;
+  const _DiarioHeroCard({this.onSwitchTab});
 
   @override
   State<_DiarioHeroCard> createState() => _DiarioHeroCardState();
@@ -245,12 +245,7 @@ class _DiarioHeroCardState extends State<_DiarioHeroCard> {
     final barColor = over ? const Color(0xFFE74C3C) : p.accent;
 
     return GestureDetector(
-      onTap: () async {
-        await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const DiarioScreen()));
-        _load();
-      },
+      onTap: () => widget.onSwitchTab?.call(1),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
@@ -397,15 +392,14 @@ class _MacroChip extends StatelessWidget {
 // ── Piano alimentare ──────────────────────────────────────────────
 
 class _PianoCard extends StatelessWidget {
-  const _PianoCard();
+  final void Function(int)? onSwitchTab;
+  const _PianoCard({this.onSwitchTab});
 
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
     return GestureDetector(
-      onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const DiarioScreen())),
+      onTap: () => onSwitchTab?.call(1),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -457,7 +451,8 @@ class _PianoCard extends StatelessWidget {
 // ── TDEE ──────────────────────────────────────────────────────────
 
 class _TdeeCard extends StatefulWidget {
-  const _TdeeCard();
+  final void Function(int)? onSwitchTab;
+  const _TdeeCard({this.onSwitchTab});
 
   @override
   State<_TdeeCard> createState() => _TdeeCardState();
@@ -508,12 +503,7 @@ class _TdeeCardState extends State<_TdeeCard> {
   Widget build(BuildContext context) {
     final p = context.palette;
     return GestureDetector(
-      onTap: () async {
-        await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const TdeeScreen()));
-        _load();
-      },
+      onTap: () => widget.onSwitchTab?.call(3),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -815,14 +805,14 @@ class _PlicometriaCard extends StatelessWidget {
 // ── Progressi ─────────────────────────────────────────────────────
 
 class _ProgressiCard extends StatelessWidget {
-  const _ProgressiCard();
+  final void Function(int)? onSwitchTab;
+  const _ProgressiCard({this.onSwitchTab});
 
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
     return GestureDetector(
-      onTap: () => Navigator.push(context,
-          MaterialPageRoute(builder: (_) => const ProgressiScreen())),
+      onTap: () => onSwitchTab?.call(2),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(

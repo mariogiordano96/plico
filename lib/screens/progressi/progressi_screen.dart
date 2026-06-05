@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:math';
 import '../../theme/app_theme.dart';
+import '../../models/body_snapshot.dart';
 import '../../models/plicometry_session.dart';
 import '../../models/measurement_snapshot.dart';
 import '../../services/database_service.dart';
+import '../storico/storico_misurazioni_screen.dart';
 
 // ── Data helpers ───────────────────────────────────────────────
 
@@ -125,6 +127,15 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
         elevation: 0,
         centerTitle: true,
         iconTheme: IconThemeData(color: p.accent),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.straighten_rounded, color: p.accent),
+            tooltip: 'Storico misurazioni',
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(
+                    builder: (_) => const StoricoMisurazioniScreen())),
+          ),
+        ],
       ),
       backgroundColor: p.background,
       body: SingleChildScrollView(
@@ -149,7 +160,13 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
             ),
             const SizedBox(height: 24),
 
-            // ── Grafico 1: Composizione ───────────────────
+            // ── Grafico 1: Peso ───────────────────────────
+            _SectionLabel('PESO', p),
+            const SizedBox(height: 14),
+            _PesoChart(startDate: start, p: p),
+            const SizedBox(height: 28),
+
+            // ── Grafico 2: Composizione ───────────────────
             _SectionLabel('COMPOSIZIONE CORPOREA', p),
             const SizedBox(height: 10),
             SingleChildScrollView(
@@ -174,7 +191,7 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
             ),
             const SizedBox(height: 28),
 
-            // ── Grafico 2: Misurazioni ────────────────────
+            // ── Grafico 3: Misurazioni ────────────────────
             _SectionLabel('MISURAZIONI', p),
             const SizedBox(height: 10),
             SingleChildScrollView(
@@ -201,6 +218,32 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ── Peso Chart ────────────────────────────────────────────────
+
+class _PesoChart extends StatelessWidget {
+  final DateTime? startDate;
+  final ColorPalette p;
+  const _PesoChart({required this.startDate, required this.p});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<BodySnapshot>>(
+      stream: DatabaseService.instance.watchBodySnapshots(),
+      builder: (context, snap) {
+        var snapshots = [...(snap.data ?? [])]
+          ..sort((a, b) => a.data.compareTo(b.data));
+        if (startDate != null) {
+          snapshots =
+              snapshots.where((s) => !s.data.isBefore(startDate!)).toList();
+        }
+        final points =
+            snapshots.map((s) => _Point(s.data, s.pesoKg)).toList();
+        return _ChartBox(points: points, unit: 'kg', color: const Color(0xFF4CAF8E), p: p);
+      },
     );
   }
 }

@@ -32,6 +32,9 @@ class PesateScreen extends StatelessWidget {
             separatorBuilder: (_, _) => const SizedBox(height: 10),
             itemBuilder: (context, i) => _PesataCard(
               pesata: pesate[i],
+              delta: i + 1 < pesate.length
+                  ? pesate[i].pesoKg - pesate[i + 1].pesoKg
+                  : null,
               onDelete: () => _confirmDelete(context, pesate[i].id),
             ),
           );
@@ -74,9 +77,10 @@ class PesateScreen extends StatelessWidget {
 
 class _PesataCard extends StatelessWidget {
   final BodySnapshot pesata;
+  final double? delta;
   final VoidCallback onDelete;
 
-  const _PesataCard({required this.pesata, required this.onDelete});
+  const _PesataCard({required this.pesata, required this.delta, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -115,8 +119,12 @@ class _PesataCard extends StatelessWidget {
                     children: [
                       Text('${pesata.pesoKg.toStringAsFixed(1)} kg',
                           style: TextStyle(color: p.textPrimary, fontSize: 18, fontWeight: FontWeight.w700)),
+                      if (delta != null) ...[
+                        const SizedBox(width: 10),
+                        _DeltaBadge(delta: delta!),
+                      ],
                       if (pesata.bodyFatManuale != null) ...[
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 8),
                         _Badge(label: '${pesata.bodyFatManuale!.toStringAsFixed(1)}% BF'),
                       ],
                     ],
@@ -150,6 +158,37 @@ class _Badge extends StatelessWidget {
         border: Border.all(color: p.accentSecondary.withValues(alpha: 0.3)),
       ),
       child: Text(label, style: TextStyle(color: p.accentSecondary, fontSize: 11, fontWeight: FontWeight.w600)),
+    );
+  }
+}
+
+class _DeltaBadge extends StatelessWidget {
+  final double delta;
+  const _DeltaBadge({required this.delta});
+
+  @override
+  Widget build(BuildContext context) {
+    final up = delta > 0;
+    final color = up ? const Color(0xFFE74C3C) : const Color(0xFF00C48C);
+    final sign = up ? '+' : '';
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(up ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
+              size: 10, color: color),
+          const SizedBox(width: 2),
+          Text('$sign${delta.toStringAsFixed(1)} kg',
+              style: TextStyle(
+                  color: color, fontSize: 11, fontWeight: FontWeight.w700)),
+        ],
+      ),
     );
   }
 }

@@ -3,18 +3,21 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../models/daily_log.dart';
-import '../../models/enums.dart';
 import '../../services/database_service.dart';
 import '../tdee/tdee_screen.dart' show calcolaTdee;
 import 'aggiunta_alimento_screen.dart';
 import 'piano_tab.dart';
 
-const _pastoLabels = ['COLAZIONE', 'PRANZO', 'CENA', 'SPUNTINO'];
+const _pastoLabels = [
+  'COLAZIONE', 'PRANZO', 'CENA', 'SPUNTINO', 'POST-WO', 'SPUNTINO SERALE',
+];
 const _pastoIcons = [
   Icons.free_breakfast_rounded,
   Icons.lunch_dining_rounded,
   Icons.dinner_dining_rounded,
   Icons.apple_rounded,
+  Icons.fitness_center_rounded,
+  Icons.nights_stay_rounded,
 ];
 
 const _goalMult = [0.80, 1.0, 1.15];
@@ -35,6 +38,8 @@ class _DiarioScreenState extends State<DiarioScreen> {
   int? _carbsTarget;
   bool _loading = true;
   StreamSubscription? _settingsSub;
+  bool _haPostWo = false;
+  int _numPasti = 3;
 
   static DateTime _dayStart(DateTime d) => DateTime(d.year, d.month, d.day);
 
@@ -57,6 +62,7 @@ class _DiarioScreenState extends State<DiarioScreen> {
     setState(() => _loading = true);
     final log = await DatabaseService.instance.getDailyLog(_date);
     final target = await _computeTargets();
+    final prefs = await DatabaseService.instance.getUserFoodPreferences();
     if (!mounted) return;
     setState(() {
       _log = log;
@@ -64,6 +70,8 @@ class _DiarioScreenState extends State<DiarioScreen> {
       _proteinTarget = target.$2;
       _fatTarget = target.$3;
       _carbsTarget = target.$4;
+      _haPostWo = prefs?.haSpuntinoPostWo ?? false;
+      _numPasti = prefs?.numPasti ?? 3;
       _loading = false;
     });
   }
@@ -109,6 +117,13 @@ class _DiarioScreenState extends State<DiarioScreen> {
     final fatTarget = (kcalTarget * 0.25 / 9).round();
     final carbsTarget = ((kcalTarget - protTarget * 4 - fatTarget * 9) / 4).round().clamp(0, 9999);
     return (kcalTarget, protTarget, fatTarget, carbsTarget);
+  }
+
+  List<int> _visiblePasti() {
+    final indices = [0, 1, 2, 3]; // colazione, pranzo, cena, spuntino
+    if (_haPostWo) indices.add(4);      // postWo
+    if (_numPasti >= 5) indices.add(5); // spuntinoSerale
+    return indices;
   }
 
   Future<void> _removeEntry(int index) async {
@@ -225,7 +240,7 @@ class _DiarioScreenState extends State<DiarioScreen> {
                   p: p,
                 ),
                 const SizedBox(height: 20),
-                ...List.generate(PastoTipo.values.length, (i) {
+                ..._visiblePasti().map((i) {
                   final entries = (log?.entries ?? [])
                       .where((e) => e.pastoTipo == i)
                       .toList();
