@@ -636,7 +636,19 @@ class DatabaseService {
   // ──────────────────────────────────────────────
 
   Future<AppSettings> getAppSettings() async {
-    return await _isar.appSettings.get(1) ?? AppSettings();
+    final s = await _isar.appSettings.get(1) ?? AppSettings();
+    // Isar sets new int fields to 0 on existing records during schema migration.
+    // Detect this and restore the intended defaults, then persist them.
+    if (s.notColMin == 0 && s.notPranzoMin == 0 && s.notCenaMin == 0) {
+      s.notColMin = 450;
+      s.notPranzoMin = 750;
+      s.notCenaMin = 1170;
+      s.notSpuntinoMin = 630;
+      s.notPostWoMin = 1020;
+      s.notSorMin = 1260;
+      await _isar.writeTxn(() async => _isar.appSettings.put(s));
+    }
+    return s;
   }
 
   Future<void> saveAppSettings(AppSettings settings) async {

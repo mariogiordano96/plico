@@ -50,18 +50,36 @@ class _NotificheScreenState extends State<NotificheScreen> {
     await _save();
   }
 
-  Future<void> _pickTime(
-      int currentMin, ValueChanged<int> onPicked) async {
-    final t = await showTimePicker(
+  // Apre il time picker e restituisce i minuti scelti, o null se annullato.
+  Future<int?> _pickTime(int currentMin) async {
+    return showTimePicker(
       context: context,
       initialTime: TimeOfDay(hour: currentMin ~/ 60, minute: currentMin % 60),
       builder: (ctx, child) => MediaQuery(
         data: MediaQuery.of(ctx).copyWith(alwaysUse24HourFormat: true),
         child: child!,
       ),
-    );
-    if (t == null || !mounted) return;
-    onPicked(t.hour * 60 + t.minute);
+    ).then((t) => t == null ? null : t.hour * 60 + t.minute);
+  }
+
+  // Toggle pasto: abilita/disabilita e, se abilitazione, apre subito il picker.
+  Future<void> _toggleMeal({
+    required bool newVal,
+    required bool Function() getActive,
+    required void Function(bool) setActive,
+    required int Function() getMin,
+    required void Function(int) setMin,
+  }) async {
+    if (newVal) {
+      final picked = await _pickTime(getMin());
+      if (!mounted) return;
+      setState(() {
+        setActive(true);
+        if (picked != null) setMin(picked);
+      });
+    } else {
+      setState(() => setActive(false));
+    }
     await _save();
   }
 
@@ -88,9 +106,19 @@ class _NotificheScreenState extends State<NotificheScreen> {
                 _masterToggleCard(p),
                 if (_s!.notificheAttive) ...[
                   const SizedBox(height: 24),
-                  _sectionLabel('PASTI', p),
+                  Text('PASTI',
+                      style: TextStyle(
+                          color: p.textMuted,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 2)),
                   const SizedBox(height: 10),
                   _mealCard(p),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Tocca l\'orario per modificarlo.',
+                    style: TextStyle(color: p.textMuted, fontSize: 12),
+                  ),
                 ],
               ],
             ),
@@ -115,7 +143,8 @@ class _NotificheScreenState extends State<NotificheScreen> {
               borderRadius: BorderRadius.circular(10),
               border: Border.all(color: p.accent.withValues(alpha: 0.3)),
             ),
-            child: Icon(Icons.notifications_rounded, color: p.accent, size: 20),
+            child:
+                Icon(Icons.notifications_rounded, color: p.accent, size: 20),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -144,94 +173,127 @@ class _NotificheScreenState extends State<NotificheScreen> {
     );
   }
 
-  Widget _sectionLabel(String label, ColorPalette p) {
-    return Text(label,
-        style: TextStyle(
-            color: p.textMuted,
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 2));
-  }
-
   Widget _mealCard(ColorPalette p) {
-    final rows = [
-      _MealRow(
+    final tiles = <_MealTileData>[
+      _MealTileData(
         icon: Icons.free_breakfast_rounded,
         label: 'Colazione',
         active: _s!.notColAttiva,
         minVal: _s!.notColMin,
-        onToggle: (v) {
-          setState(() => _s!.notColAttiva = v);
-          _save();
+        onToggle: (v) => _toggleMeal(
+          newVal: v,
+          getActive: () => _s!.notColAttiva,
+          setActive: (x) => _s!.notColAttiva = x,
+          getMin: () => _s!.notColMin,
+          setMin: (x) => _s!.notColMin = x,
+        ),
+        onTimeTap: () async {
+          final picked = await _pickTime(_s!.notColMin);
+          if (picked != null && mounted) {
+            setState(() => _s!.notColMin = picked);
+            await _save();
+          }
         },
-        onTimeTap: () => _pickTime(_s!.notColMin, (v) {
-          setState(() => _s!.notColMin = v);
-        }),
       ),
-      _MealRow(
+      _MealTileData(
         icon: Icons.lunch_dining_rounded,
         label: 'Pranzo',
         active: _s!.notPranzoAttiva,
         minVal: _s!.notPranzoMin,
-        onToggle: (v) {
-          setState(() => _s!.notPranzoAttiva = v);
-          _save();
+        onToggle: (v) => _toggleMeal(
+          newVal: v,
+          getActive: () => _s!.notPranzoAttiva,
+          setActive: (x) => _s!.notPranzoAttiva = x,
+          getMin: () => _s!.notPranzoMin,
+          setMin: (x) => _s!.notPranzoMin = x,
+        ),
+        onTimeTap: () async {
+          final picked = await _pickTime(_s!.notPranzoMin);
+          if (picked != null && mounted) {
+            setState(() => _s!.notPranzoMin = picked);
+            await _save();
+          }
         },
-        onTimeTap: () => _pickTime(_s!.notPranzoMin, (v) {
-          setState(() => _s!.notPranzoMin = v);
-        }),
       ),
-      _MealRow(
+      _MealTileData(
         icon: Icons.dinner_dining_rounded,
         label: 'Cena',
         active: _s!.notCenaAttiva,
         minVal: _s!.notCenaMin,
-        onToggle: (v) {
-          setState(() => _s!.notCenaAttiva = v);
-          _save();
+        onToggle: (v) => _toggleMeal(
+          newVal: v,
+          getActive: () => _s!.notCenaAttiva,
+          setActive: (x) => _s!.notCenaAttiva = x,
+          getMin: () => _s!.notCenaMin,
+          setMin: (x) => _s!.notCenaMin = x,
+        ),
+        onTimeTap: () async {
+          final picked = await _pickTime(_s!.notCenaMin);
+          if (picked != null && mounted) {
+            setState(() => _s!.notCenaMin = picked);
+            await _save();
+          }
         },
-        onTimeTap: () => _pickTime(_s!.notCenaMin, (v) {
-          setState(() => _s!.notCenaMin = v);
-        }),
       ),
-      _MealRow(
+      _MealTileData(
         icon: Icons.apple_rounded,
         label: 'Spuntino',
         active: _s!.notSpuntinoAttiva,
         minVal: _s!.notSpuntinoMin,
-        onToggle: (v) {
-          setState(() => _s!.notSpuntinoAttiva = v);
-          _save();
+        onToggle: (v) => _toggleMeal(
+          newVal: v,
+          getActive: () => _s!.notSpuntinoAttiva,
+          setActive: (x) => _s!.notSpuntinoAttiva = x,
+          getMin: () => _s!.notSpuntinoMin,
+          setMin: (x) => _s!.notSpuntinoMin = x,
+        ),
+        onTimeTap: () async {
+          final picked = await _pickTime(_s!.notSpuntinoMin);
+          if (picked != null && mounted) {
+            setState(() => _s!.notSpuntinoMin = picked);
+            await _save();
+          }
         },
-        onTimeTap: () => _pickTime(_s!.notSpuntinoMin, (v) {
-          setState(() => _s!.notSpuntinoMin = v);
-        }),
       ),
-      _MealRow(
+      _MealTileData(
         icon: Icons.fitness_center_rounded,
         label: 'Post-WO',
         active: _s!.notPostWoAttiva,
         minVal: _s!.notPostWoMin,
-        onToggle: (v) {
-          setState(() => _s!.notPostWoAttiva = v);
-          _save();
+        onToggle: (v) => _toggleMeal(
+          newVal: v,
+          getActive: () => _s!.notPostWoAttiva,
+          setActive: (x) => _s!.notPostWoAttiva = x,
+          getMin: () => _s!.notPostWoMin,
+          setMin: (x) => _s!.notPostWoMin = x,
+        ),
+        onTimeTap: () async {
+          final picked = await _pickTime(_s!.notPostWoMin);
+          if (picked != null && mounted) {
+            setState(() => _s!.notPostWoMin = picked);
+            await _save();
+          }
         },
-        onTimeTap: () => _pickTime(_s!.notPostWoMin, (v) {
-          setState(() => _s!.notPostWoMin = v);
-        }),
       ),
-      _MealRow(
+      _MealTileData(
         icon: Icons.nights_stay_rounded,
         label: 'Spuntino serale',
         active: _s!.notSorAttiva,
         minVal: _s!.notSorMin,
-        onToggle: (v) {
-          setState(() => _s!.notSorAttiva = v);
-          _save();
+        onToggle: (v) => _toggleMeal(
+          newVal: v,
+          getActive: () => _s!.notSorAttiva,
+          setActive: (x) => _s!.notSorAttiva = x,
+          getMin: () => _s!.notSorMin,
+          setMin: (x) => _s!.notSorMin = x,
+        ),
+        onTimeTap: () async {
+          final picked = await _pickTime(_s!.notSorMin);
+          if (picked != null && mounted) {
+            setState(() => _s!.notSorMin = picked);
+            await _save();
+          }
         },
-        onTimeTap: () => _pickTime(_s!.notSorMin, (v) {
-          setState(() => _s!.notSorMin = v);
-        }),
       ),
     ];
 
@@ -243,9 +305,9 @@ class _NotificheScreenState extends State<NotificheScreen> {
       ),
       child: Column(
         children: [
-          for (int i = 0; i < rows.length; i++) ...[
-            _buildMealTile(rows[i], p),
-            if (i < rows.length - 1)
+          for (int i = 0; i < tiles.length; i++) ...[
+            _buildTile(tiles[i], p),
+            if (i < tiles.length - 1)
               Divider(height: 1, indent: 60, color: p.cardBorder),
           ],
         ],
@@ -253,47 +315,59 @@ class _NotificheScreenState extends State<NotificheScreen> {
     );
   }
 
-  Widget _buildMealTile(_MealRow row, ColorPalette p) {
-    final timeLabel = _formatMinutes(row.minVal);
+  Widget _buildTile(_MealTileData d, ColorPalette p) {
+    final timeLabel = _formatMin(d.minVal);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
-          Icon(row.icon, color: p.textMuted, size: 20),
+          Icon(d.icon,
+              color: d.active ? p.accent : p.textMuted, size: 20),
           const SizedBox(width: 14),
           Expanded(
-            child: Text(row.label,
+            child: Text(d.label,
                 style: TextStyle(
-                    color: row.active ? p.textPrimary : p.textMuted,
+                    color: d.active ? p.textPrimary : p.textMuted,
                     fontSize: 15,
                     fontWeight: FontWeight.w500)),
           ),
           GestureDetector(
-            onTap: row.active ? row.onTimeTap : null,
+            onTap: d.active ? d.onTimeTap : null,
             child: Container(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: row.active
+                color: d.active
                     ? p.accent.withValues(alpha: 0.1)
-                    : p.cardBorder.withValues(alpha: 0.3),
+                    : p.cardBorder.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                    color: row.active
-                        ? p.accent.withValues(alpha: 0.3)
+                    color: d.active
+                        ? p.accent.withValues(alpha: 0.35)
                         : Colors.transparent),
               ),
-              child: Text(timeLabel,
-                  style: TextStyle(
-                      color: row.active ? p.accent : p.textMuted,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600)),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(timeLabel,
+                      style: TextStyle(
+                          color: d.active ? p.accent : p.textMuted,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700)),
+                  if (d.active) ...[
+                    const SizedBox(width: 4),
+                    Icon(Icons.edit_rounded,
+                        size: 11,
+                        color: p.accent.withValues(alpha: 0.7)),
+                  ],
+                ],
+              ),
             ),
           ),
           const SizedBox(width: 8),
           Switch(
-            value: row.active,
-            onChanged: row.onToggle,
+            value: d.active,
+            onChanged: d.onToggle,
             activeThumbColor: p.accent,
             activeTrackColor: p.accent.withValues(alpha: 0.4),
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -303,22 +377,22 @@ class _NotificheScreenState extends State<NotificheScreen> {
     );
   }
 
-  String _formatMinutes(int minVal) {
-    final h = minVal ~/ 60;
-    final m = minVal % 60;
-    return '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}';
+  String _formatMin(int m) {
+    final h = m ~/ 60;
+    final min = m % 60;
+    return '${h.toString().padLeft(2, '0')}:${min.toString().padLeft(2, '0')}';
   }
 }
 
-class _MealRow {
+class _MealTileData {
   final IconData icon;
   final String label;
   final bool active;
   final int minVal;
-  final ValueChanged<bool> onToggle;
+  final void Function(bool) onToggle;
   final VoidCallback onTimeTap;
 
-  const _MealRow({
+  const _MealTileData({
     required this.icon,
     required this.label,
     required this.active,
