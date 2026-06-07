@@ -20,6 +20,61 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
     super.dispose();
   }
 
+  Widget _buildCameraError(
+      BuildContext context, MobileScannerException error, Widget? child) {
+    final msg = error.errorDetails?.message ?? '';
+    final bool isPermission =
+        error.errorCode == MobileScannerErrorCode.permissionDenied ||
+            msg.toLowerCase().contains('authorized') ||
+            msg.toLowerCase().contains('permission');
+
+    return ColoredBox(
+      color: Colors.black,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 36),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                isPermission
+                    ? Icons.no_photography_outlined
+                    : Icons.videocam_off_outlined,
+                color: Colors.white54,
+                size: 52,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                isPermission
+                    ? 'Permesso fotocamera negato.\n\nVai in Impostazioni → Privacy e sicurezza → Fotocamera e abilita Plico.'
+                    : 'Impossibile avviare la fotocamera.\nAssicurati che nessuna altra app stia usando la fotocamera, poi riprova.',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    color: Colors.white70, fontSize: 14, height: 1.6),
+              ),
+              const SizedBox(height: 28),
+              if (isPermission)
+                OutlinedButton.icon(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.arrow_back, color: Colors.white70),
+                  label: const Text('Chiudi',
+                      style: TextStyle(color: Colors.white70)),
+                  style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.white38)),
+                )
+              else
+                ElevatedButton.icon(
+                  onPressed: () async => _controller.start(),
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Riprova'),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _onDetect(BarcodeCapture capture) async {
     if (_processing) return;
     final code = capture.barcodes.firstOrNull?.rawValue;
@@ -76,6 +131,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
           MobileScanner(
             controller: _controller,
             onDetect: _onDetect,
+            errorBuilder: _buildCameraError,
           ),
 
           // Overlay con frame di scansione
