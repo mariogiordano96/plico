@@ -43,8 +43,8 @@ Genera una lista della spesa aggregando tutti gli alimenti del piano con le quan
 ### Integrazione Apple Health / Google Fit
 Lettura dell'attività fisica per aggiustare il TDEE dinamicamente. Richiede platform channel nativo.
 
-### Export dati
-CSV o PDF del diario settimanale/mensile. Utile per chi segue un nutrizionista.
+### ~~Export dati~~
+~~PDF del diario settimanale (7 giorni) o mensile (30 giorni), con dettaglio pasti e riepilogo macro. Condivisione via share sheet nativo.~~
 
 ### Ricette
 Combinare più alimenti in una ricetta salvata con nome e porzioni. Prerequisito: pasti ricorrenti già implementati.

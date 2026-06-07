@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:printing/printing.dart';
 import 'dart:math';
 import '../../theme/app_theme.dart';
 import '../../models/body_snapshot.dart';
@@ -7,6 +8,7 @@ import '../../models/daily_log.dart';
 import '../../models/plicometry_session.dart';
 import '../../models/measurement_snapshot.dart';
 import '../../services/database_service.dart';
+import '../../services/pdf_export_service.dart';
 import '../storico/storico_misurazioni_screen.dart';
 
 // ── Data helpers ───────────────────────────────────────────────
@@ -138,6 +140,95 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
   _CompMetric _compMetric = _CompMetric.bf;
   String _misuraKey = 'vitaCm';
 
+  Future<void> _showExportBottomSheet() async {
+    final p = context.palette;
+    final days = await showModalBottomSheet<int>(
+      context: context,
+      backgroundColor: p.surface,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) {
+        final pp = ctx.palette;
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: pp.cardBorder,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text('Esporta Diario',
+                  style: TextStyle(
+                      color: pp.textPrimary,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700)),
+              const SizedBox(height: 4),
+              Text('Seleziona il periodo da esportare in PDF',
+                  style: TextStyle(color: pp.textMuted, fontSize: 13)),
+              const SizedBox(height: 16),
+              _ExportOptionTile(
+                label: 'Ultima settimana',
+                subtitle: '7 giorni',
+                p: pp,
+                onTap: () => Navigator.pop(ctx, 7),
+              ),
+              const SizedBox(height: 8),
+              _ExportOptionTile(
+                label: 'Ultimo mese',
+                subtitle: '30 giorni',
+                p: pp,
+                onTap: () => Navigator.pop(ctx, 30),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+    if (days == null || !mounted) return;
+    await _exportPdf(days);
+  }
+
+  Future<void> _exportPdf(int days) async {
+    final now = DateTime.now();
+    final to = DateTime(now.year, now.month, now.day);
+    final from = to.subtract(Duration(days: days - 1));
+
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const _PdfLoadingDialog(),
+    );
+
+    try {
+      final bytes = await PdfExportService.generateDiario(from: from, to: to);
+      if (!mounted) return;
+      Navigator.pop(context);
+
+      final fs = '${from.year}${from.month.toString().padLeft(2, '0')}${from.day.toString().padLeft(2, '0')}';
+      final ts = '${to.year}${to.month.toString().padLeft(2, '0')}${to.day.toString().padLeft(2, '0')}';
+      await Printing.sharePdf(
+        bytes: bytes,
+        filename: 'plico_diario_${fs}_$ts.pdf',
+      );
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Errore nell\'esportazione: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
@@ -156,6 +247,11 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
         centerTitle: true,
         iconTheme: IconThemeData(color: p.accent),
         actions: [
+          IconButton(
+            icon: Icon(Icons.download_rounded, color: p.accent),
+            tooltip: 'Esporta PDF',
+            onPressed: _showExportBottomSheet,
+          ),
           IconButton(
             icon: Icon(Icons.straighten_rounded, color: p.accent),
             tooltip: 'Storico misurazioni',
@@ -725,6 +821,88 @@ class _Stat extends StatelessWidget {
         const SizedBox(height: 2),
         Text(label, style: TextStyle(color: p.textMuted, fontSize: 11)),
       ],
+    );
+  }
+}
+
+// ── Export helpers ─────────────────────────────────────────────
+
+class _ExportOptionTile extends StatelessWidget {
+  final String label, subtitle;
+  final ColorPalette p;
+  final VoidCallback onTap;
+
+  const _ExportOptionTile({
+    required this.label,
+    required this.subtitle,
+    required this.p,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: p.background,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: p.cardBorder),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.picture_as_pdf_rounded, color: p.accent, size: 22),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label,
+                    style: TextStyle(
+                        color: p.textPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600)),
+                Text(subtitle,
+                    style: TextStyle(color: p.textMuted, fontSize: 12)),
+              ],
+            ),
+            const Spacer(),
+            Icon(Icons.arrow_forward_ios_rounded,
+                color: p.textMuted, size: 15),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PdfLoadingDialog extends StatelessWidget {
+  const _PdfLoadingDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return Dialog(
+      backgroundColor: p.surface,
+      shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 22,
+              height: 22,
+              child: CircularProgressIndicator(
+                  strokeWidth: 2.5, color: p.accent),
+            ),
+            const SizedBox(width: 16),
+            Text('Generazione PDF...',
+                style: TextStyle(color: p.textPrimary, fontSize: 14)),
+          ],
+        ),
+      ),
     );
   }
 }
