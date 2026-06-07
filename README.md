@@ -1,17 +1,73 @@
-# plico
+# Plico
 
-A new Flutter project.
+App Flutter per la gestione del piano alimentare e il tracciamento macronutrienti.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## Build Android
 
-A few resources to get you started if this is your first Flutter project:
+### APK debug (test rapido)
+```bash
+flutter build apk --debug
+# output: build/app/outputs/flutter-apk/app-debug.apk
+```
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+### APK release (da installare manualmente)
+```bash
+flutter build apk --release
+# output: build/app/outputs/flutter-apk/app-release.apk
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### App Bundle release (per il Play Store)
+```bash
+flutter build appbundle --release
+# output: build/app/outputs/bundle/release/app-release.aab
+```
+
+### Installazione diretta su device Android collegato
+```bash
+flutter run --release
+```
+
+---
+
+## Build iOS (richiede Mac + Xcode)
+
+### Prima di buildare (una tantum o dopo nuove dipendenze)
+```bash
+cd ios
+pod install
+cd ..
+```
+
+### Build debug su simulatore
+```bash
+flutter run -d "iPhone 16"    # sostituire con il nome del simulatore disponibile
+```
+
+### Build release IPA (per TestFlight / App Store)
+```bash
+flutter build ipa --release
+# output: build/ios/ipa/plico.ipa
+```
+
+### Aprire il progetto in Xcode
+```bash
+open ios/Runner.xcworkspace
+```
+
+> **Nota:** usare sempre `Runner.xcworkspace` e non `Runner.xcodeproj`.
+
+---
+
+## Aggiornamento schema Isar (dopo modifiche ai modelli)
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```
+
+## Dipendenze
+
+```bash
+flutter pub get
+```
