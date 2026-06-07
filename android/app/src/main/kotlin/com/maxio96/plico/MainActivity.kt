@@ -1,4 +1,4 @@
-package com.example.plico
+package com.maxio96.plico
 
 import io.flutter.embedding.android.FlutterActivity
 

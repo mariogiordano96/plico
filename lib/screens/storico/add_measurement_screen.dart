@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../theme/app_theme.dart';
 import '../../models/enums.dart';
 import '../../services/database_service.dart';
 import '../../widgets/measurement_guide.dart';
+import '../debug/calibration_screen.dart';
 
 class AddMeasurementScreen extends StatefulWidget {
   const AddMeasurementScreen({super.key});
@@ -142,6 +144,14 @@ class _AddMeasurementScreenState extends State<AddMeasurementScreen>
         elevation: 0,
         centerTitle: true,
         iconTheme: IconThemeData(color: p.accent),
+        actions: [
+          if (kDebugMode)
+            IconButton(
+              icon: Icon(Icons.tune_rounded, color: p.accent),
+              tooltip: 'Calibrazione punti',
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CalibrationScreen())),
+            ),
+        ],
       ),
       body: Column(
         children: [

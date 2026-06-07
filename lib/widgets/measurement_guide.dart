@@ -107,8 +107,8 @@ const _sites = <String, MeasurementSite>{
   ),
   'collo': MeasurementSite(
     label: 'Circonferenza Collo', bodyView: BodyView.front,
-    pointMale:   Offset(0.563, 0.206),
-    pointFemale: Offset(0.632, 0.210),
+    pointMale:   Offset(0.572, 0.206),
+    pointFemale: Offset(0.619, 0.221),
     description: 'Al punto più stretto del collo, appena sotto la laringe (il pomo d\'Adamo negli uomini).',
     steps: ['In piedi, testa eretta e sguardo in avanti.', 'Posiziona il metro appena sotto la laringe.', 'Avvolgi perpendicolarmente all\'asse del collo, senza comprimere.'],
   ),

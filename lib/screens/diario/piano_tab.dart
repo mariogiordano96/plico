@@ -19,7 +19,8 @@ const _diaryPastoIcons = [
 
 class PianoTab extends StatefulWidget {
   final DateTime currentDate;
-  const PianoTab({super.key, required this.currentDate});
+  final VoidCallback? onEntryAdded;
+  const PianoTab({super.key, required this.currentDate, this.onEntryAdded});
 
   @override
   State<PianoTab> createState() => _PianoTabState();
@@ -106,17 +107,20 @@ class _PianoTabState extends State<PianoTab> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (ctx) => _PastoPicker(
+      builder: (_) => _PastoPicker(
         food: food,
         currentDate: widget.currentDate,
         suggestedPasto: suggestedPasto,
         onAdded: (pastoNome) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Aggiunto a $pastoNome'),
-              duration: const Duration(seconds: 2),
-            ),
-          );
+          widget.onEntryAdded?.call();
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Aggiunto a $pastoNome'),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
         },
       ),
     );
@@ -456,6 +460,19 @@ class _PlanHeaderCard extends StatelessWidget {
               Text(
                 'Grammature da pesare a crudo',
                 style: TextStyle(color: p.textMuted, fontSize: 11),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Icon(Icons.info_outline_rounded, size: 12, color: p.textMuted),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  'Le kcal del piano possono differire leggermente dal target del diario per via degli arrotondamenti sulle grammature',
+                  style: TextStyle(color: p.textMuted, fontSize: 11),
+                ),
               ),
             ],
           ),
@@ -828,7 +845,7 @@ class _PastoPicker extends StatelessWidget {
                     final entry = _toMealEntry(i);
                     await DatabaseService.instance.addMealEntry(currentDate, entry);
                     if (context.mounted) {
-                      Navigator.pop(context);
+                      Navigator.of(context).pop();
                       onAdded(_diaryPastoNomi[i]);
                     }
                   },

@@ -32,7 +32,7 @@ const _plicaSpecs = <String, _FieldSpec>{
 };
 
 const _circSpecs = <String, _FieldSpec>{
-  'collo':   _FieldSpec('Collo', 'cm'),
+  'collo':   _FieldSpec('Collo', 'cm', 'collo'),
   'vita':    _FieldSpec('Vita', 'cm', 'vita'),
   'fianchi': _FieldSpec('Fianchi', 'cm', 'fianchi'),
 };

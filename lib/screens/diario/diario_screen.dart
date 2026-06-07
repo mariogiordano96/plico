@@ -120,7 +120,7 @@ class _DiarioScreenState extends State<DiarioScreen> {
   }
 
   List<int> _visiblePasti() {
-    final indices = [0, 1, 2, 3]; // colazione, pranzo, cena, spuntino
+    final indices = [0, 1, 3, 2]; // colazione, pranzo, spuntino, cena
     if (_haPostWo) indices.add(4);      // postWo
     if (_numPasti >= 5) indices.add(5); // spuntinoSerale
     return indices;
@@ -190,7 +190,7 @@ class _DiarioScreenState extends State<DiarioScreen> {
         body: TabBarView(
           children: [
             _buildDiarioTab(p),
-            PianoTab(currentDate: _date),
+            PianoTab(currentDate: _date, onEntryAdded: _load),
           ],
         ),
       ),
