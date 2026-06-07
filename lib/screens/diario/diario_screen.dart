@@ -340,19 +340,27 @@ class _RiepilogoCard extends StatelessWidget {
     required this.p,
   });
 
+  static const _green = Color(0xFF4CAF8E);
+
   @override
   Widget build(BuildContext context) {
     final pct =
         kcalTarget != null && kcalTarget! > 0 ? kcalLogged / kcalTarget! : 0.0;
-    final over = pct > 1.0;
-    final barColor = over ? const Color(0xFFE74C3C) : p.accent;
+    final over = pct > 1.05;
+    final onTarget = kcalTarget != null && pct >= 0.9 && !over;
+    final barColor = over
+        ? const Color(0xFFE74C3C)
+        : onTarget
+            ? _green
+            : p.accent;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: p.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: p.cardBorder),
+        border: Border.all(
+            color: onTarget ? _green.withValues(alpha: 0.35) : p.cardBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -366,7 +374,11 @@ class _RiepilogoCard extends StatelessWidget {
                 children: [
                   Text('${kcalLogged.round()} kcal',
                       style: TextStyle(
-                          color: p.textPrimary,
+                          color: over
+                              ? const Color(0xFFE74C3C)
+                              : onTarget
+                                  ? _green
+                                  : p.textPrimary,
                           fontSize: 28,
                           fontWeight: FontWeight.w800)),
                   Text(
@@ -381,11 +393,15 @@ class _RiepilogoCard extends StatelessWidget {
                 Text(
                   over
                       ? '+${(kcalLogged - kcalTarget!).round()} kcal'
-                      : '${(kcalTarget! - kcalLogged).round()} rimanenti',
+                      : onTarget
+                          ? 'obiettivo raggiunto'
+                          : '${(kcalTarget! - kcalLogged).round()} rimanenti',
                   style: TextStyle(
                       color: over
                           ? const Color(0xFFE74C3C)
-                          : p.textSecondary,
+                          : onTarget
+                              ? _green
+                              : p.textSecondary,
                       fontSize: 13,
                       fontWeight: FontWeight.w600),
                 ),
@@ -401,6 +417,21 @@ class _RiepilogoCard extends StatelessWidget {
                 valueColor: AlwaysStoppedAnimation<Color>(barColor),
                 minHeight: 8,
               ),
+            ),
+          ],
+          if (onTarget) ...[
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                const Icon(Icons.check_circle_rounded,
+                    color: _green, size: 15),
+                const SizedBox(width: 6),
+                Text('Ottimo lavoro! Sei nei target di oggi.',
+                    style: TextStyle(
+                        color: _green,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600)),
+              ],
             ),
           ],
           const SizedBox(height: 14),

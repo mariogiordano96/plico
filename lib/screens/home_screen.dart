@@ -249,11 +249,18 @@ class _DiarioHeroCardState extends State<_DiarioHeroCard> {
     final prot = _log?.proteinTotali ?? 0;
     final fat = _log?.fatTotali ?? 0;
     final carbs = _log?.carbsTotali ?? 0;
-    final pct = (_kcalTarget != null && _kcalTarget! > 0)
-        ? (logged / _kcalTarget!).clamp(0.0, 1.0)
+    final rawPct = _kcalTarget != null && _kcalTarget! > 0
+        ? logged / _kcalTarget!
         : 0.0;
-    final over = _kcalTarget != null && logged > _kcalTarget!;
-    final barColor = over ? const Color(0xFFE74C3C) : p.accent;
+    final pct = rawPct.clamp(0.0, 1.0);
+    final over = _kcalTarget != null && rawPct > 1.05;
+    final onTarget = _kcalTarget != null && rawPct >= 0.9 && !over;
+    const green = Color(0xFF4CAF8E);
+    final barColor = over
+        ? const Color(0xFFE74C3C)
+        : onTarget
+            ? green
+            : p.accent;
 
     return GestureDetector(
       onTap: () => widget.onSwitchTab?.call(1),
@@ -262,11 +269,19 @@ class _DiarioHeroCardState extends State<_DiarioHeroCard> {
         decoration: BoxDecoration(
           color: p.surface,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: p.cardBorder),
+          border: Border.all(
+              color: onTarget
+                  ? green.withValues(alpha: 0.35)
+                  : p.cardBorder),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [p.surface, p.accent.withValues(alpha: 0.04)],
+            colors: [
+              p.surface,
+              onTarget
+                  ? green.withValues(alpha: 0.04)
+                  : p.accent.withValues(alpha: 0.04)
+            ],
           ),
         ),
         child: Column(
@@ -281,8 +296,12 @@ class _DiarioHeroCardState extends State<_DiarioHeroCard> {
                         fontSize: 11,
                         letterSpacing: 2.5,
                         fontWeight: FontWeight.w600)),
-                Icon(Icons.chevron_right_rounded,
-                    color: p.textMuted, size: 18),
+                if (onTarget)
+                  const Icon(Icons.check_circle_rounded,
+                      color: green, size: 18)
+                else
+                  Icon(Icons.chevron_right_rounded,
+                      color: p.textMuted, size: 18),
               ],
             ),
             const SizedBox(height: 14),
@@ -294,7 +313,9 @@ class _DiarioHeroCardState extends State<_DiarioHeroCard> {
                   style: TextStyle(
                       color: over
                           ? const Color(0xFFE74C3C)
-                          : p.textPrimary,
+                          : onTarget
+                              ? green
+                              : p.textPrimary,
                       fontSize: 38,
                       fontWeight: FontWeight.w800,
                       letterSpacing: -1),
