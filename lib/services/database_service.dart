@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
@@ -23,16 +24,25 @@ class DatabaseService {
 
   late Isar _isar;
 
+  static const _schemas = [
+    UserProfileSchema, BodySnapshotSchema, PlicometrySessionSchema,
+    AppSettingsSchema, MeasurementSnapshotSchema, FoodItemSchema,
+    DailyLogSchema, UserFoodPreferencesSchema, MealPlanSchema,
+  ];
+
   Future<void> init() async {
     final dir = await getApplicationDocumentsDirectory();
-    _isar = await Isar.open(
-      [
-        UserProfileSchema, BodySnapshotSchema, PlicometrySessionSchema,
-        AppSettingsSchema, MeasurementSnapshotSchema, FoodItemSchema,
-        DailyLogSchema, UserFoodPreferencesSchema, MealPlanSchema,
-      ],
-      directory: dir.path,
-    );
+    _isar = await Isar.open(_schemas, directory: dir.path);
+  }
+
+  @visibleForTesting
+  Future<void> initForTest(String directory) async {
+    _isar = await Isar.open(_schemas, directory: directory, name: 'test');
+  }
+
+  @visibleForTesting
+  Future<void> close() async {
+    await _isar.close();
   }
 
   // ──────────────────────────────────────────────
@@ -356,6 +366,13 @@ class DatabaseService {
   Future<void> deleteFoodItem(Id foodId) async {
     await _isar.writeTxn(() async {
       await _isar.foodItems.delete(foodId);
+    });
+  }
+
+  @visibleForTesting
+  Future<void> saveFoodItemsBatch(List<FoodItem> items) async {
+    await _isar.writeTxn(() async {
+      await _isar.foodItems.putAll(items);
     });
   }
 

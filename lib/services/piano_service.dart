@@ -306,11 +306,28 @@ class PianoService {
     List<PlanSlot> buildMainMealSlots(double share, {double? carbsForMeal, double fruttaCarbs = 0.0}) {
       final slots = <PlanSlot>[];
 
+      // Build carb slot first (tentatively, without tracking) to know its incidental
+      // protein and fat — this lets us size the protein and fat slots accurately.
+      final effectiveCarbTarget = ((carbsForMeal ?? carbsTarget * share) - fruttaCarbs)
+          .clamp(0.0, double.infinity);
+      final sCarboTentative = buildSlot(
+        tipo: kCarboidrato,
+        foods: pool(['Cereali'], exclude: usedCarboIds),
+        altFoods: pool(['Cereali']),
+        gramsFn: (f) => f.carbsPer100g > 0 ? effectiveCarbTarget / (f.carbsPer100g / 100) : 0,
+        scoreFn: (f) => f.carbsPer100g,
+        maxGrams: 300, minGrams: 20,
+      );
+      final carbIncProt = sCarboTentative?.principale?.proteine ?? 0.0;
+      final carbIncFat  = sCarboTentative?.principale?.grassi   ?? 0.0;
+
+      // Protein slot: subtract cereal incidental protein so the total hits the target
+      final adjustedProtTarget = (protTarget * share - carbIncProt).clamp(0.0, double.infinity);
       final sProt = buildSlot(
         tipo: kProteina,
         foods: pool(['Proteine animali', 'Proteine vegetali'], exclude: usedProtIds),
         altFoods: pool(['Proteine animali', 'Proteine vegetali']),
-        gramsFn: (f) => f.proteinPer100g > 0 ? (protTarget * share) / (f.proteinPer100g / 100) : 0,
+        gramsFn: (f) => f.proteinPer100g > 0 ? adjustedProtTarget / (f.proteinPer100g / 100) : 0,
         scoreFn: (f) => f.proteinPer100g,
         maxGrams: 350, minGrams: 50,
       );
@@ -319,20 +336,9 @@ class PianoService {
 
       // Se la proteina è una leguminosa, i carbs sono già coperti dal legume stesso
       final isLegume = _leguminoseNames.contains(sProt?.principale?.nome ?? '');
-      if (!isLegume) {
-        // Sottrae i carbs della frutta già allocata per evitare di sforare il target
-        final effectiveCarbTarget = ((carbsForMeal ?? carbsTarget * share) - fruttaCarbs)
-            .clamp(0.0, double.infinity);
-        final sCarbo = buildSlot(
-          tipo: kCarboidrato,
-          foods: pool(['Cereali'], exclude: usedCarboIds),
-          altFoods: pool(['Cereali']),
-          gramsFn: (f) => f.carbsPer100g > 0 ? effectiveCarbTarget / (f.carbsPer100g / 100) : 0,
-          scoreFn: (f) => f.carbsPer100g,
-          maxGrams: 300, minGrams: 20,
-        );
-        trackPrincipal(sCarbo, usedCarboIds);
-        if (sCarbo != null) slots.add(sCarbo);
+      if (!isLegume && sCarboTentative != null) {
+        trackPrincipal(sCarboTentative, usedCarboIds);
+        slots.add(sCarboTentative);
       }
 
       final sVerd = buildSlot(
@@ -346,11 +352,14 @@ class PianoService {
       trackPrincipal(sVerd, usedVerduraIds);
       if (sVerd != null) slots.add(sVerd);
 
+      // Fat slot: subtract incidental fat from cereal and protein food
+      final protIncFat = sProt?.principale?.grassi ?? 0.0;
+      final adjustedFatTarget = (fatTarget * share - carbIncFat - protIncFat).clamp(0.0, double.infinity);
       final sGrasso = buildSlot(
         tipo: kGrasso,
         foods: pool(['Grassi'], exclude: usedGrassoIds),
         altFoods: pool(['Grassi']),
-        gramsFn: (f) => f.fatPer100g > 0 ? (fatTarget * share) / (f.fatPer100g / 100) : 0,
+        gramsFn: (f) => f.fatPer100g > 0 ? adjustedFatTarget / (f.fatPer100g / 100) : 0,
         scoreFn: (f) => f.fatPer100g,
         maxGrams: 50, minGrams: 3,
       );
@@ -396,10 +405,15 @@ class PianoService {
       trackPrincipal(sCarbo, usedCarboIds);
       if (sCarbo != null) slots.add(sCarbo);
 
+      // Latticini: subtract cereal incidental protein so the colazione total hits target
+      final colCarbIncProt = sCarbo?.principale?.proteine ?? 0.0;
+      final colCarbIncFat  = sCarbo?.principale?.grassi   ?? 0.0;
+      final adjustedColProtTarget = (protTarget * colShare - colCarbIncProt).clamp(0.0, double.infinity);
+
       final sExtra = buildSlot(
         tipo: kExtra,
         foods: poolByNames(curatedLatticiniColazione),
-        gramsFn: (f) => f.proteinPer100g > 0 ? (protTarget * colShare) / (f.proteinPer100g / 100) : 0,
+        gramsFn: (f) => f.proteinPer100g > 0 ? adjustedColProtTarget / (f.proteinPer100g / 100) : 0,
         scoreFn: (f) => f.proteinPer100g,
         maxGrams: 200, minGrams: 80,
       );
@@ -414,11 +428,15 @@ class PianoService {
       }
 
       if (!isMuesli) {
+        // Frutta secca: subtract incidental fat from cereal and latticini
+        final colExtraIncFat = sExtra?.principale?.grassi ?? 0.0;
+        final adjustedColFatTarget = (fatTarget * colShare - colCarbIncFat - colExtraIncFat)
+            .clamp(0.0, double.infinity);
         final sGrassoCol = buildSlot(
           tipo: kGrasso,
           foods: poolByNames(curatedFruttaSeccaSnack, exclude: usedGrassoIds),
           altFoods: poolByNames(curatedFruttaSeccaSnack),
-          gramsFn: (f) => f.fatPer100g > 0 ? (fatTarget * colShare) / (f.fatPer100g / 100) : 0,
+          gramsFn: (f) => f.fatPer100g > 0 ? adjustedColFatTarget / (f.fatPer100g / 100) : 0,
           scoreFn: (f) => f.fatPer100g,
           maxGrams: 30, minGrams: 5,
         );

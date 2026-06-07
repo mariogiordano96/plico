@@ -1,3 +1,6 @@
+# Isar native library downloaded for desktop tests
+libisar.so
+
 # Miscellaneous
 *.class
 *.log
