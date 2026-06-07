@@ -6,9 +6,9 @@ import '../screens/tdee/tdee_screen.dart' show calcolaTdee;
 class PianoService {
   static const _goalMult = [0.80, 1.0, 1.15];
   static const _protMatrix = [
-    [1.4, 1.8, 2.3, 2.6, 3.1],
-    [0.8, 1.2, 1.4, 1.8, 2.0],
-    [0.8, 1.2, 1.6, 1.8, 2.0],
+    [1.4, 1.8, 2.3, 2.6, 3.1],  // dimagrimento
+    [0.8, 1.2, 1.4, 1.8, 2.0],  // mantenimento
+    [1.6, 1.8, 2.0, 2.2, 2.4],  // aumento massa
   ];
 
   // Slot types
@@ -303,7 +303,7 @@ class PianoService {
       if (id != null && id != 0) used.add(id);
     }
 
-    List<PlanSlot> buildMainMealSlots(double share, {double carbsShareFactor = 1.0, double fruttaCarbs = 0.0}) {
+    List<PlanSlot> buildMainMealSlots(double share, {double? carbsForMeal, double fruttaCarbs = 0.0}) {
       final slots = <PlanSlot>[];
 
       final sProt = buildSlot(
@@ -321,7 +321,7 @@ class PianoService {
       final isLegume = _leguminoseNames.contains(sProt?.principale?.nome ?? '');
       if (!isLegume) {
         // Sottrae i carbs della frutta già allocata per evitare di sforare il target
-        final effectiveCarbTarget = (carbsTarget * share * carbsShareFactor - fruttaCarbs)
+        final effectiveCarbTarget = ((carbsForMeal ?? carbsTarget * share) - fruttaCarbs)
             .clamp(0.0, double.infinity);
         final sCarbo = buildSlot(
           tipo: kCarboidrato,
@@ -329,7 +329,7 @@ class PianoService {
           altFoods: pool(['Cereali']),
           gramsFn: (f) => f.carbsPer100g > 0 ? effectiveCarbTarget / (f.carbsPer100g / 100) : 0,
           scoreFn: (f) => f.carbsPer100g,
-          maxGrams: 150, minGrams: 20,
+          maxGrams: 300, minGrams: 20,
         );
         trackPrincipal(sCarbo, usedCarboIds);
         if (sCarbo != null) slots.add(sCarbo);
@@ -406,11 +406,26 @@ class PianoService {
       trackPrincipal(sExtra, usedExtraIds);
       if (sExtra != null) slots.add(sExtra);
 
-      // Il muesli contiene già frutta/frutta secca: non aggiungere slot frutta
+      // Il muesli contiene già frutta/frutta secca: non aggiungere slot frutta né grassi
       final isMuesli = sCarbo?.principale?.nome == 'Muesli';
       if (!isMuesli && sFruttaCol != null) {
         trackPrincipal(sFruttaCol, usedFruttaIds);
         slots.add(sFruttaCol);
+      }
+
+      if (!isMuesli) {
+        final sGrassoCol = buildSlot(
+          tipo: kGrasso,
+          foods: poolByNames(curatedFruttaSeccaSnack, exclude: usedGrassoIds),
+          altFoods: poolByNames(curatedFruttaSeccaSnack),
+          gramsFn: (f) => f.fatPer100g > 0 ? (fatTarget * colShare) / (f.fatPer100g / 100) : 0,
+          scoreFn: (f) => f.fatPer100g,
+          maxGrams: 30, minGrams: 5,
+        );
+        if (sGrassoCol != null) {
+          trackPrincipal(sGrassoCol, usedGrassoIds);
+          slots.add(sGrassoCol);
+        }
       }
 
       // versione salata (uova + pane)
@@ -440,6 +455,11 @@ class PianoService {
       }
     }
 
+    // Carbs: cena più leggera (70% share), il residuo va interamente al pranzo
+    // così la somma colazione + pranzo + spuntini + cena = 100% del target carbs
+    final cenaCarbsFactor = mainShare * 0.70;
+    final pranzoCarbsFactor = 1.0 - colShare - (snackCount.clamp(0, 1) * snkShare) - cenaCarbsFactor;
+
     // ── Pranzo ─────────────────────────────────────────────────
     {
       // Frutta selezionata prima per sottrarne i carbs al cereale
@@ -452,7 +472,8 @@ class PianoService {
       );
       final fruttaCarbsPranzo = sFruttaPranzo?.principale?.carboidrati ?? 0.0;
 
-      final slots = buildMainMealSlots(mainShare, fruttaCarbs: fruttaCarbsPranzo);
+      final slots = buildMainMealSlots(mainShare,
+          carbsForMeal: carbsTarget * pranzoCarbsFactor, fruttaCarbs: fruttaCarbsPranzo);
 
       // Non aggiungere frutta se il pasto è a base di legumi (già ricchi di carbs)
       final isLegumeMeal = slots.any(
@@ -538,7 +559,7 @@ class PianoService {
 
     // ── Cena ───────────────────────────────────────────────────
     {
-      final slots = buildMainMealSlots(mainShare, carbsShareFactor: 0.70);
+      final slots = buildMainMealSlots(mainShare, carbsForMeal: carbsTarget * cenaCarbsFactor);
       if (slots.isNotEmpty) {
         pasti.add(PlanMeal()
           ..tipo = kPastoCena
