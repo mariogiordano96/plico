@@ -605,7 +605,7 @@ class PianoService {
         pasti.add(PlanMeal()
           ..tipo = kPastoSpuntinoSerale
           ..slots = [sSnk2]
-          ..slotsAlternativa = [?sSnk2Sal]);
+          ..slotsAlternativa = [if (sSnk2Sal != null) sSnk2Sal]);
       }
     }
 

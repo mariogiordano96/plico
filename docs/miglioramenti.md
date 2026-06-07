@@ -33,8 +33,8 @@ Schermata o badge: % di pasti del piano effettivamente registrati nel diario. Ri
 ### Feedback raggiungimento obiettivo
 Messaggio o colore celebrativo quando la giornata si chiude entro il target calorico e macro. Retention.
 
-### Notifiche promemoria pasti
-Notifica opzionale a orari configurabili (es. "hai inserito il pranzo?"). La principale causa di abbandono è dimenticarsi di registrare a metà giornata.
+### ~~Notifiche promemoria pasti~~
+~~Notifica opzionale a orari configurabili (es. "hai inserito il pranzo?"). La principale causa di abbandono è dimenticarsi di registrare a metà giornata.~~
 
 ---
 

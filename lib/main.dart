@@ -3,6 +3,7 @@ import 'theme/app_theme.dart';
 import 'screens/main_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'services/database_service.dart';
+import 'services/notification_service.dart';
 
 final themeNotifier = ValueNotifier<ThemeMode>(ThemeMode.light);
 
@@ -12,6 +13,9 @@ void main() async {
   await DatabaseService.instance.seedCreaFoods();
   final isDark = await DatabaseService.instance.getIsDarkMode();
   themeNotifier.value = isDark ? ThemeMode.dark : ThemeMode.light;
+  await NotificationService.instance.init();
+  final settings = await DatabaseService.instance.getAppSettings();
+  await NotificationService.instance.scheduleAll(settings);
   runApp(const PlicoApp());
 }
 

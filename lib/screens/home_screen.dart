@@ -8,6 +8,7 @@ import '../models/user_profile.dart';
 import '../models/daily_log.dart';
 import '../services/database_service.dart';
 import '../main.dart';
+import 'impostazioni/notifiche_screen.dart';
 import 'pesate/pesate_screen.dart';
 import 'plicometry/method_selection_screen.dart';
 import 'tdee/tdee_screen.dart' show calcolaTdee;
@@ -32,6 +33,13 @@ class HomeScreen extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: Icon(Icons.notifications_outlined, color: p.accent),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const NotificheScreen()),
+            ),
+          ),
           ValueListenableBuilder<ThemeMode>(
             valueListenable: themeNotifier,
             builder: (context, mode, _) {

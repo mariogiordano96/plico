@@ -12,4 +12,19 @@ class AppSettings {
   int obiettivo = 1;      // 0=deficit 1=mantenimento 2=surplus
   bool creaSeeded = false;
   DateTime? goalSetDate;
+
+  // Promemoria pasti
+  bool notificheAttive = false;
+  bool notColAttiva = true;
+  bool notPranzoAttiva = true;
+  bool notCenaAttiva = true;
+  bool notSpuntinoAttiva = false;
+  bool notPostWoAttiva = false;
+  bool notSorAttiva = false;
+  int notColMin = 450;      // 7:30
+  int notPranzoMin = 750;   // 12:30
+  int notCenaMin = 1170;    // 19:30
+  int notSpuntinoMin = 630; // 10:30
+  int notPostWoMin = 1020;  // 17:00
+  int notSorMin = 1260;     // 21:00
 }

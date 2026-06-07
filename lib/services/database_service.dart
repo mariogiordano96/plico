@@ -632,6 +632,20 @@ class DatabaseService {
   }
 
   // ──────────────────────────────────────────────
+  // Notification settings
+  // ──────────────────────────────────────────────
+
+  Future<AppSettings> getAppSettings() async {
+    return await _isar.appSettings.get(1) ?? AppSettings();
+  }
+
+  Future<void> saveAppSettings(AppSettings settings) async {
+    await _isar.writeTxn(() async {
+      await _isar.appSettings.put(settings);
+    });
+  }
+
+  // ──────────────────────────────────────────────
   // Utility
   // ──────────────────────────────────────────────
 
