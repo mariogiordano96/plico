@@ -637,9 +637,10 @@ class DatabaseService {
 
   Future<AppSettings> getAppSettings() async {
     final s = await _isar.appSettings.get(1) ?? AppSettings();
-    // Isar sets new int fields to 0 on existing records during schema migration.
-    // Detect this and restore the intended defaults, then persist them.
-    if (s.notColMin == 0 && s.notPranzoMin == 0 && s.notCenaMin == 0) {
+    // Isar reads garbage bytes from old records when new int fields are added.
+    // Any value outside 0..1439 (valid minutes in a day) means corrupt/missing data.
+    bool invalidMin(int v) => v < 0 || v > 1439;
+    if (invalidMin(s.notColMin) || invalidMin(s.notPranzoMin) || invalidMin(s.notCenaMin)) {
       s.notColMin = 450;
       s.notPranzoMin = 750;
       s.notCenaMin = 1170;
