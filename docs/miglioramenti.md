@@ -27,8 +27,8 @@ Genera una lista della spesa aggregando tutti gli alimenti del piano con le quan
 - "Ripeti pasto di ieri" per un dato slot
 - Riduce il friction del tracciamento quotidiano, causa principale di abbandono
 
-### Aderenza al piano
-Schermata o badge: % di pasti del piano effettivamente registrati nel diario. Rinforzo positivo + dato utile per calibrazione futura.
+### ~~Aderenza al piano~~
+~~Schermata o badge: % di pasti del piano effettivamente registrati nel diario. Rinforzo positivo + dato utile per calibrazione futura.~~
 
 ### Feedback raggiungimento obiettivo
 Messaggio o colore celebrativo quando la giornata si chiude entro il target calorico e macro. Retention.

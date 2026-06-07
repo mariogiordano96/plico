@@ -615,6 +615,12 @@ class DatabaseService {
     });
   }
 
+  Future<List<DailyLog>> getDailyLogsRange(DateTime from, DateTime to) async {
+    final f = _logDate(from);
+    final t = _logDate(to);
+    return _isar.dailyLogs.filter().dataBetween(f, t).sortByData().findAll();
+  }
+
   Stream<List<DailyLog>> watchDailyLogs() {
     return _isar.dailyLogs
         .where()

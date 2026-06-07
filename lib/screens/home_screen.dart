@@ -6,6 +6,7 @@ import '../models/body_snapshot.dart';
 import '../models/plicometry_session.dart';
 import '../models/user_profile.dart';
 import '../models/daily_log.dart';
+import '../models/meal_plan.dart';
 import '../services/database_service.dart';
 import '../main.dart';
 import 'impostazioni/notifiche_screen.dart';
@@ -70,6 +71,8 @@ class HomeScreen extends StatelessWidget {
             const _GreetingHeader(),
             const SizedBox(height: 20),
             _DiarioHeroCard(onSwitchTab: onSwitchTab),
+            const SizedBox(height: 16),
+            _AderenzaCard(onSwitchTab: onSwitchTab),
             const SizedBox(height: 16),
             _PianoCard(onSwitchTab: onSwitchTab),
             const SizedBox(height: 16),
@@ -861,6 +864,209 @@ class _ProgressiCard extends StatelessWidget {
             ),
             Icon(Icons.chevron_right_rounded,
                 color: p.textMuted, size: 20),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Aderenza al piano ─────────────────────────────────────────────
+
+class _AderenzaCard extends StatefulWidget {
+  final void Function(int)? onSwitchTab;
+  const _AderenzaCard({this.onSwitchTab});
+
+  @override
+  State<_AderenzaCard> createState() => _AderenzaCardState();
+}
+
+class _AderenzaCardState extends State<_AderenzaCard> {
+  MealPlan? _plan;
+  DailyLog? _todayLog;
+  List<DailyLog> _weekLogs = [];
+  StreamSubscription? _planSub;
+  StreamSubscription? _logSub;
+
+  static DateTime get _today {
+    final n = DateTime.now();
+    return DateTime(n.year, n.month, n.day);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+    _planSub = DatabaseService.instance
+        .watchMealPlan()
+        .listen((p) { if (mounted) setState(() => _plan = p); });
+    _logSub = DatabaseService.instance
+        .watchDailyLog(_today)
+        .listen((l) { if (mounted) setState(() => _todayLog = l); });
+  }
+
+  @override
+  void dispose() {
+    _planSub?.cancel();
+    _logSub?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _load() async {
+    final plan = await DatabaseService.instance.getMealPlan();
+    final log = await DatabaseService.instance.getDailyLog(_today);
+    final from = _today.subtract(const Duration(days: 6));
+    final week = await DatabaseService.instance.getDailyLogsRange(from, _today);
+    if (!mounted) return;
+    setState(() { _plan = plan; _todayLog = log; _weekLogs = week; });
+  }
+
+  double _adherenceFor(DailyLog? log, Set<int> planned) {
+    if (planned.isEmpty) return 0.0;
+    final logged = log?.entries.map((e) => e.pastoTipo).toSet() ?? {};
+    return logged.intersection(planned).length / planned.length;
+  }
+
+  DailyLog? _logForDay(DateTime day) {
+    for (final l in _weekLogs) {
+      if (l.data == day) return l;
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_plan == null || _plan!.pasti.isEmpty) return const SizedBox.shrink();
+
+    final p = context.palette;
+    final planned = _plan!.pasti.map((m) => m.tipo).toSet();
+    final loggedToday =
+        (_todayLog?.entries.map((e) => e.pastoTipo).toSet() ?? {})
+            .intersection(planned);
+    final pct = _adherenceFor(_todayLog, planned);
+    final color = pct >= 0.8
+        ? const Color(0xFF4CAF8E)
+        : pct >= 0.4
+            ? const Color(0xFFFF8C42)
+            : pct > 0
+                ? const Color(0xFFFF8C42)
+                : p.textMuted;
+
+    final now = DateTime.now();
+    final dots = List.generate(7, (i) {
+      final day = DateTime(now.year, now.month, now.day - (6 - i));
+      final log = i == 6 ? _todayLog : _logForDay(day);
+      // future days or no log
+      if (day.isAfter(DateTime(now.year, now.month, now.day))) return -1.0;
+      return _adherenceFor(log, planned);
+    });
+
+    return GestureDetector(
+      onTap: () => widget.onSwitchTab?.call(1),
+      child: Container(
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: p.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: p.cardBorder),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('ADERENZA AL PIANO',
+                    style: TextStyle(
+                        color: p.textMuted,
+                        fontSize: 11,
+                        letterSpacing: 2.5,
+                        fontWeight: FontWeight.w600)),
+                Icon(Icons.chevron_right_rounded,
+                    color: p.textMuted, size: 18),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  '${loggedToday.length}/${planned.length}',
+                  style: TextStyle(
+                      color: pct > 0 ? color : p.textMuted,
+                      fontSize: 32,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -1),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4, left: 6),
+                  child: Text(
+                    'pasti oggi',
+                    style: TextStyle(color: p.textMuted, fontSize: 13),
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  '${(pct * 100).round()}%',
+                  style: TextStyle(
+                      color: pct > 0 ? color : p.textMuted,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: pct,
+                backgroundColor: p.cardBorder,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                    pct > 0 ? color : p.cardBorder),
+                minHeight: 5,
+              ),
+            ),
+            const SizedBox(height: 14),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('ultimi 7 giorni',
+                    style:
+                        TextStyle(color: p.textMuted, fontSize: 11)),
+                Row(
+                  children: List.generate(7, (i) {
+                    final v = dots[i];
+                    final isToday = i == 6;
+                    Color dotColor;
+                    if (v < 0) {
+                      dotColor = p.cardBorder;
+                    } else if (v >= 0.8) {
+                      dotColor = const Color(0xFF4CAF8E);
+                    } else if (v >= 0.4) {
+                      dotColor = const Color(0xFFFF8C42);
+                    } else if (v > 0) {
+                      dotColor = const Color(0xFFFF8C42).withValues(alpha: 0.5);
+                    } else {
+                      dotColor = p.cardBorder;
+                    }
+                    return Container(
+                      margin: const EdgeInsets.only(left: 5),
+                      width: isToday ? 10 : 8,
+                      height: isToday ? 10 : 8,
+                      decoration: BoxDecoration(
+                        color: dotColor,
+                        shape: BoxShape.circle,
+                        border: isToday
+                            ? Border.all(
+                                color: p.accent.withValues(alpha: 0.5),
+                                width: 1.5)
+                            : null,
+                      ),
+                    );
+                  }),
+                ),
+              ],
+            ),
           ],
         ),
       ),
