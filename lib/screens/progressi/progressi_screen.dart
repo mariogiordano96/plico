@@ -3,6 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'dart:math';
 import '../../theme/app_theme.dart';
 import '../../models/body_snapshot.dart';
+import '../../models/daily_log.dart';
 import '../../models/plicometry_session.dart';
 import '../../models/measurement_snapshot.dart';
 import '../../services/database_service.dart';
@@ -57,6 +58,32 @@ extension _CompMetricExt on _CompMetric {
   }
 }
 
+enum _DiarioMetric { kcal, proteine, grassi, carbs }
+
+extension _DiarioMetricExt on _DiarioMetric {
+  String get label {
+    switch (this) {
+      case _DiarioMetric.kcal:     return 'Kcal';
+      case _DiarioMetric.proteine: return 'Proteine';
+      case _DiarioMetric.grassi:   return 'Grassi';
+      case _DiarioMetric.carbs:    return 'Carboidrati';
+    }
+  }
+
+  String get unit {
+    return this == _DiarioMetric.kcal ? 'kcal' : 'g';
+  }
+
+  double extract(DailyLog log) {
+    switch (this) {
+      case _DiarioMetric.kcal:     return log.kcalTotali;
+      case _DiarioMetric.proteine: return log.proteinTotali;
+      case _DiarioMetric.grassi:   return log.fatTotali;
+      case _DiarioMetric.carbs:    return log.carbsTotali;
+    }
+  }
+}
+
 const _misureLabels = <String, String>{
   'vitaCm':           'Vita',
   'fianchiCm':        'Fianchi',
@@ -107,6 +134,7 @@ class ProgressiScreen extends StatefulWidget {
 
 class _ProgressiScreenState extends State<ProgressiScreen> {
   _Range _range = _Range.month1;
+  _DiarioMetric _diarioMetric = _DiarioMetric.kcal;
   _CompMetric _compMetric = _CompMetric.bf;
   String _misuraKey = 'vitaCm';
 
@@ -166,7 +194,33 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
             _PesoChart(startDate: start, p: p),
             const SizedBox(height: 28),
 
-            // ── Grafico 2: Composizione ───────────────────
+            // ── Grafico 2: Diario kcal/macro ─────────────
+            _SectionLabel('DIARIO', p),
+            const SizedBox(height: 10),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: _DiarioMetric.values.map((m) => Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: _RangeChip(
+                    label: m.label,
+                    selected: _diarioMetric == m,
+                    onTap: () => setState(() => _diarioMetric = m),
+                    p: p,
+                  ),
+                )).toList(),
+              ),
+            ),
+            const SizedBox(height: 14),
+            _DiarioChart(
+              key: ValueKey('${_diarioMetric.name}-${_range.name}'),
+              metric: _diarioMetric,
+              startDate: start,
+              p: p,
+            ),
+            const SizedBox(height: 28),
+
+            // ── Grafico 3: Composizione ───────────────────
             _SectionLabel('COMPOSIZIONE CORPOREA', p),
             const SizedBox(height: 10),
             SingleChildScrollView(
@@ -336,6 +390,41 @@ class _MisurazioniChart extends StatelessWidget {
   }
 }
 
+// ── Diario Chart ──────────────────────────────────────────────
+
+class _DiarioChart extends StatelessWidget {
+  final _DiarioMetric metric;
+  final DateTime? startDate;
+  final ColorPalette p;
+  const _DiarioChart({super.key, required this.metric, required this.startDate, required this.p});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<DailyLog>>(
+      stream: DatabaseService.instance.watchDailyLogs(),
+      builder: (context, snap) {
+        var logs = [...(snap.data ?? [])]
+          ..sort((a, b) => a.data.compareTo(b.data));
+
+        if (startDate != null) {
+          logs = logs.where((l) => !l.data.isBefore(startDate!)).toList();
+        }
+        logs = logs.where((l) => l.entries.isNotEmpty).toList();
+
+        final points = logs.map((l) => _Point(l.data, metric.extract(l))).toList();
+        return _ChartBox(
+          points: points,
+          unit: metric.unit,
+          color: const Color(0xFFE8945A),
+          p: p,
+          decimals: metric == _DiarioMetric.kcal ? 0 : 1,
+          showAvg: true,
+        );
+      },
+    );
+  }
+}
+
 // ── Chart Box ─────────────────────────────────────────────────
 
 class _ChartBox extends StatelessWidget {
@@ -343,16 +432,22 @@ class _ChartBox extends StatelessWidget {
   final String unit;
   final Color color;
   final ColorPalette p;
+  final int decimals;
+  final bool showAvg;
 
   const _ChartBox({
     required this.points,
     required this.unit,
     required this.color,
     required this.p,
+    this.decimals = 1,
+    this.showAvg = false,
   });
 
   String _fmtDate(DateTime d) =>
       '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}';
+
+  String _fmt(double v) => v.toStringAsFixed(decimals);
 
   @override
   Widget build(BuildContext context) {
@@ -392,6 +487,7 @@ class _ChartBox extends StatelessWidget {
     final last = points.last.value;
     final prev = points.length > 1 ? points[points.length - 2].value : null;
     final delta = prev != null ? last - prev : null;
+    final avg = points.fold(0.0, (s, pt) => s + pt.value) / points.length;
 
     return Container(
       decoration: BoxDecoration(
@@ -446,7 +542,7 @@ class _ChartBox extends StatelessWidget {
                           if (value == meta.min || value == meta.max) {
                             return const SizedBox.shrink();
                           }
-                          return Text(value.toStringAsFixed(1),
+                          return Text(_fmt(value),
                               style: TextStyle(
                                   color: p.textMuted, fontSize: 10));
                         },
@@ -489,7 +585,7 @@ class _ChartBox extends StatelessWidget {
                       getTooltipItems: (ts) => ts.map((s) {
                         final i = s.spotIndex;
                         return LineTooltipItem(
-                          '${dates[i]}\n${s.y.toStringAsFixed(1)} $unit',
+                          '${dates[i]}\n${_fmt(s.y)} $unit',
                           TextStyle(
                               color: p.textPrimary,
                               fontSize: 12,
@@ -514,22 +610,29 @@ class _ChartBox extends StatelessWidget {
               children: [
                 _Stat(
                     label: 'Ultimo',
-                    value: '${last.toStringAsFixed(1)} $unit',
+                    value: '${_fmt(last)} $unit',
                     color: color,
                     p: p),
-                if (delta != null) ...[
+                if (showAvg) ...[
+                  Container(width: 1, height: 28, color: p.cardBorder),
+                  _Stat(
+                    label: 'Media',
+                    value: '${_fmt(avg)} $unit',
+                    color: p.textSecondary,
+                    p: p,
+                  ),
+                ] else if (delta != null) ...[
                   Container(width: 1, height: 28, color: p.cardBorder),
                   _Stat(
                     label: 'Variazione',
-                    value:
-                        '${delta >= 0 ? '+' : ''}${delta.toStringAsFixed(1)} $unit',
+                    value: '${delta >= 0 ? '+' : ''}${_fmt(delta)} $unit',
                     color: p.textSecondary,
                     p: p,
                   ),
                 ],
                 Container(width: 1, height: 28, color: p.cardBorder),
                 _Stat(
-                    label: 'Rilevazioni',
+                    label: showAvg ? 'Giorni' : 'Rilevazioni',
                     value: '${points.length}',
                     color: p.textSecondary,
                     p: p),

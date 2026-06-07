@@ -598,6 +598,13 @@ class DatabaseService {
     });
   }
 
+  Stream<List<DailyLog>> watchDailyLogs() {
+    return _isar.dailyLogs
+        .where()
+        .sortByData()
+        .watch(fireImmediately: true);
+  }
+
   Stream<DailyLog?> watchDailyLog(DateTime date) {
     final day = _logDate(date);
     return _isar.dailyLogs

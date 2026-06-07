@@ -16,8 +16,8 @@
 
 ## Priorità alta
 
-### Storico visivo kcal
-Grafico kcal (e macro) degli ultimi 7/14 giorni dal diario alimentare. Trasforma il diario da registro puntuale a strumento di monitoraggio. Il grafico peso è già presente; manca il grafico kcal che richiede aggregazione di `DailyLog` per data.
+### ~~Storico visivo kcal~~
+~~Grafico kcal (e macro) degli ultimi 7/14 giorni dal diario alimentare. Trasforma il diario da registro puntuale a strumento di monitoraggio. Il grafico peso è già presente; manca il grafico kcal che richiede aggregazione di `DailyLog` per data.~~
 
 ### Lista della spesa dal piano
 Genera una lista della spesa aggregando tutti gli alimenti del piano con le quantità. Riduce il friction tra piano e spesa reale. Prerequisito: piano stabile e usato dall'utente.
