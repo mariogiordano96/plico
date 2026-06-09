@@ -1,6 +1,11 @@
 # Isar native library downloaded for desktop tests
 libisar.so
 
+# Android signing — never commit these
+android/key.properties
+*.jks
+*.keystore
+
 # Miscellaneous
 *.class
 *.log
