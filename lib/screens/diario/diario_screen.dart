@@ -7,7 +7,8 @@ import '../../models/meal_combo.dart';
 import '../../models/meal_entry.dart';
 import '../../services/achievement_service.dart';
 import '../../services/database_service.dart';
-import '../tdee/tdee_screen.dart' show calcolaTdee;
+import '../../services/target_service.dart';
+import '../../services/widget_service.dart';
 import 'aggiunta_alimento_screen.dart';
 import 'piano_tab.dart';
 
@@ -22,8 +23,6 @@ const _pastoIcons = [
   Icons.fitness_center_rounded,
   Icons.nights_stay_rounded,
 ];
-
-const _goalMult = [0.80, 1.0, 1.15];
 
 class DiarioScreen extends StatefulWidget {
   const DiarioScreen({super.key});
@@ -67,7 +66,7 @@ class _DiarioScreenState extends State<DiarioScreen> {
     final log = await DatabaseService.instance.getDailyLog(_date);
     final yesterdayLog = await DatabaseService.instance
         .getDailyLog(_date.subtract(const Duration(days: 1)));
-    final target = await _computeTargets();
+    final target = await computeDailyTargets();
     final prefs = await DatabaseService.instance.getUserFoodPreferences();
     if (!mounted) return;
     setState(() {
@@ -81,6 +80,7 @@ class _DiarioScreenState extends State<DiarioScreen> {
       _numPasti = prefs?.numPasti ?? 3;
       _loading = false;
     });
+    WidgetService.refresh();
   }
 
   Future<void> _repeatYesterday(int pastoTipo) async {
@@ -162,7 +162,7 @@ class _DiarioScreenState extends State<DiarioScreen> {
   }
 
   Future<void> _reloadTargets() async {
-    final target = await _computeTargets();
+    final target = await computeDailyTargets();
     if (!mounted) return;
     setState(() {
       _kcalTarget = target.$1;
@@ -170,38 +170,7 @@ class _DiarioScreenState extends State<DiarioScreen> {
       _fatTarget = target.$3;
       _carbsTarget = target.$4;
     });
-  }
-
-  Future<(int?, int?, int?, int?)> _computeTargets() async {
-    final profile = await DatabaseService.instance.getUserProfile();
-    final snapshot = await DatabaseService.instance.getLatestBodySnapshot();
-    if (profile == null || snapshot == null) return (null, null, null, null);
-    final session = await DatabaseService.instance.getLatestPlicometrySession();
-    final livello = await DatabaseService.instance.getLivelloAttivita();
-    final metodo = await DatabaseService.instance.getMetodoTdee();
-    final obiettivo = await DatabaseService.instance.getObiettivo();
-    final result = calcolaTdee(
-      sesso: profile.sesso,
-      eta: profile.etaCorrente,
-      altezzaCm: profile.altezzaCm,
-      pesoKg: snapshot.pesoKg,
-      livello: livello,
-      metodo: metodo,
-      massaMagraKg: session?.risultati.massaMagraKg,
-    );
-    if (result == null) return (null, null, null, null);
-    final kcalTarget = (result.tdee * _goalMult[obiettivo.clamp(0, 2)]).round();
-    const protMatrix = [
-      [1.4, 1.8, 2.3, 2.6, 3.1],
-      [0.8, 1.2, 1.4, 1.8, 2.0],
-      [0.8, 1.2, 1.6, 1.8, 2.0],
-    ];
-    final protTarget =
-        (snapshot.pesoKg * protMatrix[obiettivo.clamp(0, 2)][livello.clamp(0, 4)]).round();
-    // Fat: 25% delle kcal totali; Carbs: kcal rimanenti dopo prot e grassi
-    final fatTarget = (kcalTarget * 0.25 / 9).round();
-    final carbsTarget = ((kcalTarget - protTarget * 4 - fatTarget * 9) / 4).round().clamp(0, 9999);
-    return (kcalTarget, protTarget, fatTarget, carbsTarget);
+    WidgetService.refresh();
   }
 
   List<int> _visiblePasti() {

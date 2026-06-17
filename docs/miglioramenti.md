@@ -40,6 +40,7 @@ Genera una lista della spesa aggregando tutti gli alimenti del piano con le quan
 
 ## Priorità bassa
 
+
 ### Integrazione Apple Health / Google Fit
 Lettura dell'attività fisica per aggiustare il TDEE dinamicamente. Richiede platform channel nativo.
 

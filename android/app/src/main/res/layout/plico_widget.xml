@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/plico_widget_background">
+
+    <TextView
+        android:id="@+id/widget_kcal_line"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#FFE8F2FF"
+        android:text="0 / 0 kcal" />
+
+    <ProgressBar
+        android:id="@+id/widget_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:layout_marginTop="8dp"
+        android:max="100"
+        android:progress="0"
+        android:progressDrawable="@drawable/plico_widget_progress" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textSize="13sp"
+        android:textColor="#FF4A6B7A"
+        android:text="+ Aggiungi pasto" />
+</LinearLayout>

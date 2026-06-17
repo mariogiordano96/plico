@@ -14,7 +14,7 @@ La causa #1 di abbandono è che registrare ogni pasto è lento e tedioso.
 - ✅ ~~**Ripeti pasto di ieri** — copia uno slot del giorno precedente con un tap~~ — implementato
 - ✅ ~~**Pasto dal piano** — se hai il piano attivo, suggerisci gli alimenti previsti per quello slot invece di partire da zero~~ — implementato (sezione "Dal tuo piano")
 - ✅ ~~**Ricerca più intelligente** — mostra per primi gli alimenti usati di recente, poi i preferiti, poi il database~~ — implementato
-- **Widget iOS/Android** — aggiunta rapida di un pasto dalla schermata home del telefono senza aprire l'app
+- ✅ ~~**Widget iOS/Android** — aggiunta rapida di un pasto dalla schermata home del telefono senza aprire l'app~~ — Android implementato (riepilogo kcal + tap per apertura rapida); iOS preparato come scaffolding Swift in `ios/PlicoWidgetScaffold/` (richiede di creare il target Xcode su Mac, non verificabile da Linux — vedi README nella cartella)
 - **Siri / Google Assistant shortcut** — "Hey Siri, ho mangiato una banana" → aggiunta diretta
 
 ---
@@ -83,6 +83,6 @@ L'utente deve capire il valore entro i primi 3 minuti.
 | ✅ ~~Riepilogo settimanale in home~~ | Alto | Medio |
 | ✅ ~~Notifica streak a rischio~~ | Medio | Basso |
 | ✅ ~~Insights automatici sui pattern~~ | Alto | Alto |
-| Widget iOS/Android | Medio | Alto |
+| ✅ ~~Widget iOS/Android~~ (Android) | Medio | Alto |
 | Condivisione progressi | Medio | Medio |
 | Coach virtuale AI | Alto | Alto |
