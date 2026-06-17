@@ -19,6 +19,13 @@ class NotificationService {
   static const _recapChannelId = 'evening_recap';
   static const _recapChannelName = 'Riepilogo serale';
   static const _recapId = 200;
+  static const _morningRecapChannelId = 'morning_recap';
+  static const _morningRecapChannelName = 'Recap mattutino';
+  static const _morningRecapId = 201;
+  static const _weighInChannelId = 'weigh_in_reminder';
+  static const _weighInChannelName = 'Promemoria pesata';
+  static const _weighInId = 202;
+  static const _weighInThresholdDays = 5;
 
   Future<void> init() async {
     tzdata.initializeTimeZones();
@@ -123,11 +130,19 @@ class NotificationService {
         ? log.kcalTotali / kcalTarget
         : null;
     final onTargetToday = pct != null && pct >= 0.9 && pct <= 1.05;
-    await scheduleEveningRecap(streak: streak, onTargetToday: onTargetToday);
+    final loggedToday = log != null && log.entries.isNotEmpty;
+    await scheduleEveningRecap(
+      streak: streak,
+      loggedToday: loggedToday,
+      onTargetToday: onTargetToday,
+    );
   }
 
-  Future<void> scheduleEveningRecap(
-      {required int streak, required bool onTargetToday}) async {
+  Future<void> scheduleEveningRecap({
+    required int streak,
+    required bool loggedToday,
+    required bool onTargetToday,
+  }) async {
     await _plugin.cancel(id: _recapId);
 
     final now = tz.TZDateTime.now(tz.local);
@@ -136,9 +151,11 @@ class NotificationService {
 
     final body = streak <= 0
         ? 'Registra i tuoi pasti di oggi per iniziare una nuova streak.'
-        : onTargetToday
-            ? 'Oggi hai raggiunto il tuo obiettivo per $streak giorni di fila 🔥'
-            : 'Hai una streak di $streak giorni: non lasciarla cadere oggi!';
+        : !loggedToday
+            ? 'Hai registrato ogni giorno per $streak giorni. Vuoi mantenere la streak? 🔥'
+            : onTargetToday
+                ? 'Oggi hai raggiunto il tuo obiettivo per $streak giorni di fila 🔥'
+                : 'Hai registrato $streak giorni di fila! Continua così 💪';
 
     const details = NotificationDetails(
       android: AndroidNotificationDetails(
@@ -161,6 +178,126 @@ class NotificationService {
       title: 'Plico',
       body: body,
       scheduledDate: today21,
+      notificationDetails: details,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+    );
+  }
+
+  Future<void> refreshMorningRecap() async {
+    final settings = await DatabaseService.instance.getAppSettings();
+    if (!settings.notificheAttive) {
+      await _plugin.cancel(id: _morningRecapId);
+      return;
+    }
+    final now = DateTime.now();
+    final yesterday = DateTime(now.year, now.month, now.day)
+        .subtract(const Duration(days: 1));
+    final log = await DatabaseService.instance.getDailyLog(yesterday);
+    if (log == null || log.entries.isEmpty) {
+      await _plugin.cancel(id: _morningRecapId);
+      return;
+    }
+    final kcalTarget = await AchievementService.instance.currentKcalTarget();
+    await scheduleMorningRecap(kcalYesterday: log.kcalTotali, kcalTarget: kcalTarget);
+  }
+
+  Future<void> scheduleMorningRecap({
+    required double kcalYesterday,
+    required int? kcalTarget,
+  }) async {
+    await _plugin.cancel(id: _morningRecapId);
+
+    final now = tz.TZDateTime.now(tz.local);
+    final today8 = tz.TZDateTime(tz.local, now.year, now.month, now.day, 8, 0);
+    if (!today8.isAfter(now.add(const Duration(seconds: 30)))) return;
+
+    final kcal = kcalYesterday.round();
+    final pct = kcalTarget != null && kcalTarget > 0
+        ? kcalYesterday / kcalTarget
+        : null;
+    final onTarget = pct != null && pct >= 0.9 && pct <= 1.05;
+    final body = kcalTarget != null
+        ? onTarget
+            ? 'Ieri hai mangiato $kcal kcal su $kcalTarget. Ottimo lavoro! 💪'
+            : 'Ieri hai registrato $kcal kcal su $kcalTarget di obiettivo.'
+        : 'Ieri hai registrato $kcal kcal.';
+
+    const details = NotificationDetails(
+      android: AndroidNotificationDetails(
+        _morningRecapChannelId,
+        _morningRecapChannelName,
+        channelDescription: 'Riepilogo delle calorie di ieri',
+        importance: Importance.defaultImportance,
+        priority: Priority.defaultPriority,
+        playSound: true,
+      ),
+      iOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: false,
+        presentSound: true,
+      ),
+    );
+
+    await _plugin.zonedSchedule(
+      id: _morningRecapId,
+      title: 'Plico',
+      body: body,
+      scheduledDate: today8,
+      notificationDetails: details,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+    );
+  }
+
+  Future<void> refreshWeighInReminder() async {
+    final settings = await DatabaseService.instance.getAppSettings();
+    if (!settings.notificheAttive) {
+      await _plugin.cancel(id: _weighInId);
+      return;
+    }
+    final latest = await DatabaseService.instance.getLatestBodySnapshot();
+    if (latest == null) {
+      await _plugin.cancel(id: _weighInId);
+      return;
+    }
+    final today = DateTime.now();
+    final lastDay = DateTime(latest.data.year, latest.data.month, latest.data.day);
+    final daysSince =
+        DateTime(today.year, today.month, today.day).difference(lastDay).inDays;
+    if (daysSince < _weighInThresholdDays) {
+      await _plugin.cancel(id: _weighInId);
+      return;
+    }
+    await scheduleWeighInReminder(daysSince: daysSince);
+  }
+
+  Future<void> scheduleWeighInReminder({required int daysSince}) async {
+    await _plugin.cancel(id: _weighInId);
+
+    final now = tz.TZDateTime.now(tz.local);
+    final today19 = tz.TZDateTime(tz.local, now.year, now.month, now.day, 19, 0);
+    if (!today19.isAfter(now.add(const Duration(seconds: 30)))) return;
+
+    const details = NotificationDetails(
+      android: AndroidNotificationDetails(
+        _weighInChannelId,
+        _weighInChannelName,
+        channelDescription: 'Ricordati di registrare il tuo peso',
+        importance: Importance.defaultImportance,
+        priority: Priority.defaultPriority,
+        playSound: true,
+      ),
+      iOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: false,
+        presentSound: true,
+      ),
+    );
+
+    await _plugin.zonedSchedule(
+      id: _weighInId,
+      title: 'Plico',
+      body: 'Non ti pesi da $daysSince giorni. Vuoi registrare il tuo peso?',
+      scheduledDate: today19,
       notificationDetails: details,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
     );

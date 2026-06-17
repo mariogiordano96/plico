@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/app_settings.dart';
 import '../../services/database_service.dart';
+import '../../services/meal_timing_service.dart';
 import '../../services/notification_service.dart';
 import '../../theme/app_theme.dart';
 
@@ -14,6 +15,7 @@ class NotificheScreen extends StatefulWidget {
 
 class _NotificheScreenState extends State<NotificheScreen> {
   AppSettings? _s;
+  Map<int, TimeOfDay> _suggestions = {};
 
   @override
   void initState() {
@@ -23,7 +25,20 @@ class _NotificheScreenState extends State<NotificheScreen> {
 
   Future<void> _load() async {
     final s = await DatabaseService.instance.getAppSettings();
-    if (mounted) setState(() => _s = s);
+    final suggestions = <int, TimeOfDay>{};
+    final results = await Future.wait(
+      List.generate(6, (i) => MealTimingService.instance.suggestedTime(i)),
+    );
+    for (var i = 0; i < results.length; i++) {
+      final t = results[i];
+      if (t != null) suggestions[i] = t;
+    }
+    if (mounted) {
+      setState(() {
+        _s = s;
+        _suggestions = suggestions;
+      });
+    }
   }
 
   Future<void> _save() async {
@@ -61,6 +76,14 @@ class _NotificheScreenState extends State<NotificheScreen> {
         child: child!,
       ),
     ).then((t) => t == null ? null : t.hour * 60 + t.minute);
+  }
+
+  // Ritorna i minuti suggeriti se diversi di almeno 15' dall'orario attuale.
+  int? _suggestedMin(int pastoTipo, int currentMin) {
+    final t = _suggestions[pastoTipo];
+    if (t == null) return null;
+    final suggestedMin = t.hour * 60 + t.minute;
+    return (suggestedMin - currentMin).abs() >= 15 ? suggestedMin : null;
   }
 
   // Toggle pasto: abilita/disabilita e, se abilitazione, apre subito il picker.
@@ -181,6 +204,7 @@ class _NotificheScreenState extends State<NotificheScreen> {
         label: 'Colazione',
         active: _s!.notColAttiva,
         minVal: _s!.notColMin,
+        suggestedMin: _suggestedMin(0, _s!.notColMin),
         onToggle: (v) => _toggleMeal(
           newVal: v,
           getActive: () => _s!.notColAttiva,
@@ -195,12 +219,17 @@ class _NotificheScreenState extends State<NotificheScreen> {
             await _save();
           }
         },
+        onApplySuggestion: (min) async {
+          setState(() => _s!.notColMin = min);
+          await _save();
+        },
       ),
       _MealTileData(
         icon: Icons.lunch_dining_rounded,
         label: 'Pranzo',
         active: _s!.notPranzoAttiva,
         minVal: _s!.notPranzoMin,
+        suggestedMin: _suggestedMin(1, _s!.notPranzoMin),
         onToggle: (v) => _toggleMeal(
           newVal: v,
           getActive: () => _s!.notPranzoAttiva,
@@ -215,12 +244,17 @@ class _NotificheScreenState extends State<NotificheScreen> {
             await _save();
           }
         },
+        onApplySuggestion: (min) async {
+          setState(() => _s!.notPranzoMin = min);
+          await _save();
+        },
       ),
       _MealTileData(
         icon: Icons.dinner_dining_rounded,
         label: 'Cena',
         active: _s!.notCenaAttiva,
         minVal: _s!.notCenaMin,
+        suggestedMin: _suggestedMin(2, _s!.notCenaMin),
         onToggle: (v) => _toggleMeal(
           newVal: v,
           getActive: () => _s!.notCenaAttiva,
@@ -235,12 +269,17 @@ class _NotificheScreenState extends State<NotificheScreen> {
             await _save();
           }
         },
+        onApplySuggestion: (min) async {
+          setState(() => _s!.notCenaMin = min);
+          await _save();
+        },
       ),
       _MealTileData(
         icon: Icons.apple_rounded,
         label: 'Spuntino',
         active: _s!.notSpuntinoAttiva,
         minVal: _s!.notSpuntinoMin,
+        suggestedMin: _suggestedMin(3, _s!.notSpuntinoMin),
         onToggle: (v) => _toggleMeal(
           newVal: v,
           getActive: () => _s!.notSpuntinoAttiva,
@@ -255,12 +294,17 @@ class _NotificheScreenState extends State<NotificheScreen> {
             await _save();
           }
         },
+        onApplySuggestion: (min) async {
+          setState(() => _s!.notSpuntinoMin = min);
+          await _save();
+        },
       ),
       _MealTileData(
         icon: Icons.fitness_center_rounded,
         label: 'Post-WO',
         active: _s!.notPostWoAttiva,
         minVal: _s!.notPostWoMin,
+        suggestedMin: _suggestedMin(4, _s!.notPostWoMin),
         onToggle: (v) => _toggleMeal(
           newVal: v,
           getActive: () => _s!.notPostWoAttiva,
@@ -275,12 +319,17 @@ class _NotificheScreenState extends State<NotificheScreen> {
             await _save();
           }
         },
+        onApplySuggestion: (min) async {
+          setState(() => _s!.notPostWoMin = min);
+          await _save();
+        },
       ),
       _MealTileData(
         icon: Icons.nights_stay_rounded,
         label: 'Spuntino serale',
         active: _s!.notSorAttiva,
         minVal: _s!.notSorMin,
+        suggestedMin: _suggestedMin(5, _s!.notSorMin),
         onToggle: (v) => _toggleMeal(
           newVal: v,
           getActive: () => _s!.notSorAttiva,
@@ -294,6 +343,10 @@ class _NotificheScreenState extends State<NotificheScreen> {
             setState(() => _s!.notSorMin = picked);
             await _save();
           }
+        },
+        onApplySuggestion: (min) async {
+          setState(() => _s!.notSorMin = min);
+          await _save();
         },
       ),
     ];
@@ -332,38 +385,57 @@ class _NotificheScreenState extends State<NotificheScreen> {
                     fontSize: 15,
                     fontWeight: FontWeight.w500)),
           ),
-          GestureDetector(
-            onTap: d.active ? d.onTimeTap : null,
-            child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: d.active
-                    ? p.accent.withValues(alpha: 0.1)
-                    : p.cardBorder.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              GestureDetector(
+                onTap: d.active ? d.onTimeTap : null,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
                     color: d.active
-                        ? p.accent.withValues(alpha: 0.35)
-                        : Colors.transparent),
+                        ? p.accent.withValues(alpha: 0.1)
+                        : p.cardBorder.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                        color: d.active
+                            ? p.accent.withValues(alpha: 0.35)
+                            : Colors.transparent),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(timeLabel,
+                          style: TextStyle(
+                              color: d.active ? p.accent : p.textMuted,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700)),
+                      if (d.active) ...[
+                        const SizedBox(width: 4),
+                        Icon(Icons.edit_rounded,
+                            size: 11,
+                            color: p.accent.withValues(alpha: 0.7)),
+                      ],
+                    ],
+                  ),
+                ),
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(timeLabel,
-                      style: TextStyle(
-                          color: d.active ? p.accent : p.textMuted,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700)),
-                  if (d.active) ...[
-                    const SizedBox(width: 4),
-                    Icon(Icons.edit_rounded,
-                        size: 11,
-                        color: p.accent.withValues(alpha: 0.7)),
-                  ],
-                ],
-              ),
-            ),
+              if (d.active && d.suggestedMin != null) ...[
+                const SizedBox(height: 4),
+                GestureDetector(
+                  onTap: () => d.onApplySuggestion(d.suggestedMin!),
+                  child: Text(
+                    'Di solito: ${_formatMin(d.suggestedMin!)}',
+                    style: TextStyle(
+                        color: p.textMuted,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        decoration: TextDecoration.underline),
+                  ),
+                ),
+              ],
+            ],
           ),
           const SizedBox(width: 8),
           Switch(
@@ -390,15 +462,19 @@ class _MealTileData {
   final String label;
   final bool active;
   final int minVal;
+  final int? suggestedMin;
   final void Function(bool) onToggle;
   final VoidCallback onTimeTap;
+  final Future<void> Function(int) onApplySuggestion;
 
   const _MealTileData({
     required this.icon,
     required this.label,
     required this.active,
     required this.minVal,
+    this.suggestedMin,
     required this.onToggle,
     required this.onTimeTap,
+    required this.onApplySuggestion,
   });
 }

@@ -35,10 +35,10 @@ L'utente deve sentirsi bene quando apre l'app, non in colpa.
 
 Notifiche generiche vengono disabilitate. Quelle contestuali vengono lette.
 
-- **Promemoria pasto adattivo** — già implementato; migliorare con orari suggeriti basati sullo storico dell'utente ("di solito pranzi alle 13:00")
-- **Recap mattutino** — "Ieri hai mangiato 1.840 kcal su 2.100. Ottimo lavoro." — rinforzo del giorno prima
-- **Notifica pesata** — se l'utente non si pesa da X giorni, ricordarglielo (solo se usa il tracking peso)
-- **Notifica streak a rischio** — "Hai registrato ogni giorno per 6 giorni. Vuoi mantenere la streak?" (serale, solo se il giorno non è stato registrato)
+- ✅ ~~**Promemoria pasto adattivo** — già implementato; migliorare con orari suggeriti basati sullo storico dell'utente ("di solito pranzi alle 13:00")~~ — implementato (suggerimento tap-to-apply dopo 5+ campioni)
+- ✅ ~~**Recap mattutino** — "Ieri hai mangiato 1.840 kcal su 2.100. Ottimo lavoro." — rinforzo del giorno prima~~ — implementato
+- ✅ ~~**Notifica pesata** — se l'utente non si pesa da X giorni, ricordarglielo (solo se usa il tracking peso)~~ — implementato (soglia 5 giorni)
+- ✅ ~~**Notifica streak a rischio** — "Hai registrato ogni giorno per 6 giorni. Vuoi mantenere la streak?" (serale, solo se il giorno non è stato registrato)~~ — implementato
 
 ---
 
@@ -81,7 +81,7 @@ L'utente deve capire il valore entro i primi 3 minuti.
 | Pasto rapido da preferiti / ripeti ieri | Alto | Medio |
 | ✅ ~~Streak giorni consecutivi~~ | Alto | Basso |
 | Riepilogo settimanale in home | Alto | Medio |
-| Notifica streak a rischio | Medio | Basso |
+| ✅ ~~Notifica streak a rischio~~ | Medio | Basso |
 | Insights automatici sui pattern | Alto | Alto |
 | Widget iOS/Android | Medio | Alto |
 | Condivisione progressi | Medio | Medio |

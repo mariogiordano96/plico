@@ -20,6 +20,8 @@ void main() async {
   await NotificationService.instance.scheduleAll(settings);
   await AchievementService.instance.checkAll();
   await NotificationService.instance.refreshEveningRecap();
+  await NotificationService.instance.refreshMorningRecap();
+  await NotificationService.instance.refreshWeighInReminder();
   runApp(const PlicoApp());
 }
 
@@ -47,6 +49,8 @@ class _PlicoAppState extends State<PlicoApp> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       NotificationService.instance.refreshEveningRecap();
+      NotificationService.instance.refreshMorningRecap();
+      NotificationService.instance.refreshWeighInReminder();
     }
   }
 

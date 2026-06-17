@@ -53,23 +53,28 @@ const MealEntrySchema = Schema(
       name: r'kcalPer100g',
       type: IsarType.double,
     ),
-    r'pastoTipo': PropertySchema(
+    r'orarioInserimento': PropertySchema(
       id: 8,
+      name: r'orarioInserimento',
+      type: IsarType.dateTime,
+    ),
+    r'pastoTipo': PropertySchema(
+      id: 9,
       name: r'pastoTipo',
       type: IsarType.long,
     ),
     r'proteinG': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'proteinG',
       type: IsarType.double,
     ),
     r'proteinPer100g': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'proteinPer100g',
       type: IsarType.double,
     ),
     r'quantitaG': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'quantitaG',
       type: IsarType.double,
     )
@@ -110,10 +115,11 @@ void _mealEntrySerialize(
   writer.writeString(offsets[5], object.foodNome);
   writer.writeDouble(offsets[6], object.kcal);
   writer.writeDouble(offsets[7], object.kcalPer100g);
-  writer.writeLong(offsets[8], object.pastoTipo);
-  writer.writeDouble(offsets[9], object.proteinG);
-  writer.writeDouble(offsets[10], object.proteinPer100g);
-  writer.writeDouble(offsets[11], object.quantitaG);
+  writer.writeDateTime(offsets[8], object.orarioInserimento);
+  writer.writeLong(offsets[9], object.pastoTipo);
+  writer.writeDouble(offsets[10], object.proteinG);
+  writer.writeDouble(offsets[11], object.proteinPer100g);
+  writer.writeDouble(offsets[12], object.quantitaG);
 }
 
 MealEntry _mealEntryDeserialize(
@@ -128,9 +134,10 @@ MealEntry _mealEntryDeserialize(
   object.foodBrand = reader.readStringOrNull(offsets[4]);
   object.foodNome = reader.readString(offsets[5]);
   object.kcalPer100g = reader.readDouble(offsets[7]);
-  object.pastoTipo = reader.readLong(offsets[8]);
-  object.proteinPer100g = reader.readDouble(offsets[10]);
-  object.quantitaG = reader.readDouble(offsets[11]);
+  object.orarioInserimento = reader.readDateTimeOrNull(offsets[8]);
+  object.pastoTipo = reader.readLong(offsets[9]);
+  object.proteinPer100g = reader.readDouble(offsets[11]);
+  object.quantitaG = reader.readDouble(offsets[12]);
   return object;
 }
 
@@ -158,12 +165,14 @@ P _mealEntryDeserializeProp<P>(
     case 7:
       return (reader.readDouble(offset)) as P;
     case 8:
-      return (reader.readLong(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 9:
-      return (reader.readDouble(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 10:
       return (reader.readDouble(offset)) as P;
     case 11:
+      return (reader.readDouble(offset)) as P;
+    case 12:
       return (reader.readDouble(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -824,6 +833,80 @@ extension MealEntryQueryFilter
         upper: upper,
         includeUpper: includeUpper,
         epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<MealEntry, MealEntry, QAfterFilterCondition>
+      orarioInserimentoIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'orarioInserimento',
+      ));
+    });
+  }
+
+  QueryBuilder<MealEntry, MealEntry, QAfterFilterCondition>
+      orarioInserimentoIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'orarioInserimento',
+      ));
+    });
+  }
+
+  QueryBuilder<MealEntry, MealEntry, QAfterFilterCondition>
+      orarioInserimentoEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'orarioInserimento',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<MealEntry, MealEntry, QAfterFilterCondition>
+      orarioInserimentoGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'orarioInserimento',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<MealEntry, MealEntry, QAfterFilterCondition>
+      orarioInserimentoLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'orarioInserimento',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<MealEntry, MealEntry, QAfterFilterCondition>
+      orarioInserimentoBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'orarioInserimento',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
       ));
     });
   }

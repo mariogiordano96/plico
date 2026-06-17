@@ -786,7 +786,8 @@ class _PastoPicker extends StatelessWidget {
       ..fatPer100g = food.grassi * k
       ..carbsPer100g = food.carboidrati * k
       ..quantitaG = food.quantitaG
-      ..pastoTipo = pastoTipo;
+      ..pastoTipo = pastoTipo
+      ..orarioInserimento = DateTime.now();
   }
 
   @override

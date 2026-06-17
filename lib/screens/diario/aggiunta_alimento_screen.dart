@@ -375,7 +375,8 @@ class _QuantitySheetState extends State<_QuantitySheet> {
       ..fatPer100g = widget.fatPer100g
       ..carbsPer100g = widget.carbsPer100g
       ..quantitaG = _qty
-      ..pastoTipo = widget.pastoTipo;
+      ..pastoTipo = widget.pastoTipo
+      ..orarioInserimento = DateTime.now();
 
     await DatabaseService.instance.addMealEntry(widget.date, entry);
     AchievementService.instance.checkAll();
@@ -557,7 +558,8 @@ class _CustomFoodSheetState extends State<_CustomFoodSheet> {
       ..fatPer100g = item.fatPer100g
       ..carbsPer100g = item.carbsPer100g
       ..quantitaG = 100
-      ..pastoTipo = widget.pastoTipo;
+      ..pastoTipo = widget.pastoTipo
+      ..orarioInserimento = DateTime.now();
 
     await DatabaseService.instance.addMealEntry(widget.date, entry);
     AchievementService.instance.checkAll();
