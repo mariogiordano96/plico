@@ -111,6 +111,11 @@ const AppSettingsSchema = CollectionSchema(
       id: 18,
       name: r'obiettivo',
       type: IsarType.long,
+    ),
+    r'pesoObiettivo': PropertySchema(
+      id: 19,
+      name: r'pesoObiettivo',
+      type: IsarType.double,
     )
   },
   estimateSize: _appSettingsEstimateSize,
@@ -161,6 +166,7 @@ void _appSettingsSerialize(
   writer.writeLong(offsets[16], object.notSpuntinoMin);
   writer.writeBool(offsets[17], object.notificheAttive);
   writer.writeLong(offsets[18], object.obiettivo);
+  writer.writeDouble(offsets[19], object.pesoObiettivo);
 }
 
 AppSettings _appSettingsDeserialize(
@@ -190,6 +196,7 @@ AppSettings _appSettingsDeserialize(
   object.notSpuntinoMin = reader.readLong(offsets[16]);
   object.notificheAttive = reader.readBool(offsets[17]);
   object.obiettivo = reader.readLong(offsets[18]);
+  object.pesoObiettivo = reader.readDoubleOrNull(offsets[19]);
   return object;
 }
 
@@ -238,6 +245,8 @@ P _appSettingsDeserializeProp<P>(
       return (reader.readBool(offset)) as P;
     case 18:
       return (reader.readLong(offset)) as P;
+    case 19:
+      return (reader.readDoubleOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -1056,6 +1065,90 @@ extension AppSettingsQueryFilter
       ));
     });
   }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      pesoObiettivoIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'pesoObiettivo',
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      pesoObiettivoIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'pesoObiettivo',
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      pesoObiettivoEqualTo(
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'pesoObiettivo',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      pesoObiettivoGreaterThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'pesoObiettivo',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      pesoObiettivoLessThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'pesoObiettivo',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      pesoObiettivoBetween(
+    double? lower,
+    double? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'pesoObiettivo',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
 }
 
 extension AppSettingsQueryObject
@@ -1303,6 +1396,19 @@ extension AppSettingsQuerySortBy
   QueryBuilder<AppSettings, AppSettings, QAfterSortBy> sortByObiettivoDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'obiettivo', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> sortByPesoObiettivo() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pesoObiettivo', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByPesoObiettivoDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pesoObiettivo', Sort.desc);
     });
   }
 }
@@ -1560,6 +1666,19 @@ extension AppSettingsQuerySortThenBy
       return query.addSortBy(r'obiettivo', Sort.desc);
     });
   }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> thenByPesoObiettivo() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pesoObiettivo', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByPesoObiettivoDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pesoObiettivo', Sort.desc);
+    });
+  }
 }
 
 extension AppSettingsQueryWhereDistinct
@@ -1680,6 +1799,12 @@ extension AppSettingsQueryWhereDistinct
   QueryBuilder<AppSettings, AppSettings, QDistinct> distinctByObiettivo() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'obiettivo');
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QDistinct> distinctByPesoObiettivo() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'pesoObiettivo');
     });
   }
 }
@@ -1804,6 +1929,12 @@ extension AppSettingsQueryProperty
   QueryBuilder<AppSettings, int, QQueryOperations> obiettivoProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'obiettivo');
+    });
+  }
+
+  QueryBuilder<AppSettings, double?, QQueryOperations> pesoObiettivoProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'pesoObiettivo');
     });
   }
 }

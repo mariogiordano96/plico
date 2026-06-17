@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../models/app_settings.dart';
 import '../models/body_snapshot.dart';
 import '../models/plicometry_session.dart';
 import '../models/user_profile.dart';
@@ -10,6 +11,7 @@ import '../models/meal_plan.dart';
 import '../models/achievement.dart';
 import '../services/database_service.dart';
 import '../services/streak_service.dart';
+import '../services/insights_service.dart';
 import '../main.dart';
 import 'impostazioni/notifiche_screen.dart';
 import 'pesate/pesate_screen.dart';
@@ -73,10 +75,12 @@ class HomeScreen extends StatelessWidget {
             const _GreetingHeader(),
             const SizedBox(height: 20),
             _DiarioHeroCard(onSwitchTab: onSwitchTab),
+            const _WeeklyRecapCard(),
             const SizedBox(height: 16),
             _AderenzaCard(onSwitchTab: onSwitchTab),
             const SizedBox(height: 16),
             const _StreakCard(),
+            const _InsightsCard(),
             const SizedBox(height: 16),
             _PianoCard(onSwitchTab: onSwitchTab),
             const SizedBox(height: 16),
@@ -636,7 +640,14 @@ class _PesateCard extends StatelessWidget {
               final hM = profile.altezzaCm / 100;
               bmi = latest.pesoKg / (hM * hM);
             }
-            return GestureDetector(
+            return StreamBuilder<AppSettings?>(
+              stream: DatabaseService.instance.watchAppSettings(),
+              builder: (context, settingsSnap) {
+                final pesoObiettivo = settingsSnap.data?.pesoObiettivo;
+                final goalDelta = (latest != null && pesoObiettivo != null)
+                    ? latest.pesoKg - pesoObiettivo
+                    : null;
+                return GestureDetector(
               onTap: () => Navigator.push(context,
                   MaterialPageRoute(
                       builder: (_) => const PesateScreen())),
@@ -716,6 +727,20 @@ class _PesateCard extends StatelessWidget {
                               ],
                             ),
                           ],
+                          if (goalDelta != null) ...[
+                            const SizedBox(height: 5),
+                            Text(
+                              goalDelta.abs() < 0.5
+                                  ? 'Obiettivo raggiunto 🎉'
+                                  : '${goalDelta.abs().toStringAsFixed(1)} kg all\'obiettivo',
+                              style: TextStyle(
+                                  color: goalDelta.abs() < 0.5
+                                      ? const Color(0xFF4CAF8E)
+                                      : p.textSecondary,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -724,6 +749,8 @@ class _PesateCard extends StatelessWidget {
                   ],
                 ),
               ),
+            );
+              },
             );
           },
         );
@@ -896,7 +923,225 @@ class _ProgressiCard extends StatelessWidget {
   }
 }
 
+// ── Riepilogo settimanale (solo lunedì) ────────────────────────────
+
+class _WeeklyRecapCard extends StatefulWidget {
+  const _WeeklyRecapCard();
+
+  @override
+  State<_WeeklyRecapCard> createState() => _WeeklyRecapCardState();
+}
+
+class _WeeklyRecapWeek {
+  final double? avgKcal;
+  final double? adherence;
+  final DateTime start;
+  final DateTime end;
+  const _WeeklyRecapWeek({
+    required this.avgKcal,
+    required this.adherence,
+    required this.start,
+    required this.end,
+  });
+}
+
+class _WeeklyRecapCardState extends State<_WeeklyRecapCard> {
+  bool _loading = true;
+  _WeeklyRecapWeek? _current;
+  _WeeklyRecapWeek? _previous;
+  double? _weightChangeCurrent;
+  double? _weightChangePrevious;
+
+  bool get _isMonday => DateTime.now().weekday == DateTime.monday;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_isMonday) _load();
+  }
+
+  Future<_WeeklyRecapWeek> _week(
+      DateTime start, DateTime end, MealPlan? plan) async {
+    final logs = await DatabaseService.instance.getDailyLogsRange(start, end);
+    final loggedDays = logs.where((l) => l.entries.isNotEmpty).toList();
+    final avgKcal = loggedDays.isEmpty
+        ? null
+        : loggedDays.fold<double>(0, (s, l) => s + l.kcalTotali) /
+            loggedDays.length;
+
+    double? adherence;
+    if (plan != null && plan.pasti.isNotEmpty) {
+      final planned = plan.pasti.map((m) => m.tipo).toSet();
+      final days = List.generate(7, (i) => start.add(Duration(days: i)));
+      final values = days.map((day) {
+        final log = logs.firstWhere(
+          (l) => l.data == day,
+          orElse: () => DailyLog()..data = day,
+        );
+        return _adherenceFor(log, planned);
+      });
+      adherence = values.fold<double>(0, (s, v) => s + v) / values.length;
+    }
+
+    return _WeeklyRecapWeek(
+        avgKcal: avgKcal, adherence: adherence, start: start, end: end);
+  }
+
+  double? _weightChangeFor(List<BodySnapshot> snapshots, DateTime end) {
+    BodySnapshot? before(DateTime limit) {
+      for (final s in snapshots) {
+        if (!s.data.isAfter(limit)) return s;
+      }
+      return null;
+    }
+
+    final atEnd = before(end);
+    if (atEnd == null) return null;
+    final atStart = before(end.subtract(const Duration(days: 7)));
+    if (atStart == null) return null;
+    return atEnd.pesoKg - atStart.pesoKg;
+  }
+
+  Future<void> _load() async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final currentWeekEnd = today.subtract(const Duration(days: 1));
+    final currentWeekStart = currentWeekEnd.subtract(const Duration(days: 6));
+    final previousWeekEnd = currentWeekStart.subtract(const Duration(days: 1));
+    final previousWeekStart =
+        previousWeekEnd.subtract(const Duration(days: 6));
+
+    final plan = await DatabaseService.instance.getMealPlan();
+    final snapshots = await DatabaseService.instance.getBodySnapshots();
+
+    final current = await _week(currentWeekStart, currentWeekEnd, plan);
+    final previous = await _week(previousWeekStart, previousWeekEnd, plan);
+
+    if (!mounted) return;
+    setState(() {
+      _current = current;
+      _previous = previous;
+      _weightChangeCurrent = _weightChangeFor(snapshots, currentWeekEnd);
+      _weightChangePrevious = _weightChangeFor(snapshots, previousWeekEnd);
+      _loading = false;
+    });
+  }
+
+  Widget _row(ColorPalette p, String label, String currentVal, double? delta,
+      {bool higherIsBetter = true}) {
+    Widget? trend;
+    if (delta != null && delta.abs() >= 0.05) {
+      final improved = higherIsBetter ? delta > 0 : delta < 0;
+      trend = Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+              delta > 0
+                  ? Icons.arrow_upward_rounded
+                  : Icons.arrow_downward_rounded,
+              size: 13,
+              color: improved
+                  ? const Color(0xFF4CAF8E)
+                  : const Color(0xFFFF8C42)),
+        ],
+      );
+    }
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: TextStyle(color: p.textMuted, fontSize: 12)),
+          Row(
+            children: [
+              Text(currentVal,
+                  style: TextStyle(
+                      color: p.textPrimary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700)),
+              if (trend != null) ...[const SizedBox(width: 4), trend],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_isMonday || _loading) return const SizedBox.shrink();
+    final current = _current;
+    if (current == null) return const SizedBox.shrink();
+    final p = context.palette;
+
+    final kcalLabel = current.avgKcal == null
+        ? 'Nessun dato'
+        : '${current.avgKcal!.round()} kcal/g';
+    final kcalDelta = (current.avgKcal != null && _previous?.avgKcal != null)
+        ? current.avgKcal! - _previous!.avgKcal!
+        : null;
+
+    final pesoLabel = _weightChangeCurrent == null
+        ? 'Nessun dato'
+        : '${_weightChangeCurrent! >= 0 ? '+' : ''}${_weightChangeCurrent!.toStringAsFixed(1)} kg';
+    final pesoDelta =
+        (_weightChangeCurrent != null && _weightChangePrevious != null)
+            ? _weightChangeCurrent! - _weightChangePrevious!
+            : null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: p.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: p.cardBorder),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.calendar_view_week_rounded,
+                      color: p.accent, size: 18),
+                  const SizedBox(width: 8),
+                  Text('RIEPILOGO SETTIMANALE',
+                      style: TextStyle(
+                          color: p.textMuted,
+                          fontSize: 11,
+                          letterSpacing: 2,
+                          fontWeight: FontWeight.w600)),
+                ],
+              ),
+              const SizedBox(height: 10),
+              _row(p, 'Media kcal', kcalLabel, kcalDelta,
+                  higherIsBetter: false),
+              _row(p, 'Variazione peso', pesoLabel, pesoDelta,
+                  higherIsBetter: false),
+              if (current.adherence != null)
+                _row(p, 'Aderenza al piano',
+                    '${(current.adherence! * 100).round()}%',
+                    (_previous?.adherence != null)
+                        ? current.adherence! - _previous!.adherence!
+                        : null),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 // ── Aderenza al piano ─────────────────────────────────────────────
+
+double _adherenceFor(DailyLog? log, Set<int> planned) {
+  if (planned.isEmpty) return 0.0;
+  final logged = log?.entries.map((e) => e.pastoTipo).toSet() ?? {};
+  return logged.intersection(planned).length / planned.length;
+}
 
 class _AderenzaCard extends StatefulWidget {
   final void Function(int)? onSwitchTab;
@@ -944,12 +1189,6 @@ class _AderenzaCardState extends State<_AderenzaCard> {
     final week = await DatabaseService.instance.getDailyLogsRange(from, _today);
     if (!mounted) return;
     setState(() { _plan = plan; _todayLog = log; _weekLogs = week; });
-  }
-
-  double _adherenceFor(DailyLog? log, Set<int> planned) {
-    if (planned.isEmpty) return 0.0;
-    final logged = log?.entries.map((e) => e.pastoTipo).toSet() ?? {};
-    return logged.intersection(planned).length / planned.length;
   }
 
   DailyLog? _logForDay(DateTime day) {
@@ -1195,6 +1434,63 @@ class _StreakCard extends StatelessWidget {
               ),
             );
           },
+        );
+      },
+    );
+  }
+}
+
+// ── Insights automatici ───────────────────────────────────────────
+
+class _InsightsCard extends StatelessWidget {
+  const _InsightsCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return FutureBuilder<List<String>>(
+      future: InsightsService.instance.generate(),
+      builder: (context, snap) {
+        final insights = snap.data ?? const <String>[];
+        if (insights.isEmpty) return const SizedBox.shrink();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: p.surface,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: p.cardBorder),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (var i = 0; i < insights.length; i++) ...[
+                    if (i > 0) const SizedBox(height: 10),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.lightbulb_outline_rounded,
+                            color: p.accent, size: 18),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            insights[i],
+                            style: TextStyle(
+                                color: p.textSecondary,
+                                fontSize: 13,
+                                height: 1.4),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
         );
       },
     );

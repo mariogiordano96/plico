@@ -46,10 +46,10 @@ Notifiche generiche vengono disabilitate. Quelle contestuali vengono lette.
 
 L'utente deve sentire che l'app è "sua" e che sta andando da qualche parte.
 
-- **Riepilogo settimanale** — ogni lunedì, una card in home con: media kcal, variazione peso, % aderenza al piano, confronto con la settimana precedente
-- **Insights automatici** — "Tendi a sforare il giovedì sera" / "La tua proteina è costantemente sotto target" — analisi passiva dei pattern
-- **Calibrazione TDEE dinamica** — se l'utente registra peso + cibo per 2+ settimane, suggerire aggiustamento automatico del TDEE basato sui dati reali
-- **Obiettivo visibile sempre** — mostrare chiaramente quanto manca all'obiettivo peso (es. "-4.2 kg all'obiettivo") in home
+- ✅ ~~**Riepilogo settimanale** — ogni lunedì, una card in home con: media kcal, variazione peso, % aderenza al piano, confronto con la settimana precedente~~ — implementato
+- ✅ ~~**Insights automatici** — "Tendi a sforare il giovedì sera" / "La tua proteina è costantemente sotto target" — analisi passiva dei pattern~~ — implementato (2 regole: sforamento per giorno della settimana, proteine sotto target)
+- ✅ ~~**Calibrazione TDEE dinamica** — se l'utente registra peso + cibo per 2+ settimane, suggerire aggiustamento automatico del TDEE basato sui dati reali~~ — implementato (solo suggerimento informativo, nessun override automatico)
+- ✅ ~~**Obiettivo visibile sempre** — mostrare chiaramente quanto manca all'obiettivo peso (es. "-4.2 kg all'obiettivo") in home~~ — implementato
 
 ---
 
@@ -80,9 +80,9 @@ L'utente deve capire il valore entro i primi 3 minuti.
 |---|---|---|
 | Pasto rapido da preferiti / ripeti ieri | Alto | Medio |
 | ✅ ~~Streak giorni consecutivi~~ | Alto | Basso |
-| Riepilogo settimanale in home | Alto | Medio |
+| ✅ ~~Riepilogo settimanale in home~~ | Alto | Medio |
 | ✅ ~~Notifica streak a rischio~~ | Medio | Basso |
-| Insights automatici sui pattern | Alto | Alto |
+| ✅ ~~Insights automatici sui pattern~~ | Alto | Alto |
 | Widget iOS/Android | Medio | Alto |
 | Condivisione progressi | Medio | Medio |
 | Coach virtuale AI | Alto | Alto |

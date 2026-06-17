@@ -5,6 +5,7 @@ import '../../models/user_profile.dart';
 import '../../models/body_snapshot.dart';
 import '../../models/plicometry_session.dart';
 import '../../services/database_service.dart';
+import '../../services/tdee_calibration_service.dart';
 
 // ── Costanti attività ──────────────────────────────────────────
 
@@ -181,6 +182,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
   int _livello = 2;
   int _metodo = 0;
   int _goal = 1;
+  final _pesoObiettivoCtrl = TextEditingController();
 
   DateTime? _goalSetDate;
   bool _loading = true;
@@ -192,6 +194,12 @@ class _TdeeScreenState extends State<TdeeScreen> {
     _load();
   }
 
+  @override
+  void dispose() {
+    _pesoObiettivoCtrl.dispose();
+    super.dispose();
+  }
+
   Future<void> _load() async {
     final profile = await DatabaseService.instance.getUserProfile();
     final snapshot = await DatabaseService.instance.getLatestBodySnapshot();
@@ -200,6 +208,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
     final metodo = await DatabaseService.instance.getMetodoTdee();
     final goal = await DatabaseService.instance.getObiettivo();
     final goalSetDate = await DatabaseService.instance.getGoalSetDate();
+    final settings = await DatabaseService.instance.getAppSettings();
     if (!mounted) return;
     setState(() {
       _profile = profile;
@@ -210,6 +219,9 @@ class _TdeeScreenState extends State<TdeeScreen> {
       _goal = goal;
       _goalSetDate = goalSetDate;
       _loading = false;
+      if (settings.pesoObiettivo != null) {
+        _pesoObiettivoCtrl.text = settings.pesoObiettivo!.toStringAsFixed(1);
+      }
     });
   }
 
@@ -243,6 +255,9 @@ class _TdeeScreenState extends State<TdeeScreen> {
       livello: _livello,
       metodo: _metodo,
       obiettivo: _goal,
+      pesoObiettivo: _goal == 1
+          ? null
+          : double.tryParse(_pesoObiettivoCtrl.text.replaceAll(',', '.')),
     );
     await _load();
     setState(() => _saving = false);
@@ -367,6 +382,35 @@ class _TdeeScreenState extends State<TdeeScreen> {
             onSelect: (v) => setState(() => _goal = v),
             p: p,
           ),
+          if (_goal != 1) ...[
+            const SizedBox(height: 12),
+            TextField(
+              controller: _pesoObiettivoCtrl,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              style: TextStyle(color: p.textPrimary, fontSize: 15),
+              decoration: InputDecoration(
+                labelText: 'Peso obiettivo (kg)',
+                labelStyle: TextStyle(color: p.textMuted, fontSize: 13),
+                filled: true,
+                fillColor: p.surface,
+                suffixText: 'kg',
+                suffixStyle: TextStyle(color: p.textMuted, fontSize: 13),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: p.cardBorder),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: p.cardBorder),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: p.accent),
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 20),
 
           _SectionLabel('LIVELLO DI ATTIVITÀ', p),
@@ -526,6 +570,47 @@ class _TdeeScreenState extends State<TdeeScreen> {
             ),
             const SizedBox(height: 20),
           ],
+
+          // Calibrazione TDEE dinamica (solo suggerimento informativo)
+          if (result != null)
+            FutureBuilder<TdeeCalibrationResult?>(
+              future:
+                  TdeeCalibrationService.instance.suggestion(result.tdee),
+              builder: (context, snap) {
+                final cal = snap.data;
+                if (cal == null) return const SizedBox.shrink();
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 20),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: p.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: p.cardBorder),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.insights_rounded,
+                            color: p.accent, size: 20),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'In base ai tuoi dati delle ultime ${cal.days} giorni, '
+                            'il tuo TDEE reale potrebbe essere ~${cal.suggestedTdee} kcal '
+                            '(stimato: ${cal.currentTdee} kcal).',
+                            style: TextStyle(
+                                color: p.textSecondary,
+                                fontSize: 13,
+                                height: 1.4),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
 
           // Card piano attivo
           Container(

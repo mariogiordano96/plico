@@ -301,6 +301,7 @@ class DatabaseService {
     required int livello,
     required int metodo,
     required int obiettivo,
+    double? pesoObiettivo,
   }) async {
     await _isar.writeTxn(() async {
       final settings = await _isar.appSettings.get(1) ?? AppSettings();
@@ -308,6 +309,7 @@ class DatabaseService {
       settings.metodoTdee = metodo;
       settings.obiettivo = obiettivo;
       settings.goalSetDate = DateTime.now();
+      settings.pesoObiettivo = pesoObiettivo;
       await _isar.appSettings.put(settings);
     });
   }
