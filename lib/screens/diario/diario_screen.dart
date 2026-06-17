@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../models/daily_log.dart';
+import '../../models/meal_combo.dart';
+import '../../models/meal_entry.dart';
+import '../../services/achievement_service.dart';
 import '../../services/database_service.dart';
 import '../tdee/tdee_screen.dart' show calcolaTdee;
 import 'aggiunta_alimento_screen.dart';
@@ -32,6 +35,7 @@ class DiarioScreen extends StatefulWidget {
 class _DiarioScreenState extends State<DiarioScreen> {
   DateTime _date = _dayStart(DateTime.now());
   DailyLog? _log;
+  DailyLog? _yesterdayLog;
   int? _kcalTarget;
   int? _proteinTarget;
   int? _fatTarget;
@@ -61,11 +65,14 @@ class _DiarioScreenState extends State<DiarioScreen> {
   Future<void> _load() async {
     setState(() => _loading = true);
     final log = await DatabaseService.instance.getDailyLog(_date);
+    final yesterdayLog = await DatabaseService.instance
+        .getDailyLog(_date.subtract(const Duration(days: 1)));
     final target = await _computeTargets();
     final prefs = await DatabaseService.instance.getUserFoodPreferences();
     if (!mounted) return;
     setState(() {
       _log = log;
+      _yesterdayLog = yesterdayLog;
       _kcalTarget = target.$1;
       _proteinTarget = target.$2;
       _fatTarget = target.$3;
@@ -74,6 +81,84 @@ class _DiarioScreenState extends State<DiarioScreen> {
       _numPasti = prefs?.numPasti ?? 3;
       _loading = false;
     });
+  }
+
+  Future<void> _repeatYesterday(int pastoTipo) async {
+    final entries =
+        _yesterdayLog?.entries.where((e) => e.pastoTipo == pastoTipo) ??
+            const <MealEntry>[];
+    for (final e in entries) {
+      final copy = MealEntry()
+        ..foodNome = e.foodNome
+        ..foodBrand = e.foodBrand
+        ..kcalPer100g = e.kcalPer100g
+        ..proteinPer100g = e.proteinPer100g
+        ..fatPer100g = e.fatPer100g
+        ..carbsPer100g = e.carbsPer100g
+        ..quantitaG = e.quantitaG
+        ..pastoTipo = pastoTipo
+        ..orarioInserimento = DateTime.now();
+      await DatabaseService.instance.addMealEntry(_date, copy);
+    }
+    AchievementService.instance.checkAll();
+    await _load();
+  }
+
+  Future<String?> _askComboName() {
+    final ctrl = TextEditingController();
+    final p = context.palette;
+    return showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: p.surface,
+        title: Text('Salva come preferito',
+            style: TextStyle(color: p.textPrimary)),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          style: TextStyle(color: p.textPrimary),
+          decoration: InputDecoration(
+            hintText: 'Es. La mia colazione',
+            hintStyle: TextStyle(color: p.textMuted),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Annulla'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, ctrl.text),
+            child: const Text('Salva'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _saveAsCombo(int pastoTipo, List<MealEntry> entries) async {
+    if (entries.isEmpty) return;
+    final nome = await _askComboName();
+    if (nome == null || nome.trim().isEmpty) return;
+    final combo = MealCombo()
+      ..nome = nome.trim()
+      ..pastoTipo = pastoTipo
+      ..items = entries
+          .map((e) => MealEntry()
+            ..foodNome = e.foodNome
+            ..foodBrand = e.foodBrand
+            ..kcalPer100g = e.kcalPer100g
+            ..proteinPer100g = e.proteinPer100g
+            ..fatPer100g = e.fatPer100g
+            ..carbsPer100g = e.carbsPer100g
+            ..quantitaG = e.quantitaG
+            ..pastoTipo = e.pastoTipo)
+          .toList();
+    await DatabaseService.instance.saveMealCombo(combo);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Salvato come preferito: ${combo.nome}')),
+    );
   }
 
   Future<void> _reloadTargets() async {
@@ -252,6 +337,9 @@ class _DiarioScreenState extends State<DiarioScreen> {
                       }
                     }
                   }
+                  final yesterdayHasEntries = _yesterdayLog?.entries
+                          .any((e) => e.pastoTipo == i) ??
+                      false;
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 16),
                     child: _PastoSection(
@@ -261,6 +349,12 @@ class _DiarioScreenState extends State<DiarioScreen> {
                       globalIndices: globalIndices,
                       onAdd: () => _openAdd(i),
                       onRemove: _removeEntry,
+                      canRepeatYesterday:
+                          entries.isEmpty && yesterdayHasEntries,
+                      onRepeatYesterday: () => _repeatYesterday(i),
+                      onSaveCombo: entries.isEmpty
+                          ? null
+                          : () => _saveAsCombo(i, entries),
                       p: p,
                     ),
                   );
@@ -523,6 +617,9 @@ class _PastoSection extends StatelessWidget {
   final List<int> globalIndices;
   final VoidCallback onAdd;
   final ValueChanged<int> onRemove;
+  final bool canRepeatYesterday;
+  final VoidCallback? onRepeatYesterday;
+  final VoidCallback? onSaveCombo;
   final ColorPalette p;
 
   const _PastoSection({
@@ -532,6 +629,9 @@ class _PastoSection extends StatelessWidget {
     required this.globalIndices,
     required this.onAdd,
     required this.onRemove,
+    this.canRepeatYesterday = false,
+    this.onRepeatYesterday,
+    this.onSaveCombo,
     required this.p,
   });
 
@@ -567,6 +667,17 @@ class _PastoSection extends StatelessWidget {
                   Text('${_kcalTotali.round()} kcal',
                       style:
                           TextStyle(color: p.textMuted, fontSize: 12)),
+                if (onSaveCombo != null) ...[
+                  const SizedBox(width: 6),
+                  IconButton(
+                    icon: Icon(Icons.bookmark_add_outlined,
+                        color: p.accent, size: 19),
+                    onPressed: onSaveCombo,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    tooltip: 'Salva come preferito',
+                  ),
+                ],
                 IconButton(
                   icon: Icon(Icons.add_rounded, color: p.accent, size: 20),
                   onPressed: onAdd,
@@ -651,8 +762,31 @@ class _PastoSection extends StatelessWidget {
           if (entries.isEmpty)
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
-              child: Text('Nessun alimento registrato',
-                  style: TextStyle(color: p.textMuted, fontSize: 12)),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text('Nessun alimento registrato',
+                        style:
+                            TextStyle(color: p.textMuted, fontSize: 12)),
+                  ),
+                  if (canRepeatYesterday && onRepeatYesterday != null)
+                    TextButton.icon(
+                      onPressed: onRepeatYesterday,
+                      icon: Icon(Icons.replay_rounded,
+                          color: p.accent, size: 15),
+                      label: Text('Ripeti pasto di ieri',
+                          style: TextStyle(
+                              color: p.accent,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600)),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
+                ],
+              ),
             ),
         ],
       ),

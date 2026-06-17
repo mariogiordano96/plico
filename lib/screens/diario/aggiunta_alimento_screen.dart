@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../theme/app_theme.dart';
 import '../../models/food_item.dart';
+import '../../models/meal_combo.dart';
 import '../../models/meal_entry.dart';
+import '../../models/meal_plan.dart';
 import '../../services/achievement_service.dart';
 import '../../services/database_service.dart';
 import '../../services/open_food_facts_service.dart';
@@ -30,6 +32,8 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
   Timer? _debounce;
   List<OFFFood> _offResults = [];
   List<FoodItem> _localResults = [];
+  List<PlanFood> _planFoods = [];
+  List<MealCombo> _combos = [];
   bool _searching = false;
   bool _hasSearched = false;
 
@@ -37,6 +41,38 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
   void initState() {
     super.initState();
     _loadLocal('');
+    _loadPlanFoods();
+    _loadCombos();
+  }
+
+  Future<void> _loadPlanFoods() async {
+    final plan = await DatabaseService.instance.getMealPlan();
+    if (plan == null) return;
+    PlanMeal? pasto;
+    for (final p in plan.pasti) {
+      if (p.tipo == widget.pastoTipo) {
+        pasto = p;
+        break;
+      }
+    }
+    if (pasto == null || !mounted) return;
+    final foods = pasto.slots
+        .map((s) => s.principale)
+        .whereType<PlanFood>()
+        .toList();
+    setState(() => _planFoods = foods);
+  }
+
+  Future<void> _loadCombos() async {
+    final combos = await DatabaseService.instance.getMealCombos();
+    combos.sort((a, b) {
+      final aMatch = a.pastoTipo == widget.pastoTipo;
+      final bMatch = b.pastoTipo == widget.pastoTipo;
+      if (aMatch != bMatch) return aMatch ? -1 : 1;
+      return a.nome.compareTo(b.nome);
+    });
+    if (!mounted) return;
+    setState(() => _combos = combos);
   }
 
   @override
@@ -96,7 +132,39 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
       proteinPer100g: item.proteinPer100g,
       fatPer100g: item.fatPer100g,
       carbsPer100g: item.carbsPer100g,
+      foodItemId: item.id,
     );
+  }
+
+  void _selectPlanFood(PlanFood food) {
+    final k = food.quantitaG > 0 ? 100 / food.quantitaG : 0.0;
+    _showQuantitySheet(
+      nome: food.nome,
+      kcalPer100g: food.kcal * k,
+      proteinPer100g: food.proteine * k,
+      fatPer100g: food.grassi * k,
+      carbsPer100g: food.carboidrati * k,
+      initialQty: food.quantitaG,
+      foodItemId: food.foodItemId != 0 ? food.foodItemId : null,
+    );
+  }
+
+  Future<void> _applyCombo(MealCombo combo) async {
+    for (final item in combo.items) {
+      final entry = MealEntry()
+        ..foodNome = item.foodNome
+        ..foodBrand = item.foodBrand
+        ..kcalPer100g = item.kcalPer100g
+        ..proteinPer100g = item.proteinPer100g
+        ..fatPer100g = item.fatPer100g
+        ..carbsPer100g = item.carbsPer100g
+        ..quantitaG = item.quantitaG
+        ..pastoTipo = widget.pastoTipo
+        ..orarioInserimento = DateTime.now();
+      await DatabaseService.instance.addMealEntry(widget.date, entry);
+    }
+    AchievementService.instance.checkAll();
+    if (mounted) Navigator.pop(context, true);
   }
 
   Future<void> _openScanner() async {
@@ -125,6 +193,8 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
     required double fatPer100g,
     required double carbsPer100g,
     String? offCode,
+    double initialQty = 100,
+    int? foodItemId,
   }) async {
     final added = await showModalBottomSheet<bool>(
       context: context,
@@ -138,6 +208,8 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
         fatPer100g: fatPer100g,
         carbsPer100g: carbsPer100g,
         offCode: offCode,
+        initialQty: initialQty,
+        foodItemId: foodItemId,
         pastoTipo: widget.pastoTipo,
         date: widget.date,
         onAdded: () => Navigator.pop(context, true),
@@ -217,6 +289,56 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
                 : ListView(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
                     children: [
+                      if (_searchCtrl.text.isEmpty && _combos.isNotEmpty) ...[
+                        _SectionLabel('I TUOI PASTI PREFERITI', p),
+                        const SizedBox(height: 8),
+                        _FoodListBox(
+                          children: _combos.map((combo) {
+                            final kcal = combo.items
+                                .fold<double>(0, (s, e) => s + e.kcal);
+                            return _FoodTile(
+                              nome: combo.nome,
+                              brand: combo.items
+                                  .map((e) => e.foodNome)
+                                  .join(', '),
+                              kcal: kcal,
+                              protein: combo.items
+                                  .fold<double>(0, (s, e) => s + e.proteinG),
+                              fat: combo.items
+                                  .fold<double>(0, (s, e) => s + e.fatG),
+                              carbs: combo.items
+                                  .fold<double>(0, (s, e) => s + e.carbsG),
+                              isLast: combo == _combos.last,
+                              onTap: () => _applyCombo(combo),
+                              p: p,
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                      if (_searchCtrl.text.isEmpty &&
+                          _planFoods.isNotEmpty) ...[
+                        _SectionLabel('DAL TUO PIANO', p),
+                        const SizedBox(height: 8),
+                        _FoodListBox(
+                          children: _planFoods.map((food) {
+                            final k = food.quantitaG > 0
+                                ? 100 / food.quantitaG
+                                : 0.0;
+                            return _FoodTile(
+                              nome: food.nome,
+                              kcal: food.kcal * k,
+                              protein: food.proteine * k,
+                              fat: food.grassi * k,
+                              carbs: food.carboidrati * k,
+                              isLast: food == _planFoods.last,
+                              onTap: () => _selectPlanFood(food),
+                              p: p,
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
                       if (_localResults.isNotEmpty) ...[
                         _SectionLabel(
                           _searchCtrl.text.isEmpty
@@ -316,6 +438,8 @@ class _QuantitySheet extends StatefulWidget {
   final double fatPer100g;
   final double carbsPer100g;
   final String? offCode;
+  final double initialQty;
+  final int? foodItemId;
   final int pastoTipo;
   final DateTime date;
   final VoidCallback onAdded;
@@ -328,6 +452,8 @@ class _QuantitySheet extends StatefulWidget {
     required this.fatPer100g,
     required this.carbsPer100g,
     this.offCode,
+    this.initialQty = 100,
+    this.foodItemId,
     required this.pastoTipo,
     required this.date,
     required this.onAdded,
@@ -338,9 +464,25 @@ class _QuantitySheet extends StatefulWidget {
 }
 
 class _QuantitySheetState extends State<_QuantitySheet> {
-  final _ctrl = TextEditingController(text: '100');
-  double _qty = 100;
+  late final TextEditingController _ctrl;
+  late double _qty;
   bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _qty = widget.initialQty;
+    _ctrl = TextEditingController(text: _formatQty(_qty));
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  String _formatQty(double v) =>
+      v % 1 == 0 ? v.toInt().toString() : v.toString();
 
   double get _kcal => widget.kcalPer100g * _qty / 100;
   double get _protein => widget.proteinPer100g * _qty / 100;
@@ -362,9 +504,14 @@ class _QuantitySheetState extends State<_QuantitySheet> {
           ..proteinPer100g = widget.proteinPer100g
           ..fatPer100g = widget.fatPer100g
           ..carbsPer100g = widget.carbsPer100g
-          ..offCode = widget.offCode;
+          ..offCode = widget.offCode
+          ..lastUsedAt = DateTime.now();
         await DatabaseService.instance.saveFoodItem(item);
+      } else {
+        await DatabaseService.instance.markFoodUsed(existing.id);
       }
+    } else if (widget.foodItemId != null) {
+      await DatabaseService.instance.markFoodUsed(widget.foodItemId!);
     }
 
     final entry = MealEntry()
@@ -546,7 +693,8 @@ class _CustomFoodSheetState extends State<_CustomFoodSheet> {
       ..proteinPer100g = double.tryParse(_proteinCtrl.text) ?? 0
       ..fatPer100g = double.tryParse(_fatCtrl.text) ?? 0
       ..carbsPer100g = double.tryParse(_carbsCtrl.text) ?? 0
-      ..isCustom = true;
+      ..isCustom = true
+      ..lastUsedAt = DateTime.now();
 
     await DatabaseService.instance.saveFoodItem(item);
 

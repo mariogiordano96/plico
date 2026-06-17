@@ -18,6 +18,7 @@ import '../models/enums.dart';
 import '../models/user_food_preferences.dart';
 import '../models/meal_plan.dart';
 import '../models/achievement.dart';
+import '../models/meal_combo.dart';
 
 class DatabaseService {
   static final DatabaseService instance = DatabaseService._();
@@ -29,7 +30,7 @@ class DatabaseService {
     UserProfileSchema, BodySnapshotSchema, PlicometrySessionSchema,
     AppSettingsSchema, MeasurementSnapshotSchema, FoodItemSchema,
     DailyLogSchema, UserFoodPreferencesSchema, MealPlanSchema,
-    AchievementSchema,
+    AchievementSchema, MealComboSchema,
   ];
 
   Future<void> init() async {
@@ -327,20 +328,46 @@ class DatabaseService {
   // ──────────────────────────────────────────────
 
   Future<List<FoodItem>> searchFoodItems(String query) async {
+    final List<FoodItem> items;
     if (query.trim().isEmpty) {
-      return _isar.foodItems
+      items = await _isar.foodItems
           .filter()
           .isFavoriteEqualTo(true)
           .or()
           .isCustomEqualTo(true)
-          .sortByNome()
+          .or()
+          .lastUsedAtIsNotNull()
+          .findAll();
+    } else {
+      items = await _isar.foodItems
+          .filter()
+          .nomeContains(query, caseSensitive: false)
           .findAll();
     }
-    return _isar.foodItems
-        .filter()
-        .nomeContains(query, caseSensitive: false)
-        .sortByNome()
-        .findAll();
+    items.sort(_byRecencyThenFavoriteThenNome);
+    return items;
+  }
+
+  int _byRecencyThenFavoriteThenNome(FoodItem a, FoodItem b) {
+    final aUsed = a.lastUsedAt;
+    final bUsed = b.lastUsedAt;
+    if (aUsed != null || bUsed != null) {
+      if (aUsed == null) return 1;
+      if (bUsed == null) return -1;
+      final cmp = bUsed.compareTo(aUsed);
+      if (cmp != 0) return cmp;
+    }
+    if (a.isFavorite != b.isFavorite) return a.isFavorite ? -1 : 1;
+    return a.nome.compareTo(b.nome);
+  }
+
+  Future<void> markFoodUsed(Id foodId) async {
+    await _isar.writeTxn(() async {
+      final item = await _isar.foodItems.get(foodId);
+      if (item == null) return;
+      item.lastUsedAt = DateTime.now();
+      await _isar.foodItems.put(item);
+    });
   }
 
   Future<FoodItem?> getFoodItemByOffCode(String offCode) async {
@@ -370,6 +397,28 @@ class DatabaseService {
   Future<void> deleteFoodItem(Id foodId) async {
     await _isar.writeTxn(() async {
       await _isar.foodItems.delete(foodId);
+    });
+  }
+
+  // ──────────────────────────────────────────────
+  // MealCombo (pasti preferiti)
+  // ──────────────────────────────────────────────
+
+  Future<List<MealCombo>> getMealCombos() async {
+    return _isar.mealCombos.where().sortByNome().findAll();
+  }
+
+  Future<Id> saveMealCombo(MealCombo combo) async {
+    late Id id;
+    await _isar.writeTxn(() async {
+      id = await _isar.mealCombos.put(combo);
+    });
+    return id;
+  }
+
+  Future<void> deleteMealCombo(Id id) async {
+    await _isar.writeTxn(() async {
+      await _isar.mealCombos.delete(id);
     });
   }
 

@@ -10,10 +10,10 @@
 
 La causa #1 di abbandono è che registrare ogni pasto è lento e tedioso.
 
-- **Pasto rapido da preferiti** — salva combinazioni di alimenti usate spesso ("la mia colazione"), aggiungibili in un tap
-- **Ripeti pasto di ieri** — copia uno slot del giorno precedente con un tap
-- **Pasto dal piano** — se hai il piano attivo, suggerisci gli alimenti previsti per quello slot invece di partire da zero
-- **Ricerca più intelligente** — mostra per primi gli alimenti usati di recente, poi i preferiti, poi il database
+- ✅ ~~**Pasto rapido da preferiti** — salva combinazioni di alimenti usate spesso ("la mia colazione"), aggiungibili in un tap~~ — implementato (sezione "I tuoi pasti preferiti" nell'aggiunta alimento)
+- ✅ ~~**Ripeti pasto di ieri** — copia uno slot del giorno precedente con un tap~~ — implementato
+- ✅ ~~**Pasto dal piano** — se hai il piano attivo, suggerisci gli alimenti previsti per quello slot invece di partire da zero~~ — implementato (sezione "Dal tuo piano")
+- ✅ ~~**Ricerca più intelligente** — mostra per primi gli alimenti usati di recente, poi i preferiti, poi il database~~ — implementato
 - **Widget iOS/Android** — aggiunta rapida di un pasto dalla schermata home del telefono senza aprire l'app
 - **Siri / Google Assistant shortcut** — "Hey Siri, ho mangiato una banana" → aggiunta diretta
 
@@ -78,7 +78,7 @@ L'utente deve capire il valore entro i primi 3 minuti.
 
 | Feature | Impatto retention | Sforzo |
 |---|---|---|
-| Pasto rapido da preferiti / ripeti ieri | Alto | Medio |
+| ✅ ~~Pasto rapido da preferiti / ripeti ieri~~ | Alto | Medio |
 | ✅ ~~Streak giorni consecutivi~~ | Alto | Basso |
 | ✅ ~~Riepilogo settimanale in home~~ | Alto | Medio |
 | ✅ ~~Notifica streak a rischio~~ | Medio | Basso |

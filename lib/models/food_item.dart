@@ -18,6 +18,7 @@ class FoodItem {
   String? offCode;
   bool isCustom = false;
   bool isFavorite = false;
+  DateTime? lastUsedAt;
 
   // Metadati CREA
   String? creaCode;

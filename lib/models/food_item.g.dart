@@ -62,39 +62,44 @@ const FoodItemSchema = CollectionSchema(
       name: r'kcalPer100g',
       type: IsarType.double,
     ),
-    r'nome': PropertySchema(
+    r'lastUsedAt': PropertySchema(
       id: 9,
+      name: r'lastUsedAt',
+      type: IsarType.dateTime,
+    ),
+    r'nome': PropertySchema(
+      id: 10,
       name: r'nome',
       type: IsarType.string,
     ),
     r'nomeInglese': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'nomeInglese',
       type: IsarType.string,
     ),
     r'nutrizione': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'nutrizione',
       type: IsarType.object,
       target: r'NutrizioneCompleta',
     ),
     r'offCode': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'offCode',
       type: IsarType.string,
     ),
     r'parteCommestibile': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'parteCommestibile',
       type: IsarType.double,
     ),
     r'porzione': PropertySchema(
-      id: 14,
+      id: 15,
       name: r'porzione',
       type: IsarType.double,
     ),
     r'proteinPer100g': PropertySchema(
-      id: 15,
+      id: 16,
       name: r'proteinPer100g',
       type: IsarType.double,
     )
@@ -182,18 +187,19 @@ void _foodItemSerialize(
   writer.writeBool(offsets[6], object.isCustom);
   writer.writeBool(offsets[7], object.isFavorite);
   writer.writeDouble(offsets[8], object.kcalPer100g);
-  writer.writeString(offsets[9], object.nome);
-  writer.writeString(offsets[10], object.nomeInglese);
+  writer.writeDateTime(offsets[9], object.lastUsedAt);
+  writer.writeString(offsets[10], object.nome);
+  writer.writeString(offsets[11], object.nomeInglese);
   writer.writeObject<NutrizioneCompleta>(
-    offsets[11],
+    offsets[12],
     allOffsets,
     NutrizioneCompletaSchema.serialize,
     object.nutrizione,
   );
-  writer.writeString(offsets[12], object.offCode);
-  writer.writeDouble(offsets[13], object.parteCommestibile);
-  writer.writeDouble(offsets[14], object.porzione);
-  writer.writeDouble(offsets[15], object.proteinPer100g);
+  writer.writeString(offsets[13], object.offCode);
+  writer.writeDouble(offsets[14], object.parteCommestibile);
+  writer.writeDouble(offsets[15], object.porzione);
+  writer.writeDouble(offsets[16], object.proteinPer100g);
 }
 
 FoodItem _foodItemDeserialize(
@@ -213,17 +219,18 @@ FoodItem _foodItemDeserialize(
   object.isCustom = reader.readBool(offsets[6]);
   object.isFavorite = reader.readBool(offsets[7]);
   object.kcalPer100g = reader.readDouble(offsets[8]);
-  object.nome = reader.readString(offsets[9]);
-  object.nomeInglese = reader.readStringOrNull(offsets[10]);
+  object.lastUsedAt = reader.readDateTimeOrNull(offsets[9]);
+  object.nome = reader.readString(offsets[10]);
+  object.nomeInglese = reader.readStringOrNull(offsets[11]);
   object.nutrizione = reader.readObjectOrNull<NutrizioneCompleta>(
-    offsets[11],
+    offsets[12],
     NutrizioneCompletaSchema.deserialize,
     allOffsets,
   );
-  object.offCode = reader.readStringOrNull(offsets[12]);
-  object.parteCommestibile = reader.readDoubleOrNull(offsets[13]);
-  object.porzione = reader.readDoubleOrNull(offsets[14]);
-  object.proteinPer100g = reader.readDouble(offsets[15]);
+  object.offCode = reader.readStringOrNull(offsets[13]);
+  object.parteCommestibile = reader.readDoubleOrNull(offsets[14]);
+  object.porzione = reader.readDoubleOrNull(offsets[15]);
+  object.proteinPer100g = reader.readDouble(offsets[16]);
   return object;
 }
 
@@ -253,22 +260,24 @@ P _foodItemDeserializeProp<P>(
     case 8:
       return (reader.readDouble(offset)) as P;
     case 9:
-      return (reader.readString(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 10:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 11:
+      return (reader.readStringOrNull(offset)) as P;
+    case 12:
       return (reader.readObjectOrNull<NutrizioneCompleta>(
         offset,
         NutrizioneCompletaSchema.deserialize,
         allOffsets,
       )) as P;
-    case 12:
-      return (reader.readStringOrNull(offset)) as P;
     case 13:
-      return (reader.readDoubleOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 14:
       return (reader.readDoubleOrNull(offset)) as P;
     case 15:
+      return (reader.readDoubleOrNull(offset)) as P;
+    case 16:
       return (reader.readDouble(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1209,6 +1218,76 @@ extension FoodItemQueryFilter
     });
   }
 
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> lastUsedAtIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'lastUsedAt',
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition>
+      lastUsedAtIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'lastUsedAt',
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> lastUsedAtEqualTo(
+      DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'lastUsedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> lastUsedAtGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'lastUsedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> lastUsedAtLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'lastUsedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> lastUsedAtBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'lastUsedAt',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<FoodItem, FoodItem, QAfterFilterCondition> nomeEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -2000,6 +2079,18 @@ extension FoodItemQuerySortBy on QueryBuilder<FoodItem, FoodItem, QSortBy> {
     });
   }
 
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByLastUsedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastUsedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByLastUsedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastUsedAt', Sort.desc);
+    });
+  }
+
   QueryBuilder<FoodItem, FoodItem, QAfterSortBy> sortByNome() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'nome', Sort.asc);
@@ -2195,6 +2286,18 @@ extension FoodItemQuerySortThenBy
     });
   }
 
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByLastUsedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastUsedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByLastUsedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastUsedAt', Sort.desc);
+    });
+  }
+
   QueryBuilder<FoodItem, FoodItem, QAfterSortBy> thenByNome() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'nome', Sort.asc);
@@ -2328,6 +2431,12 @@ extension FoodItemQueryWhereDistinct
     });
   }
 
+  QueryBuilder<FoodItem, FoodItem, QDistinct> distinctByLastUsedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'lastUsedAt');
+    });
+  }
+
   QueryBuilder<FoodItem, FoodItem, QDistinct> distinctByNome(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -2427,6 +2536,12 @@ extension FoodItemQueryProperty
   QueryBuilder<FoodItem, double, QQueryOperations> kcalPer100gProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'kcalPer100g');
+    });
+  }
+
+  QueryBuilder<FoodItem, DateTime?, QQueryOperations> lastUsedAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'lastUsedAt');
     });
   }
 
