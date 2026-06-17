@@ -30,6 +30,7 @@ class _NotificheScreenState extends State<NotificheScreen> {
     if (_s == null) return;
     await DatabaseService.instance.saveAppSettings(_s!);
     await NotificationService.instance.scheduleAll(_s!);
+    await NotificationService.instance.refreshEveningRecap();
   }
 
   Future<void> _toggleMaster(bool val) async {

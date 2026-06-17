@@ -17,6 +17,7 @@ import '../models/meal_entry.dart';
 import '../models/enums.dart';
 import '../models/user_food_preferences.dart';
 import '../models/meal_plan.dart';
+import '../models/achievement.dart';
 
 class DatabaseService {
   static final DatabaseService instance = DatabaseService._();
@@ -28,6 +29,7 @@ class DatabaseService {
     UserProfileSchema, BodySnapshotSchema, PlicometrySessionSchema,
     AppSettingsSchema, MeasurementSnapshotSchema, FoodItemSchema,
     DailyLogSchema, UserFoodPreferencesSchema, MealPlanSchema,
+    AchievementSchema,
   ];
 
   Future<void> init() async {
@@ -635,6 +637,38 @@ class DatabaseService {
         .dataEqualTo(day)
         .watch(fireImmediately: true)
         .map((list) => list.isEmpty ? null : list.first);
+  }
+
+  // ──────────────────────────────────────────────
+  // Achievement
+  // ──────────────────────────────────────────────
+
+  Future<void> unlockAchievement(AchievementType type) async {
+    await _isar.writeTxn(() async {
+      final existing =
+          await _isar.achievements.filter().typeEqualTo(type.name).findFirst();
+      if (existing != null) return;
+      await _isar.achievements.put(Achievement()
+        ..type = type.name
+        ..unlockedAt = DateTime.now());
+    });
+  }
+
+  static AchievementType? _typeFromName(String name) {
+    for (final t in AchievementType.values) {
+      if (t.name == name) return t;
+    }
+    return null;
+  }
+
+  Future<Set<AchievementType>> getUnlockedTypes() async {
+    final all = await _isar.achievements.where().findAll();
+    return all.map((a) => _typeFromName(a.type)).whereType<AchievementType>().toSet();
+  }
+
+  Stream<Set<AchievementType>> watchUnlockedTypes() {
+    return _isar.achievements.where().watch(fireImmediately: true).map((all) =>
+        all.map((a) => _typeFromName(a.type)).whereType<AchievementType>().toSet());
   }
 
   // ──────────────────────────────────────────────

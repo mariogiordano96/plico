@@ -4,6 +4,9 @@ import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
 import '../models/app_settings.dart';
+import 'achievement_service.dart';
+import 'database_service.dart';
+import 'streak_service.dart';
 
 class NotificationService {
   static final NotificationService instance = NotificationService._();
@@ -13,6 +16,9 @@ class NotificationService {
 
   static const _channelId = 'pasti_reminders';
   static const _channelName = 'Promemoria pasti';
+  static const _recapChannelId = 'evening_recap';
+  static const _recapChannelName = 'Riepilogo serale';
+  static const _recapId = 200;
 
   Future<void> init() async {
     tzdata.initializeTimeZones();
@@ -99,6 +105,64 @@ class NotificationService {
       notificationDetails: details,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.time,
+    );
+  }
+
+  Future<void> refreshEveningRecap() async {
+    final settings = await DatabaseService.instance.getAppSettings();
+    if (!settings.notificheAttive) {
+      await _plugin.cancel(id: _recapId);
+      return;
+    }
+    final streak = await StreakService.instance.currentStreak();
+    final kcalTarget = await AchievementService.instance.currentKcalTarget();
+    final now = DateTime.now();
+    final log = await DatabaseService.instance
+        .getDailyLog(DateTime(now.year, now.month, now.day));
+    final pct = kcalTarget != null && kcalTarget > 0 && log != null
+        ? log.kcalTotali / kcalTarget
+        : null;
+    final onTargetToday = pct != null && pct >= 0.9 && pct <= 1.05;
+    await scheduleEveningRecap(streak: streak, onTargetToday: onTargetToday);
+  }
+
+  Future<void> scheduleEveningRecap(
+      {required int streak, required bool onTargetToday}) async {
+    await _plugin.cancel(id: _recapId);
+
+    final now = tz.TZDateTime.now(tz.local);
+    final today21 = tz.TZDateTime(tz.local, now.year, now.month, now.day, 21, 0);
+    if (!today21.isAfter(now.add(const Duration(seconds: 30)))) return;
+
+    final body = streak <= 0
+        ? 'Registra i tuoi pasti di oggi per iniziare una nuova streak.'
+        : onTargetToday
+            ? 'Oggi hai raggiunto il tuo obiettivo per $streak giorni di fila 🔥'
+            : 'Hai una streak di $streak giorni: non lasciarla cadere oggi!';
+
+    const details = NotificationDetails(
+      android: AndroidNotificationDetails(
+        _recapChannelId,
+        _recapChannelName,
+        channelDescription: 'Riepilogo serale dei tuoi progressi',
+        importance: Importance.defaultImportance,
+        priority: Priority.defaultPriority,
+        playSound: true,
+      ),
+      iOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: false,
+        presentSound: true,
+      ),
+    );
+
+    await _plugin.zonedSchedule(
+      id: _recapId,
+      title: 'Plico',
+      body: body,
+      scheduledDate: today21,
+      notificationDetails: details,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
     );
   }
 

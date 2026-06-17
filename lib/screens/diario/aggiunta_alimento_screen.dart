@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../theme/app_theme.dart';
 import '../../models/food_item.dart';
 import '../../models/meal_entry.dart';
+import '../../services/achievement_service.dart';
 import '../../services/database_service.dart';
 import '../../services/open_food_facts_service.dart';
 import 'barcode_scanner_screen.dart';
@@ -377,13 +378,16 @@ class _QuantitySheetState extends State<_QuantitySheet> {
       ..pastoTipo = widget.pastoTipo;
 
     await DatabaseService.instance.addMealEntry(widget.date, entry);
+    AchievementService.instance.checkAll();
     if (mounted) widget.onAdded();
   }
 
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    return Padding(
+    return SafeArea(
+      top: false,
+      child: Padding(
       padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Container(
@@ -501,6 +505,7 @@ class _QuantitySheetState extends State<_QuantitySheet> {
           ],
         ),
       ),
+      ),
     );
   }
 }
@@ -555,13 +560,16 @@ class _CustomFoodSheetState extends State<_CustomFoodSheet> {
       ..pastoTipo = widget.pastoTipo;
 
     await DatabaseService.instance.addMealEntry(widget.date, entry);
+    AchievementService.instance.checkAll();
     if (mounted) widget.onAdded();
   }
 
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    return Padding(
+    return SafeArea(
+      top: false,
+      child: Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Container(
         decoration: BoxDecoration(
@@ -622,6 +630,7 @@ class _CustomFoodSheetState extends State<_CustomFoodSheet> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

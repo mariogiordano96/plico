@@ -483,6 +483,8 @@ class _MacroStat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pct = target != null && target! > 0 ? logged / target! : null;
+    final onTarget = pct != null && pct >= 0.9 && pct <= 1.05;
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -497,10 +499,15 @@ class _MacroStat extends StatelessWidget {
               if (target != null)
                 Text(' / ${target!.round()}g',
                     style: TextStyle(color: p.textMuted, fontSize: 11)),
+              if (onTarget) ...[
+                const SizedBox(width: 4),
+                Icon(Icons.check_circle_rounded, color: color, size: 12),
+              ],
             ],
           ),
           Text(label,
-              style: TextStyle(color: p.textMuted, fontSize: 10)),
+              style: TextStyle(
+                  color: onTarget ? color : p.textMuted, fontSize: 10)),
         ],
       ),
     );

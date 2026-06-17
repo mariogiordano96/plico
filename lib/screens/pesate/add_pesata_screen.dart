@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../theme/app_theme.dart';
 import '../../models/body_snapshot.dart';
+import '../../services/achievement_service.dart';
 import '../../services/database_service.dart';
 
 class AddPesataScreen extends StatefulWidget {
@@ -65,6 +66,7 @@ class _AddPesataScreenState extends State<AddPesataScreen> {
       ..note = _noteController.text.trim().isEmpty ? null : _noteController.text.trim();
 
     await DatabaseService.instance.addBodySnapshot(snapshot);
+    AchievementService.instance.checkAll();
     if (!mounted) return;
     Navigator.pop(context);
   }

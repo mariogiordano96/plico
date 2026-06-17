@@ -7,7 +7,9 @@ import '../models/plicometry_session.dart';
 import '../models/user_profile.dart';
 import '../models/daily_log.dart';
 import '../models/meal_plan.dart';
+import '../models/achievement.dart';
 import '../services/database_service.dart';
+import '../services/streak_service.dart';
 import '../main.dart';
 import 'impostazioni/notifiche_screen.dart';
 import 'pesate/pesate_screen.dart';
@@ -73,6 +75,8 @@ class HomeScreen extends StatelessWidget {
             _DiarioHeroCard(onSwitchTab: onSwitchTab),
             const SizedBox(height: 16),
             _AderenzaCard(onSwitchTab: onSwitchTab),
+            const SizedBox(height: 16),
+            const _StreakCard(),
             const SizedBox(height: 16),
             _PianoCard(onSwitchTab: onSwitchTab),
             const SizedBox(height: 16),
@@ -1090,6 +1094,150 @@ class _AderenzaCardState extends State<_AderenzaCard> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ── Streak + badge traguardi ────────────────────────────────────────
+
+const _badgeInfo = {
+  AchievementType.firstKgLost: (Icons.scale_rounded, '1° kg perso'),
+  AchievementType.streak7: (Icons.local_fire_department_rounded, 'Streak 7gg'),
+  AchievementType.days30Logged: (Icons.calendar_month_rounded, '30 giorni'),
+  AchievementType.weekOnTarget: (Icons.flag_rounded, 'Settimana in target'),
+};
+
+class _StreakCard extends StatelessWidget {
+  const _StreakCard();
+
+  static const _flame = Color(0xFFFF6B35);
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return StreamBuilder<int>(
+      stream: StreakService.instance.watchCurrentStreak(),
+      builder: (context, streakSnap) {
+        final streak = streakSnap.data ?? 0;
+        final active = streak > 0;
+        return StreamBuilder<Set<AchievementType>>(
+          stream: DatabaseService.instance.watchUnlockedTypes(),
+          builder: (context, badgeSnap) {
+            final unlocked = badgeSnap.data ?? const <AchievementType>{};
+            return Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: p.surface,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                    color:
+                        active ? _flame.withValues(alpha: 0.35) : p.cardBorder),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: _flame.withValues(alpha: active ? 0.12 : 0.06),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                              color: _flame.withValues(
+                                  alpha: active ? 0.35 : 0.15)),
+                        ),
+                        child: Icon(Icons.local_fire_department_rounded,
+                            color: active ? _flame : p.textMuted, size: 20),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('STREAK',
+                                style: TextStyle(
+                                    color: p.textMuted,
+                                    fontSize: 11,
+                                    letterSpacing: 2)),
+                            const SizedBox(height: 2),
+                            Text(
+                              active
+                                  ? '$streak giorni di fila'
+                                  : 'Inizia oggi la tua streak',
+                              style: TextStyle(
+                                  color: p.textPrimary,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: _badgeInfo.entries.map((e) {
+                      final isUnlocked = unlocked.contains(e.key);
+                      final (icon, label) = e.value;
+                      return _BadgeIcon(
+                        icon: icon,
+                        label: label,
+                        unlocked: isUnlocked,
+                        p: p,
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _BadgeIcon extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool unlocked;
+  final ColorPalette p;
+  const _BadgeIcon(
+      {required this.icon,
+      required this.label,
+      required this.unlocked,
+      required this.p});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = unlocked ? const Color(0xFFFFB800) : p.textMuted;
+    return Expanded(
+      child: Column(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: unlocked ? 0.15 : 0.06),
+              shape: BoxShape.circle,
+              border: Border.all(color: color.withValues(alpha: unlocked ? 0.4 : 0.15)),
+            ),
+            child: Icon(icon, color: color, size: 17),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: unlocked ? p.textSecondary : p.textMuted,
+                fontSize: 9,
+                fontWeight: FontWeight.w600),
+          ),
+        ],
       ),
     );
   }

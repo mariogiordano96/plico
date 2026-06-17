@@ -384,15 +384,27 @@ class _PesoChart extends StatelessWidget {
     return StreamBuilder<List<BodySnapshot>>(
       stream: DatabaseService.instance.watchBodySnapshots(),
       builder: (context, snap) {
-        var snapshots = [...(snap.data ?? [])]
+        final allSorted = [...(snap.data ?? [])]
           ..sort((a, b) => a.data.compareTo(b.data));
-        if (startDate != null) {
-          snapshots =
-              snapshots.where((s) => !s.data.isBefore(startDate!)).toList();
-        }
+        final filtered = startDate != null
+            ? allSorted.where((s) => !s.data.isBefore(startDate!)).toList()
+            : allSorted;
         final points =
-            snapshots.map((s) => _Point(s.data, s.pesoKg)).toList();
-        return _ChartBox(points: points, unit: 'kg', color: const Color(0xFF4CAF8E), p: p);
+            filtered.map((s) => _Point(s.data, s.pesoKg)).toList();
+        final trendValues = filtered.map((s) {
+          final windowStart = s.data.subtract(const Duration(days: 6));
+          final window = allSorted.where((x) =>
+              !x.data.isBefore(windowStart) && !x.data.isAfter(s.data));
+          final sum = window.fold(0.0, (acc, x) => acc + x.pesoKg);
+          return sum / window.length;
+        }).toList();
+        return _ChartBox(
+          points: points,
+          trendValues: trendValues,
+          unit: 'kg',
+          color: const Color(0xFF4CAF8E),
+          p: p,
+        );
       },
     );
   }
@@ -530,6 +542,7 @@ class _ChartBox extends StatelessWidget {
   final ColorPalette p;
   final int decimals;
   final bool showAvg;
+  final List<double>? trendValues;
 
   const _ChartBox({
     required this.points,
@@ -538,6 +551,7 @@ class _ChartBox extends StatelessWidget {
     required this.p,
     this.decimals = 1,
     this.showAvg = false,
+    this.trendValues,
   });
 
   String _fmtDate(DateTime d) =>
@@ -576,8 +590,19 @@ class _ChartBox extends StatelessWidget {
         .toList();
     final dates = points.map((pt) => _fmtDate(pt.date)).toList();
 
-    final minY = spots.map((s) => s.y).reduce(min);
-    final maxY = spots.map((s) => s.y).reduce(max);
+    final showTrend =
+        trendValues != null && trendValues!.length == points.length;
+    final trendSpots = showTrend
+        ? trendValues!
+            .asMap()
+            .entries
+            .map((e) => FlSpot(e.key.toDouble(), e.value))
+            .toList()
+        : const <FlSpot>[];
+
+    final allY = [...spots.map((s) => s.y), ...trendSpots.map((s) => s.y)];
+    final minY = allY.reduce(min);
+    final maxY = allY.reduce(max);
     final pad = max((maxY - minY) * 0.2, 1.5);
 
     final last = points.last.value;
@@ -624,6 +649,16 @@ class _ChartBox extends StatelessWidget {
                         ),
                       ),
                     ),
+                    if (showTrend)
+                      LineChartBarData(
+                        spots: trendSpots,
+                        isCurved: trendSpots.length > 2,
+                        curveSmoothness: 0.3,
+                        color: p.textSecondary.withValues(alpha: 0.6),
+                        barWidth: 1.5,
+                        dashArray: [6, 4],
+                        dotData: const FlDotData(show: false),
+                      ),
                   ],
                   titlesData: FlTitlesData(
                     topTitles: const AxisTitles(
@@ -680,10 +715,13 @@ class _ChartBox extends StatelessWidget {
                       tooltipBorder: BorderSide(color: p.cardBorder),
                       getTooltipItems: (ts) => ts.map((s) {
                         final i = s.spotIndex;
+                        final isTrend = s.barIndex == 1;
                         return LineTooltipItem(
-                          '${dates[i]}\n${_fmt(s.y)} $unit',
+                          isTrend
+                              ? 'media 7gg: ${_fmt(s.y)} $unit'
+                              : '${dates[i]}\n${_fmt(s.y)} $unit',
                           TextStyle(
-                              color: p.textPrimary,
+                              color: isTrend ? p.textMuted : p.textPrimary,
                               fontSize: 12,
                               fontWeight: FontWeight.w600),
                         );

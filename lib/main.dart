@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'theme/app_theme.dart';
 import 'screens/main_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
+import 'services/achievement_service.dart';
 import 'services/database_service.dart';
 import 'services/notification_service.dart';
 
@@ -17,11 +18,37 @@ void main() async {
   await NotificationService.instance.init();
   final settings = await DatabaseService.instance.getAppSettings();
   await NotificationService.instance.scheduleAll(settings);
+  await AchievementService.instance.checkAll();
+  await NotificationService.instance.refreshEveningRecap();
   runApp(const PlicoApp());
 }
 
-class PlicoApp extends StatelessWidget {
+class PlicoApp extends StatefulWidget {
   const PlicoApp({super.key});
+
+  @override
+  State<PlicoApp> createState() => _PlicoAppState();
+}
+
+class _PlicoAppState extends State<PlicoApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      NotificationService.instance.refreshEveningRecap();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

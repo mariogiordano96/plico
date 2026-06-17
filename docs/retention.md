@@ -23,11 +23,11 @@ La causa #1 di abbandono è che registrare ogni pasto è lento e tedioso.
 
 L'utente deve sentirsi bene quando apre l'app, non in colpa.
 
-- **Streak giorni consecutivi** — badge visivo per ogni giorno di registrazione continua; perdere la streak è un forte motivatore a non saltare
-- **Celebrazione obiettivo calorico** — già implementato; estendere ai macro (proteine, carboidrati, grassi) con animazioni separate
-- **Riepilogo serale** — notifica alle 21:00 "Oggi hai raggiunto il tuo obiettivo per 5 giorni di fila 🔥"
-- **Grafico andamento peso** — già presente; aggiungere linea di tendenza (media mobile 7gg) per mostrare progressi anche quando il peso oscilla
-- **Badge traguardi** — primo kg perso, 7 giorni di streak, 30 giorni registrati, obiettivo raggiunto per una settimana intera
+- ✅ ~~**Streak giorni consecutivi** — badge visivo per ogni giorno di registrazione continua; perdere la streak è un forte motivatore a non saltare~~ — implementato
+- ✅ ~~**Celebrazione obiettivo calorico** — già implementato; estendere ai macro (proteine, carboidrati, grassi) con animazioni separate~~ — implementato (check visivo su proteine/carboidrati/grassi)
+- ✅ ~~**Riepilogo serale** — notifica alle 21:00 "Oggi hai raggiunto il tuo obiettivo per 5 giorni di fila 🔥"~~ — implementato
+- ✅ ~~**Grafico andamento peso** — già presente; aggiungere linea di tendenza (media mobile 7gg) per mostrare progressi anche quando il peso oscilla~~ — implementato
+- ✅ ~~**Badge traguardi** — primo kg perso, 7 giorni di streak, 30 giorni registrati, obiettivo raggiunto per una settimana intera~~ — implementato
 
 ---
 
@@ -79,7 +79,7 @@ L'utente deve capire il valore entro i primi 3 minuti.
 | Feature | Impatto retention | Sforzo |
 |---|---|---|
 | Pasto rapido da preferiti / ripeti ieri | Alto | Medio |
-| Streak giorni consecutivi | Alto | Basso |
+| ✅ ~~Streak giorni consecutivi~~ | Alto | Basso |
 | Riepilogo settimanale in home | Alto | Medio |
 | Notifica streak a rischio | Medio | Basso |
 | Insights automatici sui pattern | Alto | Alto |

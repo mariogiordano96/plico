@@ -5,6 +5,7 @@ import '../../theme/app_theme.dart';
 import '../../models/meal_plan.dart';
 import '../../models/meal_entry.dart';
 import '../../models/user_food_preferences.dart';
+import '../../services/achievement_service.dart';
 import '../../services/database_service.dart';
 import '../../services/piano_service.dart';
 import 'questionario_screen.dart';
@@ -844,6 +845,7 @@ class _PastoPicker extends StatelessWidget {
                   onTap: () async {
                     final entry = _toMealEntry(i);
                     await DatabaseService.instance.addMealEntry(currentDate, entry);
+                    AchievementService.instance.checkAll();
                     if (context.mounted) {
                       Navigator.of(context).pop();
                       onAdded(_diaryPastoNomi[i]);
