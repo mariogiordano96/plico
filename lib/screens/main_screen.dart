@@ -30,7 +30,9 @@ class _MainScreenState extends State<MainScreen> {
           const TdeeScreen(),
         ],
       ),
-      bottomNavigationBar: Container(
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Container(
         decoration: BoxDecoration(
           border: Border(top: BorderSide(color: p.cardBorder, width: 0.5)),
         ),
@@ -64,6 +66,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ],
         ),
+      ),
       ),
     );
   }
