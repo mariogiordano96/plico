@@ -22,16 +22,6 @@ class _Point {
 enum _Range { month1, month3, month6, year1, all }
 
 extension _RangeExt on _Range {
-  String get label {
-    switch (this) {
-      case _Range.month1: return '1M';
-      case _Range.month3: return '3M';
-      case _Range.month6: return '6M';
-      case _Range.year1:  return '1A';
-      case _Range.all:    return 'Tutto';
-    }
-  }
-
   DateTime? get startDate {
     final now = DateTime.now();
     switch (this) {
@@ -47,14 +37,6 @@ extension _RangeExt on _Range {
 enum _CompMetric { bf, grassa, magra }
 
 extension _CompMetricExt on _CompMetric {
-  String get label {
-    switch (this) {
-      case _CompMetric.bf:     return 'BF%';
-      case _CompMetric.grassa: return 'Massa Grassa';
-      case _CompMetric.magra:  return 'Massa Magra';
-    }
-  }
-
   String get unit {
     return this == _CompMetric.bf ? '%' : 'kg';
   }
@@ -63,15 +45,6 @@ extension _CompMetricExt on _CompMetric {
 enum _DiarioMetric { kcal, proteine, grassi, carbs }
 
 extension _DiarioMetricExt on _DiarioMetric {
-  String get label {
-    switch (this) {
-      case _DiarioMetric.kcal:     return 'Kcal';
-      case _DiarioMetric.proteine: return 'Proteine';
-      case _DiarioMetric.grassi:   return 'Grassi';
-      case _DiarioMetric.carbs:    return 'Carboidrati';
-    }
-  }
-
   String get unit {
     return this == _DiarioMetric.kcal ? 'kcal' : 'g';
   }
@@ -86,21 +59,42 @@ extension _DiarioMetricExt on _DiarioMetric {
   }
 }
 
-const _misureLabels = <String, String>{
-  'vitaCm':           'Vita',
-  'fianchiCm':        'Fianchi',
-  'braccioCm':        'Braccio',
-  'colloCm':          'Collo',
-  'cosciaCm':         'Coscia',
-  'polpaccioCm':      'Polpaccio',
-  'toraceCm':         'Torace',
-  'spalleCm':         'Spalle',
-  'tricipiteMm':      'Tricipite',
-  'bicipiteMm':       'Bicipite',
-  'sottoscapolareMm': 'Sottoscap.',
-  'sovrailiachMm':    'Sovrailiaca',
-  'addomineMm':       'Addome',
-  'cosciaMm':         'Coscia (pl.)',
+String _rangeLabel(_Range r, BuildContext context) => switch (r) {
+  _Range.month1 => '1M',
+  _Range.month3 => '3M',
+  _Range.month6 => '6M',
+  _Range.year1  => context.l10n.progressiRange1A,
+  _Range.all    => context.l10n.progressiRangeTutto,
+};
+
+String _compMetricLabel(_CompMetric m, BuildContext context) => switch (m) {
+  _CompMetric.bf     => 'BF%',
+  _CompMetric.grassa => context.l10n.progressiMassaGrassa,
+  _CompMetric.magra  => context.l10n.progressiMassaMagra,
+};
+
+String _diarioMetricLabel(_DiarioMetric m, BuildContext context) => switch (m) {
+  _DiarioMetric.kcal     => 'Kcal',
+  _DiarioMetric.proteine => context.l10n.progressiProteine,
+  _DiarioMetric.grassi   => context.l10n.progressiGrassi,
+  _DiarioMetric.carbs    => context.l10n.progressiCarboidrati,
+};
+
+Map<String, String> _getMisureLabels(BuildContext context) => {
+  'vitaCm':           context.l10n.misuraVita,
+  'fianchiCm':        context.l10n.misuraFianchi,
+  'braccioCm':        context.l10n.misuraBraccio,
+  'colloCm':          context.l10n.misuraCollo,
+  'cosciaCm':         context.l10n.misuraCoscia,
+  'polpaccioCm':      context.l10n.misuraPolpaccio,
+  'toraceCm':         context.l10n.misuraTorace,
+  'spalleCm':         context.l10n.misuraSpalle,
+  'tricipiteMm':      context.l10n.misuraTricipite,
+  'bicipiteMm':       context.l10n.misuraBicipite,
+  'sottoscapolareMm': context.l10n.misuraSottoscap,
+  'sovrailiachMm':    context.l10n.misuraSovrailiaca,
+  'addomineMm':       context.l10n.misuraAddome,
+  'cosciaMm':         context.l10n.misuraCosciaPlica,
 };
 
 double? _snapValue(MeasurementSnapshot s, String key) {
@@ -166,25 +160,25 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              Text('Esporta Diario',
+              Text(ctx.l10n.progressiEsportaDiario,
                   style: TextStyle(
                       color: pp.textPrimary,
                       fontSize: 17,
                       fontWeight: FontWeight.w700)),
               const SizedBox(height: 4),
-              Text('Seleziona il periodo da esportare in PDF',
+              Text(ctx.l10n.progressiEsportaSub,
                   style: TextStyle(color: pp.textMuted, fontSize: 13)),
               const SizedBox(height: 16),
               _ExportOptionTile(
-                label: 'Ultima settimana',
-                subtitle: '7 giorni',
+                label: ctx.l10n.progressiUltimaSettimana,
+                subtitle: ctx.l10n.progressi7Giorni,
                 p: pp,
                 onTap: () => Navigator.pop(ctx, 7),
               ),
               const SizedBox(height: 8),
               _ExportOptionTile(
-                label: 'Ultimo mese',
-                subtitle: '30 giorni',
+                label: ctx.l10n.progressiUltimoMese,
+                subtitle: ctx.l10n.progressi30Giorni,
                 p: pp,
                 onTap: () => Navigator.pop(ctx, 30),
               ),
@@ -224,7 +218,7 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
       if (!mounted) return;
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Errore nell\'esportazione: $e')),
+        SnackBar(content: Text(context.l10n.progressiErrEsportazione(e.toString()))),
       );
     }
   }
@@ -236,7 +230,7 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('PROGRESSI',
+        title: Text(context.l10n.progressiTitolo,
             style: TextStyle(
                 color: p.accent,
                 fontSize: 17,
@@ -249,12 +243,12 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.download_rounded, color: p.accent),
-            tooltip: 'Esporta PDF',
+            tooltip: context.l10n.progressiTooltipEsporta,
             onPressed: _showExportBottomSheet,
           ),
           IconButton(
             icon: Icon(Icons.straighten_rounded, color: p.accent),
-            tooltip: 'Storico misurazioni',
+            tooltip: context.l10n.progressiTooltipStorico,
             onPressed: () => Navigator.push(context,
                 MaterialPageRoute(
                     builder: (_) => const StoricoMisurazioniScreen())),
@@ -274,7 +268,7 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
                 children: _Range.values.map((r) => Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: _RangeChip(
-                    label: r.label,
+                    label: _rangeLabel(r, context),
                     selected: _range == r,
                     onTap: () => setState(() => _range = r),
                     p: p,
@@ -285,13 +279,13 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
             const SizedBox(height: 24),
 
             // ── Grafico 1: Peso ───────────────────────────
-            _SectionLabel('PESO', p),
+            _SectionLabel(context.l10n.progressiSezPeso, p),
             const SizedBox(height: 14),
             _PesoChart(startDate: start, p: p),
             const SizedBox(height: 28),
 
             // ── Grafico 2: Diario kcal/macro ─────────────
-            _SectionLabel('DIARIO', p),
+            _SectionLabel(context.l10n.progressiSezDiario, p),
             const SizedBox(height: 10),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -299,7 +293,7 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
                 children: _DiarioMetric.values.map((m) => Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: _RangeChip(
-                    label: m.label,
+                    label: _diarioMetricLabel(m, context),
                     selected: _diarioMetric == m,
                     onTap: () => setState(() => _diarioMetric = m),
                     p: p,
@@ -317,7 +311,7 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
             const SizedBox(height: 28),
 
             // ── Grafico 3: Composizione ───────────────────
-            _SectionLabel('COMPOSIZIONE CORPOREA', p),
+            _SectionLabel(context.l10n.progressiSezComposizione, p),
             const SizedBox(height: 10),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -325,7 +319,7 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
                 children: _CompMetric.values.map((m) => Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: _RangeChip(
-                    label: m.label,
+                    label: _compMetricLabel(m, context),
                     selected: _compMetric == m,
                     onTap: () => setState(() => _compMetric = m),
                     p: p,
@@ -342,12 +336,12 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
             const SizedBox(height: 28),
 
             // ── Grafico 3: Misurazioni ────────────────────
-            _SectionLabel('MISURAZIONI', p),
+            _SectionLabel(context.l10n.progressiSezMisurazioni, p),
             const SizedBox(height: 10),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: _misureLabels.entries.map((e) => Padding(
+                children: _getMisureLabels(context).entries.map((e) => Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: _RangeChip(
                     label: e.value,
@@ -575,7 +569,7 @@ class _ChartBox extends StatelessWidget {
             children: [
               Icon(Icons.show_chart_rounded, color: p.textMuted, size: 36),
               const SizedBox(height: 8),
-              Text('Nessun dato nel periodo selezionato',
+              Text(context.l10n.progressiNessunDato,
                   style: TextStyle(color: p.textMuted, fontSize: 13)),
             ],
           ),
@@ -718,7 +712,7 @@ class _ChartBox extends StatelessWidget {
                         final isTrend = s.barIndex == 1;
                         return LineTooltipItem(
                           isTrend
-                              ? 'media 7gg: ${_fmt(s.y)} $unit'
+                              ? context.l10n.progressiMedia7gg(_fmt(s.y), unit)
                               : '${dates[i]}\n${_fmt(s.y)} $unit',
                           TextStyle(
                               color: isTrend ? p.textMuted : p.textPrimary,
@@ -743,14 +737,14 @@ class _ChartBox extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _Stat(
-                    label: 'Ultimo',
+                    label: context.l10n.progressiStatUltimo,
                     value: '${_fmt(last)} $unit',
                     color: color,
                     p: p),
                 if (showAvg) ...[
                   Container(width: 1, height: 28, color: p.cardBorder),
                   _Stat(
-                    label: 'Media',
+                    label: context.l10n.progressiStatMedia,
                     value: '${_fmt(avg)} $unit',
                     color: p.textSecondary,
                     p: p,
@@ -758,7 +752,7 @@ class _ChartBox extends StatelessWidget {
                 ] else if (delta != null) ...[
                   Container(width: 1, height: 28, color: p.cardBorder),
                   _Stat(
-                    label: 'Variazione',
+                    label: context.l10n.progressiStatVariazione,
                     value: '${delta >= 0 ? '+' : ''}${_fmt(delta)} $unit',
                     color: p.textSecondary,
                     p: p,
@@ -766,7 +760,7 @@ class _ChartBox extends StatelessWidget {
                 ],
                 Container(width: 1, height: 28, color: p.cardBorder),
                 _Stat(
-                    label: showAvg ? 'Giorni' : 'Rilevazioni',
+                    label: showAvg ? context.l10n.progressiStatGiorni : context.l10n.progressiStatRilevazioni,
                     value: '${points.length}',
                     color: p.textSecondary,
                     p: p),
@@ -936,7 +930,7 @@ class _PdfLoadingDialog extends StatelessWidget {
                   strokeWidth: 2.5, color: p.accent),
             ),
             const SizedBox(width: 16),
-            Text('Generazione PDF...',
+            Text(context.l10n.progressiGenerazionePdf,
                 style: TextStyle(color: p.textPrimary, fontSize: 14)),
           ],
         ),

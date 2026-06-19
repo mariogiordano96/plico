@@ -99,7 +99,7 @@ class _AddMeasurementScreenState extends State<AddMeasurementScreen>
   Future<void> _save() async {
     if (!_hasAnyValue) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: const Text('Inserisci almeno un valore'),
+        content: Text(context.l10n.misurazioneInserisciValore),
         backgroundColor: context.palette.surface,
       ));
       return;
@@ -139,7 +139,7 @@ class _AddMeasurementScreenState extends State<AddMeasurementScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('NUOVA MISURAZIONE', style: TextStyle(color: p.accent, fontSize: 17, fontWeight: FontWeight.w600, letterSpacing: 1.5)),
+        title: Text(context.l10n.misurazioneNuova, style: TextStyle(color: p.accent, fontSize: 17, fontWeight: FontWeight.w600, letterSpacing: 1.5)),
         backgroundColor: p.background,
         elevation: 0,
         centerTitle: true,
@@ -148,7 +148,7 @@ class _AddMeasurementScreenState extends State<AddMeasurementScreen>
           if (kDebugMode)
             IconButton(
               icon: Icon(Icons.tune_rounded, color: p.accent),
-              tooltip: 'Calibrazione punti',
+              tooltip: context.l10n.misurazioneCalibrazione,
               onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CalibrationScreen())),
             ),
         ],
@@ -169,7 +169,7 @@ class _AddMeasurementScreenState extends State<AddMeasurementScreen>
                     const SizedBox(width: 12),
                     Text(dataStr, style: TextStyle(color: p.textPrimary, fontSize: 15, fontWeight: FontWeight.w500)),
                     const Spacer(),
-                    Text('Modifica', style: TextStyle(color: p.accent, fontSize: 13)),
+                    Text(context.l10n.misurazioneModifica, style: TextStyle(color: p.accent, fontSize: 13)),
                   ],
                 ),
               ),
@@ -189,9 +189,9 @@ class _AddMeasurementScreenState extends State<AddMeasurementScreen>
               labelColor: p.background,
               unselectedLabelColor: p.textMuted,
               labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, letterSpacing: 1),
-              tabs: const [
-                Tab(text: 'PLICHE'),
-                Tab(text: 'CIRCONFERENZE'),
+              tabs: [
+                Tab(text: context.l10n.misurazioneTabPliche),
+                Tab(text: context.l10n.misurazioneTabCirconferenze),
               ],
             ),
           ),
@@ -227,7 +227,7 @@ class _AddMeasurementScreenState extends State<AddMeasurementScreen>
               onPressed: _saving ? null : _save,
               child: _saving
                   ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: p.background))
-                  : const Text('SALVA MISURAZIONE'),
+                  : Text(context.l10n.misurazioneSalva),
             ),
           ),
         ],
@@ -257,15 +257,15 @@ class _PlicheTab extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
       children: [
-        _MeasureField(label: 'Tricipite', unit: 'mm', controller: tricipite, siteKey: 'tricipite', sesso: sesso),
-        _MeasureField(label: 'Bicipite', unit: 'mm', controller: bicipite, siteKey: 'bicipite', sesso: sesso),
-        _MeasureField(label: 'Pettorale', unit: 'mm', controller: pettorale, siteKey: 'pettorale', sesso: sesso),
-        _MeasureField(label: 'Ascellare', unit: 'mm', controller: ascellare, siteKey: 'ascellare', sesso: sesso),
-        _MeasureField(label: 'Sottoscapolare', unit: 'mm', controller: sottoscapolare, siteKey: 'sottoscapolare', sesso: sesso),
-        _MeasureField(label: 'Sovrailiaca', unit: 'mm', controller: sovrailica, siteKey: 'sovrailiaca', sesso: sesso),
-        _MeasureField(label: 'Addome', unit: 'mm', controller: addome, siteKey: 'addome', sesso: sesso),
-        _MeasureField(label: 'Coscia', unit: 'mm', controller: coscia, siteKey: 'coscia_plica', sesso: sesso),
-        _MeasureField(label: 'Polpaccio', unit: 'mm', controller: polpaccio, siteKey: 'polpaccio_plica', sesso: sesso),
+        _MeasureField(label: context.l10n.misuraTricipite, unit: 'mm', controller: tricipite, siteKey: 'tricipite', sesso: sesso),
+        _MeasureField(label: context.l10n.misuraBicipite, unit: 'mm', controller: bicipite, siteKey: 'bicipite', sesso: sesso),
+        _MeasureField(label: context.l10n.misuraPettorale, unit: 'mm', controller: pettorale, siteKey: 'pettorale', sesso: sesso),
+        _MeasureField(label: context.l10n.misuraAscellare, unit: 'mm', controller: ascellare, siteKey: 'ascellare', sesso: sesso),
+        _MeasureField(label: context.l10n.misuraSottoscapolare, unit: 'mm', controller: sottoscapolare, siteKey: 'sottoscapolare', sesso: sesso),
+        _MeasureField(label: context.l10n.misuraSovrailiaca, unit: 'mm', controller: sovrailica, siteKey: 'sovrailiaca', sesso: sesso),
+        _MeasureField(label: context.l10n.misuraAddome, unit: 'mm', controller: addome, siteKey: 'addome', sesso: sesso),
+        _MeasureField(label: context.l10n.misuraCosciaPlica, unit: 'mm', controller: coscia, siteKey: 'coscia_plica', sesso: sesso),
+        _MeasureField(label: context.l10n.misuraPolpaccio, unit: 'mm', controller: polpaccio, siteKey: 'polpaccio_plica', sesso: sesso),
       ],
     );
   }
@@ -291,14 +291,14 @@ class _CirconferenzeTab extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
       children: [
-        _MeasureField(label: 'Collo', unit: 'cm', controller: collo, siteKey: 'collo', sesso: sesso),
-        _MeasureField(label: 'Vita', unit: 'cm', controller: vita, siteKey: 'vita', sesso: sesso),
-        _MeasureField(label: 'Fianchi', unit: 'cm', controller: fianchi, siteKey: 'fianchi', sesso: sesso),
-        _MeasureField(label: 'Braccio', unit: 'cm', controller: braccio, siteKey: 'braccio', sesso: sesso),
-        _MeasureField(label: 'Coscia', unit: 'cm', controller: coscia, siteKey: 'coscia_circ', sesso: sesso),
-        _MeasureField(label: 'Polpaccio', unit: 'cm', controller: polpaccio, siteKey: 'polpaccio_circ', sesso: sesso),
-        _MeasureField(label: 'Torace', unit: 'cm', controller: torace, siteKey: 'torace', sesso: sesso),
-        _MeasureField(label: 'Spalle', unit: 'cm', controller: spalle, siteKey: 'spalle', sesso: sesso),
+        _MeasureField(label: context.l10n.misuraCollo, unit: 'cm', controller: collo, siteKey: 'collo', sesso: sesso),
+        _MeasureField(label: context.l10n.misuraVita, unit: 'cm', controller: vita, siteKey: 'vita', sesso: sesso),
+        _MeasureField(label: context.l10n.misuraFianchi, unit: 'cm', controller: fianchi, siteKey: 'fianchi', sesso: sesso),
+        _MeasureField(label: context.l10n.misuraBraccio, unit: 'cm', controller: braccio, siteKey: 'braccio', sesso: sesso),
+        _MeasureField(label: context.l10n.misuraCoscia, unit: 'cm', controller: coscia, siteKey: 'coscia_circ', sesso: sesso),
+        _MeasureField(label: context.l10n.misuraPolpaccio, unit: 'cm', controller: polpaccio, siteKey: 'polpaccio_circ', sesso: sesso),
+        _MeasureField(label: context.l10n.misuraTorace, unit: 'cm', controller: torace, siteKey: 'torace', sesso: sesso),
+        _MeasureField(label: context.l10n.misuraSpalle, unit: 'cm', controller: spalle, siteKey: 'spalle', sesso: sesso),
       ],
     );
   }

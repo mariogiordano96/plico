@@ -12,7 +12,7 @@ class PesateScreen extends StatelessWidget {
     final p = context.palette;
     return Scaffold(
       appBar: AppBar(
-        title: Text('PESATE', style: TextStyle(color: p.accent, fontSize: 18, fontWeight: FontWeight.w600, letterSpacing: 2)),
+        title: Text(context.l10n.pesateTitolo, style: TextStyle(color: p.accent, fontSize: 18, fontWeight: FontWeight.w600, letterSpacing: 2)),
         backgroundColor: p.background,
         elevation: 0,
         centerTitle: true,
@@ -55,19 +55,19 @@ class PesateScreen extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: p.surface,
-        title: Text('Elimina pesata', style: TextStyle(color: p.textPrimary)),
-        content: Text('Sei sicuro di voler eliminare questa misurazione?', style: TextStyle(color: p.textSecondary)),
+        title: Text(context.l10n.pesateEliminaTitle, style: TextStyle(color: p.textPrimary)),
+        content: Text(context.l10n.pesateEliminaSub, style: TextStyle(color: p.textSecondary)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Annulla', style: TextStyle(color: p.textMuted)),
+            child: Text(context.l10n.diarioAnnulla, style: TextStyle(color: p.textMuted)),
           ),
           TextButton(
             onPressed: () {
               DatabaseService.instance.deleteBodySnapshot(id);
               Navigator.pop(ctx);
             },
-            child: Text('Elimina', style: TextStyle(color: p.error)),
+            child: Text(context.l10n.appElimina, style: TextStyle(color: p.error)),
           ),
         ],
       ),
@@ -209,9 +209,9 @@ class _EmptyState extends StatelessWidget {
             child: Icon(Icons.monitor_weight_outlined, color: p.accent, size: 32),
           ),
           const SizedBox(height: 20),
-          Text('Nessuna pesata', style: TextStyle(color: p.textPrimary, fontSize: 18, fontWeight: FontWeight.w600)),
+          Text(context.l10n.pesateNessuna, style: TextStyle(color: p.textPrimary, fontSize: 18, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
-          Text('Premi + per aggiungere\nla prima misurazione', textAlign: TextAlign.center, style: TextStyle(color: p.textMuted, height: 1.5)),
+          Text(context.l10n.pesateNessunaSub, textAlign: TextAlign.center, style: TextStyle(color: p.textMuted, height: 1.5)),
         ],
       ),
     );

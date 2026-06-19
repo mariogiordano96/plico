@@ -78,7 +78,7 @@ class _AddPesataScreenState extends State<AddPesataScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('NUOVA PESATA', style: TextStyle(color: p.accent, fontSize: 18, fontWeight: FontWeight.w600, letterSpacing: 2)),
+        title: Text(context.l10n.pesateNuova, style: TextStyle(color: p.accent, fontSize: 18, fontWeight: FontWeight.w600, letterSpacing: 2)),
         backgroundColor: p.background,
         elevation: 0,
         centerTitle: true,
@@ -91,7 +91,7 @@ class _AddPesataScreenState extends State<AddPesataScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _Label('DATA', p),
+              _Label(context.l10n.pesateData, p),
               const SizedBox(height: 8),
               GestureDetector(
                 onTap: _pickDate,
@@ -109,57 +109,57 @@ class _AddPesataScreenState extends State<AddPesataScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              _Label('PESO *', p),
+              _Label(context.l10n.pesatePeso, p),
               const SizedBox(height: 8),
               _Field(
                 controller: _pesoController, hint: '75.5', suffix: 'kg', p: p,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
                 validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'Campo obbligatorio';
+                  if (v == null || v.trim().isEmpty) return context.l10n.pesateCampoObb;
                   final n = double.tryParse(v.trim());
-                  if (n == null || n < 20 || n > 300) return 'Peso non valido';
+                  if (n == null || n < 20 || n > 300) return context.l10n.pesatePesoInvalido;
                   return null;
                 },
               ),
               const SizedBox(height: 20),
-              _Label('ALTEZZA (opzionale)', p),
+              _Label(context.l10n.pesateAltezzaOpz, p),
               const SizedBox(height: 8),
               _Field(
-                controller: _altezzaController, hint: 'Solo se diversa dal profilo', suffix: 'cm', p: p,
+                controller: _altezzaController, hint: context.l10n.pesateAltezzaHint, suffix: 'cm', p: p,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return null;
                   final n = double.tryParse(v.trim());
-                  if (n == null || n < 100 || n > 250) return 'Altezza non valida';
+                  if (n == null || n < 100 || n > 250) return context.l10n.pesateAltezzaInvalida;
                   return null;
                 },
               ),
               const SizedBox(height: 20),
-              _Label('BODY FAT (opzionale)', p),
+              _Label(context.l10n.pesateBodyFatOpz, p),
               const SizedBox(height: 8),
               _Field(
-                controller: _bodyFatController, hint: 'Es. da bilancia impedenziometrica', suffix: '%', p: p,
+                controller: _bodyFatController, hint: context.l10n.pesateBodyFatHint, suffix: '%', p: p,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return null;
                   final n = double.tryParse(v.trim());
-                  if (n == null || n < 1 || n > 70) return 'Valore non valido (1–70%)';
+                  if (n == null || n < 1 || n > 70) return context.l10n.pesateBodyFatInvalido;
                   return null;
                 },
               ),
               const SizedBox(height: 20),
-              _Label('NOTE (opzionale)', p),
+              _Label(context.l10n.pesateNoteOpz, p),
               const SizedBox(height: 8),
-              _Field(controller: _noteController, hint: 'Es. mattina a digiuno...', p: p, maxLines: 3),
+              _Field(controller: _noteController, hint: context.l10n.pesateNoteHint, p: p, maxLines: 3),
               const SizedBox(height: 40),
               ElevatedButton(
                 onPressed: _saving ? null : _save,
                 child: _saving
                     ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: p.background))
-                    : const Text('SALVA PESATA'),
+                    : Text(context.l10n.pesateSalva),
               ),
             ],
           ),

@@ -12,7 +12,7 @@ class StoricoMisurazioniScreen extends StatelessWidget {
     final p = context.palette;
     return Scaffold(
       appBar: AppBar(
-        title: Text('MISURAZIONI', style: TextStyle(color: p.accent, fontSize: 17, fontWeight: FontWeight.w600, letterSpacing: 1.5)),
+        title: Text(context.l10n.storicoMisurazioni, style: TextStyle(color: p.accent, fontSize: 17, fontWeight: FontWeight.w600, letterSpacing: 1.5)),
         backgroundColor: p.background,
         elevation: 0,
         centerTitle: true,
@@ -50,13 +50,13 @@ class StoricoMisurazioniScreen extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: p.surface,
-        title: Text('Elimina misurazione', style: TextStyle(color: p.textPrimary)),
-        content: Text('Eliminare i dati di questa giornata?', style: TextStyle(color: p.textSecondary)),
+        title: Text(context.l10n.storicoEliminaTitle, style: TextStyle(color: p.textPrimary)),
+        content: Text(context.l10n.storicoEliminaSub, style: TextStyle(color: p.textSecondary)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Annulla', style: TextStyle(color: p.textMuted))),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(context.l10n.diarioAnnulla, style: TextStyle(color: p.textMuted))),
           TextButton(
             onPressed: () { DatabaseService.instance.deleteMeasurementSnapshot(id); Navigator.pop(ctx); },
-            child: Text('Elimina', style: TextStyle(color: p.error)),
+            child: Text(context.l10n.appElimina, style: TextStyle(color: p.error)),
           ),
         ],
       ),
@@ -106,9 +106,9 @@ class _SnapshotCard extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                if (hasPliche) _CountChip(icon: Icons.straighten_rounded, label: '${snapshot.contPliche} pliche', p: p),
+                if (hasPliche) _CountChip(icon: Icons.straighten_rounded, label: context.l10n.misurazioneContPliche('${snapshot.contPliche}'), p: p),
                 if (hasPliche && hasCirc) const SizedBox(width: 8),
-                if (hasCirc) _CountChip(icon: Icons.radio_button_unchecked_rounded, label: '${snapshot.contCirconferenze} circonf.', p: p),
+                if (hasCirc) _CountChip(icon: Icons.radio_button_unchecked_rounded, label: context.l10n.misurazioneContCirconferenze('${snapshot.contCirconferenze}'), p: p),
               ],
             ),
             if (hasPliche) ...[
@@ -199,7 +199,6 @@ class _SourceBadge extends StatelessWidget {
   const _SourceBadge({required this.fonte});
 
   static const _labels = {
-    'manuale': 'Manuale',
     'durninWomersley': 'D&W',
     'jacksonPollock3': 'J&P 3',
     'jacksonPollock7': 'J&P 7',
@@ -209,7 +208,9 @@ class _SourceBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    final label = _labels[fonte] ?? fonte;
+    final label = fonte == 'manuale'
+        ? context.l10n.storicoFonteManuale
+        : _labels[fonte] ?? fonte;
     return Container(
       margin: const EdgeInsets.only(left: 6),
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
@@ -235,9 +236,9 @@ class _EmptyState extends StatelessWidget {
             child: Icon(Icons.straighten_rounded, color: p.accent, size: 32),
           ),
           const SizedBox(height: 20),
-          Text('Nessuna misurazione', style: TextStyle(color: p.textPrimary, fontSize: 18, fontWeight: FontWeight.w600)),
+          Text(context.l10n.storicoNessuna, style: TextStyle(color: p.textPrimary, fontSize: 18, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
-          Text('Le misurazioni appariranno qui\ndopo una sessione o un inserimento manuale.',
+          Text(context.l10n.storicoNessunaSub,
               textAlign: TextAlign.center, style: TextStyle(color: p.textMuted, height: 1.5, fontSize: 13)),
         ],
       ),
