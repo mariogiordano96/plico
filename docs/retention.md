@@ -53,17 +53,7 @@ L'utente deve sentire che l'app è "sua" e che sta andando da qualche parte.
 
 ---
 
-## 5. Social e accountability
-
-Anche solo la percezione di essere osservati aumenta la consistenza.
-
-- **Condivisione progressi** — card condivisibile con grafico peso + streak (stile Duolingo/Strava) per Instagram/WhatsApp
-- **Sfida con amici** — "Chi mantiene la streak più lunga questa settimana?" — minima infrastruttura, alto impatto
-- **Coach virtuale** — feedback testuale settimanale generato dall'AI basato sui dati reali dell'utente ("questa settimana hai mangiato bene ma le proteine erano basse — prova ad aggiungere uno yogurt greco a colazione")
-
----
-
-## 6. Onboarding e primo "aha moment"
+## 5. Onboarding e primo "aha moment"
 
 L'utente deve capire il valore entro i primi 3 minuti.
 
@@ -84,5 +74,4 @@ L'utente deve capire il valore entro i primi 3 minuti.
 | ✅ ~~Notifica streak a rischio~~ | Medio | Basso |
 | ✅ ~~Insights automatici sui pattern~~ | Alto | Alto |
 | ✅ ~~Widget iOS/Android~~ | Medio | Alto |
-| Condivisione progressi | Medio | Medio |
 | Coach virtuale AI | Alto | Alto |
