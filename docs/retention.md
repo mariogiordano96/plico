@@ -15,7 +15,6 @@ La causa #1 di abbandono è che registrare ogni pasto è lento e tedioso.
 - ✅ ~~**Pasto dal piano** — se hai il piano attivo, suggerisci gli alimenti previsti per quello slot invece di partire da zero~~ — implementato (sezione "Dal tuo piano")
 - ✅ ~~**Ricerca più intelligente** — mostra per primi gli alimenti usati di recente, poi i preferiti, poi il database~~ — implementato
 - ✅ ~~**Widget iOS/Android** — aggiunta rapida di un pasto dalla schermata home del telefono senza aprire l'app~~ — implementato su entrambe le piattaforme (riepilogo kcal + tap per apertura rapida aggiunta pasto); verificato su device Android e iPhone (iOS 26)
-- **Siri / Google Assistant shortcut** — "Hey Siri, ho mangiato una banana" → aggiunta diretta
 
 ---
 
