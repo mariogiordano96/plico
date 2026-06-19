@@ -3,5 +3,31 @@
   "appName": "Plico",
   "@appName": {
     "description": "Nome dell'applicazione"
-  }
+  },
+
+  "pastoColazione": "Colazione",
+  "@pastoColazione": { "description": "Etichetta pasto: colazione" },
+  "pastoPranzo": "Pranzo",
+  "@pastoPranzo": { "description": "Etichetta pasto: pranzo" },
+  "pastoCena": "Cena",
+  "@pastoCena": { "description": "Etichetta pasto: cena" },
+  "pastoSpuntino": "Spuntino",
+  "@pastoSpuntino": { "description": "Etichetta pasto: spuntino" },
+  "pastoPostWo": "Post-WO",
+  "@pastoPostWo": { "description": "Etichetta pasto: spuntino post allenamento" },
+  "pastoSpuntinoSerale": "Spuntino serale",
+  "@pastoSpuntinoSerale": { "description": "Etichetta pasto: spuntino serale" },
+
+  "slotProteina": "Proteina",
+  "@slotProteina": { "description": "Etichetta slot: proteina" },
+  "slotCarboidrati": "Carboidrati",
+  "@slotCarboidrati": { "description": "Etichetta slot: carboidrati" },
+  "slotVerdura": "Verdura",
+  "@slotVerdura": { "description": "Etichetta slot: verdura" },
+  "slotGrassi": "Grassi",
+  "@slotGrassi": { "description": "Etichetta slot: grassi" },
+  "slotExtra": "Extra",
+  "@slotExtra": { "description": "Etichetta slot: extra (latticini, formaggi)" },
+  "slotFrutta": "Frutta",
+  "@slotFrutta": { "description": "Etichetta slot: frutta" }
 }

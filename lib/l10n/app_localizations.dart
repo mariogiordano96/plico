@@ -103,6 +103,78 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Plico'**
   String get appName;
+
+  /// Etichetta pasto: colazione
+  ///
+  /// In it, this message translates to:
+  /// **'Colazione'**
+  String get pastoColazione;
+
+  /// Etichetta pasto: pranzo
+  ///
+  /// In it, this message translates to:
+  /// **'Pranzo'**
+  String get pastoPranzo;
+
+  /// Etichetta pasto: cena
+  ///
+  /// In it, this message translates to:
+  /// **'Cena'**
+  String get pastoCena;
+
+  /// Etichetta pasto: spuntino
+  ///
+  /// In it, this message translates to:
+  /// **'Spuntino'**
+  String get pastoSpuntino;
+
+  /// Etichetta pasto: spuntino post allenamento
+  ///
+  /// In it, this message translates to:
+  /// **'Post-WO'**
+  String get pastoPostWo;
+
+  /// Etichetta pasto: spuntino serale
+  ///
+  /// In it, this message translates to:
+  /// **'Spuntino serale'**
+  String get pastoSpuntinoSerale;
+
+  /// Etichetta slot: proteina
+  ///
+  /// In it, this message translates to:
+  /// **'Proteina'**
+  String get slotProteina;
+
+  /// Etichetta slot: carboidrati
+  ///
+  /// In it, this message translates to:
+  /// **'Carboidrati'**
+  String get slotCarboidrati;
+
+  /// Etichetta slot: verdura
+  ///
+  /// In it, this message translates to:
+  /// **'Verdura'**
+  String get slotVerdura;
+
+  /// Etichetta slot: grassi
+  ///
+  /// In it, this message translates to:
+  /// **'Grassi'**
+  String get slotGrassi;
+
+  /// Etichetta slot: extra (latticini, formaggi)
+  ///
+  /// In it, this message translates to:
+  /// **'Extra'**
+  String get slotExtra;
+
+  /// Etichetta slot: frutta
+  ///
+  /// In it, this message translates to:
+  /// **'Frutta'**
+  String get slotFrutta;
 }
 
 class _AppLocalizationsDelegate

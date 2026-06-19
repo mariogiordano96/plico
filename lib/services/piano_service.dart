@@ -1,5 +1,6 @@
 import '../models/food_item.dart';
 import '../models/meal_plan.dart';
+import '../l10n/app_localizations.dart';
 import 'database_service.dart';
 import '../screens/tdee/tdee_screen.dart' show calcolaTdee;
 
@@ -22,6 +23,15 @@ class PianoService {
   static const slotLabels = ['Proteina', 'Carboidrati', 'Verdura', 'Grassi', 'Extra', 'Frutta'];
   static const slotEmoji = ['🥩', '🍚', '🥦', '🫒', '🧀', '🍓'];
 
+  static String slotLabel(AppLocalizations l10n, int tipo) => switch (tipo) {
+    0 => l10n.slotProteina,
+    1 => l10n.slotCarboidrati,
+    2 => l10n.slotVerdura,
+    3 => l10n.slotGrassi,
+    4 => l10n.slotExtra,
+    _ => l10n.slotFrutta,
+  };
+
   // Meal types
   static const kPastoColazione = 0;
   static const kPastoPranzo = 1;
@@ -32,6 +42,15 @@ class PianoService {
 
   static const pastoLabels = ['Colazione', 'Pranzo', 'Cena', 'Spuntino', 'Post-WO', 'Spuntino serale'];
   static const pastoEmoji = ['☀️', '🍽️', '🌙', '🍎', '💪', '⭐'];
+
+  static String pastoLabel(AppLocalizations l10n, int tipo) => switch (tipo) {
+    0 => l10n.pastoColazione,
+    1 => l10n.pastoPranzo,
+    2 => l10n.pastoCena,
+    3 => l10n.pastoSpuntino,
+    4 => l10n.pastoPostWo,
+    _ => l10n.pastoSpuntinoSerale,
+  };
 
   static const curatedCerealiColazione = [
     "Fiocchi d'avena",

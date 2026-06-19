@@ -10,4 +10,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get appName => 'Plico';
+
+  @override
+  String get pastoColazione => 'Breakfast';
+
+  @override
+  String get pastoPranzo => 'Lunch';
+
+  @override
+  String get pastoCena => 'Dinner';
+
+  @override
+  String get pastoSpuntino => 'Snack';
+
+  @override
+  String get pastoPostWo => 'Post-WO';
+
+  @override
+  String get pastoSpuntinoSerale => 'Evening snack';
+
+  @override
+  String get slotProteina => 'Protein';
+
+  @override
+  String get slotCarboidrati => 'Carbs';
+
+  @override
+  String get slotVerdura => 'Vegetables';
+
+  @override
+  String get slotGrassi => 'Fats';
+
+  @override
+  String get slotExtra => 'Extra';
+
+  @override
+  String get slotFrutta => 'Fruit';
 }

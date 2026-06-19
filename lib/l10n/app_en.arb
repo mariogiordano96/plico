@@ -1,4 +1,18 @@
 {
   "@@locale": "en",
-  "appName": "Plico"
+  "appName": "Plico",
+
+  "pastoColazione": "Breakfast",
+  "pastoPranzo": "Lunch",
+  "pastoCena": "Dinner",
+  "pastoSpuntino": "Snack",
+  "pastoPostWo": "Post-WO",
+  "pastoSpuntinoSerale": "Evening snack",
+
+  "slotProteina": "Protein",
+  "slotCarboidrati": "Carbs",
+  "slotVerdura": "Vegetables",
+  "slotGrassi": "Fats",
+  "slotExtra": "Extra",
+  "slotFrutta": "Fruit"
 }

@@ -533,7 +533,7 @@ class _MealHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label = PianoService.pastoLabels[tipo.clamp(0, 5)];
+    final label = PianoService.pastoLabel(context.l10n, tipo);
     final emoji = PianoService.pastoEmoji[tipo.clamp(0, 5)];
     return Row(
       children: [
@@ -573,7 +573,7 @@ class _SlotCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final food = slot.principale!;
-    final slotLabel = PianoService.slotLabels[slot.tipo.clamp(0, 5)];
+    final slotLabel = PianoService.slotLabel(context.l10n, slot.tipo);
     final slotEmoji = PianoService.slotEmoji[slot.tipo.clamp(0, 5)];
 
     return Opacity(
