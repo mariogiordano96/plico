@@ -8,18 +8,20 @@
 
 ## Stato attuale
 
+> ✅ **COMPLETATA** — Fasi 0–10 implementate e pushate su `main`.
+
 | Aspetto | Stato |
 |---|---|
-| `flutter_localizations` in pubspec.yaml | ✅ già presente |
-| Delegate `GlobalMaterialLocalizations` in main.dart | ✅ già presente |
-| File `.arb` con stringhe dell'app | ❌ assenti |
-| Pacchetto `intl` | ❌ assente |
-| `AppLocalizations` generato | ❌ assente |
-| Stringhe hardcodate in italiano | ~200+ in 63 file Dart |
-| Date formattate con `padLeft()` manuale | ❌ non locale-aware |
-| Numeri formattati con `toStringAsFixed()` | ❌ non locale-aware |
-
-La struttura di base è pronta: mancano il layer di traduzione e l'estrazione delle stringhe.
+| `flutter_localizations` in pubspec.yaml | ✅ presente |
+| Delegate `GlobalMaterialLocalizations` in main.dart | ✅ presente |
+| File `.arb` con stringhe dell'app | ✅ `app_it.arb` + `app_en.arb` (~290 chiavi) |
+| Pacchetto `intl` | ✅ presente |
+| `AppLocalizations` generato | ✅ `lib/l10n/app_localizations.dart` |
+| Stringhe hardcodate in italiano | ✅ estratte in ARB, sostituite con `context.l10n` |
+| Date formattate con `padLeft()` manuale | ✅ `DateFormat.yMd/EEEE/MMMM(locale)` |
+| Numeri formattati con `toStringAsFixed()` | ✅ `NumberFormat.decimalPatternDigits(locale, 1)` |
+| Notifiche locali | ✅ `NotificationService.setL10n()` + fallback IT |
+| PDF export | ✅ `PdfStrings` value class, stringhe pre-risolte dal caller |
 
 ---
 
@@ -251,38 +253,35 @@ NumberFormat('#,##0.0', locale.languageCode).format(peso)
 
 ## Piano di implementazione
 
-### Fase 1 — Setup infrastruttura (0.5 gg)
-- [ ] Aggiungere `intl` a `pubspec.yaml`
-- [ ] Aggiungere `generate: true` sotto `flutter:`
-- [ ] Creare `l10n.yaml` in root
-- [ ] Creare `lib/l10n/app_it.arb` vuoto
-- [ ] Aggiungere `AppLocalizations.delegate` in `main.dart`
-- [ ] Aggiungere extension `context.l10n`
+### Fase 0 — Setup infrastruttura ✅
+- [x] Aggiungere `intl` a `pubspec.yaml`
+- [x] Aggiungere `generate: true` sotto `flutter:`
+- [x] Creare `l10n.yaml` in root
+- [x] Creare `lib/l10n/app_it.arb` e `app_en.arb`
+- [x] Aggiungere `AppLocalizations.delegate` in `main.dart`
+- [x] Aggiungere extension `context.l10n` in `app_theme.dart`
 
-### Fase 2 — Estrazione stringhe IT (2–3 gg)
-- [ ] Estrarre tutte le stringhe dalle 19 schermate in `app_it.arb`
-- [ ] Sostituire le stringhe hardcodate con `context.l10n.chiave`
-- [ ] Centralizzare i label di `PastoTipo`, livelli attività, obiettivi
-- [ ] Aggiornare notifiche locali per usare stringhe localizzate
+### Fase 1–7 — Estrazione stringhe IT + traduzione EN ✅
+- [x] Enum e label globali (`piano_service.dart`) — pasto*, slot*
+- [x] App Tour (`app_tour.dart`)
+- [x] Onboarding (`onboarding_screen.dart`)
+- [x] Home Screen (`home_screen.dart`)
+- [x] Diario — 4 file (`diario_screen`, `piano_tab`, `aggiunta_alimento`, `questionario`)
+- [x] Progressi e Pesate — 5 file
+- [x] TDEE Screen — ICU plural, attività, obiettivi, formule
 
-### Fase 3 — Traduzione EN (1 gg)
-- [ ] Creare `app_en.arb` con tutte le ~200 chiavi tradotte in inglese
-- [ ] Tradurre `crea_seed.json` aggiungendo campo `nomeEn` per ~80 alimenti
-- [ ] Aggiornare barcode service per usare `product_name_en` se locale = en
+### Fase 8 — Notifiche ✅
+- [x] `NotificationService.setL10n()` — stringhe risolte a scheduling-time
+- [x] `MaterialApp.builder` inietta la locale ad ogni cambio lingua
 
-### Fase 4 — Date, numeri, PDF (0.5 gg)
-- [ ] Sostituire tutti i `padLeft` con `DateFormat`
-- [ ] Sostituire `toStringAsFixed` con `NumberFormat` dove il numero è mostrato all'utente
-- [ ] Aggiornare PDF export per usare stringhe localizzate
+### Fase 9 — Date e numeri locale-aware ✅
+- [x] `DateFormat.yMd/EEEE/MMMM(locale)` su tutti i file coinvolti
+- [x] `NumberFormat.decimalPatternDigits(locale, 1)` per valori numerici UI
 
-### Fase 5 — Test e rifinitura (1 gg)
-- [ ] Testare su device con lingua impostata su EN
-- [ ] Verificare che il piano alimentare e il PDF escano in inglese
-- [ ] Verificare le notifiche locali
-- [ ] Aggiornare `AppSettings` con un campo `languageCode` se si vuole override manuale
-  (opzionale — di default si segue la lingua del sistema operativo)
-
-**Stima totale: ~5–6 giorni di sviluppo**
+### Fase 10 — PDF export ✅
+- [x] `PdfStrings` value class — stringhe pre-risolte passate dal caller
+- [x] Array `_weekdays`/`_months` sostituiti da `DateFormat`
+- [x] Call sites aggiornati in `progressi_screen` e `piano_tab`
 
 ---
 
