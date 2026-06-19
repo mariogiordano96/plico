@@ -6,6 +6,7 @@ import 'package:printing/printing.dart';
 
 import '../models/daily_log.dart';
 import '../models/meal_entry.dart';
+import '../models/meal_plan.dart';
 import '../models/user_profile.dart';
 import '../models/body_snapshot.dart';
 import '../services/database_service.dart';
@@ -450,6 +451,179 @@ class PdfExportService {
             style: pw.TextStyle(
                 font: font, fontSize: 9, color: PdfColors.grey500),
           ),
+      ],
+    );
+  }
+
+  // ── Piano alimentare PDF ───────────────────────────────────────
+
+  static const _pianoMealLabels = [
+    'Colazione', 'Pranzo', 'Cena', 'Spuntino', 'Post-WO', 'Spuntino serale'
+  ];
+  static const _pianoSlotLabels = [
+    'Proteina', 'Carboidrati', 'Verdura', 'Grassi', 'Extra', 'Frutta'
+  ];
+
+  static Future<Uint8List> generatePiano(MealPlan plan) async {
+    final db = DatabaseService.instance;
+    final profile = await db.getUserProfile();
+    final font = await PdfGoogleFonts.notoSansRegular();
+    final bold = await PdfGoogleFonts.notoSansBold();
+
+    final userName = profile != null
+        ? '${profile.nome} ${profile.cognome}'.trim()
+        : '';
+    final created =
+        '${plan.dataCreazione.day.toString().padLeft(2, '0')}/'
+        '${plan.dataCreazione.month.toString().padLeft(2, '0')}/'
+        '${plan.dataCreazione.year}';
+
+    final doc = pw.Document(compress: true);
+    doc.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+        header: (_) => _buildPianoHeader(
+          userName: userName,
+          created: created,
+          plan: plan,
+          font: font,
+          bold: bold,
+        ),
+        footer: (ctx) => _buildFooter(ctx, font),
+        build: (_) => [
+          pw.SizedBox(height: 12),
+          ...plan.pasti.map((meal) => _buildPianoMeal(meal, font, bold)),
+        ],
+      ),
+    );
+    return doc.save();
+  }
+
+  static pw.Widget _buildPianoHeader({
+    required String userName,
+    required String created,
+    required MealPlan plan,
+    required pw.Font font,
+    required pw.Font bold,
+  }) {
+    final macro =
+        '${plan.kcalTotali.round()} kcal  ·  '
+        'P ${plan.proteineTotali.round()}g  ·  '
+        'G ${plan.grassiTotali.round()}g  ·  '
+        'C ${plan.carbsTotali.round()}g';
+
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          children: [
+            pw.Text('PLICO',
+                style: pw.TextStyle(font: bold, fontSize: 16, color: PdfColors.black)),
+            pw.Text('Piano Alimentare',
+                style: pw.TextStyle(font: font, fontSize: 11, color: PdfColors.grey600)),
+          ],
+        ),
+        pw.SizedBox(height: 2),
+        pw.Text('Generato il $created${userName.isNotEmpty ? '  ·  $userName' : ''}',
+            style: pw.TextStyle(font: bold, fontSize: 11, color: PdfColors.grey800)),
+        pw.Text(macro,
+            style: pw.TextStyle(font: font, fontSize: 9, color: PdfColors.grey600)),
+        pw.SizedBox(height: 6),
+        pw.Divider(thickness: 0.5, color: PdfColors.grey400),
+      ],
+    );
+  }
+
+  static pw.Widget _buildPianoMeal(PlanMeal meal, pw.Font font, pw.Font bold) {
+    final label = meal.tipo < _pianoMealLabels.length
+        ? _pianoMealLabels[meal.tipo]
+        : 'Pasto';
+    final validSlots = meal.slots.where((s) => s.principale != null).toList();
+    if (validSlots.isEmpty) return pw.SizedBox();
+
+    final mealKcal = validSlots.fold(
+        0.0, (s, slot) => s + (slot.principale?.kcal ?? 0));
+
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        // Meal header
+        pw.Container(
+          color: PdfColors.grey100,
+          padding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+          child: pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Text(label.toUpperCase(),
+                  style: pw.TextStyle(font: bold, fontSize: 9, color: PdfColors.grey900)),
+              pw.Text('${mealKcal.round()} kcal',
+                  style: pw.TextStyle(font: font, fontSize: 9, color: PdfColors.grey700)),
+            ],
+          ),
+        ),
+        pw.SizedBox(height: 4),
+        // Slots
+        ...validSlots.map((slot) {
+          final slotLabel = slot.tipo < _pianoSlotLabels.length
+              ? _pianoSlotLabels[slot.tipo]
+              : '';
+          final f = slot.principale!;
+          final alts = slot.alternative
+              .where((a) => a.nome.isNotEmpty)
+              .toList();
+          return pw.Padding(
+            padding: const pw.EdgeInsets.fromLTRB(6, 2, 6, 4),
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Row(
+                  children: [
+                    pw.SizedBox(
+                      width: 64,
+                      child: pw.Text(slotLabel,
+                          style: pw.TextStyle(
+                              font: bold, fontSize: 8, color: PdfColors.grey500)),
+                    ),
+                    pw.Expanded(
+                      child: pw.Text(f.nome,
+                          style: pw.TextStyle(
+                              font: bold, fontSize: 9, color: PdfColors.grey900),
+                          maxLines: 1,
+                          overflow: pw.TextOverflow.clip),
+                    ),
+                    pw.SizedBox(width: 6),
+                    pw.Text('${f.quantitaG.round()}g',
+                        style: pw.TextStyle(font: font, fontSize: 8, color: PdfColors.grey600)),
+                    pw.SizedBox(width: 6),
+                    pw.Text('${f.kcal.round()} kcal',
+                        style: pw.TextStyle(font: font, fontSize: 8, color: PdfColors.grey700)),
+                    pw.SizedBox(width: 6),
+                    pw.Text(
+                        'P${f.proteine.round()} G${f.grassi.round()} C${f.carboidrati.round()}',
+                        style: pw.TextStyle(font: font, fontSize: 7.5, color: PdfColors.grey500)),
+                  ],
+                ),
+                if (alts.isNotEmpty)
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.only(left: 64, top: 1),
+                    child: pw.Text(
+                      'Alt: ${alts.map((a) => '${a.nome} (${a.quantitaG.round()}g)').join(', ')}',
+                      style: pw.TextStyle(
+                          font: font,
+                          fontSize: 7.5,
+                          fontStyle: pw.FontStyle.italic,
+                          color: PdfColors.grey500),
+                      maxLines: 1,
+                      overflow: pw.TextOverflow.clip,
+                    ),
+                  ),
+              ],
+            ),
+          );
+        }),
+        pw.SizedBox(height: 6),
       ],
     );
   }

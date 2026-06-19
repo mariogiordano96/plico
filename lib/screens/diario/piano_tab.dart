@@ -7,6 +7,8 @@ import '../../models/meal_entry.dart';
 import '../../models/user_food_preferences.dart';
 import '../../services/achievement_service.dart';
 import '../../services/database_service.dart';
+import 'package:printing/printing.dart';
+import '../../services/pdf_export_service.dart';
 import '../../services/piano_service.dart';
 import 'questionario_screen.dart';
 
@@ -86,6 +88,19 @@ class _PianoTabState extends State<PianoTab> {
   Future<void> _rigenera() async {
     await DatabaseService.instance.markPlanObsoleto(false);
     await _generaPiano();
+  }
+
+  Future<void> _exportPdf() async {
+    if (_plan == null) return;
+    try {
+      final bytes = await PdfExportService.generatePiano(_plan!);
+      await Printing.sharePdf(bytes: bytes, filename: 'plico_piano_alimentare.pdf');
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Errore durante la generazione del PDF')),
+      );
+    }
   }
 
   Future<void> _openQuestionario() async {
@@ -228,7 +243,16 @@ class _PianoTabState extends State<PianoTab> {
             const SizedBox(height: 12),
           ],
           _PlanHeaderCard(plan: plan, p: p),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: _exportPdf,
+              icon: Icon(Icons.picture_as_pdf_rounded, size: 18, color: p.accent),
+              label: Text('Esporta PDF', style: TextStyle(color: p.accent, fontSize: 13)),
+            ),
+          ),
+          const SizedBox(height: 8),
 
           // Pasti
           ...plan.pasti.asMap().entries.expand((mealEntry) {

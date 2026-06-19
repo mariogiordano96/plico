@@ -236,15 +236,15 @@ class _DiarioScreenState extends State<DiarioScreen> {
             labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 0.8),
             unselectedLabelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
             tabs: const [
-              Tab(text: 'DIARIO'),
               Tab(text: 'PIANO'),
+              Tab(text: 'DIARIO'),
             ],
           ),
         ),
         body: TabBarView(
           children: [
-            _buildDiarioTab(p),
             PianoTab(currentDate: _date, onEntryAdded: _load),
+            _buildDiarioTab(p),
           ],
         ),
       ),
