@@ -465,5 +465,30 @@
   "notifPesataBody": "Non ti pesi da {days} giorni. Vuoi registrare il tuo peso?",
   "@notifPesataBody": {
     "placeholders": { "days": { "type": "int" } }
+  },
+
+  "pdfDiarioTitle": "Diario Alimentare",
+  "pdfTargetLabel": "target",
+  "pdfPagina": "pagina {page} di {total}",
+  "@pdfPagina": {
+    "placeholders": { "page": { "type": "int" }, "total": { "type": "int" } }
+  },
+  "pdfNessunDato": "Nessun dato registrato",
+  "pdfPastoFallback": "Pasto",
+  "pdfRiepilogo": "RIEPILOGO",
+  "pdfGiorniConDati": "Giorni con dati: {withData}/{days}",
+  "@pdfGiorniConDati": {
+    "placeholders": { "withData": { "type": "int" }, "days": { "type": "int" } }
+  },
+  "pdfGiorniOnTarget": "Giorni on-target (90–105%): {onTarget}/{total}",
+  "@pdfGiorniOnTarget": {
+    "placeholders": { "onTarget": { "type": "int" }, "total": { "type": "int" } }
+  },
+  "pdfMediaLabel": "Media giornaliera:",
+  "pdfTargetPrefix": "Target:",
+  "pdfPianoTitle": "Piano Alimentare",
+  "pdfGenerato": "Generato il {created}",
+  "@pdfGenerato": {
+    "placeholders": { "created": { "type": "String" } }
   }
 }

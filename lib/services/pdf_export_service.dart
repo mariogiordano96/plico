@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -12,30 +13,57 @@ import '../models/body_snapshot.dart';
 import '../services/database_service.dart';
 import '../screens/tdee/tdee_screen.dart' show calcolaTdee;
 
-const _weekdays = [
-  'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì',
-  'Venerdì', 'Sabato', 'Domenica'
-];
-const _months = [
-  'gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno',
-  'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'
-];
-const _pastoLabels = [
-  'Colazione', 'Pranzo', 'Cena', 'Spuntino', 'Post-WO', 'Spuntino serale'
-];
 const _goalMult = [0.80, 1.0, 1.15];
+
+/// Pre-resolved PDF strings. Build from AppLocalizations in the widget layer
+/// and pass to PDF generation methods (which have no BuildContext).
+class PdfStrings {
+  final String diarioTitle;
+  final String targetLabel;
+  final String kcalGiornoUnit;
+  final String Function(int page, int total) footerPage;
+  final String nessunoRegistrato;
+  final String pastoFallback;
+  final List<String> pastoLabels;
+  final String riepilogo;
+  final String Function(int withData, int days) giorniConDati;
+  final String Function(int onTarget, int total) giorniOnTarget;
+  final String mediaLabel;
+  final String targetPrefixLabel;
+  final String pianoTitle;
+  final String Function(String created) generato;
+  final List<String> pianoSlotLabels;
+
+  const PdfStrings({
+    required this.diarioTitle,
+    required this.targetLabel,
+    required this.kcalGiornoUnit,
+    required this.footerPage,
+    required this.nessunoRegistrato,
+    required this.pastoFallback,
+    required this.pastoLabels,
+    required this.riepilogo,
+    required this.giorniConDati,
+    required this.giorniOnTarget,
+    required this.mediaLabel,
+    required this.targetPrefixLabel,
+    required this.pianoTitle,
+    required this.generato,
+    required this.pianoSlotLabels,
+  });
+}
 
 class PdfExportService {
   PdfExportService._();
 
-  /// Genera il PDF del diario dal [from] al [to] e restituisce i byte.
   static Future<Uint8List> generateDiario({
     required DateTime from,
     required DateTime to,
+    required PdfStrings strings,
+    required String locale,
   }) async {
     final db = DatabaseService.instance;
 
-    // ── Dati utente ──────────────────────────────────────────────
     final profile = await db.getUserProfile();
     final snapshot = await db.getLatestBodySnapshot();
     final session = await db.getLatestPlicometrySession();
@@ -44,7 +72,6 @@ class PdfExportService {
     final obiettivo = await db.getObiettivo();
     final logs = await db.getDailyLogsRange(from, to);
 
-    // ── Target ───────────────────────────────────────────────────
     int? kcalTarget, protTarget, fatTarget;
     if (profile != null && snapshot != null) {
       final r = calcolaTdee(
@@ -70,7 +97,6 @@ class PdfExportService {
       }
     }
 
-    // ── Font ─────────────────────────────────────────────────────
     final font = await PdfGoogleFonts.notoSansRegular();
     final bold = await PdfGoogleFonts.notoSansBold();
 
@@ -85,6 +111,8 @@ class PdfExportService {
       fatTarget: fatTarget,
       font: font,
       bold: bold,
+      strings: strings,
+      locale: locale,
     );
   }
 
@@ -99,6 +127,8 @@ class PdfExportService {
     required int? fatTarget,
     required pw.Font font,
     required pw.Font bold,
+    required PdfStrings strings,
+    required String locale,
   }) async {
     final doc = pw.Document(compress: true);
     final logMap = {for (final l in logs) _dayOnly(l.data): l};
@@ -117,7 +147,9 @@ class PdfExportService {
     final pesoStr = snapshot != null
         ? '${snapshot.pesoKg.toStringAsFixed(1)} kg'
         : '';
-    final targetStr = kcalTarget != null ? '$kcalTarget kcal/giorno' : '';
+    final targetStr = kcalTarget != null
+        ? '$kcalTarget ${strings.kcalGiornoUnit}'
+        : '';
 
     doc.addPage(
       pw.MultiPage(
@@ -131,8 +163,10 @@ class PdfExportService {
           targetStr: targetStr,
           font: font,
           bold: bold,
+          strings: strings,
+          locale: locale,
         ),
-        footer: (ctx) => _buildFooter(ctx, font),
+        footer: (ctx) => _buildFooter(ctx, font, strings),
         build: (ctx) => [
           pw.SizedBox(height: 12),
           ...days.map((d) => _buildDaySection(
@@ -141,6 +175,8 @@ class PdfExportService {
                 kcalTarget: kcalTarget,
                 font: font,
                 bold: bold,
+                strings: strings,
+                locale: locale,
               )),
           pw.SizedBox(height: 8),
           _buildSummary(
@@ -151,6 +187,7 @@ class PdfExportService {
             fatTarget: fatTarget,
             font: font,
             bold: bold,
+            strings: strings,
           ),
         ],
       ),
@@ -169,15 +206,19 @@ class PdfExportService {
     required String targetStr,
     required pw.Font font,
     required pw.Font bold,
+    required PdfStrings strings,
+    required String locale,
   }) {
+    final monthFmt = DateFormat.MMMM(locale);
+    final dateFmt = DateFormat.yMd(locale);
     final period = from.month == to.month && from.year == to.year
-        ? '${from.day}–${to.day} ${_months[from.month - 1]} ${from.year}'
-        : '${_fmtDate(from)} – ${_fmtDate(to)}';
+        ? '${from.day}–${to.day} ${monthFmt.format(from)} ${from.year}'
+        : '${dateFmt.format(from)} – ${dateFmt.format(to)}';
 
     final subtitles = [
       if (userName.isNotEmpty) userName,
       if (pesoStr.isNotEmpty) pesoStr,
-      if (targetStr.isNotEmpty) 'target $targetStr',
+      if (targetStr.isNotEmpty) '${strings.targetLabel} $targetStr',
     ].join('  ·  ');
 
     return pw.Column(
@@ -189,7 +230,7 @@ class PdfExportService {
             pw.Text('PLICO',
                 style: pw.TextStyle(
                     font: bold, fontSize: 16, color: PdfColors.black)),
-            pw.Text('Diario Alimentare',
+            pw.Text(strings.diarioTitle,
                 style: pw.TextStyle(
                     font: font, fontSize: 11, color: PdfColors.grey600)),
           ],
@@ -210,13 +251,13 @@ class PdfExportService {
 
   // ── Footer pagina ──────────────────────────────────────────────
 
-  static pw.Widget _buildFooter(pw.Context ctx, pw.Font font) {
+  static pw.Widget _buildFooter(
+      pw.Context ctx, pw.Font font, PdfStrings strings) {
     return pw.Align(
       alignment: pw.Alignment.centerRight,
       child: pw.Text(
-        'pagina ${ctx.pageNumber} di ${ctx.pagesCount}',
-        style:
-            pw.TextStyle(font: font, fontSize: 8, color: PdfColors.grey500),
+        strings.footerPage(ctx.pageNumber, ctx.pagesCount),
+        style: pw.TextStyle(font: font, fontSize: 8, color: PdfColors.grey500),
       ),
     );
   }
@@ -229,9 +270,11 @@ class PdfExportService {
     required int? kcalTarget,
     required pw.Font font,
     required pw.Font bold,
+    required PdfStrings strings,
+    required String locale,
   }) {
     final dayLabel =
-        '${_weekdays[date.weekday - 1].toUpperCase()}  ${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+        '${DateFormat.EEEE(locale).format(date).toUpperCase()}  ${DateFormat.yMd(locale).format(date)}';
 
     final hasEntries = log != null && log.entries.isNotEmpty;
     final totalKcal = log?.kcalTotali ?? 0.0;
@@ -242,7 +285,6 @@ class PdfExportService {
         ? (totalKcal / kcalTarget * 100).round()
         : null;
 
-    // Raggruppa per tipo pasto
     final byMeal = <int, List<MealEntry>>{};
     for (final e in log?.entries ?? <MealEntry>[]) {
       byMeal.putIfAbsent(e.pastoTipo, () => []).add(e);
@@ -252,11 +294,9 @@ class PdfExportService {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        // ── Day header ─────────────────────────────────
         pw.Container(
           color: PdfColors.grey100,
-          padding:
-              const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+          padding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 4),
           child: pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
@@ -273,11 +313,10 @@ class PdfExportService {
             ],
           ),
         ),
-        // ── Contenuto ─────────────────────────────────
         if (!hasEntries)
           pw.Padding(
             padding: const pw.EdgeInsets.fromLTRB(6, 4, 0, 6),
-            child: pw.Text('Nessun dato registrato',
+            child: pw.Text(strings.nessunoRegistrato,
                 style: pw.TextStyle(
                     font: font,
                     fontSize: 9,
@@ -287,9 +326,9 @@ class PdfExportService {
         else ...[
           pw.SizedBox(height: 4),
           ...mealOrder.map((tipo) {
-            final label = tipo < _pastoLabels.length
-                ? _pastoLabels[tipo]
-                : 'Pasto';
+            final label = tipo < strings.pastoLabels.length
+                ? strings.pastoLabels[tipo]
+                : strings.pastoFallback;
             final entries = byMeal[tipo]!;
             return pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -303,8 +342,7 @@ class PdfExportService {
                           color: PdfColors.grey800)),
                 ),
                 ...entries.map((e) => pw.Padding(
-                      padding:
-                          const pw.EdgeInsets.fromLTRB(14, 1, 6, 1),
+                      padding: const pw.EdgeInsets.fromLTRB(14, 1, 6, 1),
                       child: pw.Row(
                         children: [
                           pw.Expanded(
@@ -395,6 +433,7 @@ class PdfExportService {
     required int? fatTarget,
     required pw.Font font,
     required pw.Font bold,
+    required PdfStrings strings,
   }) {
     final withData = logs.where((l) => l.entries.isNotEmpty).toList();
     if (withData.isEmpty) return pw.SizedBox();
@@ -421,30 +460,30 @@ class PdfExportService {
       children: [
         pw.Divider(thickness: 0.5, color: PdfColors.grey400),
         pw.SizedBox(height: 6),
-        pw.Text('RIEPILOGO',
+        pw.Text(strings.riepilogo,
             style: pw.TextStyle(
                 font: bold, fontSize: 10, color: PdfColors.grey900)),
         pw.SizedBox(height: 5),
         pw.Text(
-          'Giorni con dati: ${withData.length}/$days',
+          strings.giorniConDati(withData.length, days),
           style:
               pw.TextStyle(font: font, fontSize: 9, color: PdfColors.grey700),
         ),
         if (kcalTarget != null)
           pw.Text(
-            'Giorni on-target (90–105%): $onTarget/${withData.length}',
+            strings.giorniOnTarget(onTarget, withData.length),
             style: pw.TextStyle(
                 font: font, fontSize: 9, color: PdfColors.grey700),
           ),
         pw.SizedBox(height: 4),
         pw.Text(
-          'Media giornaliera: ${avgKcal.round()} kcal  ·  P ${avgProt.round()}g  ·  G ${avgFat.round()}g  ·  C ${avgCarbs.round()}g',
+          '${strings.mediaLabel} ${avgKcal.round()} kcal  ·  P ${avgProt.round()}g  ·  G ${avgFat.round()}g  ·  C ${avgCarbs.round()}g',
           style:
               pw.TextStyle(font: font, fontSize: 9, color: PdfColors.grey700),
         ),
         if (kcalTarget != null || protTarget != null || fatTarget != null)
           pw.Text(
-            'Target: '
+            '${strings.targetPrefixLabel} '
             '${kcalTarget != null ? '$kcalTarget kcal  ·  ' : ''}'
             '${protTarget != null ? 'P ${protTarget}g  ·  ' : ''}'
             '${fatTarget != null ? 'G ${fatTarget}g' : ''}',
@@ -457,14 +496,11 @@ class PdfExportService {
 
   // ── Piano alimentare PDF ───────────────────────────────────────
 
-  static const _pianoMealLabels = [
-    'Colazione', 'Pranzo', 'Cena', 'Spuntino', 'Post-WO', 'Spuntino serale'
-  ];
-  static const _pianoSlotLabels = [
-    'Proteina', 'Carboidrati', 'Verdura', 'Grassi', 'Extra', 'Frutta'
-  ];
-
-  static Future<Uint8List> generatePiano(MealPlan plan) async {
+  static Future<Uint8List> generatePiano(
+    MealPlan plan, {
+    required PdfStrings strings,
+    required String locale,
+  }) async {
     final db = DatabaseService.instance;
     final profile = await db.getUserProfile();
     final font = await PdfGoogleFonts.notoSansRegular();
@@ -473,10 +509,7 @@ class PdfExportService {
     final userName = profile != null
         ? '${profile.nome} ${profile.cognome}'.trim()
         : '';
-    final created =
-        '${plan.dataCreazione.day.toString().padLeft(2, '0')}/'
-        '${plan.dataCreazione.month.toString().padLeft(2, '0')}/'
-        '${plan.dataCreazione.year}';
+    final created = DateFormat.yMd(locale).format(plan.dataCreazione);
 
     final doc = pw.Document(compress: true);
     doc.addPage(
@@ -489,11 +522,12 @@ class PdfExportService {
           plan: plan,
           font: font,
           bold: bold,
+          strings: strings,
         ),
-        footer: (ctx) => _buildFooter(ctx, font),
+        footer: (ctx) => _buildFooter(ctx, font, strings),
         build: (_) => [
           pw.SizedBox(height: 12),
-          ...plan.pasti.map((meal) => _buildPianoMeal(meal, font, bold)),
+          ...plan.pasti.map((meal) => _buildPianoMeal(meal, font, bold, strings)),
         ],
       ),
     );
@@ -506,9 +540,9 @@ class PdfExportService {
     required MealPlan plan,
     required pw.Font font,
     required pw.Font bold,
+    required PdfStrings strings,
   }) {
-    final macro =
-        '${plan.kcalTotali.round()} kcal  ·  '
+    final macro = '${plan.kcalTotali.round()} kcal  ·  '
         'P ${plan.proteineTotali.round()}g  ·  '
         'G ${plan.grassiTotali.round()}g  ·  '
         'C ${plan.carbsTotali.round()}g';
@@ -520,36 +554,41 @@ class PdfExportService {
           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
           children: [
             pw.Text('PLICO',
-                style: pw.TextStyle(font: bold, fontSize: 16, color: PdfColors.black)),
-            pw.Text('Piano Alimentare',
-                style: pw.TextStyle(font: font, fontSize: 11, color: PdfColors.grey600)),
+                style: pw.TextStyle(
+                    font: bold, fontSize: 16, color: PdfColors.black)),
+            pw.Text(strings.pianoTitle,
+                style: pw.TextStyle(
+                    font: font, fontSize: 11, color: PdfColors.grey600)),
           ],
         ),
         pw.SizedBox(height: 2),
-        pw.Text('Generato il $created${userName.isNotEmpty ? '  ·  $userName' : ''}',
-            style: pw.TextStyle(font: bold, fontSize: 11, color: PdfColors.grey800)),
+        pw.Text(
+          '${strings.generato(created)}${userName.isNotEmpty ? '  ·  $userName' : ''}',
+          style: pw.TextStyle(
+              font: bold, fontSize: 11, color: PdfColors.grey800)),
         pw.Text(macro,
-            style: pw.TextStyle(font: font, fontSize: 9, color: PdfColors.grey600)),
+            style: pw.TextStyle(
+                font: font, fontSize: 9, color: PdfColors.grey600)),
         pw.SizedBox(height: 6),
         pw.Divider(thickness: 0.5, color: PdfColors.grey400),
       ],
     );
   }
 
-  static pw.Widget _buildPianoMeal(PlanMeal meal, pw.Font font, pw.Font bold) {
-    final label = meal.tipo < _pianoMealLabels.length
-        ? _pianoMealLabels[meal.tipo]
-        : 'Pasto';
+  static pw.Widget _buildPianoMeal(
+      PlanMeal meal, pw.Font font, pw.Font bold, PdfStrings strings) {
+    final label = meal.tipo < strings.pastoLabels.length
+        ? strings.pastoLabels[meal.tipo]
+        : strings.pastoFallback;
     final validSlots = meal.slots.where((s) => s.principale != null).toList();
     if (validSlots.isEmpty) return pw.SizedBox();
 
-    final mealKcal = validSlots.fold(
-        0.0, (s, slot) => s + (slot.principale?.kcal ?? 0));
+    final mealKcal =
+        validSlots.fold(0.0, (s, slot) => s + (slot.principale?.kcal ?? 0));
 
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        // Meal header
         pw.Container(
           color: PdfColors.grey100,
           padding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 4),
@@ -557,22 +596,22 @@ class PdfExportService {
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
               pw.Text(label.toUpperCase(),
-                  style: pw.TextStyle(font: bold, fontSize: 9, color: PdfColors.grey900)),
+                  style: pw.TextStyle(
+                      font: bold, fontSize: 9, color: PdfColors.grey900)),
               pw.Text('${mealKcal.round()} kcal',
-                  style: pw.TextStyle(font: font, fontSize: 9, color: PdfColors.grey700)),
+                  style: pw.TextStyle(
+                      font: font, fontSize: 9, color: PdfColors.grey700)),
             ],
           ),
         ),
         pw.SizedBox(height: 4),
-        // Slots
         ...validSlots.map((slot) {
-          final slotLabel = slot.tipo < _pianoSlotLabels.length
-              ? _pianoSlotLabels[slot.tipo]
+          final slotLabel = slot.tipo < strings.pianoSlotLabels.length
+              ? strings.pianoSlotLabels[slot.tipo]
               : '';
           final f = slot.principale!;
-          final alts = slot.alternative
-              .where((a) => a.nome.isNotEmpty)
-              .toList();
+          final alts =
+              slot.alternative.where((a) => a.nome.isNotEmpty).toList();
           return pw.Padding(
             padding: const pw.EdgeInsets.fromLTRB(6, 2, 6, 4),
             child: pw.Column(
@@ -584,25 +623,38 @@ class PdfExportService {
                       width: 64,
                       child: pw.Text(slotLabel,
                           style: pw.TextStyle(
-                              font: bold, fontSize: 8, color: PdfColors.grey500)),
+                              font: bold,
+                              fontSize: 8,
+                              color: PdfColors.grey500)),
                     ),
                     pw.Expanded(
                       child: pw.Text(f.nome,
                           style: pw.TextStyle(
-                              font: bold, fontSize: 9, color: PdfColors.grey900),
+                              font: bold,
+                              fontSize: 9,
+                              color: PdfColors.grey900),
                           maxLines: 1,
                           overflow: pw.TextOverflow.clip),
                     ),
                     pw.SizedBox(width: 6),
                     pw.Text('${f.quantitaG.round()}g',
-                        style: pw.TextStyle(font: font, fontSize: 8, color: PdfColors.grey600)),
+                        style: pw.TextStyle(
+                            font: font,
+                            fontSize: 8,
+                            color: PdfColors.grey600)),
                     pw.SizedBox(width: 6),
                     pw.Text('${f.kcal.round()} kcal',
-                        style: pw.TextStyle(font: font, fontSize: 8, color: PdfColors.grey700)),
+                        style: pw.TextStyle(
+                            font: font,
+                            fontSize: 8,
+                            color: PdfColors.grey700)),
                     pw.SizedBox(width: 6),
                     pw.Text(
                         'P${f.proteine.round()} G${f.grassi.round()} C${f.carboidrati.round()}',
-                        style: pw.TextStyle(font: font, fontSize: 7.5, color: PdfColors.grey500)),
+                        style: pw.TextStyle(
+                            font: font,
+                            fontSize: 7.5,
+                            color: PdfColors.grey500)),
                   ],
                 ),
                 if (alts.isNotEmpty)
@@ -631,7 +683,4 @@ class PdfExportService {
   // ── Helpers ────────────────────────────────────────────────────
 
   static DateTime _dayOnly(DateTime d) => DateTime(d.year, d.month, d.day);
-
-  static String _fmtDate(DateTime d) =>
-      '${d.day} ${_months[d.month - 1]} ${d.year}';
 }

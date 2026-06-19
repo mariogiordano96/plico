@@ -197,6 +197,32 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
     final to = DateTime(now.year, now.month, now.day);
     final from = to.subtract(Duration(days: days - 1));
 
+    final locale = Localizations.localeOf(context).toString();
+    final l10n = context.l10n;
+    final strings = PdfStrings(
+      diarioTitle: l10n.pdfDiarioTitle,
+      targetLabel: l10n.pdfTargetLabel,
+      kcalGiornoUnit: l10n.tdeeKcalGiornoUnit,
+      footerPage: l10n.pdfPagina,
+      nessunoRegistrato: l10n.pdfNessunDato,
+      pastoFallback: l10n.pdfPastoFallback,
+      pastoLabels: [
+        l10n.pastoColazione, l10n.pastoPranzo, l10n.pastoCena,
+        l10n.pastoSpuntino, l10n.pastoPostWo, l10n.pastoSpuntinoSerale,
+      ],
+      riepilogo: l10n.pdfRiepilogo,
+      giorniConDati: l10n.pdfGiorniConDati,
+      giorniOnTarget: l10n.pdfGiorniOnTarget,
+      mediaLabel: l10n.pdfMediaLabel,
+      targetPrefixLabel: l10n.pdfTargetPrefix,
+      pianoTitle: l10n.pdfPianoTitle,
+      generato: l10n.pdfGenerato,
+      pianoSlotLabels: [
+        l10n.slotProteina, l10n.slotCarboidrati, l10n.slotVerdura,
+        l10n.slotGrassi, l10n.slotExtra, l10n.slotFrutta,
+      ],
+    );
+
     if (!mounted) return;
     showDialog(
       context: context,
@@ -205,7 +231,8 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
     );
 
     try {
-      final bytes = await PdfExportService.generateDiario(from: from, to: to);
+      final bytes = await PdfExportService.generateDiario(
+          from: from, to: to, strings: strings, locale: locale);
       if (!mounted) return;
       Navigator.pop(context);
 

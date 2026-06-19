@@ -362,5 +362,18 @@
   "notifMattinoOnTarget": "Yesterday you ate {kcal} kcal out of {target}. Great job! 💪",
   "notifMattinoOffTarget": "Yesterday you logged {kcal} kcal out of {target} target.",
   "notifMattinoNoTarget": "Yesterday you logged {kcal} kcal.",
-  "notifPesataBody": "You haven't weighed in for {days} days. Want to log your weight?"
+  "notifPesataBody": "You haven't weighed in for {days} days. Want to log your weight?",
+
+  "pdfDiarioTitle": "Food Diary",
+  "pdfTargetLabel": "target",
+  "pdfPagina": "page {page} of {total}",
+  "pdfNessunDato": "No data recorded",
+  "pdfPastoFallback": "Meal",
+  "pdfRiepilogo": "SUMMARY",
+  "pdfGiorniConDati": "Days with data: {withData}/{days}",
+  "pdfGiorniOnTarget": "Days on-target (90–105%): {onTarget}/{total}",
+  "pdfMediaLabel": "Daily average:",
+  "pdfTargetPrefix": "Target:",
+  "pdfPianoTitle": "Meal Plan",
+  "pdfGenerato": "Generated on {created}"
 }
