@@ -57,7 +57,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   bool _validateStep2() {
     if (_sesso == null || _dataNascita == null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: const Text('Seleziona sesso e data di nascita'),
+        content: Text(context.l10n.onboardingSessoDataError),
         backgroundColor: context.palette.surface,
       ));
       return false;
@@ -128,6 +128,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -139,34 +140,55 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 onPageChanged: (i) => setState(() => _currentPage = i),
                 children: [
-                  _Step1(formKey: _formKey1, nomeController: _nomeController, cognomeController: _cognomeController,
-                      onNext: () { if (_validateStep1()) _nextPage(); }),
-                  _Step2(sesso: _sesso, dataNascita: _dataNascita,
-                      onSessoChanged: (s) => setState(() => _sesso = s),
-                      onPickDate: _pickDate,
-                      onNext: () { if (_validateStep2()) _nextPage(); },
-                      onBack: _prevPage),
-                  _Step3(formKey: _formKey3, altezzaController: _altezzaController,
-                      pesoController: _pesoController, bodyFatController: _bodyFatController,
-                      onNext: () { if (_validateStep3()) _nextPage(); },
-                      onBack: _prevPage),
+                  _Step1(
+                    formKey: _formKey1,
+                    nomeController: _nomeController,
+                    cognomeController: _cognomeController,
+                    l10n: l10n,
+                    onNext: () { if (_validateStep1()) _nextPage(); },
+                  ),
+                  _Step2(
+                    sesso: _sesso,
+                    dataNascita: _dataNascita,
+                    l10n: l10n,
+                    onSessoChanged: (s) => setState(() => _sesso = s),
+                    onPickDate: _pickDate,
+                    onNext: () { if (_validateStep2()) _nextPage(); },
+                    onBack: _prevPage,
+                  ),
+                  _Step3(
+                    formKey: _formKey3,
+                    altezzaController: _altezzaController,
+                    pesoController: _pesoController,
+                    bodyFatController: _bodyFatController,
+                    l10n: l10n,
+                    onNext: () { if (_validateStep3()) _nextPage(); },
+                    onBack: _prevPage,
+                  ),
                   _StepObiettivo(
-                      selected: _goal,
-                      onSelect: (v) => setState(() => _goal = v),
-                      onNext: _nextPage,
-                      onBack: _prevPage),
+                    selected: _goal,
+                    l10n: l10n,
+                    onSelect: (v) => setState(() => _goal = v),
+                    onNext: _nextPage,
+                    onBack: _prevPage,
+                  ),
                   _StepAttivita(
-                      selected: _livello,
-                      onSelect: (v) => setState(() => _livello = v),
-                      onNext: _nextPage,
-                      onBack: _prevPage),
-                  _Step4(selectedTheme: _selectedTheme,
-                      onThemeChanged: (t) {
-                        setState(() => _selectedTheme = t);
-                        themeNotifier.value = t;
-                      },
-                      onComplete: _complete,
-                      onBack: _prevPage),
+                    selected: _livello,
+                    l10n: l10n,
+                    onSelect: (v) => setState(() => _livello = v),
+                    onNext: _nextPage,
+                    onBack: _prevPage,
+                  ),
+                  _Step4(
+                    selectedTheme: _selectedTheme,
+                    l10n: l10n,
+                    onThemeChanged: (t) {
+                      setState(() => _selectedTheme = t);
+                      themeNotifier.value = t;
+                    },
+                    onComplete: _complete,
+                    onBack: _prevPage,
+                  ),
                 ],
               ),
             ),
@@ -219,10 +241,16 @@ class _Step1 extends StatelessWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController nomeController;
   final TextEditingController cognomeController;
+  final dynamic l10n;
   final VoidCallback onNext;
 
-  const _Step1({required this.formKey, required this.nomeController,
-      required this.cognomeController, required this.onNext});
+  const _Step1({
+    required this.formKey,
+    required this.nomeController,
+    required this.cognomeController,
+    required this.l10n,
+    required this.onNext,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -237,15 +265,21 @@ class _Step1 extends StatelessWidget {
             const SizedBox(height: 32),
             Text('PLICO', style: TextStyle(color: p.accent, fontSize: 13, letterSpacing: 4, fontWeight: FontWeight.w600)),
             const SizedBox(height: 12),
-            Text('Benvenuto.\nDimmi come ti chiami.', style: TextStyle(color: p.textPrimary, fontSize: 28, fontWeight: FontWeight.w700, height: 1.3)),
+            Text(l10n.onboardingWelcomeTitle, style: TextStyle(color: p.textPrimary, fontSize: 28, fontWeight: FontWeight.w700, height: 1.3)),
             const SizedBox(height: 48),
-            _OnboardingField(controller: nomeController, label: 'Nome',
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Inserisci il nome' : null),
+            _OnboardingField(
+              controller: nomeController,
+              label: l10n.onboardingNomeLabel,
+              validator: (v) => (v == null || v.trim().isEmpty) ? l10n.onboardingNomeError : null,
+            ),
             const SizedBox(height: 16),
-            _OnboardingField(controller: cognomeController, label: 'Cognome',
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Inserisci il cognome' : null),
+            _OnboardingField(
+              controller: cognomeController,
+              label: l10n.onboardingCognomeLabel,
+              validator: (v) => (v == null || v.trim().isEmpty) ? l10n.onboardingCognomeError : null,
+            ),
             const SizedBox(height: 48),
-            ElevatedButton(onPressed: onNext, child: const Text('CONTINUA')),
+            ElevatedButton(onPressed: onNext, child: Text(l10n.onboardingContinua)),
           ],
         ),
       ),
@@ -260,14 +294,21 @@ class _Step1 extends StatelessWidget {
 class _Step2 extends StatelessWidget {
   final Sesso? sesso;
   final DateTime? dataNascita;
+  final dynamic l10n;
   final ValueChanged<Sesso> onSessoChanged;
   final VoidCallback onPickDate;
   final VoidCallback onNext;
   final VoidCallback onBack;
 
-  const _Step2({required this.sesso, required this.dataNascita,
-      required this.onSessoChanged, required this.onPickDate,
-      required this.onNext, required this.onBack});
+  const _Step2({
+    required this.sesso,
+    required this.dataNascita,
+    required this.l10n,
+    required this.onSessoChanged,
+    required this.onPickDate,
+    required this.onNext,
+    required this.onBack,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -278,19 +319,19 @@ class _Step2 extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 32),
-          Text('Chi sei?', style: TextStyle(color: p.textPrimary, fontSize: 28, fontWeight: FontWeight.w700)),
+          Text(l10n.onboardingChiSeiTitle, style: TextStyle(color: p.textPrimary, fontSize: 28, fontWeight: FontWeight.w700)),
           const SizedBox(height: 48),
-          Text('SESSO', style: TextStyle(color: p.textMuted, fontSize: 11, letterSpacing: 2.5)),
+          Text(l10n.onboardingSessoLabel, style: TextStyle(color: p.textMuted, fontSize: 11, letterSpacing: 2.5)),
           const SizedBox(height: 12),
           Row(
             children: [
-              _SessoButton(label: 'Uomo', icon: Icons.male_rounded, selected: sesso == Sesso.maschio, onTap: () => onSessoChanged(Sesso.maschio)),
+              _SessoButton(label: l10n.onboardingUomo, icon: Icons.male_rounded, selected: sesso == Sesso.maschio, onTap: () => onSessoChanged(Sesso.maschio)),
               const SizedBox(width: 12),
-              _SessoButton(label: 'Donna', icon: Icons.female_rounded, selected: sesso == Sesso.femmina, onTap: () => onSessoChanged(Sesso.femmina)),
+              _SessoButton(label: l10n.onboardingDonna, icon: Icons.female_rounded, selected: sesso == Sesso.femmina, onTap: () => onSessoChanged(Sesso.femmina)),
             ],
           ),
           const SizedBox(height: 32),
-          Text('DATA DI NASCITA', style: TextStyle(color: p.textMuted, fontSize: 11, letterSpacing: 2.5)),
+          Text(l10n.onboardingDataNascitaLabel, style: TextStyle(color: p.textMuted, fontSize: 11, letterSpacing: 2.5)),
           const SizedBox(height: 12),
           GestureDetector(
             onTap: onPickDate,
@@ -309,7 +350,7 @@ class _Step2 extends StatelessWidget {
                   Text(
                     dataNascita != null
                         ? '${dataNascita!.day.toString().padLeft(2, '0')}/${dataNascita!.month.toString().padLeft(2, '0')}/${dataNascita!.year}'
-                        : 'Seleziona la data',
+                        : l10n.onboardingSelezionaData,
                     style: TextStyle(color: dataNascita != null ? p.textPrimary : p.textMuted, fontSize: 16),
                   ),
                 ],
@@ -317,9 +358,9 @@ class _Step2 extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 48),
-          ElevatedButton(onPressed: onNext, child: const Text('CONTINUA')),
+          ElevatedButton(onPressed: onNext, child: Text(l10n.onboardingContinua)),
           const SizedBox(height: 12),
-          TextButton(onPressed: onBack, child: Text('Indietro', style: TextStyle(color: p.textMuted))),
+          TextButton(onPressed: onBack, child: Text(l10n.onboardingIndietro, style: TextStyle(color: p.textMuted))),
         ],
       ),
     );
@@ -370,12 +411,19 @@ class _Step3 extends StatelessWidget {
   final TextEditingController altezzaController;
   final TextEditingController pesoController;
   final TextEditingController bodyFatController;
+  final dynamic l10n;
   final VoidCallback onNext;
   final VoidCallback onBack;
 
-  const _Step3({required this.formKey, required this.altezzaController,
-      required this.pesoController, required this.bodyFatController,
-      required this.onNext, required this.onBack});
+  const _Step3({
+    required this.formKey,
+    required this.altezzaController,
+    required this.pesoController,
+    required this.bodyFatController,
+    required this.l10n,
+    required this.onNext,
+    required this.onBack,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -388,50 +436,55 @@ class _Step3 extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 32),
-            Text('Le tue misure', style: TextStyle(color: p.textPrimary, fontSize: 28, fontWeight: FontWeight.w700)),
+            Text(l10n.onboardingMisureTitle, style: TextStyle(color: p.textPrimary, fontSize: 28, fontWeight: FontWeight.w700)),
             const SizedBox(height: 48),
             _OnboardingField(
-              controller: altezzaController, label: 'Altezza', suffix: 'cm',
+              controller: altezzaController,
+              label: l10n.onboardingAltezzaLabel,
+              suffix: 'cm',
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
               validator: (v) {
-                if (v == null || v.trim().isEmpty) return 'Inserisci l\'altezza';
+                if (v == null || v.trim().isEmpty) return l10n.onboardingAltezzaError;
                 final n = double.tryParse(v.trim());
-                if (n == null || n < 100 || n > 250) return 'Altezza non valida';
+                if (n == null || n < 100 || n > 250) return l10n.onboardingAltezzaInvalid;
                 return null;
               },
             ),
             const SizedBox(height: 16),
             _OnboardingField(
-              controller: pesoController, label: 'Peso attuale (opzionale)', suffix: 'kg',
+              controller: pesoController,
+              label: l10n.onboardingPesoLabel,
+              suffix: 'kg',
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
               validator: (v) {
                 if (v == null || v.trim().isEmpty) return null;
                 final n = double.tryParse(v.trim());
-                if (n == null || n < 20 || n > 300) return 'Peso non valido';
+                if (n == null || n < 20 || n > 300) return l10n.onboardingPesoInvalid;
                 return null;
               },
             ),
             const SizedBox(height: 16),
             _OnboardingField(
-              controller: bodyFatController, label: 'Body fat iniziale (opzionale)', suffix: '%',
+              controller: bodyFatController,
+              label: l10n.onboardingBodyFatLabel,
+              suffix: '%',
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
               validator: (v) {
                 if (v == null || v.trim().isEmpty) return null;
                 final n = double.tryParse(v.trim());
-                if (n == null || n < 1 || n > 70) return 'Valore non valido (1–70%)';
+                if (n == null || n < 1 || n > 70) return l10n.onboardingBodyFatInvalid;
                 return null;
               },
             ),
             const SizedBox(height: 8),
-            Text('Peso e body fat sono opzionali. Se inseriti, verranno salvati come punto di partenza nello storico.',
-                style: TextStyle(color: p.textMuted, fontSize: 12, height: 1.5)),
+            Text(l10n.onboardingMisureNote, style: TextStyle(color: p.textMuted, fontSize: 12, height: 1.5)),
             const SizedBox(height: 48),
-            ElevatedButton(onPressed: onNext, child: const Text('CONTINUA')),
+            ElevatedButton(onPressed: onNext, child: Text(l10n.onboardingContinua)),
             const SizedBox(height: 12),
-            TextButton(onPressed: onBack, child: Text('Indietro', style: TextStyle(color: p.textMuted))),
+            TextButton(onPressed: onBack, child: Text(l10n.onboardingIndietro, style: TextStyle(color: p.textMuted))),
           ],
         ),
       ),
@@ -445,12 +498,18 @@ class _Step3 extends StatelessWidget {
 
 class _Step4 extends StatelessWidget {
   final ThemeMode selectedTheme;
+  final dynamic l10n;
   final ValueChanged<ThemeMode> onThemeChanged;
   final VoidCallback onComplete;
   final VoidCallback onBack;
 
-  const _Step4({required this.selectedTheme, required this.onThemeChanged,
-      required this.onComplete, required this.onBack});
+  const _Step4({
+    required this.selectedTheme,
+    required this.l10n,
+    required this.onThemeChanged,
+    required this.onComplete,
+    required this.onBack,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -461,14 +520,14 @@ class _Step4 extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 32),
-          Text('Scegli il tema', style: TextStyle(color: p.textPrimary, fontSize: 28, fontWeight: FontWeight.w700)),
+          Text(l10n.onboardingTemaTitle, style: TextStyle(color: p.textPrimary, fontSize: 28, fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
-          Text('Potrai cambiarlo in qualsiasi momento dall\'app.', style: TextStyle(color: p.textMuted, fontSize: 13, height: 1.5)),
+          Text(l10n.onboardingTemaSubtitle, style: TextStyle(color: p.textMuted, fontSize: 13, height: 1.5)),
           const SizedBox(height: 40),
           Row(
             children: [
               Expanded(child: _ThemeCard(
-                label: 'Chiaro', icon: Icons.light_mode_rounded,
+                label: l10n.onboardingTemaChiaro, icon: Icons.light_mode_rounded,
                 selected: selectedTheme == ThemeMode.light,
                 bgColor: const Color(0xFFF2FAF5), surfaceColor: Colors.white,
                 accentColor: const Color(0xFF00995A), textColor: const Color(0xFF0A1A0F),
@@ -479,7 +538,7 @@ class _Step4 extends StatelessWidget {
               )),
               const SizedBox(width: 14),
               Expanded(child: _ThemeCard(
-                label: 'Scuro', icon: Icons.dark_mode_rounded,
+                label: l10n.onboardingTemaScuro, icon: Icons.dark_mode_rounded,
                 selected: selectedTheme == ThemeMode.dark,
                 bgColor: const Color(0xFF0B1622), surfaceColor: const Color(0xFF162035),
                 accentColor: const Color(0xFF00FF88), textColor: const Color(0xFFE8F2FF),
@@ -491,9 +550,9 @@ class _Step4 extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 48),
-          ElevatedButton(onPressed: onComplete, child: const Text('INIZIA')),
+          ElevatedButton(onPressed: onComplete, child: Text(l10n.onboardingInizia)),
           const SizedBox(height: 12),
-          TextButton(onPressed: onBack, child: Text('Indietro', style: TextStyle(color: p.textMuted))),
+          TextButton(onPressed: onBack, child: Text(l10n.onboardingIndietro, style: TextStyle(color: p.textMuted))),
         ],
       ),
     );
@@ -599,49 +658,56 @@ class _ThemeCard extends StatelessWidget {
 }
 
 // ──────────────────────────────────────────────
-// Step 4 — Obiettivo
+// Step Obiettivo
 // ──────────────────────────────────────────────
 
 class _StepObiettivo extends StatelessWidget {
   final int selected;
+  final dynamic l10n;
   final ValueChanged<int> onSelect;
   final VoidCallback onNext;
   final VoidCallback onBack;
 
   const _StepObiettivo({
     required this.selected,
+    required this.l10n,
     required this.onSelect,
     required this.onNext,
     required this.onBack,
   });
 
-  static const _items = [
-    (id: 0, label: 'Perdere peso', sub: 'Deficit −20%',
-        desc: 'Riduzione graduale del grasso corporeo mantenendo la massa muscolare',
-        icon: Icons.trending_down_rounded, color: Color(0xFF3B9FF2)),
-    (id: 1, label: 'Mantenermi', sub: 'Mantenimento',
-        desc: 'Ottimizza la composizione corporea senza cambiare il peso',
-        icon: Icons.balance_rounded, color: Color(0xFF00C48C)),
-    (id: 2, label: 'Aumentare massa', sub: 'Surplus +15%',
-        desc: 'Massimizza la crescita muscolare con un apporto calorico superiore',
-        icon: Icons.trending_up_rounded, color: Color(0xFFFF8C42)),
+  static const _icons = [
+    Icons.trending_down_rounded,
+    Icons.balance_rounded,
+    Icons.trending_up_rounded,
+  ];
+  static const _colors = [
+    Color(0xFF3B9FF2),
+    Color(0xFF00C48C),
+    Color(0xFFFF8C42),
   ];
 
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
+    final items = [
+      (id: 0, label: l10n.onboardingObiettivo0Label, sub: l10n.onboardingObiettivo0Sub, desc: l10n.onboardingObiettivo0Desc),
+      (id: 1, label: l10n.onboardingObiettivo1Label, sub: l10n.onboardingObiettivo1Sub, desc: l10n.onboardingObiettivo1Desc),
+      (id: 2, label: l10n.onboardingObiettivo2Label, sub: l10n.onboardingObiettivo2Sub, desc: l10n.onboardingObiettivo2Desc),
+    ];
     return SingleChildScrollView(
       padding: const EdgeInsets.all(28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 32),
-          Text('Qual è il tuo\nobiettivo?',
+          Text(l10n.onboardingObiettivoTitle,
               style: TextStyle(color: p.textPrimary, fontSize: 28,
                   fontWeight: FontWeight.w700, height: 1.3)),
           const SizedBox(height: 40),
-          ..._items.map((item) {
+          ...items.map((item) {
             final sel = selected == item.id;
+            final color = _colors[item.id];
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: GestureDetector(
@@ -650,22 +716,20 @@ class _StepObiettivo extends StatelessWidget {
                   duration: const Duration(milliseconds: 200),
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: sel ? item.color.withValues(alpha: 0.08) : p.surfaceVariant,
+                    color: sel ? color.withValues(alpha: 0.08) : p.surfaceVariant,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                        color: sel ? item.color : p.cardBorder,
-                        width: sel ? 1.5 : 1),
+                    border: Border.all(color: sel ? color : p.cardBorder, width: sel ? 1.5 : 1),
                   ),
                   child: Row(
                     children: [
                       Container(
                         width: 48, height: 48,
                         decoration: BoxDecoration(
-                          color: item.color.withValues(alpha: sel ? 0.15 : 0.08),
+                          color: color.withValues(alpha: sel ? 0.15 : 0.08),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Icon(item.icon,
-                            color: sel ? item.color : item.color.withValues(alpha: 0.6),
+                        child: Icon(_icons[item.id],
+                            color: sel ? color : color.withValues(alpha: 0.6),
                             size: 24),
                       ),
                       const SizedBox(width: 16),
@@ -675,12 +739,12 @@ class _StepObiettivo extends StatelessWidget {
                           children: [
                             Text(item.label,
                                 style: TextStyle(
-                                    color: sel ? item.color : p.textPrimary,
+                                    color: sel ? color : p.textPrimary,
                                     fontSize: 15, fontWeight: FontWeight.w700)),
                             const SizedBox(height: 2),
                             Text(item.sub,
                                 style: TextStyle(
-                                    color: sel ? item.color.withValues(alpha: 0.8) : p.accent,
+                                    color: sel ? color.withValues(alpha: 0.8) : p.accent,
                                     fontSize: 12, fontWeight: FontWeight.w600)),
                             const SizedBox(height: 4),
                             Text(item.desc,
@@ -689,7 +753,7 @@ class _StepObiettivo extends StatelessWidget {
                         ),
                       ),
                       if (sel)
-                        Icon(Icons.check_circle_rounded, color: item.color, size: 20),
+                        Icon(Icons.check_circle_rounded, color: color, size: 20),
                     ],
                   ),
                 ),
@@ -697,10 +761,10 @@ class _StepObiettivo extends StatelessWidget {
             );
           }),
           const SizedBox(height: 24),
-          ElevatedButton(onPressed: onNext, child: const Text('CONTINUA')),
+          ElevatedButton(onPressed: onNext, child: Text(l10n.onboardingContinua)),
           const SizedBox(height: 12),
           TextButton(onPressed: onBack,
-              child: Text('Indietro', style: TextStyle(color: p.textMuted))),
+              child: Text(l10n.onboardingIndietro, style: TextStyle(color: p.textMuted))),
         ],
       ),
     );
@@ -708,48 +772,53 @@ class _StepObiettivo extends StatelessWidget {
 }
 
 // ──────────────────────────────────────────────
-// Step 5 — Livello di attività
+// Step Livello di attività
 // ──────────────────────────────────────────────
 
 class _StepAttivita extends StatelessWidget {
   final int selected;
+  final dynamic l10n;
   final ValueChanged<int> onSelect;
   final VoidCallback onNext;
   final VoidCallback onBack;
 
   const _StepAttivita({
     required this.selected,
+    required this.l10n,
     required this.onSelect,
     required this.onNext,
     required this.onBack,
   });
 
-  static const _labels = [
-    'Sedentario', 'Legg. attivo', 'Mod. attivo', 'Molto attivo', 'Atleta',
-  ];
-  static const _descs = [
-    'Lavoro sedentario, poco o nessun esercizio',
-    'Esercizio leggero 1–3 giorni/settimana',
-    'Esercizio moderato 3–5 giorni/settimana',
-    'Esercizio intenso 6–7 giorni/settimana',
-    'Lavoro fisico intenso o doppio allenamento',
-  ];
   static const _multipli = ['×1.2', '×1.375', '×1.55', '×1.725', '×1.9'];
 
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
+    final labels = [
+      l10n.onboardingAttivita0Label,
+      l10n.onboardingAttivita1Label,
+      l10n.onboardingAttivita2Label,
+      l10n.onboardingAttivita3Label,
+      l10n.onboardingAttivita4Label,
+    ];
+    final descs = [
+      l10n.onboardingAttivita0Desc,
+      l10n.onboardingAttivita1Desc,
+      l10n.onboardingAttivita2Desc,
+      l10n.onboardingAttivita3Desc,
+      l10n.onboardingAttivita4Desc,
+    ];
     return SingleChildScrollView(
       padding: const EdgeInsets.all(28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 32),
-          Text('Quanto sei attivo?',
-              style: TextStyle(color: p.textPrimary, fontSize: 28,
-                  fontWeight: FontWeight.w700)),
+          Text(l10n.onboardingAttivitaTitle,
+              style: TextStyle(color: p.textPrimary, fontSize: 28, fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
-          Text('Considera la tua attività media settimanale.',
+          Text(l10n.onboardingAttivitaSubtitle,
               style: TextStyle(color: p.textMuted, fontSize: 13, height: 1.5)),
           const SizedBox(height: 32),
           Container(
@@ -759,9 +828,9 @@ class _StepAttivita extends StatelessWidget {
               border: Border.all(color: p.cardBorder),
             ),
             child: Column(
-              children: List.generate(_labels.length, (i) {
+              children: List.generate(labels.length, (i) {
                 final sel = selected == i;
-                final isLast = i == _labels.length - 1;
+                final isLast = i == labels.length - 1;
                 return GestureDetector(
                   onTap: () => onSelect(i),
                   child: AnimatedContainer(
@@ -792,12 +861,12 @@ class _StepAttivita extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(_labels[i],
+                              Text(labels[i],
                                   style: TextStyle(
                                       color: sel ? const Color(0xFFFF6B35) : p.textPrimary,
                                       fontSize: 14,
                                       fontWeight: sel ? FontWeight.w700 : FontWeight.w500)),
-                              Text(_descs[i],
+                              Text(descs[i],
                                   style: TextStyle(color: p.textMuted, fontSize: 12)),
                             ],
                           ),
@@ -814,10 +883,10 @@ class _StepAttivita extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 32),
-          ElevatedButton(onPressed: onNext, child: const Text('CONTINUA')),
+          ElevatedButton(onPressed: onNext, child: Text(l10n.onboardingContinua)),
           const SizedBox(height: 12),
           TextButton(onPressed: onBack,
-              child: Text('Indietro', style: TextStyle(color: p.textMuted))),
+              child: Text(l10n.onboardingIndietro, style: TextStyle(color: p.textMuted))),
         ],
       ),
     );
@@ -836,8 +905,14 @@ class _OnboardingField extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final FormFieldValidator<String>? validator;
 
-  const _OnboardingField({required this.controller, required this.label,
-      this.suffix, this.keyboardType, this.inputFormatters, this.validator});
+  const _OnboardingField({
+    required this.controller,
+    required this.label,
+    this.suffix,
+    this.keyboardType,
+    this.inputFormatters,
+    this.validator,
+  });
 
   @override
   Widget build(BuildContext context) {

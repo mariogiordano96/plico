@@ -241,6 +241,306 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Inizia'**
   String get tourStart;
+
+  /// Pulsante continua nell'onboarding
+  ///
+  /// In it, this message translates to:
+  /// **'CONTINUA'**
+  String get onboardingContinua;
+
+  /// Pulsante indietro nell'onboarding
+  ///
+  /// In it, this message translates to:
+  /// **'Indietro'**
+  String get onboardingIndietro;
+
+  /// Pulsante finale nell'onboarding
+  ///
+  /// In it, this message translates to:
+  /// **'INIZIA'**
+  String get onboardingInizia;
+
+  /// Titolo step 1 onboarding
+  ///
+  /// In it, this message translates to:
+  /// **'Benvenuto.\nDimmi come ti chiami.'**
+  String get onboardingWelcomeTitle;
+
+  /// Label campo nome
+  ///
+  /// In it, this message translates to:
+  /// **'Nome'**
+  String get onboardingNomeLabel;
+
+  /// Errore validazione campo nome
+  ///
+  /// In it, this message translates to:
+  /// **'Inserisci il nome'**
+  String get onboardingNomeError;
+
+  /// Label campo cognome
+  ///
+  /// In it, this message translates to:
+  /// **'Cognome'**
+  String get onboardingCognomeLabel;
+
+  /// Errore validazione campo cognome
+  ///
+  /// In it, this message translates to:
+  /// **'Inserisci il cognome'**
+  String get onboardingCognomeError;
+
+  /// Titolo step 2 onboarding
+  ///
+  /// In it, this message translates to:
+  /// **'Chi sei?'**
+  String get onboardingChiSeiTitle;
+
+  /// Label sezione sesso
+  ///
+  /// In it, this message translates to:
+  /// **'SESSO'**
+  String get onboardingSessoLabel;
+
+  /// Opzione sesso: uomo
+  ///
+  /// In it, this message translates to:
+  /// **'Uomo'**
+  String get onboardingUomo;
+
+  /// Opzione sesso: donna
+  ///
+  /// In it, this message translates to:
+  /// **'Donna'**
+  String get onboardingDonna;
+
+  /// Label sezione data nascita
+  ///
+  /// In it, this message translates to:
+  /// **'DATA DI NASCITA'**
+  String get onboardingDataNascitaLabel;
+
+  /// Placeholder selezione data nascita
+  ///
+  /// In it, this message translates to:
+  /// **'Seleziona la data'**
+  String get onboardingSelezionaData;
+
+  /// Errore validazione step 2: sesso/data mancanti
+  ///
+  /// In it, this message translates to:
+  /// **'Seleziona sesso e data di nascita'**
+  String get onboardingSessoDataError;
+
+  /// Titolo step 3 onboarding
+  ///
+  /// In it, this message translates to:
+  /// **'Le tue misure'**
+  String get onboardingMisureTitle;
+
+  /// Label campo altezza
+  ///
+  /// In it, this message translates to:
+  /// **'Altezza'**
+  String get onboardingAltezzaLabel;
+
+  /// Errore validazione altezza vuota
+  ///
+  /// In it, this message translates to:
+  /// **'Inserisci l\'altezza'**
+  String get onboardingAltezzaError;
+
+  /// Errore validazione altezza fuori range
+  ///
+  /// In it, this message translates to:
+  /// **'Altezza non valida'**
+  String get onboardingAltezzaInvalid;
+
+  /// Label campo peso
+  ///
+  /// In it, this message translates to:
+  /// **'Peso attuale (opzionale)'**
+  String get onboardingPesoLabel;
+
+  /// Errore validazione peso fuori range
+  ///
+  /// In it, this message translates to:
+  /// **'Peso non valido'**
+  String get onboardingPesoInvalid;
+
+  /// Label campo body fat
+  ///
+  /// In it, this message translates to:
+  /// **'Body fat iniziale (opzionale)'**
+  String get onboardingBodyFatLabel;
+
+  /// Errore validazione body fat fuori range
+  ///
+  /// In it, this message translates to:
+  /// **'Valore non valido (1–70%)'**
+  String get onboardingBodyFatInvalid;
+
+  /// Nota informativa sotto i campi misure
+  ///
+  /// In it, this message translates to:
+  /// **'Peso e body fat sono opzionali. Se inseriti, verranno salvati come punto di partenza nello storico.'**
+  String get onboardingMisureNote;
+
+  /// Titolo step obiettivo
+  ///
+  /// In it, this message translates to:
+  /// **'Qual è il tuo\nobiettivo?'**
+  String get onboardingObiettivoTitle;
+
+  /// No description provided for @onboardingObiettivo0Label.
+  ///
+  /// In it, this message translates to:
+  /// **'Perdere peso'**
+  String get onboardingObiettivo0Label;
+
+  /// No description provided for @onboardingObiettivo0Sub.
+  ///
+  /// In it, this message translates to:
+  /// **'Deficit −20%'**
+  String get onboardingObiettivo0Sub;
+
+  /// No description provided for @onboardingObiettivo0Desc.
+  ///
+  /// In it, this message translates to:
+  /// **'Riduzione graduale del grasso corporeo mantenendo la massa muscolare'**
+  String get onboardingObiettivo0Desc;
+
+  /// No description provided for @onboardingObiettivo1Label.
+  ///
+  /// In it, this message translates to:
+  /// **'Mantenermi'**
+  String get onboardingObiettivo1Label;
+
+  /// No description provided for @onboardingObiettivo1Sub.
+  ///
+  /// In it, this message translates to:
+  /// **'Mantenimento'**
+  String get onboardingObiettivo1Sub;
+
+  /// No description provided for @onboardingObiettivo1Desc.
+  ///
+  /// In it, this message translates to:
+  /// **'Ottimizza la composizione corporea senza cambiare il peso'**
+  String get onboardingObiettivo1Desc;
+
+  /// No description provided for @onboardingObiettivo2Label.
+  ///
+  /// In it, this message translates to:
+  /// **'Aumentare massa'**
+  String get onboardingObiettivo2Label;
+
+  /// No description provided for @onboardingObiettivo2Sub.
+  ///
+  /// In it, this message translates to:
+  /// **'Surplus +15%'**
+  String get onboardingObiettivo2Sub;
+
+  /// No description provided for @onboardingObiettivo2Desc.
+  ///
+  /// In it, this message translates to:
+  /// **'Massimizza la crescita muscolare con un apporto calorico superiore'**
+  String get onboardingObiettivo2Desc;
+
+  /// Titolo step livello attività
+  ///
+  /// In it, this message translates to:
+  /// **'Quanto sei attivo?'**
+  String get onboardingAttivitaTitle;
+
+  /// Sottotitolo step livello attività
+  ///
+  /// In it, this message translates to:
+  /// **'Considera la tua attività media settimanale.'**
+  String get onboardingAttivitaSubtitle;
+
+  /// No description provided for @onboardingAttivita0Label.
+  ///
+  /// In it, this message translates to:
+  /// **'Sedentario'**
+  String get onboardingAttivita0Label;
+
+  /// No description provided for @onboardingAttivita0Desc.
+  ///
+  /// In it, this message translates to:
+  /// **'Lavoro sedentario, poco o nessun esercizio'**
+  String get onboardingAttivita0Desc;
+
+  /// No description provided for @onboardingAttivita1Label.
+  ///
+  /// In it, this message translates to:
+  /// **'Legg. attivo'**
+  String get onboardingAttivita1Label;
+
+  /// No description provided for @onboardingAttivita1Desc.
+  ///
+  /// In it, this message translates to:
+  /// **'Esercizio leggero 1–3 giorni/settimana'**
+  String get onboardingAttivita1Desc;
+
+  /// No description provided for @onboardingAttivita2Label.
+  ///
+  /// In it, this message translates to:
+  /// **'Mod. attivo'**
+  String get onboardingAttivita2Label;
+
+  /// No description provided for @onboardingAttivita2Desc.
+  ///
+  /// In it, this message translates to:
+  /// **'Esercizio moderato 3–5 giorni/settimana'**
+  String get onboardingAttivita2Desc;
+
+  /// No description provided for @onboardingAttivita3Label.
+  ///
+  /// In it, this message translates to:
+  /// **'Molto attivo'**
+  String get onboardingAttivita3Label;
+
+  /// No description provided for @onboardingAttivita3Desc.
+  ///
+  /// In it, this message translates to:
+  /// **'Esercizio intenso 6–7 giorni/settimana'**
+  String get onboardingAttivita3Desc;
+
+  /// No description provided for @onboardingAttivita4Label.
+  ///
+  /// In it, this message translates to:
+  /// **'Atleta'**
+  String get onboardingAttivita4Label;
+
+  /// No description provided for @onboardingAttivita4Desc.
+  ///
+  /// In it, this message translates to:
+  /// **'Lavoro fisico intenso o doppio allenamento'**
+  String get onboardingAttivita4Desc;
+
+  /// Titolo step scelta tema
+  ///
+  /// In it, this message translates to:
+  /// **'Scegli il tema'**
+  String get onboardingTemaTitle;
+
+  /// Sottotitolo step scelta tema
+  ///
+  /// In it, this message translates to:
+  /// **'Potrai cambiarlo in qualsiasi momento dall\'app.'**
+  String get onboardingTemaSubtitle;
+
+  /// Opzione tema chiaro
+  ///
+  /// In it, this message translates to:
+  /// **'Chiaro'**
+  String get onboardingTemaChiaro;
+
+  /// Opzione tema scuro
+  ///
+  /// In it, this message translates to:
+  /// **'Scuro'**
+  String get onboardingTemaScuro;
 }
 
 class _AppLocalizationsDelegate

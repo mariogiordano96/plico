@@ -83,4 +83,161 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tourStart => 'Start';
+
+  @override
+  String get onboardingContinua => 'CONTINUE';
+
+  @override
+  String get onboardingIndietro => 'Back';
+
+  @override
+  String get onboardingInizia => 'START';
+
+  @override
+  String get onboardingWelcomeTitle => 'Welcome.\nTell me your name.';
+
+  @override
+  String get onboardingNomeLabel => 'First name';
+
+  @override
+  String get onboardingNomeError => 'Enter your first name';
+
+  @override
+  String get onboardingCognomeLabel => 'Last name';
+
+  @override
+  String get onboardingCognomeError => 'Enter your last name';
+
+  @override
+  String get onboardingChiSeiTitle => 'Who are you?';
+
+  @override
+  String get onboardingSessoLabel => 'SEX';
+
+  @override
+  String get onboardingUomo => 'Male';
+
+  @override
+  String get onboardingDonna => 'Female';
+
+  @override
+  String get onboardingDataNascitaLabel => 'DATE OF BIRTH';
+
+  @override
+  String get onboardingSelezionaData => 'Select date';
+
+  @override
+  String get onboardingSessoDataError => 'Please select sex and date of birth';
+
+  @override
+  String get onboardingMisureTitle => 'Your measurements';
+
+  @override
+  String get onboardingAltezzaLabel => 'Height';
+
+  @override
+  String get onboardingAltezzaError => 'Enter your height';
+
+  @override
+  String get onboardingAltezzaInvalid => 'Invalid height';
+
+  @override
+  String get onboardingPesoLabel => 'Current weight (optional)';
+
+  @override
+  String get onboardingPesoInvalid => 'Invalid weight';
+
+  @override
+  String get onboardingBodyFatLabel => 'Starting body fat (optional)';
+
+  @override
+  String get onboardingBodyFatInvalid => 'Invalid value (1–70%)';
+
+  @override
+  String get onboardingMisureNote =>
+      'Weight and body fat are optional. If entered, they will be saved as your starting point in the history.';
+
+  @override
+  String get onboardingObiettivoTitle => 'What is your\ngoal?';
+
+  @override
+  String get onboardingObiettivo0Label => 'Lose weight';
+
+  @override
+  String get onboardingObiettivo0Sub => '−20% deficit';
+
+  @override
+  String get onboardingObiettivo0Desc =>
+      'Gradual reduction of body fat while maintaining muscle mass';
+
+  @override
+  String get onboardingObiettivo1Label => 'Maintain';
+
+  @override
+  String get onboardingObiettivo1Sub => 'Maintenance';
+
+  @override
+  String get onboardingObiettivo1Desc =>
+      'Optimise body composition without changing weight';
+
+  @override
+  String get onboardingObiettivo2Label => 'Gain muscle';
+
+  @override
+  String get onboardingObiettivo2Sub => '+15% surplus';
+
+  @override
+  String get onboardingObiettivo2Desc =>
+      'Maximise muscle growth with a higher caloric intake';
+
+  @override
+  String get onboardingAttivitaTitle => 'How active are you?';
+
+  @override
+  String get onboardingAttivitaSubtitle =>
+      'Consider your average weekly activity.';
+
+  @override
+  String get onboardingAttivita0Label => 'Sedentary';
+
+  @override
+  String get onboardingAttivita0Desc => 'Desk job, little or no exercise';
+
+  @override
+  String get onboardingAttivita1Label => 'Lightly active';
+
+  @override
+  String get onboardingAttivita1Desc => 'Light exercise 1–3 days/week';
+
+  @override
+  String get onboardingAttivita2Label => 'Mod. active';
+
+  @override
+  String get onboardingAttivita2Desc => 'Moderate exercise 3–5 days/week';
+
+  @override
+  String get onboardingAttivita3Label => 'Very active';
+
+  @override
+  String get onboardingAttivita3Desc => 'Intense exercise 6–7 days/week';
+
+  @override
+  String get onboardingAttivita4Label => 'Athlete';
+
+  @override
+  String get onboardingAttivita4Desc =>
+      'Intense physical work or double training sessions';
+
+  @override
+  String get onboardingTemaTitle => 'Choose your theme';
+
+  @override
+  String get onboardingTemaSubtitle =>
+      'You can change it at any time from the app.';
+
+  @override
+  String get onboardingTemaChiaro => 'Light';
+
+  @override
+  String get onboardingTemaScuro => 'Dark';
 }
