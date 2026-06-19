@@ -74,4 +74,3 @@ L'utente deve capire il valore entro i primi 3 minuti.
 | ✅ ~~Notifica streak a rischio~~ | Medio | Basso |
 | ✅ ~~Insights automatici sui pattern~~ | Alto | Alto |
 | ✅ ~~Widget iOS/Android~~ | Medio | Alto |
-| Coach virtuale AI | Alto | Alto |
