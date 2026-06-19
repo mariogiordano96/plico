@@ -175,6 +175,72 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Frutta'**
   String get slotFrutta;
+
+  /// Tour: titolo tab Home
+  ///
+  /// In it, this message translates to:
+  /// **'Home'**
+  String get tourHomeTitle;
+
+  /// Tour: descrizione tab Home
+  ///
+  /// In it, this message translates to:
+  /// **'Il tuo riepilogo quotidiano: kcal consumate, macro, streak e il piano del giorno — tutto a colpo d\'occhio.'**
+  String get tourHomeDesc;
+
+  /// Tour: titolo tab Diario
+  ///
+  /// In it, this message translates to:
+  /// **'Diario'**
+  String get tourDiarioTitle;
+
+  /// Tour: descrizione tab Diario
+  ///
+  /// In it, this message translates to:
+  /// **'Registra ogni pasto della giornata. Tocca il \"+\" in alto per aggiungere un alimento o scannerizza un barcode.'**
+  String get tourDiarioDesc;
+
+  /// Tour: titolo tab Progressi
+  ///
+  /// In it, this message translates to:
+  /// **'Progressi'**
+  String get tourProgressiTitle;
+
+  /// Tour: descrizione tab Progressi
+  ///
+  /// In it, this message translates to:
+  /// **'Monitora il tuo peso nel tempo, guarda i badge guadagnati e il riepilogo settimanale.'**
+  String get tourProgressiDesc;
+
+  /// Tour: titolo tab TDEE
+  ///
+  /// In it, this message translates to:
+  /// **'TDEE'**
+  String get tourTdeeTitle;
+
+  /// Tour: descrizione tab TDEE
+  ///
+  /// In it, this message translates to:
+  /// **'Il tuo fabbisogno calorico personalizzato, calcolato e aggiornato sui tuoi dati reali.'**
+  String get tourTdeeDesc;
+
+  /// Tour: pulsante per saltare il tutorial
+  ///
+  /// In it, this message translates to:
+  /// **'Salta'**
+  String get tourSkip;
+
+  /// Tour: pulsante per andare al passo successivo
+  ///
+  /// In it, this message translates to:
+  /// **'Avanti'**
+  String get tourNext;
+
+  /// Tour: pulsante finale per iniziare l'app
+  ///
+  /// In it, this message translates to:
+  /// **'Inizia'**
+  String get tourStart;
 }
 
 class _AppLocalizationsDelegate

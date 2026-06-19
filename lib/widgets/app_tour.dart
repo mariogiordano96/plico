@@ -9,12 +9,8 @@ class _TourStep {
   const _TourStep(this.tabIndex, this.title, this.description);
 }
 
-const _steps = [
-  _TourStep(0, 'Home', 'Il tuo riepilogo quotidiano: kcal consumate, macro, streak e il piano del giorno — tutto a colpo d\'occhio.'),
-  _TourStep(1, 'Diario', 'Registra ogni pasto della giornata. Tocca il "+" in alto per aggiungere un alimento o scannerizza un barcode.'),
-  _TourStep(2, 'Progressi', 'Monitora il tuo peso nel tempo, guarda i badge guadagnati e il riepilogo settimanale.'),
-  _TourStep(3, 'TDEE', 'Il tuo fabbisogno calorico personalizzato, calcolato e aggiornato sui tuoi dati reali.'),
-];
+// Tab indices used for navigation — not localizable
+const _kTourTabIndices = [0, 1, 2, 3];
 
 class AppTour extends StatefulWidget {
   final Widget child;
@@ -72,9 +68,9 @@ class _AppTourState extends State<AppTour> with SingleTickerProviderStateMixin {
   }
 
   void _next() {
-    if (_stepNotifier.value < _steps.length - 1) {
+    if (_stepNotifier.value < _kTourTabIndices.length - 1) {
       _stepNotifier.value++;
-      widget.onSwitchTab(_steps[_stepNotifier.value].tabIndex);
+      widget.onSwitchTab(_kTourTabIndices[_stepNotifier.value]);
     } else {
       _finish();
     }
@@ -105,12 +101,20 @@ class _TourUI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final steps = [
+      _TourStep(0, l10n.tourHomeTitle, l10n.tourHomeDesc),
+      _TourStep(1, l10n.tourDiarioTitle, l10n.tourDiarioDesc),
+      _TourStep(2, l10n.tourProgressiTitle, l10n.tourProgressiDesc),
+      _TourStep(3, l10n.tourTdeeTitle, l10n.tourTdeeDesc),
+    ];
+
     final mq = MediaQuery.of(context);
     final screenW = mq.size.width;
     const navH = 56.0;
     final bottomPad = mq.padding.bottom;
-    final itemW = screenW / _steps.length;
-    final ts = _steps[step];
+    final itemW = screenW / steps.length;
+    final ts = steps[step];
     final spotCx = itemW * ts.tabIndex + itemW / 2;
     final spotCy = mq.size.height - bottomPad - navH / 2;
     const spotR = 32.0;
@@ -156,7 +160,7 @@ class _TourUI extends StatelessWidget {
             color: Colors.transparent,
             child: _TourCard(
               step: step,
-              total: _steps.length,
+              total: steps.length,
               title: ts.title,
               description: ts.description,
               onNext: onNext,
@@ -210,6 +214,7 @@ class _TourCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
+    final l10n = context.l10n;
     final isLast = step == total - 1;
 
     return Container(
@@ -243,7 +248,7 @@ class _TourCard extends StatelessWidget {
                 onTap: onSkip,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-                  child: Text('Salta', style: TextStyle(color: p.textMuted, fontSize: 14)),
+                  child: Text(l10n.tourSkip, style: TextStyle(color: p.textMuted, fontSize: 14)),
                 ),
               ),
               const Spacer(),
@@ -256,7 +261,7 @@ class _TourCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    isLast ? 'Inizia' : 'Avanti',
+                    isLast ? l10n.tourStart : l10n.tourNext,
                     style: TextStyle(
                         fontSize: 14, fontWeight: FontWeight.bold, color: p.background),
                   ),

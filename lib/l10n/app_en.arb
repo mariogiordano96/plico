@@ -14,5 +14,17 @@
   "slotVerdura": "Vegetables",
   "slotGrassi": "Fats",
   "slotExtra": "Extra",
-  "slotFrutta": "Fruit"
+  "slotFrutta": "Fruit",
+
+  "tourHomeTitle": "Home",
+  "tourHomeDesc": "Your daily summary: calories consumed, macros, streak and the day's plan — all at a glance.",
+  "tourDiarioTitle": "Diary",
+  "tourDiarioDesc": "Log every meal of the day. Tap \"+\" at the top to add a food or scan a barcode.",
+  "tourProgressiTitle": "Progress",
+  "tourProgressiDesc": "Track your weight over time, view earned badges and your weekly summary.",
+  "tourTdeeTitle": "TDEE",
+  "tourTdeeDesc": "Your personalised caloric needs, calculated and updated based on your real data.",
+  "tourSkip": "Skip",
+  "tourNext": "Next",
+  "tourStart": "Start"
 }

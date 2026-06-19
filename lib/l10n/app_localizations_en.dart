@@ -46,4 +46,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get slotFrutta => 'Fruit';
+
+  @override
+  String get tourHomeTitle => 'Home';
+
+  @override
+  String get tourHomeDesc =>
+      'Your daily summary: calories consumed, macros, streak and the day\'s plan — all at a glance.';
+
+  @override
+  String get tourDiarioTitle => 'Diary';
+
+  @override
+  String get tourDiarioDesc =>
+      'Log every meal of the day. Tap \"+\" at the top to add a food or scan a barcode.';
+
+  @override
+  String get tourProgressiTitle => 'Progress';
+
+  @override
+  String get tourProgressiDesc =>
+      'Track your weight over time, view earned badges and your weekly summary.';
+
+  @override
+  String get tourTdeeTitle => 'TDEE';
+
+  @override
+  String get tourTdeeDesc =>
+      'Your personalised caloric needs, calculated and updated based on your real data.';
+
+  @override
+  String get tourSkip => 'Skip';
+
+  @override
+  String get tourNext => 'Next';
+
+  @override
+  String get tourStart => 'Start';
 }

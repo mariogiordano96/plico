@@ -46,4 +46,41 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get slotFrutta => 'Frutta';
+
+  @override
+  String get tourHomeTitle => 'Home';
+
+  @override
+  String get tourHomeDesc =>
+      'Il tuo riepilogo quotidiano: kcal consumate, macro, streak e il piano del giorno — tutto a colpo d\'occhio.';
+
+  @override
+  String get tourDiarioTitle => 'Diario';
+
+  @override
+  String get tourDiarioDesc =>
+      'Registra ogni pasto della giornata. Tocca il \"+\" in alto per aggiungere un alimento o scannerizza un barcode.';
+
+  @override
+  String get tourProgressiTitle => 'Progressi';
+
+  @override
+  String get tourProgressiDesc =>
+      'Monitora il tuo peso nel tempo, guarda i badge guadagnati e il riepilogo settimanale.';
+
+  @override
+  String get tourTdeeTitle => 'TDEE';
+
+  @override
+  String get tourTdeeDesc =>
+      'Il tuo fabbisogno calorico personalizzato, calcolato e aggiornato sui tuoi dati reali.';
+
+  @override
+  String get tourSkip => 'Salta';
+
+  @override
+  String get tourNext => 'Avanti';
+
+  @override
+  String get tourStart => 'Inizia';
 }
