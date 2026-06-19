@@ -423,5 +423,47 @@
   "tdeeMetodoKatchDesc": "BMR = 370 + 21,6 × massa magra. La più precisa: considera solo la massa metabolicamente attiva.",
   "tdeeMetodoMifflinDesc": "Formula raccomandata dall'American Dietetic Association. Accurata per la maggior parte delle persone.",
   "tdeeMetodoHarrisDesc": "Formula classica revisionata (Roza & Shizgal, 1984). Tende a sovrastimare leggermente.",
-  "tdeeRichiedePlic": "richiede plicometria"
+  "tdeeRichiedePlic": "richiede plicometria",
+
+  "notifChannelPasti": "Promemoria pasti",
+  "notifChannelPastiDesc": "Ricordati di registrare i tuoi pasti",
+  "notifChannelRecap": "Riepilogo serale",
+  "notifChannelRecapDesc": "Riepilogo serale dei tuoi progressi",
+  "notifChannelMattino": "Recap mattutino",
+  "notifChannelMattinoDesc": "Riepilogo delle calorie di ieri",
+  "notifChannelPesata": "Promemoria pesata",
+  "notifChannelPesataDesc": "Ricordati di registrare il tuo peso",
+  "notifPastoBody": "Hai registrato {pasto}?",
+  "@notifPastoBody": {
+    "placeholders": { "pasto": { "type": "String" } }
+  },
+  "notifRecapNuovaStreak": "Registra i tuoi pasti di oggi per iniziare una nuova streak.",
+  "notifRecapMantieni": "Hai registrato ogni giorno per {streak} giorni. Vuoi mantenere la streak? 🔥",
+  "@notifRecapMantieni": {
+    "placeholders": { "streak": { "type": "int" } }
+  },
+  "notifRecapObiettivo": "Oggi hai raggiunto il tuo obiettivo per {streak} giorni di fila 🔥",
+  "@notifRecapObiettivo": {
+    "placeholders": { "streak": { "type": "int" } }
+  },
+  "notifRecapStreak": "Hai registrato {streak} giorni di fila! Continua così 💪",
+  "@notifRecapStreak": {
+    "placeholders": { "streak": { "type": "int" } }
+  },
+  "notifMattinoOnTarget": "Ieri hai mangiato {kcal} kcal su {target}. Ottimo lavoro! 💪",
+  "@notifMattinoOnTarget": {
+    "placeholders": { "kcal": { "type": "int" }, "target": { "type": "int" } }
+  },
+  "notifMattinoOffTarget": "Ieri hai registrato {kcal} kcal su {target} di obiettivo.",
+  "@notifMattinoOffTarget": {
+    "placeholders": { "kcal": { "type": "int" }, "target": { "type": "int" } }
+  },
+  "notifMattinoNoTarget": "Ieri hai registrato {kcal} kcal.",
+  "@notifMattinoNoTarget": {
+    "placeholders": { "kcal": { "type": "int" } }
+  },
+  "notifPesataBody": "Non ti pesi da {days} giorni. Vuoi registrare il tuo peso?",
+  "@notifPesataBody": {
+    "placeholders": { "days": { "type": "int" } }
+  }
 }

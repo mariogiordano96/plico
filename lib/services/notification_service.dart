@@ -3,6 +3,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../l10n/app_localizations.dart';
 import '../models/app_settings.dart';
 import 'achievement_service.dart';
 import 'database_service.dart';
@@ -13,6 +14,9 @@ class NotificationService {
   NotificationService._();
 
   final _plugin = FlutterLocalNotificationsPlugin();
+  AppLocalizations? _l10n;
+
+  void setL10n(AppLocalizations l10n) => _l10n = l10n;
 
   static const _channelId = 'pasti_reminders';
   static const _channelName = 'Promemoria pasti';
@@ -70,12 +74,12 @@ class NotificationService {
     if (!s.notificheAttive) return;
 
     final meals = [
-      (100, 'Colazione', s.notColAttiva, s.notColMin),
-      (101, 'Pranzo', s.notPranzoAttiva, s.notPranzoMin),
-      (102, 'Cena', s.notCenaAttiva, s.notCenaMin),
-      (103, 'Spuntino', s.notSpuntinoAttiva, s.notSpuntinoMin),
-      (104, 'Post-WO', s.notPostWoAttiva, s.notPostWoMin),
-      (105, 'Spuntino serale', s.notSorAttiva, s.notSorMin),
+      (100, _l10n?.pastoColazione ?? 'Colazione', s.notColAttiva, s.notColMin),
+      (101, _l10n?.pastoPranzo ?? 'Pranzo', s.notPranzoAttiva, s.notPranzoMin),
+      (102, _l10n?.pastoCena ?? 'Cena', s.notCenaAttiva, s.notCenaMin),
+      (103, _l10n?.pastoSpuntino ?? 'Spuntino', s.notSpuntinoAttiva, s.notSpuntinoMin),
+      (104, _l10n?.pastoPostWo ?? 'Post-WO', s.notPostWoAttiva, s.notPostWoMin),
+      (105, _l10n?.pastoSpuntinoSerale ?? 'Spuntino serale', s.notSorAttiva, s.notSorMin),
     ];
 
     for (final (id, label, active, minVal) in meals) {
@@ -88,16 +92,16 @@ class NotificationService {
 
   Future<void> _scheduleDaily(
       int id, String label, int hour, int minute) async {
-    const details = NotificationDetails(
+    final details = NotificationDetails(
       android: AndroidNotificationDetails(
         _channelId,
-        _channelName,
-        channelDescription: 'Ricordati di registrare i tuoi pasti',
+        _l10n?.notifChannelPasti ?? _channelName,
+        channelDescription: _l10n?.notifChannelPastiDesc ?? 'Ricordati di registrare i tuoi pasti',
         importance: Importance.defaultImportance,
         priority: Priority.defaultPriority,
         playSound: true,
       ),
-      iOS: DarwinNotificationDetails(
+      iOS: const DarwinNotificationDetails(
         presentAlert: true,
         presentBadge: false,
         presentSound: true,
@@ -107,7 +111,7 @@ class NotificationService {
     await _plugin.zonedSchedule(
       id: id,
       title: 'Plico',
-      body: 'Hai registrato ${label.toLowerCase()}?',
+      body: _l10n?.notifPastoBody(label.toLowerCase()) ?? 'Hai registrato ${label.toLowerCase()}?',
       scheduledDate: _nextOccurrence(hour, minute),
       notificationDetails: details,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
@@ -150,23 +154,23 @@ class NotificationService {
     if (!today21.isAfter(now.add(const Duration(seconds: 30)))) return;
 
     final body = streak <= 0
-        ? 'Registra i tuoi pasti di oggi per iniziare una nuova streak.'
+        ? (_l10n?.notifRecapNuovaStreak ?? 'Registra i tuoi pasti di oggi per iniziare una nuova streak.')
         : !loggedToday
-            ? 'Hai registrato ogni giorno per $streak giorni. Vuoi mantenere la streak? 🔥'
+            ? (_l10n?.notifRecapMantieni(streak) ?? 'Hai registrato ogni giorno per $streak giorni. Vuoi mantenere la streak? 🔥')
             : onTargetToday
-                ? 'Oggi hai raggiunto il tuo obiettivo per $streak giorni di fila 🔥'
-                : 'Hai registrato $streak giorni di fila! Continua così 💪';
+                ? (_l10n?.notifRecapObiettivo(streak) ?? 'Oggi hai raggiunto il tuo obiettivo per $streak giorni di fila 🔥')
+                : (_l10n?.notifRecapStreak(streak) ?? 'Hai registrato $streak giorni di fila! Continua così 💪');
 
-    const details = NotificationDetails(
+    final details = NotificationDetails(
       android: AndroidNotificationDetails(
         _recapChannelId,
-        _recapChannelName,
-        channelDescription: 'Riepilogo serale dei tuoi progressi',
+        _l10n?.notifChannelRecap ?? _recapChannelName,
+        channelDescription: _l10n?.notifChannelRecapDesc ?? 'Riepilogo serale dei tuoi progressi',
         importance: Importance.defaultImportance,
         priority: Priority.defaultPriority,
         playSound: true,
       ),
-      iOS: DarwinNotificationDetails(
+      iOS: const DarwinNotificationDetails(
         presentAlert: true,
         presentBadge: false,
         presentSound: true,
@@ -218,20 +222,20 @@ class NotificationService {
     final onTarget = pct != null && pct >= 0.9 && pct <= 1.05;
     final body = kcalTarget != null
         ? onTarget
-            ? 'Ieri hai mangiato $kcal kcal su $kcalTarget. Ottimo lavoro! 💪'
-            : 'Ieri hai registrato $kcal kcal su $kcalTarget di obiettivo.'
-        : 'Ieri hai registrato $kcal kcal.';
+            ? (_l10n?.notifMattinoOnTarget(kcal, kcalTarget) ?? 'Ieri hai mangiato $kcal kcal su $kcalTarget. Ottimo lavoro! 💪')
+            : (_l10n?.notifMattinoOffTarget(kcal, kcalTarget) ?? 'Ieri hai registrato $kcal kcal su $kcalTarget di obiettivo.')
+        : (_l10n?.notifMattinoNoTarget(kcal) ?? 'Ieri hai registrato $kcal kcal.');
 
-    const details = NotificationDetails(
+    final details = NotificationDetails(
       android: AndroidNotificationDetails(
         _morningRecapChannelId,
-        _morningRecapChannelName,
-        channelDescription: 'Riepilogo delle calorie di ieri',
+        _l10n?.notifChannelMattino ?? _morningRecapChannelName,
+        channelDescription: _l10n?.notifChannelMattinoDesc ?? 'Riepilogo delle calorie di ieri',
         importance: Importance.defaultImportance,
         priority: Priority.defaultPriority,
         playSound: true,
       ),
-      iOS: DarwinNotificationDetails(
+      iOS: const DarwinNotificationDetails(
         presentAlert: true,
         presentBadge: false,
         presentSound: true,
@@ -277,16 +281,16 @@ class NotificationService {
     final today19 = tz.TZDateTime(tz.local, now.year, now.month, now.day, 19, 0);
     if (!today19.isAfter(now.add(const Duration(seconds: 30)))) return;
 
-    const details = NotificationDetails(
+    final details = NotificationDetails(
       android: AndroidNotificationDetails(
         _weighInChannelId,
-        _weighInChannelName,
-        channelDescription: 'Ricordati di registrare il tuo peso',
+        _l10n?.notifChannelPesata ?? _weighInChannelName,
+        channelDescription: _l10n?.notifChannelPesataDesc ?? 'Ricordati di registrare il tuo peso',
         importance: Importance.defaultImportance,
         priority: Priority.defaultPriority,
         playSound: true,
       ),
-      iOS: DarwinNotificationDetails(
+      iOS: const DarwinNotificationDetails(
         presentAlert: true,
         presentBadge: false,
         presentSound: true,
@@ -296,7 +300,7 @@ class NotificationService {
     await _plugin.zonedSchedule(
       id: _weighInId,
       title: 'Plico',
-      body: 'Non ti pesi da $daysSince giorni. Vuoi registrare il tuo peso?',
+      body: _l10n?.notifPesataBody(daysSince) ?? 'Non ti pesi da $daysSince giorni. Vuoi registrare il tuo peso?',
       scheduledDate: today19,
       notificationDetails: details,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,

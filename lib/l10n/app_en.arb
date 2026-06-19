@@ -344,5 +344,23 @@
   "tdeeMetodoKatchDesc": "BMR = 370 + 21.6 × lean mass. The most accurate: considers only metabolically active mass.",
   "tdeeMetodoMifflinDesc": "Formula recommended by the American Dietetic Association. Accurate for most people.",
   "tdeeMetodoHarrisDesc": "Revised classic formula (Roza & Shizgal, 1984). Tends to slightly overestimate.",
-  "tdeeRichiedePlic": "requires skinfold test"
+  "tdeeRichiedePlic": "requires skinfold test",
+
+  "notifChannelPasti": "Meal reminders",
+  "notifChannelPastiDesc": "Remember to log your meals",
+  "notifChannelRecap": "Evening recap",
+  "notifChannelRecapDesc": "Evening summary of your progress",
+  "notifChannelMattino": "Morning recap",
+  "notifChannelMattinoDesc": "Yesterday's calorie summary",
+  "notifChannelPesata": "Weigh-in reminder",
+  "notifChannelPesataDesc": "Remember to log your weight",
+  "notifPastoBody": "Did you log {pasto}?",
+  "notifRecapNuovaStreak": "Log your meals today to start a new streak.",
+  "notifRecapMantieni": "You've logged every day for {streak} days. Keep your streak going? 🔥",
+  "notifRecapObiettivo": "Today you hit your goal for {streak} days in a row 🔥",
+  "notifRecapStreak": "You've logged {streak} days in a row! Keep it up 💪",
+  "notifMattinoOnTarget": "Yesterday you ate {kcal} kcal out of {target}. Great job! 💪",
+  "notifMattinoOffTarget": "Yesterday you logged {kcal} kcal out of {target} target.",
+  "notifMattinoNoTarget": "Yesterday you logged {kcal} kcal.",
+  "notifPesataBody": "You haven't weighed in for {days} days. Want to log your weight?"
 }

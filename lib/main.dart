@@ -124,6 +124,11 @@ class _PlicoAppState extends State<PlicoApp> with WidgetsBindingObserver {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: AppLocalizations.supportedLocales,
+          builder: (context, child) {
+            final l10n = AppLocalizations.of(context);
+            if (l10n != null) NotificationService.instance.setL10n(l10n);
+            return child!;
+          },
           home: FutureBuilder<bool>(
             future: DatabaseService.instance.hasUserProfile(),
             builder: (context, snapshot) {
