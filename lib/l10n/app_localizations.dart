@@ -781,6 +781,510 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Settimana in target'**
   String get homeBadgeSettimanaTarget;
+
+  /// No description provided for @diarioTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'DIARIO'**
+  String get diarioTitolo;
+
+  /// No description provided for @diarioTabPiano.
+  ///
+  /// In it, this message translates to:
+  /// **'PIANO'**
+  String get diarioTabPiano;
+
+  /// No description provided for @diarioTabDiario.
+  ///
+  /// In it, this message translates to:
+  /// **'DIARIO'**
+  String get diarioTabDiario;
+
+  /// No description provided for @diarioSalvaComePref.
+  ///
+  /// In it, this message translates to:
+  /// **'Salva come preferito'**
+  String get diarioSalvaComePref;
+
+  /// No description provided for @diarioSalvaHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Es. La mia colazione'**
+  String get diarioSalvaHint;
+
+  /// No description provided for @diarioAnnulla.
+  ///
+  /// In it, this message translates to:
+  /// **'Annulla'**
+  String get diarioAnnulla;
+
+  /// No description provided for @diarioBtnSalva.
+  ///
+  /// In it, this message translates to:
+  /// **'Salva'**
+  String get diarioBtnSalva;
+
+  /// No description provided for @diarioSalvatoComePref.
+  ///
+  /// In it, this message translates to:
+  /// **'Salvato come preferito: {nome}'**
+  String diarioSalvatoComePref(String nome);
+
+  /// No description provided for @diarioOggi.
+  ///
+  /// In it, this message translates to:
+  /// **'Oggi'**
+  String get diarioOggi;
+
+  /// No description provided for @diarioIeri.
+  ///
+  /// In it, this message translates to:
+  /// **'Ieri'**
+  String get diarioIeri;
+
+  /// No description provided for @diarioKcalObiettivo.
+  ///
+  /// In it, this message translates to:
+  /// **'di {target} obiettivo'**
+  String diarioKcalObiettivo(String target);
+
+  /// No description provided for @diarioNessunObiettivo.
+  ///
+  /// In it, this message translates to:
+  /// **'nessun obiettivo impostato'**
+  String get diarioNessunObiettivo;
+
+  /// No description provided for @diarioObiettivoRaggiunto.
+  ///
+  /// In it, this message translates to:
+  /// **'obiettivo raggiunto'**
+  String get diarioObiettivoRaggiunto;
+
+  /// No description provided for @diarioKcalRimanenti.
+  ///
+  /// In it, this message translates to:
+  /// **'{kcal} rimanenti'**
+  String diarioKcalRimanenti(String kcal);
+
+  /// No description provided for @diarioOttimoLavoro.
+  ///
+  /// In it, this message translates to:
+  /// **'Ottimo lavoro! Sei nei target di oggi.'**
+  String get diarioOttimoLavoro;
+
+  /// No description provided for @diarioMacroProteine.
+  ///
+  /// In it, this message translates to:
+  /// **'Proteine'**
+  String get diarioMacroProteine;
+
+  /// No description provided for @diarioMacroGrassi.
+  ///
+  /// In it, this message translates to:
+  /// **'Grassi'**
+  String get diarioMacroGrassi;
+
+  /// No description provided for @diarioMacroCarbo.
+  ///
+  /// In it, this message translates to:
+  /// **'Carbo'**
+  String get diarioMacroCarbo;
+
+  /// No description provided for @diarioNessunAlimento.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessun alimento registrato'**
+  String get diarioNessunAlimento;
+
+  /// No description provided for @diarioRipetiIeri.
+  ///
+  /// In it, this message translates to:
+  /// **'Ripeti pasto di ieri'**
+  String get diarioRipetiIeri;
+
+  /// No description provided for @aggiuntiA.
+  ///
+  /// In it, this message translates to:
+  /// **'AGGIUNGI A {pasto}'**
+  String aggiuntiA(String pasto);
+
+  /// No description provided for @aggiuntiPastiPreferiti.
+  ///
+  /// In it, this message translates to:
+  /// **'I TUOI PASTI PREFERITI'**
+  String get aggiuntiPastiPreferiti;
+
+  /// No description provided for @aggiuntiDalPiano.
+  ///
+  /// In it, this message translates to:
+  /// **'DAL TUO PIANO'**
+  String get aggiuntiDalPiano;
+
+  /// No description provided for @aggiuntiTuoiAlimenti.
+  ///
+  /// In it, this message translates to:
+  /// **'I TUOI ALIMENTI'**
+  String get aggiuntiTuoiAlimenti;
+
+  /// No description provided for @aggiuntiAlimentiSalvati.
+  ///
+  /// In it, this message translates to:
+  /// **'ALIMENTI SALVATI'**
+  String get aggiuntiAlimentiSalvati;
+
+  /// No description provided for @aggiuntiRisultatiOFF.
+  ///
+  /// In it, this message translates to:
+  /// **'RISULTATI OPEN FOOD FACTS'**
+  String get aggiuntiRisultatiOFF;
+
+  /// No description provided for @aggiuntiNessunRisultato.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessun risultato trovato.\nProva a creare un alimento manuale.'**
+  String get aggiuntiNessunRisultato;
+
+  /// No description provided for @aggiuntiCreaManuale.
+  ///
+  /// In it, this message translates to:
+  /// **'Crea alimento manuale'**
+  String get aggiuntiCreaManuale;
+
+  /// No description provided for @aggiuntiQuantitaG.
+  ///
+  /// In it, this message translates to:
+  /// **'Quantità (g)'**
+  String get aggiuntiQuantitaG;
+
+  /// No description provided for @aggiuntiAggiungi.
+  ///
+  /// In it, this message translates to:
+  /// **'AGGIUNGI'**
+  String get aggiuntiAggiungi;
+
+  /// No description provided for @aggiuntiCreaAlimento.
+  ///
+  /// In it, this message translates to:
+  /// **'CREA ALIMENTO'**
+  String get aggiuntiCreaAlimento;
+
+  /// No description provided for @aggiuntiNome.
+  ///
+  /// In it, this message translates to:
+  /// **'Nome *'**
+  String get aggiuntiNome;
+
+  /// No description provided for @aggiuntiBrand.
+  ///
+  /// In it, this message translates to:
+  /// **'Brand (opzionale)'**
+  String get aggiuntiBrand;
+
+  /// No description provided for @aggiuntiKcal100g.
+  ///
+  /// In it, this message translates to:
+  /// **'Kcal/100g *'**
+  String get aggiuntiKcal100g;
+
+  /// No description provided for @aggiuntiProteine100g.
+  ///
+  /// In it, this message translates to:
+  /// **'Proteine/100g'**
+  String get aggiuntiProteine100g;
+
+  /// No description provided for @aggiuntiGrassi100g.
+  ///
+  /// In it, this message translates to:
+  /// **'Grassi/100g'**
+  String get aggiuntiGrassi100g;
+
+  /// No description provided for @aggiuntiCarbo100g.
+  ///
+  /// In it, this message translates to:
+  /// **'Carbo/100g'**
+  String get aggiuntiCarbo100g;
+
+  /// No description provided for @aggiuntiSalvaAggiungi.
+  ///
+  /// In it, this message translates to:
+  /// **'SALVA E AGGIUNGI'**
+  String get aggiuntiSalvaAggiungi;
+
+  /// No description provided for @aggiuntiCercaHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Cerca alimento o marca...'**
+  String get aggiuntiCercaHint;
+
+  /// No description provided for @questionarioTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'PREFERENZE ALIMENTARI'**
+  String get questionarioTitolo;
+
+  /// No description provided for @questionarioIndietro.
+  ///
+  /// In it, this message translates to:
+  /// **'INDIETRO'**
+  String get questionarioIndietro;
+
+  /// No description provided for @questionarioAvanti.
+  ///
+  /// In it, this message translates to:
+  /// **'AVANTI'**
+  String get questionarioAvanti;
+
+  /// No description provided for @questionarioSalvaGenera.
+  ///
+  /// In it, this message translates to:
+  /// **'SALVA E GENERA'**
+  String get questionarioSalvaGenera;
+
+  /// No description provided for @questionarioRestrizioni.
+  ///
+  /// In it, this message translates to:
+  /// **'Restrizioni'**
+  String get questionarioRestrizioni;
+
+  /// No description provided for @questionarioRestrizioniSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Seleziona eventuali restrizioni dietetiche. Puoi saltare se non hai vincoli.'**
+  String get questionarioRestrizioniSub;
+
+  /// No description provided for @questionarioVegetariano.
+  ///
+  /// In it, this message translates to:
+  /// **'Vegetariano'**
+  String get questionarioVegetariano;
+
+  /// No description provided for @questionarioVegano.
+  ///
+  /// In it, this message translates to:
+  /// **'Vegano'**
+  String get questionarioVegano;
+
+  /// No description provided for @questionarioNoLattosio.
+  ///
+  /// In it, this message translates to:
+  /// **'No lattosio'**
+  String get questionarioNoLattosio;
+
+  /// No description provided for @questionarioNoGlutine.
+  ///
+  /// In it, this message translates to:
+  /// **'No glutine'**
+  String get questionarioNoGlutine;
+
+  /// No description provided for @questionarioNoPesce.
+  ///
+  /// In it, this message translates to:
+  /// **'No pesce'**
+  String get questionarioNoPesce;
+
+  /// No description provided for @questionarioNoFruttaSecca.
+  ///
+  /// In it, this message translates to:
+  /// **'No frutta secca'**
+  String get questionarioNoFruttaSecca;
+
+  /// No description provided for @questionarioNessunaRestrizione.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessuna restrizione — ottimo!'**
+  String get questionarioNessunaRestrizione;
+
+  /// No description provided for @questionarioPreferenze.
+  ///
+  /// In it, this message translates to:
+  /// **'Preferenze'**
+  String get questionarioPreferenze;
+
+  /// No description provided for @questionarioPreferenzeSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Seleziona gli alimenti che ti piacciono. Il piano darà priorità alle tue scelte.'**
+  String get questionarioPreferenzeSub;
+
+  /// No description provided for @questionarioStruttura.
+  ///
+  /// In it, this message translates to:
+  /// **'Struttura'**
+  String get questionarioStruttura;
+
+  /// No description provided for @questionarioStrutturaSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Come organizzi i tuoi pasti?'**
+  String get questionarioStrutturaSub;
+
+  /// No description provided for @questionarioPastiGiorno.
+  ///
+  /// In it, this message translates to:
+  /// **'Pasti al giorno'**
+  String get questionarioPastiGiorno;
+
+  /// No description provided for @questionarioSpuntinoPostWo.
+  ///
+  /// In it, this message translates to:
+  /// **'Spuntino post-allenamento'**
+  String get questionarioSpuntinoPostWo;
+
+  /// No description provided for @questionarioSpuntinoPostWoSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Include quota proteica extra per il recupero'**
+  String get questionarioSpuntinoPostWoSub;
+
+  /// No description provided for @pianoGenerazioneInCorso.
+  ///
+  /// In it, this message translates to:
+  /// **'Generazione piano in corso…'**
+  String get pianoGenerazioneInCorso;
+
+  /// No description provided for @pianoPianoAlimentare.
+  ///
+  /// In it, this message translates to:
+  /// **'Piano Alimentare'**
+  String get pianoPianoAlimentare;
+
+  /// No description provided for @pianoPromoSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Dicci le tue preferenze alimentari e generiamo un piano personalizzato sui tuoi macro target.'**
+  String get pianoPromoSub;
+
+  /// No description provided for @pianoIniziaQuestionario.
+  ///
+  /// In it, this message translates to:
+  /// **'INIZIA QUESTIONARIO'**
+  String get pianoIniziaQuestionario;
+
+  /// No description provided for @pianoPreferenzeSalvate.
+  ///
+  /// In it, this message translates to:
+  /// **'Preferenze salvate'**
+  String get pianoPreferenzeSalvate;
+
+  /// No description provided for @pianoProntoGenerare.
+  ///
+  /// In it, this message translates to:
+  /// **'Pronto per generare il tuo piano alimentare.'**
+  String get pianoProntoGenerare;
+
+  /// No description provided for @pianoGeneraPiano.
+  ///
+  /// In it, this message translates to:
+  /// **'GENERA PIANO'**
+  String get pianoGeneraPiano;
+
+  /// No description provided for @pianoModificaPreferenze.
+  ///
+  /// In it, this message translates to:
+  /// **'Modifica preferenze'**
+  String get pianoModificaPreferenze;
+
+  /// No description provided for @pianoEsportaPdf.
+  ///
+  /// In it, this message translates to:
+  /// **'Esporta PDF'**
+  String get pianoEsportaPdf;
+
+  /// No description provided for @pianoObiettiviCambiati.
+  ///
+  /// In it, this message translates to:
+  /// **'I tuoi obiettivi sono cambiati. Rigenera il piano per aggiornare le grammature.'**
+  String get pianoObiettiviCambiati;
+
+  /// No description provided for @pianoRigenera.
+  ///
+  /// In it, this message translates to:
+  /// **'RIGENERA'**
+  String get pianoRigenera;
+
+  /// No description provided for @pianoGeneratoIl.
+  ///
+  /// In it, this message translates to:
+  /// **'Generato il {data}'**
+  String pianoGeneratoIl(String data);
+
+  /// No description provided for @pianoAttivo.
+  ///
+  /// In it, this message translates to:
+  /// **'ATTIVO'**
+  String get pianoAttivo;
+
+  /// No description provided for @pianoGrammatureCrudo.
+  ///
+  /// In it, this message translates to:
+  /// **'Grammature da pesare a crudo'**
+  String get pianoGrammatureCrudo;
+
+  /// No description provided for @pianoKcalNote.
+  ///
+  /// In it, this message translates to:
+  /// **'Le kcal del piano possono differire leggermente dal target del diario per via degli arrotondamenti sulle grammature'**
+  String get pianoKcalNote;
+
+  /// No description provided for @pianoQbRiferimento.
+  ///
+  /// In it, this message translates to:
+  /// **'q.b.  ·  ~{g} g come riferimento'**
+  String pianoQbRiferimento(String g);
+
+  /// No description provided for @pianoQb.
+  ///
+  /// In it, this message translates to:
+  /// **'q.b.  ·  ~{g} g'**
+  String pianoQb(String g);
+
+  /// No description provided for @pianoNascondiAlternative.
+  ///
+  /// In it, this message translates to:
+  /// **'Nascondi alternative'**
+  String get pianoNascondiAlternative;
+
+  /// No description provided for @pianoNAlternative.
+  ///
+  /// In it, this message translates to:
+  /// **'{count, plural, one{{count} alternativa} other{{count} alternative}}'**
+  String pianoNAlternative(int count);
+
+  /// No description provided for @pianoAggiungiAlDiario.
+  ///
+  /// In it, this message translates to:
+  /// **'Aggiungi al diario'**
+  String get pianoAggiungiAlDiario;
+
+  /// No description provided for @pianoSuggerito.
+  ///
+  /// In it, this message translates to:
+  /// **'Suggerito'**
+  String get pianoSuggerito;
+
+  /// No description provided for @pianoAggiunto.
+  ///
+  /// In it, this message translates to:
+  /// **'Aggiunto a {pasto}'**
+  String pianoAggiunto(String pasto);
+
+  /// No description provided for @pianoErrorePdf.
+  ///
+  /// In it, this message translates to:
+  /// **'Errore durante la generazione del PDF'**
+  String get pianoErrorePdf;
+
+  /// No description provided for @pianoStileDolce.
+  ///
+  /// In it, this message translates to:
+  /// **'🍯 Dolce'**
+  String get pianoStileDolce;
+
+  /// No description provided for @pianoStileSalata.
+  ///
+  /// In it, this message translates to:
+  /// **'🧀 Salata'**
+  String get pianoStileSalata;
 }
 
 class _AppLocalizationsDelegate

@@ -107,7 +107,7 @@ class _QuestionarioScreenState extends State<QuestionarioScreen> {
         elevation: 0,
         iconTheme: IconThemeData(color: p.accent),
         title: Text(
-          'PREFERENZE ALIMENTARI',
+          context.l10n.questionarioTitolo,
           style: TextStyle(
             color: p.accent,
             fontSize: 14,
@@ -149,7 +149,7 @@ class _QuestionarioScreenState extends State<QuestionarioScreen> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                 ),
-                child: const Text('INDIETRO', style: TextStyle(fontSize: 13)),
+                child: Text(context.l10n.questionarioIndietro, style: const TextStyle(fontSize: 13)),
               ),
               const SizedBox(width: 12),
             ],
@@ -170,7 +170,7 @@ class _QuestionarioScreenState extends State<QuestionarioScreen> {
                         child: CircularProgressIndicator(strokeWidth: 2, color: p.background),
                       )
                     : Text(
-                        _page < 2 ? 'AVANTI' : 'SALVA E GENERA',
+                        _page < 2 ? context.l10n.questionarioAvanti : context.l10n.questionarioSalvaGenera,
                         style: const TextStyle(fontWeight: FontWeight.w700, letterSpacing: 1, fontSize: 13),
                       ),
               ),
@@ -200,11 +200,11 @@ class _QuestionarioScreenState extends State<QuestionarioScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Restrizioni',
+        Text(context.l10n.questionarioRestrizioni,
             style: TextStyle(color: p.textPrimary, fontSize: 20, fontWeight: FontWeight.w700)),
         const SizedBox(height: 6),
         Text(
-          'Seleziona eventuali restrizioni dietetiche. Puoi saltare se non hai vincoli.',
+          context.l10n.questionarioRestrizioniSub,
           style: TextStyle(color: p.textMuted, fontSize: 13, height: 1.5),
         ),
         const SizedBox(height: 24),
@@ -212,17 +212,17 @@ class _QuestionarioScreenState extends State<QuestionarioScreen> {
           spacing: 10,
           runSpacing: 10,
           children: [
-            _RChip(value: 'vegetariano', label: 'Vegetariano', icon: Icons.eco_rounded, sel: _restrizioni, onTap: _toggleRestriz, p: p),
-            _RChip(value: 'vegano', label: 'Vegano', icon: Icons.spa_rounded, sel: _restrizioni, onTap: _toggleRestriz, p: p),
-            _RChip(value: 'no_lattosio', label: 'No lattosio', icon: Icons.local_cafe_rounded, sel: _restrizioni, onTap: _toggleRestriz, p: p),
-            _RChip(value: 'no_glutine', label: 'No glutine', icon: Icons.grain_rounded, sel: _restrizioni, onTap: _toggleRestriz, p: p),
-            _RChip(value: 'no_pesce', label: 'No pesce', icon: Icons.water_rounded, sel: _restrizioni, onTap: _toggleRestriz, p: p),
-            _RChip(value: 'no_fruttaSecca', label: 'No frutta secca', icon: Icons.nature_rounded, sel: _restrizioni, onTap: _toggleRestriz, p: p),
+            _RChip(value: 'vegetariano', label: context.l10n.questionarioVegetariano, icon: Icons.eco_rounded, sel: _restrizioni, onTap: _toggleRestriz, p: p),
+            _RChip(value: 'vegano', label: context.l10n.questionarioVegano, icon: Icons.spa_rounded, sel: _restrizioni, onTap: _toggleRestriz, p: p),
+            _RChip(value: 'no_lattosio', label: context.l10n.questionarioNoLattosio, icon: Icons.local_cafe_rounded, sel: _restrizioni, onTap: _toggleRestriz, p: p),
+            _RChip(value: 'no_glutine', label: context.l10n.questionarioNoGlutine, icon: Icons.grain_rounded, sel: _restrizioni, onTap: _toggleRestriz, p: p),
+            _RChip(value: 'no_pesce', label: context.l10n.questionarioNoPesce, icon: Icons.water_rounded, sel: _restrizioni, onTap: _toggleRestriz, p: p),
+            _RChip(value: 'no_fruttaSecca', label: context.l10n.questionarioNoFruttaSecca, icon: Icons.nature_rounded, sel: _restrizioni, onTap: _toggleRestriz, p: p),
           ],
         ),
         const SizedBox(height: 20),
         if (_restrizioni.isEmpty)
-          Text('Nessuna restrizione — ottimo!',
+          Text(context.l10n.questionarioNessunaRestrizione,
               style: TextStyle(color: p.textMuted, fontSize: 12)),
       ],
     );
@@ -234,11 +234,11 @@ class _QuestionarioScreenState extends State<QuestionarioScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Preferenze',
+        Text(context.l10n.questionarioPreferenze,
             style: TextStyle(color: p.textPrimary, fontSize: 20, fontWeight: FontWeight.w700)),
         const SizedBox(height: 6),
         Text(
-          'Seleziona gli alimenti che ti piacciono. Il piano darà priorità alle tue scelte.',
+          context.l10n.questionarioPreferenzeSub,
           style: TextStyle(color: p.textMuted, fontSize: 13, height: 1.5),
         ),
         const SizedBox(height: 24),
@@ -308,13 +308,13 @@ class _QuestionarioScreenState extends State<QuestionarioScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Struttura',
+        Text(context.l10n.questionarioStruttura,
             style: TextStyle(color: p.textPrimary, fontSize: 20, fontWeight: FontWeight.w700)),
         const SizedBox(height: 6),
-        Text('Come organizzi i tuoi pasti?',
+        Text(context.l10n.questionarioStrutturaSub,
             style: TextStyle(color: p.textMuted, fontSize: 13, height: 1.5)),
         const SizedBox(height: 28),
-        Text('Pasti al giorno',
+        Text(context.l10n.questionarioPastiGiorno,
             style: TextStyle(color: p.textSecondary, fontSize: 14, fontWeight: FontWeight.w600)),
         const SizedBox(height: 12),
         Row(
@@ -362,13 +362,13 @@ class _QuestionarioScreenState extends State<QuestionarioScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Spuntino post-allenamento',
+                    Text(context.l10n.questionarioSpuntinoPostWo,
                         style: TextStyle(
                             color: p.textPrimary,
                             fontSize: 14,
                             fontWeight: FontWeight.w500)),
                     const SizedBox(height: 4),
-                    Text('Include quota proteica extra per il recupero',
+                    Text(context.l10n.questionarioSpuntinoPostWoSub,
                         style: TextStyle(color: p.textMuted, fontSize: 12)),
                   ],
                 ),
@@ -448,10 +448,13 @@ class _ProgressBar extends StatelessWidget {
   final ColorPalette p;
   const _ProgressBar({required this.current, required this.p});
 
-  static const _titles = ['Restrizioni', 'Preferenze', 'Struttura'];
-
   @override
   Widget build(BuildContext context) {
+    final titles = [
+      context.l10n.questionarioRestrizioni,
+      context.l10n.questionarioPreferenze,
+      context.l10n.questionarioStruttura,
+    ];
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
       child: Column(
@@ -460,7 +463,7 @@ class _ProgressBar extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(_titles[current],
+              Text(titles[current],
                   style: TextStyle(
                       color: p.textSecondary,
                       fontSize: 13,

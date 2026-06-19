@@ -12,7 +12,6 @@ import '../../services/pdf_export_service.dart';
 import '../../services/piano_service.dart';
 import 'questionario_screen.dart';
 
-const _diaryPastoNomi = ['Colazione', 'Pranzo', 'Cena', 'Spuntino'];
 const _diaryPastoIcons = [
   Icons.free_breakfast_rounded,
   Icons.lunch_dining_rounded,
@@ -98,7 +97,7 @@ class _PianoTabState extends State<PianoTab> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Errore durante la generazione del PDF')),
+        SnackBar(content: Text(context.l10n.pianoErrorePdf)),
       );
     }
   }
@@ -132,7 +131,7 @@ class _PianoTabState extends State<PianoTab> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Aggiunto a $pastoNome'),
+                content: Text(context.l10n.pianoAggiunto(pastoNome)),
                 duration: const Duration(seconds: 2),
               ),
             );
@@ -157,7 +156,7 @@ class _PianoTabState extends State<PianoTab> {
           children: [
             CircularProgressIndicator(color: p.accent),
             const SizedBox(height: 16),
-            Text('Generazione piano in corso…',
+            Text(context.l10n.pianoGenerazioneInCorso,
                 style: TextStyle(color: p.textSecondary, fontSize: 14)),
           ],
         ),
@@ -184,16 +183,16 @@ class _PianoTabState extends State<PianoTab> {
               child: Icon(Icons.restaurant_menu_rounded, size: 48, color: p.accent),
             ),
             const SizedBox(height: 24),
-            Text('Piano Alimentare',
+            Text(context.l10n.pianoPianoAlimentare,
                 style: TextStyle(color: p.textPrimary, fontSize: 22, fontWeight: FontWeight.w700)),
             const SizedBox(height: 10),
             Text(
-              'Dicci le tue preferenze alimentari e generiamo un piano personalizzato sui tuoi macro target.',
+              context.l10n.pianoPromoSub,
               textAlign: TextAlign.center,
               style: TextStyle(color: p.textMuted, fontSize: 14, height: 1.5),
             ),
             const SizedBox(height: 32),
-            _AccentButton(label: 'INIZIA QUESTIONARIO', onTap: _openQuestionario, p: p),
+            _AccentButton(label: context.l10n.pianoIniziaQuestionario, onTap: _openQuestionario, p: p),
           ],
         ),
       ),
@@ -211,17 +210,17 @@ class _PianoTabState extends State<PianoTab> {
           children: [
             Icon(Icons.check_circle_outline_rounded, size: 48, color: p.accent),
             const SizedBox(height: 16),
-            Text('Preferenze salvate',
+            Text(context.l10n.pianoPreferenzeSalvate,
                 style: TextStyle(color: p.textPrimary, fontSize: 18, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
-            Text('Pronto per generare il tuo piano alimentare.',
+            Text(context.l10n.pianoProntoGenerare,
                 style: TextStyle(color: p.textMuted, fontSize: 13)),
             const SizedBox(height: 32),
-            _AccentButton(label: 'GENERA PIANO', onTap: _generaPiano, p: p),
+            _AccentButton(label: context.l10n.pianoGeneraPiano, onTap: _generaPiano, p: p),
             const SizedBox(height: 12),
             TextButton(
               onPressed: _openQuestionario,
-              child: Text('Modifica preferenze', style: TextStyle(color: p.textMuted, fontSize: 13)),
+              child: Text(context.l10n.pianoModificaPreferenze, style: TextStyle(color: p.textMuted, fontSize: 13)),
             ),
           ],
         ),
@@ -249,7 +248,7 @@ class _PianoTabState extends State<PianoTab> {
             child: TextButton.icon(
               onPressed: _exportPdf,
               icon: Icon(Icons.picture_as_pdf_rounded, size: 18, color: p.accent),
-              label: Text('Esporta PDF', style: TextStyle(color: p.accent, fontSize: 13)),
+              label: Text(context.l10n.pianoEsportaPdf, style: TextStyle(color: p.accent, fontSize: 13)),
             ),
           ),
           const SizedBox(height: 8),
@@ -277,7 +276,7 @@ class _PianoTabState extends State<PianoTab> {
                 Row(
                   children: [
                     _StileChip(
-                      label: '🍯 Dolce',
+                      label: context.l10n.pianoStileDolce,
                       selected: !isSalato,
                       onTap: () => setState(() {
                         _salatoByMeal[mealIdx] = false;
@@ -288,7 +287,7 @@ class _PianoTabState extends State<PianoTab> {
                     ),
                     const SizedBox(width: 8),
                     _StileChip(
-                      label: '🧀 Salata',
+                      label: context.l10n.pianoStileSalata,
                       selected: isSalato,
                       onTap: () => setState(() {
                         _salatoByMeal[mealIdx] = true;
@@ -331,7 +330,7 @@ class _PianoTabState extends State<PianoTab> {
             child: TextButton.icon(
               onPressed: _openQuestionario,
               icon: Icon(Icons.tune_rounded, color: p.textMuted, size: 16),
-              label: Text('Modifica preferenze',
+              label: Text(context.l10n.pianoModificaPreferenze,
                   style: TextStyle(color: p.textMuted, fontSize: 13)),
             ),
           ),
@@ -395,7 +394,7 @@ class _ObsoletoBanner extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'I tuoi obiettivi sono cambiati. Rigenera il piano per aggiornare le grammature.',
+              context.l10n.pianoObiettiviCambiati,
               style: TextStyle(color: p.textSecondary, fontSize: 12, height: 1.4),
             ),
           ),
@@ -407,8 +406,8 @@ class _ObsoletoBanner extends StatelessWidget {
               backgroundColor: const Color(0xFFFFB800).withValues(alpha: 0.2),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            child: const Text('RIGENERA',
-                style: TextStyle(
+            child: Text(context.l10n.pianoRigenera,
+                style: const TextStyle(
                     color: Color(0xFFFFB800), fontSize: 11, fontWeight: FontWeight.w700)),
           ),
         ],
@@ -446,10 +445,10 @@ class _PlanHeaderCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('${plan.kcalTotali.round()} kcal/giorno',
+                    Text(context.l10n.homeTdeeKcalGiorno('${plan.kcalTotali.round()}'),
                         style: TextStyle(
                             color: p.textPrimary, fontSize: 22, fontWeight: FontWeight.w800)),
-                    Text('Generato il ${_formatDate(plan.dataCreazione)}',
+                    Text(context.l10n.pianoGeneratoIl(_formatDate(plan.dataCreazione)),
                         style: TextStyle(color: p.textMuted, fontSize: 12)),
                   ],
                 ),
@@ -461,7 +460,7 @@ class _PlanHeaderCard extends StatelessWidget {
                     color: p.accent.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text('ATTIVO',
+                  child: Text(context.l10n.pianoAttivo,
                       style: TextStyle(
                           color: p.accent, fontSize: 11, fontWeight: FontWeight.w700)),
                 ),
@@ -483,7 +482,7 @@ class _PlanHeaderCard extends StatelessWidget {
               Icon(Icons.info_outline_rounded, size: 12, color: p.textMuted),
               const SizedBox(width: 4),
               Text(
-                'Grammature da pesare a crudo',
+                context.l10n.pianoGrammatureCrudo,
                 style: TextStyle(color: p.textMuted, fontSize: 11),
               ),
             ],
@@ -495,7 +494,7 @@ class _PlanHeaderCard extends StatelessWidget {
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
-                  'Le kcal del piano possono differire leggermente dal target del diario per via degli arrotondamenti sulle grammature',
+                  context.l10n.pianoKcalNote,
                   style: TextStyle(color: p.textMuted, fontSize: 11),
                 ),
               ),
@@ -622,7 +621,7 @@ class _SlotCard extends StatelessWidget {
                             const SizedBox(height: 3),
                             if (slot.tipo == PianoService.kVerdura) ...[
                               Text(
-                                'q.b.  ·  ~${food.quantitaG.round()} g come riferimento',
+                                context.l10n.pianoQbRiferimento('${food.quantitaG.round()}'),
                                 style: TextStyle(color: p.textMuted, fontSize: 12),
                               ),
                             ] else ...[
@@ -670,8 +669,8 @@ class _SlotCard extends StatelessWidget {
                       children: [
                         Text(
                           expanded
-                              ? 'Nascondi alternative'
-                              : '${slot.alternative.length} alternativ${slot.alternative.length == 1 ? "a" : "e"}',
+                              ? context.l10n.pianoNascondiAlternative
+                              : context.l10n.pianoNAlternative(slot.alternative.length),
                           style: TextStyle(
                               color: p.accent, fontSize: 12, fontWeight: FontWeight.w600),
                         ),
@@ -712,7 +711,7 @@ class _SlotCard extends StatelessWidget {
                                 const SizedBox(height: 2),
                                 if (slot.tipo == PianoService.kVerdura)
                                   Text(
-                                    'q.b.  ·  ~${alt.quantitaG.round()} g',
+                                    context.l10n.pianoQb('${alt.quantitaG.round()}'),
                                     style: TextStyle(color: p.textMuted, fontSize: 11),
                                   )
                                 else
@@ -824,7 +823,7 @@ class _PastoPicker extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Aggiungi al diario',
+            Text(context.l10n.pianoAggiungiAlDiario,
                 style: TextStyle(
                     color: p.textPrimary, fontSize: 16, fontWeight: FontWeight.w700)),
             const SizedBox(height: 4),
@@ -850,7 +849,7 @@ class _PastoPicker extends StatelessWidget {
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                   leading: Icon(_diaryPastoIcons[i],
                       color: isSuggested ? p.accent : p.textMuted),
-                  title: Text(_diaryPastoNomi[i],
+                  title: Text(PianoService.pastoLabel(context.l10n, i),
                       style: TextStyle(
                           color: isSuggested ? p.accent : p.textPrimary,
                           fontSize: 14,
@@ -862,7 +861,7 @@ class _PastoPicker extends StatelessWidget {
                             color: p.accent.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Text('Suggerito',
+                          child: Text(context.l10n.pianoSuggerito,
                               style: TextStyle(
                                   color: p.accent, fontSize: 10, fontWeight: FontWeight.w600)),
                         )
@@ -873,7 +872,7 @@ class _PastoPicker extends StatelessWidget {
                     AchievementService.instance.checkAll();
                     if (context.mounted) {
                       Navigator.of(context).pop();
-                      onAdded(_diaryPastoNomi[i]);
+                      onAdded(PianoService.pastoLabel(context.l10n, i));
                     }
                   },
                 ),

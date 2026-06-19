@@ -9,12 +9,9 @@ import '../../services/achievement_service.dart';
 import '../../services/database_service.dart';
 import '../../services/target_service.dart';
 import '../../services/widget_service.dart';
+import '../../services/piano_service.dart';
 import 'aggiunta_alimento_screen.dart';
 import 'piano_tab.dart';
-
-const _pastoLabels = [
-  'COLAZIONE', 'PRANZO', 'CENA', 'SPUNTINO', 'POST-WO', 'SPUNTINO SERALE',
-];
 const _pastoIcons = [
   Icons.free_breakfast_rounded,
   Icons.lunch_dining_rounded,
@@ -107,29 +104,30 @@ class _DiarioScreenState extends State<DiarioScreen> {
   Future<String?> _askComboName() {
     final ctrl = TextEditingController();
     final p = context.palette;
+    final l10n = context.l10n;
     return showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: p.surface,
-        title: Text('Salva come preferito',
+        title: Text(l10n.diarioSalvaComePref,
             style: TextStyle(color: p.textPrimary)),
         content: TextField(
           controller: ctrl,
           autofocus: true,
           style: TextStyle(color: p.textPrimary),
           decoration: InputDecoration(
-            hintText: 'Es. La mia colazione',
+            hintText: l10n.diarioSalvaHint,
             hintStyle: TextStyle(color: p.textMuted),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Annulla'),
+            child: Text(l10n.diarioAnnulla),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, ctrl.text),
-            child: const Text('Salva'),
+            child: Text(l10n.diarioBtnSalva),
           ),
         ],
       ),
@@ -157,7 +155,7 @@ class _DiarioScreenState extends State<DiarioScreen> {
     await DatabaseService.instance.saveMealCombo(combo);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Salvato come preferito: ${combo.nome}')),
+      SnackBar(content: Text(context.l10n.diarioSalvatoComePref(combo.nome))),
     );
   }
 
@@ -199,14 +197,15 @@ class _DiarioScreenState extends State<DiarioScreen> {
   }
 
   String _formatDate(DateTime d) {
+    final l10n = context.l10n;
     const weekdays = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
     const months = [
       'gen', 'feb', 'mar', 'apr', 'mag', 'giu',
       'lug', 'ago', 'set', 'ott', 'nov', 'dic'
     ];
     final today = _dayStart(DateTime.now());
-    if (d == today) return 'Oggi';
-    if (d == today.subtract(const Duration(days: 1))) return 'Ieri';
+    if (d == today) return l10n.diarioOggi;
+    if (d == today.subtract(const Duration(days: 1))) return l10n.diarioIeri;
     return '${weekdays[d.weekday - 1]} ${d.day} ${months[d.month - 1]}';
   }
 
@@ -219,7 +218,7 @@ class _DiarioScreenState extends State<DiarioScreen> {
       child: Scaffold(
         backgroundColor: p.background,
         appBar: AppBar(
-          title: Text('DIARIO',
+          title: Text(context.l10n.diarioTitolo,
               style: TextStyle(
                   color: p.accent,
                   fontSize: 17,
@@ -235,9 +234,9 @@ class _DiarioScreenState extends State<DiarioScreen> {
             unselectedLabelColor: p.textMuted,
             labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 0.8),
             unselectedLabelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-            tabs: const [
-              Tab(text: 'PIANO'),
-              Tab(text: 'DIARIO'),
+            tabs: [
+              Tab(text: context.l10n.diarioTabPiano),
+              Tab(text: context.l10n.diarioTabDiario),
             ],
           ),
         ),
@@ -312,7 +311,7 @@ class _DiarioScreenState extends State<DiarioScreen> {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 16),
                     child: _PastoSection(
-                      label: _pastoLabels[i],
+                      label: PianoService.pastoLabel(context.l10n, i).toUpperCase(),
                       icon: _pastoIcons[i],
                       entries: entries,
                       globalIndices: globalIndices,
@@ -446,8 +445,8 @@ class _RiepilogoCard extends StatelessWidget {
                           fontWeight: FontWeight.w800)),
                   Text(
                     kcalTarget != null
-                        ? 'di ${kcalTarget!} obiettivo'
-                        : 'nessun obiettivo impostato',
+                        ? context.l10n.diarioKcalObiettivo('$kcalTarget')
+                        : context.l10n.diarioNessunObiettivo,
                     style: TextStyle(color: p.textMuted, fontSize: 12),
                   ),
                 ],
@@ -457,8 +456,8 @@ class _RiepilogoCard extends StatelessWidget {
                   over
                       ? '+${(kcalLogged - kcalTarget!).round()} kcal'
                       : onTarget
-                          ? 'obiettivo raggiunto'
-                          : '${(kcalTarget! - kcalLogged).round()} rimanenti',
+                          ? context.l10n.diarioObiettivoRaggiunto
+                          : context.l10n.diarioKcalRimanenti('${(kcalTarget! - kcalLogged).round()}'),
                   style: TextStyle(
                       color: over
                           ? const Color(0xFFE74C3C)
@@ -489,7 +488,7 @@ class _RiepilogoCard extends StatelessWidget {
                 const Icon(Icons.check_circle_rounded,
                     color: _green, size: 15),
                 const SizedBox(width: 6),
-                Text('Ottimo lavoro! Sei nei target di oggi.',
+                Text(context.l10n.diarioOttimoLavoro,
                     style: TextStyle(
                         color: _green,
                         fontSize: 12,
@@ -501,7 +500,7 @@ class _RiepilogoCard extends StatelessWidget {
           Row(
             children: [
               _MacroStat(
-                label: 'Proteine',
+                label: context.l10n.diarioMacroProteine,
                 logged: protLogged,
                 target: protTarget?.toDouble(),
                 color: const Color(0xFF3B9FF2),
@@ -509,7 +508,7 @@ class _RiepilogoCard extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               _MacroStat(
-                label: 'Grassi',
+                label: context.l10n.diarioMacroGrassi,
                 logged: fatLogged,
                 target: fatTarget?.toDouble(),
                 color: const Color(0xFFFFB800),
@@ -517,7 +516,7 @@ class _RiepilogoCard extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               _MacroStat(
-                label: 'Carbo',
+                label: context.l10n.diarioMacroCarbo,
                 logged: carbsLogged,
                 target: carbsTarget?.toDouble(),
                 color: const Color(0xFF4CAF8E),
@@ -644,7 +643,7 @@ class _PastoSection extends StatelessWidget {
                     onPressed: onSaveCombo,
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
-                    tooltip: 'Salva come preferito',
+                    tooltip: context.l10n.diarioSalvaComePref,
                   ),
                 ],
                 IconButton(
@@ -734,7 +733,7 @@ class _PastoSection extends StatelessWidget {
               child: Row(
                 children: [
                   Expanded(
-                    child: Text('Nessun alimento registrato',
+                    child: Text(context.l10n.diarioNessunAlimento,
                         style:
                             TextStyle(color: p.textMuted, fontSize: 12)),
                   ),
@@ -743,7 +742,7 @@ class _PastoSection extends StatelessWidget {
                       onPressed: onRepeatYesterday,
                       icon: Icon(Icons.replay_rounded,
                           color: p.accent, size: 15),
-                      label: Text('Ripeti pasto di ieri',
+                      label: Text(context.l10n.diarioRipetiIeri,
                           style: TextStyle(
                               color: p.accent,
                               fontSize: 12,

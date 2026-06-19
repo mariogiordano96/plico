@@ -372,4 +372,288 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get homeBadgeSettimanaTarget => 'Settimana in target';
+
+  @override
+  String get diarioTitolo => 'DIARIO';
+
+  @override
+  String get diarioTabPiano => 'PIANO';
+
+  @override
+  String get diarioTabDiario => 'DIARIO';
+
+  @override
+  String get diarioSalvaComePref => 'Salva come preferito';
+
+  @override
+  String get diarioSalvaHint => 'Es. La mia colazione';
+
+  @override
+  String get diarioAnnulla => 'Annulla';
+
+  @override
+  String get diarioBtnSalva => 'Salva';
+
+  @override
+  String diarioSalvatoComePref(String nome) {
+    return 'Salvato come preferito: $nome';
+  }
+
+  @override
+  String get diarioOggi => 'Oggi';
+
+  @override
+  String get diarioIeri => 'Ieri';
+
+  @override
+  String diarioKcalObiettivo(String target) {
+    return 'di $target obiettivo';
+  }
+
+  @override
+  String get diarioNessunObiettivo => 'nessun obiettivo impostato';
+
+  @override
+  String get diarioObiettivoRaggiunto => 'obiettivo raggiunto';
+
+  @override
+  String diarioKcalRimanenti(String kcal) {
+    return '$kcal rimanenti';
+  }
+
+  @override
+  String get diarioOttimoLavoro => 'Ottimo lavoro! Sei nei target di oggi.';
+
+  @override
+  String get diarioMacroProteine => 'Proteine';
+
+  @override
+  String get diarioMacroGrassi => 'Grassi';
+
+  @override
+  String get diarioMacroCarbo => 'Carbo';
+
+  @override
+  String get diarioNessunAlimento => 'Nessun alimento registrato';
+
+  @override
+  String get diarioRipetiIeri => 'Ripeti pasto di ieri';
+
+  @override
+  String aggiuntiA(String pasto) {
+    return 'AGGIUNGI A $pasto';
+  }
+
+  @override
+  String get aggiuntiPastiPreferiti => 'I TUOI PASTI PREFERITI';
+
+  @override
+  String get aggiuntiDalPiano => 'DAL TUO PIANO';
+
+  @override
+  String get aggiuntiTuoiAlimenti => 'I TUOI ALIMENTI';
+
+  @override
+  String get aggiuntiAlimentiSalvati => 'ALIMENTI SALVATI';
+
+  @override
+  String get aggiuntiRisultatiOFF => 'RISULTATI OPEN FOOD FACTS';
+
+  @override
+  String get aggiuntiNessunRisultato =>
+      'Nessun risultato trovato.\nProva a creare un alimento manuale.';
+
+  @override
+  String get aggiuntiCreaManuale => 'Crea alimento manuale';
+
+  @override
+  String get aggiuntiQuantitaG => 'Quantità (g)';
+
+  @override
+  String get aggiuntiAggiungi => 'AGGIUNGI';
+
+  @override
+  String get aggiuntiCreaAlimento => 'CREA ALIMENTO';
+
+  @override
+  String get aggiuntiNome => 'Nome *';
+
+  @override
+  String get aggiuntiBrand => 'Brand (opzionale)';
+
+  @override
+  String get aggiuntiKcal100g => 'Kcal/100g *';
+
+  @override
+  String get aggiuntiProteine100g => 'Proteine/100g';
+
+  @override
+  String get aggiuntiGrassi100g => 'Grassi/100g';
+
+  @override
+  String get aggiuntiCarbo100g => 'Carbo/100g';
+
+  @override
+  String get aggiuntiSalvaAggiungi => 'SALVA E AGGIUNGI';
+
+  @override
+  String get aggiuntiCercaHint => 'Cerca alimento o marca...';
+
+  @override
+  String get questionarioTitolo => 'PREFERENZE ALIMENTARI';
+
+  @override
+  String get questionarioIndietro => 'INDIETRO';
+
+  @override
+  String get questionarioAvanti => 'AVANTI';
+
+  @override
+  String get questionarioSalvaGenera => 'SALVA E GENERA';
+
+  @override
+  String get questionarioRestrizioni => 'Restrizioni';
+
+  @override
+  String get questionarioRestrizioniSub =>
+      'Seleziona eventuali restrizioni dietetiche. Puoi saltare se non hai vincoli.';
+
+  @override
+  String get questionarioVegetariano => 'Vegetariano';
+
+  @override
+  String get questionarioVegano => 'Vegano';
+
+  @override
+  String get questionarioNoLattosio => 'No lattosio';
+
+  @override
+  String get questionarioNoGlutine => 'No glutine';
+
+  @override
+  String get questionarioNoPesce => 'No pesce';
+
+  @override
+  String get questionarioNoFruttaSecca => 'No frutta secca';
+
+  @override
+  String get questionarioNessunaRestrizione => 'Nessuna restrizione — ottimo!';
+
+  @override
+  String get questionarioPreferenze => 'Preferenze';
+
+  @override
+  String get questionarioPreferenzeSub =>
+      'Seleziona gli alimenti che ti piacciono. Il piano darà priorità alle tue scelte.';
+
+  @override
+  String get questionarioStruttura => 'Struttura';
+
+  @override
+  String get questionarioStrutturaSub => 'Come organizzi i tuoi pasti?';
+
+  @override
+  String get questionarioPastiGiorno => 'Pasti al giorno';
+
+  @override
+  String get questionarioSpuntinoPostWo => 'Spuntino post-allenamento';
+
+  @override
+  String get questionarioSpuntinoPostWoSub =>
+      'Include quota proteica extra per il recupero';
+
+  @override
+  String get pianoGenerazioneInCorso => 'Generazione piano in corso…';
+
+  @override
+  String get pianoPianoAlimentare => 'Piano Alimentare';
+
+  @override
+  String get pianoPromoSub =>
+      'Dicci le tue preferenze alimentari e generiamo un piano personalizzato sui tuoi macro target.';
+
+  @override
+  String get pianoIniziaQuestionario => 'INIZIA QUESTIONARIO';
+
+  @override
+  String get pianoPreferenzeSalvate => 'Preferenze salvate';
+
+  @override
+  String get pianoProntoGenerare =>
+      'Pronto per generare il tuo piano alimentare.';
+
+  @override
+  String get pianoGeneraPiano => 'GENERA PIANO';
+
+  @override
+  String get pianoModificaPreferenze => 'Modifica preferenze';
+
+  @override
+  String get pianoEsportaPdf => 'Esporta PDF';
+
+  @override
+  String get pianoObiettiviCambiati =>
+      'I tuoi obiettivi sono cambiati. Rigenera il piano per aggiornare le grammature.';
+
+  @override
+  String get pianoRigenera => 'RIGENERA';
+
+  @override
+  String pianoGeneratoIl(String data) {
+    return 'Generato il $data';
+  }
+
+  @override
+  String get pianoAttivo => 'ATTIVO';
+
+  @override
+  String get pianoGrammatureCrudo => 'Grammature da pesare a crudo';
+
+  @override
+  String get pianoKcalNote =>
+      'Le kcal del piano possono differire leggermente dal target del diario per via degli arrotondamenti sulle grammature';
+
+  @override
+  String pianoQbRiferimento(String g) {
+    return 'q.b.  ·  ~$g g come riferimento';
+  }
+
+  @override
+  String pianoQb(String g) {
+    return 'q.b.  ·  ~$g g';
+  }
+
+  @override
+  String get pianoNascondiAlternative => 'Nascondi alternative';
+
+  @override
+  String pianoNAlternative(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count alternative',
+      one: '$count alternativa',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get pianoAggiungiAlDiario => 'Aggiungi al diario';
+
+  @override
+  String get pianoSuggerito => 'Suggerito';
+
+  @override
+  String pianoAggiunto(String pasto) {
+    return 'Aggiunto a $pasto';
+  }
+
+  @override
+  String get pianoErrorePdf => 'Errore durante la generazione del PDF';
+
+  @override
+  String get pianoStileDolce => '🍯 Dolce';
+
+  @override
+  String get pianoStileSalata => '🧀 Salata';
 }

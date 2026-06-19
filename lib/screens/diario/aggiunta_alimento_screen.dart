@@ -9,9 +9,8 @@ import '../../models/meal_plan.dart';
 import '../../services/achievement_service.dart';
 import '../../services/database_service.dart';
 import '../../services/open_food_facts_service.dart';
+import '../../services/piano_service.dart';
 import 'barcode_scanner_screen.dart';
-
-const _pastoLabels = ['Colazione', 'Pranzo', 'Cena', 'Spuntino'];
 
 class AggiuntaAlimentoScreen extends StatefulWidget {
   final int pastoTipo;
@@ -239,7 +238,7 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
       backgroundColor: p.background,
       appBar: AppBar(
         title: Text(
-          'AGGIUNGI A ${_pastoLabels[widget.pastoTipo].toUpperCase()}',
+          context.l10n.aggiuntiA(PianoService.pastoLabel(context.l10n, widget.pastoTipo).toUpperCase()),
           style: TextStyle(
             color: p.accent,
             fontSize: 15,
@@ -290,7 +289,7 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
                     children: [
                       if (_searchCtrl.text.isEmpty && _combos.isNotEmpty) ...[
-                        _SectionLabel('I TUOI PASTI PREFERITI', p),
+                        _SectionLabel(context.l10n.aggiuntiPastiPreferiti, p),
                         const SizedBox(height: 8),
                         _FoodListBox(
                           children: _combos.map((combo) {
@@ -318,7 +317,7 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
                       ],
                       if (_searchCtrl.text.isEmpty &&
                           _planFoods.isNotEmpty) ...[
-                        _SectionLabel('DAL TUO PIANO', p),
+                        _SectionLabel(context.l10n.aggiuntiDalPiano, p),
                         const SizedBox(height: 8),
                         _FoodListBox(
                           children: _planFoods.map((food) {
@@ -342,8 +341,8 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
                       if (_localResults.isNotEmpty) ...[
                         _SectionLabel(
                           _searchCtrl.text.isEmpty
-                              ? 'I TUOI ALIMENTI'
-                              : 'ALIMENTI SALVATI',
+                              ? context.l10n.aggiuntiTuoiAlimenti
+                              : context.l10n.aggiuntiAlimentiSalvati,
                           p,
                         ),
                         const SizedBox(height: 8),
@@ -371,7 +370,7 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
                         const SizedBox(height: 20),
                       ],
                       if (_hasSearched && _offResults.isNotEmpty) ...[
-                        _SectionLabel('RISULTATI OPEN FOOD FACTS', p),
+                        _SectionLabel(context.l10n.aggiuntiRisultatiOFF, p),
                         const SizedBox(height: 8),
                         _FoodListBox(
                           children: _offResults.map((food) {
@@ -396,7 +395,7 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
                           child: Padding(
                             padding: const EdgeInsets.only(top: 40),
                             child: Text(
-                              'Nessun risultato trovato.\nProva a creare un alimento manuale.',
+                              context.l10n.aggiuntiNessunRisultato,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   color: p.textMuted, fontSize: 14),
@@ -415,7 +414,7 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
             onPressed: _showCustomForm,
             icon: Icon(Icons.add_circle_outline, color: p.accent),
             label: Text(
-              'Crea alimento manuale',
+              context.l10n.aggiuntiCreaManuale,
               style: TextStyle(
                   color: p.accent,
                   fontWeight: FontWeight.w600,
@@ -576,7 +575,7 @@ class _QuantitySheetState extends State<_QuantitySheet> {
                     inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
                     style: TextStyle(color: p.textPrimary, fontSize: 16),
                     decoration: InputDecoration(
-                      labelText: 'Quantità (g)',
+                      labelText: context.l10n.aggiuntiQuantitaG,
                       labelStyle: TextStyle(color: p.textMuted),
                       suffix: Text('g', style: TextStyle(color: p.textMuted)),
                       enabledBorder: OutlineInputBorder(
@@ -644,8 +643,8 @@ class _QuantitySheetState extends State<_QuantitySheet> {
                         width: 20, height: 20,
                         child: CircularProgressIndicator(
                             color: Colors.white, strokeWidth: 2))
-                    : const Text('AGGIUNGI',
-                        style: TextStyle(
+                    : Text(context.l10n.aggiuntiAggiungi,
+                        style: const TextStyle(
                             fontWeight: FontWeight.w700,
                             letterSpacing: 1.2)),
               ),
@@ -739,27 +738,27 @@ class _CustomFoodSheetState extends State<_CustomFoodSheet> {
                       borderRadius: BorderRadius.circular(2))),
             ),
             const SizedBox(height: 16),
-            Text('CREA ALIMENTO',
+            Text(context.l10n.aggiuntiCreaAlimento,
                 style: TextStyle(
                     color: p.accent,
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.5)),
             const SizedBox(height: 16),
-            _Field(ctrl: _nomeCtrl, label: 'Nome *', p: p),
+            _Field(ctrl: _nomeCtrl, label: context.l10n.aggiuntiNome, p: p),
             const SizedBox(height: 10),
-            _Field(ctrl: _brandCtrl, label: 'Brand (opzionale)', p: p),
+            _Field(ctrl: _brandCtrl, label: context.l10n.aggiuntiBrand, p: p),
             const SizedBox(height: 10),
             Row(children: [
-              Expanded(child: _Field(ctrl: _kcalCtrl, label: 'Kcal/100g *', p: p, isNumber: true)),
+              Expanded(child: _Field(ctrl: _kcalCtrl, label: context.l10n.aggiuntiKcal100g, p: p, isNumber: true)),
               const SizedBox(width: 10),
-              Expanded(child: _Field(ctrl: _proteinCtrl, label: 'Proteine/100g', p: p, isNumber: true)),
+              Expanded(child: _Field(ctrl: _proteinCtrl, label: context.l10n.aggiuntiProteine100g, p: p, isNumber: true)),
             ]),
             const SizedBox(height: 10),
             Row(children: [
-              Expanded(child: _Field(ctrl: _fatCtrl, label: 'Grassi/100g', p: p, isNumber: true)),
+              Expanded(child: _Field(ctrl: _fatCtrl, label: context.l10n.aggiuntiGrassi100g, p: p, isNumber: true)),
               const SizedBox(width: 10),
-              Expanded(child: _Field(ctrl: _carbsCtrl, label: 'Carbo/100g', p: p, isNumber: true)),
+              Expanded(child: _Field(ctrl: _carbsCtrl, label: context.l10n.aggiuntiCarbo100g, p: p, isNumber: true)),
             ]),
             const SizedBox(height: 20),
             SizedBox(
@@ -773,8 +772,8 @@ class _CustomFoodSheetState extends State<_CustomFoodSheet> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
                 ),
-                child: const Text('SALVA E AGGIUNGI',
-                    style: TextStyle(
+                child: Text(context.l10n.aggiuntiSalvaAggiungi,
+                    style: const TextStyle(
                         fontWeight: FontWeight.w700, letterSpacing: 1.2)),
               ),
             ),
@@ -808,7 +807,7 @@ class _SearchBar extends StatelessWidget {
         onChanged: onChanged,
         style: TextStyle(color: p.textPrimary, fontSize: 15),
         decoration: InputDecoration(
-          hintText: 'Cerca alimento o marca...',
+          hintText: context.l10n.aggiuntiCercaHint,
           hintStyle: TextStyle(color: p.textMuted, fontSize: 15),
           prefixIcon: Icon(Icons.search_rounded, color: p.textMuted),
           border: InputBorder.none,

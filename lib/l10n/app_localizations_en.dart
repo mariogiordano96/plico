@@ -369,4 +369,287 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeBadgeSettimanaTarget => 'Week on target';
+
+  @override
+  String get diarioTitolo => 'DIARY';
+
+  @override
+  String get diarioTabPiano => 'PLAN';
+
+  @override
+  String get diarioTabDiario => 'DIARY';
+
+  @override
+  String get diarioSalvaComePref => 'Save as favourite';
+
+  @override
+  String get diarioSalvaHint => 'E.g. My breakfast';
+
+  @override
+  String get diarioAnnulla => 'Cancel';
+
+  @override
+  String get diarioBtnSalva => 'Save';
+
+  @override
+  String diarioSalvatoComePref(String nome) {
+    return 'Saved as favourite: $nome';
+  }
+
+  @override
+  String get diarioOggi => 'Today';
+
+  @override
+  String get diarioIeri => 'Yesterday';
+
+  @override
+  String diarioKcalObiettivo(String target) {
+    return 'of $target goal';
+  }
+
+  @override
+  String get diarioNessunObiettivo => 'no goal set';
+
+  @override
+  String get diarioObiettivoRaggiunto => 'goal reached';
+
+  @override
+  String diarioKcalRimanenti(String kcal) {
+    return '$kcal remaining';
+  }
+
+  @override
+  String get diarioOttimoLavoro => 'Great job! You\'re on target today.';
+
+  @override
+  String get diarioMacroProteine => 'Protein';
+
+  @override
+  String get diarioMacroGrassi => 'Fats';
+
+  @override
+  String get diarioMacroCarbo => 'Carbs';
+
+  @override
+  String get diarioNessunAlimento => 'No food logged';
+
+  @override
+  String get diarioRipetiIeri => 'Repeat yesterday\'s meal';
+
+  @override
+  String aggiuntiA(String pasto) {
+    return 'ADD TO $pasto';
+  }
+
+  @override
+  String get aggiuntiPastiPreferiti => 'YOUR FAVOURITE MEALS';
+
+  @override
+  String get aggiuntiDalPiano => 'FROM YOUR PLAN';
+
+  @override
+  String get aggiuntiTuoiAlimenti => 'YOUR FOODS';
+
+  @override
+  String get aggiuntiAlimentiSalvati => 'SAVED FOODS';
+
+  @override
+  String get aggiuntiRisultatiOFF => 'OPEN FOOD FACTS RESULTS';
+
+  @override
+  String get aggiuntiNessunRisultato =>
+      'No results found.\nTry creating a food manually.';
+
+  @override
+  String get aggiuntiCreaManuale => 'Create manual food';
+
+  @override
+  String get aggiuntiQuantitaG => 'Quantity (g)';
+
+  @override
+  String get aggiuntiAggiungi => 'ADD';
+
+  @override
+  String get aggiuntiCreaAlimento => 'CREATE FOOD';
+
+  @override
+  String get aggiuntiNome => 'Name *';
+
+  @override
+  String get aggiuntiBrand => 'Brand (optional)';
+
+  @override
+  String get aggiuntiKcal100g => 'Kcal/100g *';
+
+  @override
+  String get aggiuntiProteine100g => 'Protein/100g';
+
+  @override
+  String get aggiuntiGrassi100g => 'Fats/100g';
+
+  @override
+  String get aggiuntiCarbo100g => 'Carbs/100g';
+
+  @override
+  String get aggiuntiSalvaAggiungi => 'SAVE & ADD';
+
+  @override
+  String get aggiuntiCercaHint => 'Search food or brand...';
+
+  @override
+  String get questionarioTitolo => 'DIETARY PREFERENCES';
+
+  @override
+  String get questionarioIndietro => 'BACK';
+
+  @override
+  String get questionarioAvanti => 'NEXT';
+
+  @override
+  String get questionarioSalvaGenera => 'SAVE & GENERATE';
+
+  @override
+  String get questionarioRestrizioni => 'Restrictions';
+
+  @override
+  String get questionarioRestrizioniSub =>
+      'Select any dietary restrictions. You can skip if you have none.';
+
+  @override
+  String get questionarioVegetariano => 'Vegetarian';
+
+  @override
+  String get questionarioVegano => 'Vegan';
+
+  @override
+  String get questionarioNoLattosio => 'No lactose';
+
+  @override
+  String get questionarioNoGlutine => 'No gluten';
+
+  @override
+  String get questionarioNoPesce => 'No fish';
+
+  @override
+  String get questionarioNoFruttaSecca => 'No nuts';
+
+  @override
+  String get questionarioNessunaRestrizione => 'No restrictions — great!';
+
+  @override
+  String get questionarioPreferenze => 'Preferences';
+
+  @override
+  String get questionarioPreferenzeSub =>
+      'Select foods you like. The plan will prioritise your choices.';
+
+  @override
+  String get questionarioStruttura => 'Structure';
+
+  @override
+  String get questionarioStrutturaSub => 'How do you organise your meals?';
+
+  @override
+  String get questionarioPastiGiorno => 'Meals per day';
+
+  @override
+  String get questionarioSpuntinoPostWo => 'Post-workout snack';
+
+  @override
+  String get questionarioSpuntinoPostWoSub =>
+      'Includes extra protein for recovery';
+
+  @override
+  String get pianoGenerazioneInCorso => 'Generating plan…';
+
+  @override
+  String get pianoPianoAlimentare => 'Meal Plan';
+
+  @override
+  String get pianoPromoSub =>
+      'Tell us your food preferences and we\'ll generate a personalised plan based on your macro targets.';
+
+  @override
+  String get pianoIniziaQuestionario => 'START QUESTIONNAIRE';
+
+  @override
+  String get pianoPreferenzeSalvate => 'Preferences saved';
+
+  @override
+  String get pianoProntoGenerare => 'Ready to generate your meal plan.';
+
+  @override
+  String get pianoGeneraPiano => 'GENERATE PLAN';
+
+  @override
+  String get pianoModificaPreferenze => 'Edit preferences';
+
+  @override
+  String get pianoEsportaPdf => 'Export PDF';
+
+  @override
+  String get pianoObiettiviCambiati =>
+      'Your goals have changed. Regenerate the plan to update the quantities.';
+
+  @override
+  String get pianoRigenera => 'REGENERATE';
+
+  @override
+  String pianoGeneratoIl(String data) {
+    return 'Generated on $data';
+  }
+
+  @override
+  String get pianoAttivo => 'ACTIVE';
+
+  @override
+  String get pianoGrammatureCrudo => 'Quantities to weigh raw';
+
+  @override
+  String get pianoKcalNote =>
+      'Plan kcal may differ slightly from the diary target due to rounding of quantities';
+
+  @override
+  String pianoQbRiferimento(String g) {
+    return 'to taste  ·  ~$g g as reference';
+  }
+
+  @override
+  String pianoQb(String g) {
+    return 'to taste  ·  ~$g g';
+  }
+
+  @override
+  String get pianoNascondiAlternative => 'Hide alternatives';
+
+  @override
+  String pianoNAlternative(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count alternatives',
+      one: '$count alternative',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get pianoAggiungiAlDiario => 'Add to diary';
+
+  @override
+  String get pianoSuggerito => 'Suggested';
+
+  @override
+  String pianoAggiunto(String pasto) {
+    return 'Added to $pasto';
+  }
+
+  @override
+  String get pianoErrorePdf => 'Error generating PDF';
+
+  @override
+  String get pianoStileDolce => '🍯 Sweet';
+
+  @override
+  String get pianoStileSalata => '🧀 Savoury';
 }
