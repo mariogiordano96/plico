@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../theme/app_theme.dart';
 import '../../models/body_snapshot.dart';
 import '../../services/database_service.dart';
@@ -86,7 +87,9 @@ class _PesataCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = context.palette;
     final data = pesata.data;
-    final dataStr = '${data.day.toString().padLeft(2, '0')}/${data.month.toString().padLeft(2, '0')}/${data.year}';
+    final locale = Localizations.localeOf(context).toString();
+    final nf1 = NumberFormat.decimalPatternDigits(locale: locale, decimalDigits: 1);
+    final dataStr = DateFormat.yMd(locale).format(data);
 
     return Dismissible(
       key: Key('pesata_${pesata.id}'),
@@ -117,7 +120,7 @@ class _PesataCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Text('${pesata.pesoKg.toStringAsFixed(1)} kg',
+                      Text('${nf1.format(pesata.pesoKg)} kg',
                           style: TextStyle(color: p.textPrimary, fontSize: 18, fontWeight: FontWeight.w700)),
                       if (delta != null) ...[
                         const SizedBox(width: 10),
@@ -125,7 +128,7 @@ class _PesataCard extends StatelessWidget {
                       ],
                       if (pesata.bodyFatManuale != null) ...[
                         const SizedBox(width: 8),
-                        _Badge(label: '${pesata.bodyFatManuale!.toStringAsFixed(1)}% BF'),
+                        _Badge(label: '${nf1.format(pesata.bodyFatManuale!)}% BF'),
                       ],
                     ],
                   ),
@@ -171,6 +174,8 @@ class _DeltaBadge extends StatelessWidget {
     final up = delta > 0;
     final color = up ? const Color(0xFFE74C3C) : const Color(0xFF00C48C);
     final sign = up ? '+' : '';
+    final nf1 = NumberFormat.decimalPatternDigits(
+        locale: Localizations.localeOf(context).toString(), decimalDigits: 1);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
@@ -184,7 +189,7 @@ class _DeltaBadge extends StatelessWidget {
           Icon(up ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
               size: 10, color: color),
           const SizedBox(width: 2),
-          Text('$sign${delta.toStringAsFixed(1)} kg',
+          Text('$sign${nf1.format(delta)} kg',
               style: TextStyle(
                   color: color, fontSize: 11, fontWeight: FontWeight.w700)),
         ],

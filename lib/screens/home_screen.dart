@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../theme/app_theme.dart';
 import '../models/app_settings.dart';
 import '../models/body_snapshot.dart';
@@ -602,8 +603,8 @@ class _TdeeCardState extends State<_TdeeCard> {
 class _PesateCard extends StatelessWidget {
   const _PesateCard();
 
-  String _formatDate(DateTime d) =>
-      '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
+  String _formatDate(DateTime d, BuildContext context) =>
+      DateFormat.yMd(Localizations.localeOf(context).toString()).format(d);
 
   String _bmiLabel(double bmi, BuildContext context) {
     final l10n = context.l10n;
@@ -624,6 +625,8 @@ class _PesateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
+    final nf1 = NumberFormat.decimalPatternDigits(
+        locale: Localizations.localeOf(context).toString(), decimalDigits: 1);
     return StreamBuilder<UserProfile?>(
       stream: DatabaseService.instance.watchUserProfile(),
       builder: (context, profileSnap) {
@@ -686,7 +689,7 @@ class _PesateCard extends StatelessWidget {
                           const SizedBox(height: 2),
                           Text(
                             latest != null
-                                ? '${latest.pesoKg.toStringAsFixed(1)} kg — ${_formatDate(latest.data)}'
+                                ? '${nf1.format(latest.pesoKg)} kg — ${_formatDate(latest.data, context)}'
                                 : context.l10n.homeNessunaPesata,
                             style: TextStyle(
                                 color: p.textPrimary,
@@ -698,7 +701,7 @@ class _PesateCard extends StatelessWidget {
                             Row(
                               children: [
                                 Text(
-                                  'BMI ${bmi.toStringAsFixed(1)}',
+                                  'BMI ${nf1.format(bmi)}',
                                   style: TextStyle(
                                       color: _bmiColor(bmi, p),
                                       fontSize: 13,
@@ -733,7 +736,7 @@ class _PesateCard extends StatelessWidget {
                             Text(
                               goalDelta.abs() < 0.5
                                   ? context.l10n.homePesoObiettivoRaggiunto
-                                  : context.l10n.homePesoAlObiettivo(goalDelta.abs().toStringAsFixed(1)),
+                                  : context.l10n.homePesoAlObiettivo(nf1.format(goalDelta.abs())),
                               style: TextStyle(
                                   color: goalDelta.abs() < 0.5
                                       ? const Color(0xFF4CAF8E)
@@ -765,12 +768,14 @@ class _PesateCard extends StatelessWidget {
 class _PlicometriaCard extends StatelessWidget {
   const _PlicometriaCard();
 
-  String _formatDate(DateTime d) =>
-      '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
+  String _formatDate(DateTime d, BuildContext context) =>
+      DateFormat.yMd(Localizations.localeOf(context).toString()).format(d);
 
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
+    final nf1 = NumberFormat.decimalPatternDigits(
+        locale: Localizations.localeOf(context).toString(), decimalDigits: 1);
     return StreamBuilder<List<PlicometrySession>>(
       stream: DatabaseService.instance.watchPlicometrySessions(),
       builder: (context, snapshot) {
@@ -797,7 +802,7 @@ class _PlicometriaCard extends StatelessWidget {
                           letterSpacing: 2.5,
                           fontWeight: FontWeight.w600)),
                   if (session != null)
-                    Text(_formatDate(session.data),
+                    Text(_formatDate(session.data, context),
                         style:
                             TextStyle(color: p.textMuted, fontSize: 12)),
                 ],
@@ -810,19 +815,19 @@ class _PlicometriaCard extends StatelessWidget {
                     _StatItem(
                         label: 'BF%',
                         value:
-                            '${session.risultati.bodyFatPercent.toStringAsFixed(1)}%'),
+                            '${nf1.format(session.risultati.bodyFatPercent)}%'),
                     Container(
                         width: 1, height: 36, color: p.cardBorder),
                     _StatItem(
                         label: context.l10n.homePlicoMassaGrassa,
                         value:
-                            '${session.risultati.massaGrassaKg.toStringAsFixed(1)} kg'),
+                            '${nf1.format(session.risultati.massaGrassaKg)} kg'),
                     Container(
                         width: 1, height: 36, color: p.cardBorder),
                     _StatItem(
                         label: context.l10n.homePlicoMassaMagra,
                         value:
-                            '${session.risultati.massaMagraKg.toStringAsFixed(1)} kg'),
+                            '${nf1.format(session.risultati.massaMagraKg)} kg'),
                   ],
                 ),
                 const SizedBox(height: 14),
@@ -1076,6 +1081,8 @@ class _WeeklyRecapCardState extends State<_WeeklyRecapCard> {
     final p = context.palette;
 
     final l10n = context.l10n;
+    final nf1 = NumberFormat.decimalPatternDigits(
+        locale: Localizations.localeOf(context).toString(), decimalDigits: 1);
     final kcalLabel = current.avgKcal == null
         ? l10n.homeNessunDato
         : l10n.homeWeeklyAvgKcal('${current.avgKcal!.round()}');
@@ -1085,7 +1092,7 @@ class _WeeklyRecapCardState extends State<_WeeklyRecapCard> {
 
     final pesoLabel = _weightChangeCurrent == null
         ? l10n.homeNessunDato
-        : '${_weightChangeCurrent! >= 0 ? '+' : ''}${_weightChangeCurrent!.toStringAsFixed(1)} kg';
+        : '${_weightChangeCurrent! >= 0 ? '+' : ''}${nf1.format(_weightChangeCurrent!)} kg';
     final pesoDelta =
         (_weightChangeCurrent != null && _weightChangePrevious != null)
             ? _weightChangeCurrent! - _weightChangePrevious!

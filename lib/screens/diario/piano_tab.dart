@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../theme/app_theme.dart';
 import '../../models/meal_plan.dart';
 import '../../models/meal_entry.dart';
@@ -574,6 +575,8 @@ class _SlotCard extends StatelessWidget {
     final food = slot.principale!;
     final slotLabel = PianoService.slotLabel(context.l10n, slot.tipo);
     final slotEmoji = PianoService.slotEmoji[slot.tipo.clamp(0, 5)];
+    final nf1 = NumberFormat.decimalPatternDigits(
+        locale: Localizations.localeOf(context).toString(), decimalDigits: 1);
 
     return Opacity(
       opacity: dimmed ? 0.5 : 1.0,
@@ -631,7 +634,7 @@ class _SlotCard extends StatelessWidget {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                'P ${food.proteine.toStringAsFixed(1)}  G ${food.grassi.toStringAsFixed(1)}  C ${food.carboidrati.toStringAsFixed(1)}',
+                                'P ${nf1.format(food.proteine)}  G ${nf1.format(food.grassi)}  C ${nf1.format(food.carboidrati)}',
                                 style: TextStyle(color: p.textMuted, fontSize: 11),
                               ),
                             ],
@@ -716,7 +719,7 @@ class _SlotCard extends StatelessWidget {
                                   )
                                 else
                                   Text(
-                                    '${alt.quantitaG.round()}g  ·  ${alt.kcal.round()} kcal  ·  P ${alt.proteine.toStringAsFixed(1)}  G ${alt.grassi.toStringAsFixed(1)}  C ${alt.carboidrati.toStringAsFixed(1)}',
+                                    '${alt.quantitaG.round()}g  ·  ${alt.kcal.round()} kcal  ·  P ${nf1.format(alt.proteine)}  G ${nf1.format(alt.grassi)}  C ${nf1.format(alt.carboidrati)}',
                                     style: TextStyle(color: p.textMuted, fontSize: 11),
                                   ),
                               ],

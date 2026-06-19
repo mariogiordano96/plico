@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:printing/printing.dart';
+import 'package:intl/intl.dart';
 import 'dart:math';
 import '../../theme/app_theme.dart';
 import '../../models/body_snapshot.dart';
@@ -548,13 +549,13 @@ class _ChartBox extends StatelessWidget {
     this.trendValues,
   });
 
-  String _fmtDate(DateTime d) =>
-      '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}';
-
-  String _fmt(double v) => v.toStringAsFixed(decimals);
-
   @override
   Widget build(BuildContext context) {
+    final locale = Localizations.localeOf(context).toString();
+    String fmtDate(DateTime d) => DateFormat.Md(locale).format(d);
+    final nf = NumberFormat.decimalPatternDigits(locale: locale, decimalDigits: decimals);
+    String fmt(double v) => nf.format(v);
+
     if (points.isEmpty) {
       return Container(
         height: 180,
@@ -582,7 +583,7 @@ class _ChartBox extends StatelessWidget {
         .entries
         .map((e) => FlSpot(e.key.toDouble(), e.value.value))
         .toList();
-    final dates = points.map((pt) => _fmtDate(pt.date)).toList();
+    final dates = points.map((pt) => fmtDate(pt.date)).toList();
 
     final showTrend =
         trendValues != null && trendValues!.length == points.length;
@@ -667,7 +668,7 @@ class _ChartBox extends StatelessWidget {
                           if (value == meta.min || value == meta.max) {
                             return const SizedBox.shrink();
                           }
-                          return Text(_fmt(value),
+                          return Text(fmt(value),
                               style: TextStyle(
                                   color: p.textMuted, fontSize: 10));
                         },
@@ -712,8 +713,8 @@ class _ChartBox extends StatelessWidget {
                         final isTrend = s.barIndex == 1;
                         return LineTooltipItem(
                           isTrend
-                              ? context.l10n.progressiMedia7gg(_fmt(s.y), unit)
-                              : '${dates[i]}\n${_fmt(s.y)} $unit',
+                              ? context.l10n.progressiMedia7gg(fmt(s.y), unit)
+                              : '${dates[i]}\n${fmt(s.y)} $unit',
                           TextStyle(
                               color: isTrend ? p.textMuted : p.textPrimary,
                               fontSize: 12,
@@ -738,14 +739,14 @@ class _ChartBox extends StatelessWidget {
               children: [
                 _Stat(
                     label: context.l10n.progressiStatUltimo,
-                    value: '${_fmt(last)} $unit',
+                    value: '${fmt(last)} $unit',
                     color: color,
                     p: p),
                 if (showAvg) ...[
                   Container(width: 1, height: 28, color: p.cardBorder),
                   _Stat(
                     label: context.l10n.progressiStatMedia,
-                    value: '${_fmt(avg)} $unit',
+                    value: '${fmt(avg)} $unit',
                     color: p.textSecondary,
                     p: p,
                   ),
@@ -753,7 +754,7 @@ class _ChartBox extends StatelessWidget {
                   Container(width: 1, height: 28, color: p.cardBorder),
                   _Stat(
                     label: context.l10n.progressiStatVariazione,
-                    value: '${delta >= 0 ? '+' : ''}${_fmt(delta)} $unit',
+                    value: '${delta >= 0 ? '+' : ''}${fmt(delta)} $unit',
                     color: p.textSecondary,
                     p: p,
                   ),
