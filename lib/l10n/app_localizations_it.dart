@@ -244,4 +244,132 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get onboardingTemaScuro => 'Scuro';
+
+  @override
+  String get homeSalutoBuongiorno => 'Buongiorno';
+
+  @override
+  String get homeSalutoBuonPomeriggio => 'Buon pomeriggio';
+
+  @override
+  String get homeSalutoBuonasera => 'Buonasera';
+
+  @override
+  String get homeFallbackNome => 'Benvenuto';
+
+  @override
+  String get homeDiarioDiOggi => 'DIARIO DI OGGI';
+
+  @override
+  String get homePianoLabel => 'PIANO ALIMENTARE';
+
+  @override
+  String get homePianoSubtitle => 'Visualizza e genera il piano';
+
+  @override
+  String homeTdeeKcalGiorno(String kcal) {
+    return '$kcal kcal/giorno';
+  }
+
+  @override
+  String get homeTdeeCalcola => 'Calcola il tuo fabbisogno';
+
+  @override
+  String get homePesoLabel => 'PESO';
+
+  @override
+  String get homeNessunaPesata => 'Nessuna pesata registrata';
+
+  @override
+  String get homeBmiSottopeso => 'Sottopeso';
+
+  @override
+  String get homeBmiNormopeso => 'Normopeso';
+
+  @override
+  String get homeBmiSovrappeso => 'Sovrappeso';
+
+  @override
+  String get homeBmiObesitaI => 'Obesità I';
+
+  @override
+  String get homeBmiObesitaII => 'Obesità II+';
+
+  @override
+  String get homePesoObiettivoRaggiunto => 'Obiettivo raggiunto 🎉';
+
+  @override
+  String homePesoAlObiettivo(String delta) {
+    return '$delta kg dall\'obiettivo';
+  }
+
+  @override
+  String get homePlicoLabel => 'PLICOMETRIA';
+
+  @override
+  String get homePlicoMassaGrassa => 'Massa Grassa';
+
+  @override
+  String get homePlicoMassaMagra => 'Massa Magra';
+
+  @override
+  String get homeNessunaSessionePlico => 'Nessuna sessione registrata';
+
+  @override
+  String get homePlicoNuovaMisurazione => 'Nuova misurazione';
+
+  @override
+  String get homeProgressiLabel => 'PROGRESSI';
+
+  @override
+  String get homeProgressiSubtitle => 'Composizione e misurazioni nel tempo';
+
+  @override
+  String get homeRiepilogoSettimanale => 'RIEPILOGO SETTIMANALE';
+
+  @override
+  String get homeNessunDato => 'Nessun dato';
+
+  @override
+  String get homeMediaKcal => 'Media kcal';
+
+  @override
+  String homeWeeklyAvgKcal(String kcal) {
+    return '$kcal kcal/g';
+  }
+
+  @override
+  String get homeVariazionePeso => 'Variazione peso';
+
+  @override
+  String get homeAderenzaAlPiano => 'Aderenza al piano';
+
+  @override
+  String get homeAderenzaHeader => 'ADERENZA AL PIANO';
+
+  @override
+  String get homePastiOggi => 'pasti oggi';
+
+  @override
+  String get homeUltimiSetteGiorni => 'ultimi 7 giorni';
+
+  @override
+  String homeStreakGiorni(String count) {
+    return '$count giorni di fila';
+  }
+
+  @override
+  String get homeStreakInizia => 'Inizia oggi la tua streak';
+
+  @override
+  String get homeBadge1KgPerso => '1° kg perso';
+
+  @override
+  String get homeBadgeStreak7 => 'Streak 7gg';
+
+  @override
+  String get homeBadge30Giorni => '30 giorni';
+
+  @override
+  String get homeBadgeSettimanaTarget => 'Settimana in target';
 }

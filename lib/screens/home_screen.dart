@@ -103,11 +103,11 @@ class HomeScreen extends StatelessWidget {
 class _GreetingHeader extends StatelessWidget {
   const _GreetingHeader();
 
-  String _saluto() {
+  String _saluto(BuildContext context) {
     final h = DateTime.now().hour;
-    if (h >= 5 && h < 12) return 'Buongiorno';
-    if (h >= 12 && h < 18) return 'Buon pomeriggio';
-    return 'Buonasera';
+    if (h >= 5 && h < 12) return context.l10n.homeSalutoBuongiorno;
+    if (h >= 12 && h < 18) return context.l10n.homeSalutoBuonPomeriggio;
+    return context.l10n.homeSalutoBuonasera;
   }
 
   String _formatDate(DateTime d) {
@@ -136,10 +136,10 @@ class _GreetingHeader extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(_saluto(),
+                Text(_saluto(context),
                     style: TextStyle(color: p.textMuted, fontSize: 13)),
                 Text(
-                  nome.isNotEmpty ? nome : 'Benvenuto',
+                  nome.isNotEmpty ? nome : context.l10n.homeFallbackNome,
                   style: TextStyle(
                       color: p.textPrimary,
                       fontSize: 24,
@@ -298,7 +298,7 @@ class _DiarioHeroCardState extends State<_DiarioHeroCard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('DIARIO DI OGGI',
+                Text(context.l10n.homeDiarioDiOggi,
                     style: TextStyle(
                         color: p.textMuted,
                         fontSize: 11,
@@ -465,13 +465,13 @@ class _PianoCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('PIANO ALIMENTARE',
+                  Text(context.l10n.homePianoLabel,
                       style: TextStyle(
                           color: p.textMuted,
                           fontSize: 11,
                           letterSpacing: 2)),
                   const SizedBox(height: 2),
-                  Text('Visualizza e genera il piano',
+                  Text(context.l10n.homePianoSubtitle,
                       style: TextStyle(
                           color: p.textPrimary,
                           fontSize: 15,
@@ -578,8 +578,8 @@ class _TdeeCardState extends State<_TdeeCard> {
                   const SizedBox(height: 2),
                   Text(
                     _tdee != null
-                        ? '${_tdee!} kcal/giorno'
-                        : 'Calcola il tuo fabbisogno',
+                        ? context.l10n.homeTdeeKcalGiorno('$_tdee')
+                        : context.l10n.homeTdeeCalcola,
                     style: TextStyle(
                         color: p.textPrimary,
                         fontSize: 15,
@@ -605,12 +605,13 @@ class _PesateCard extends StatelessWidget {
   String _formatDate(DateTime d) =>
       '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
 
-  String _bmiLabel(double bmi) {
-    if (bmi < 18.5) return 'Sottopeso';
-    if (bmi < 25.0) return 'Normopeso';
-    if (bmi < 30.0) return 'Sovrappeso';
-    if (bmi < 35.0) return 'Obesità I';
-    return 'Obesità II+';
+  String _bmiLabel(double bmi, BuildContext context) {
+    final l10n = context.l10n;
+    if (bmi < 18.5) return l10n.homeBmiSottopeso;
+    if (bmi < 25.0) return l10n.homeBmiNormopeso;
+    if (bmi < 30.0) return l10n.homeBmiSovrappeso;
+    if (bmi < 35.0) return l10n.homeBmiObesitaI;
+    return l10n.homeBmiObesitaII;
   }
 
   Color _bmiColor(double bmi, ColorPalette p) {
@@ -677,7 +678,7 @@ class _PesateCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('PESO',
+                          Text(context.l10n.homePesoLabel,
                               style: TextStyle(
                                   color: p.textMuted,
                                   fontSize: 11,
@@ -686,7 +687,7 @@ class _PesateCard extends StatelessWidget {
                           Text(
                             latest != null
                                 ? '${latest.pesoKg.toStringAsFixed(1)} kg — ${_formatDate(latest.data)}'
-                                : 'Nessuna pesata registrata',
+                                : context.l10n.homeNessunaPesata,
                             style: TextStyle(
                                 color: p.textPrimary,
                                 fontSize: 15,
@@ -717,7 +718,7 @@ class _PesateCard extends StatelessWidget {
                                             .withValues(alpha: 0.35)),
                                   ),
                                   child: Text(
-                                    _bmiLabel(bmi),
+                                    _bmiLabel(bmi, context),
                                     style: TextStyle(
                                         color: _bmiColor(bmi, p),
                                         fontSize: 11,
@@ -731,8 +732,8 @@ class _PesateCard extends StatelessWidget {
                             const SizedBox(height: 5),
                             Text(
                               goalDelta.abs() < 0.5
-                                  ? 'Obiettivo raggiunto 🎉'
-                                  : '${goalDelta.abs().toStringAsFixed(1)} kg all\'obiettivo',
+                                  ? context.l10n.homePesoObiettivoRaggiunto
+                                  : context.l10n.homePesoAlObiettivo(goalDelta.abs().toStringAsFixed(1)),
                               style: TextStyle(
                                   color: goalDelta.abs() < 0.5
                                       ? const Color(0xFF4CAF8E)
@@ -789,7 +790,7 @@ class _PlicometriaCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('PLICOMETRIA',
+                  Text(context.l10n.homePlicoLabel,
                       style: TextStyle(
                           color: p.textMuted,
                           fontSize: 11,
@@ -813,13 +814,13 @@ class _PlicometriaCard extends StatelessWidget {
                     Container(
                         width: 1, height: 36, color: p.cardBorder),
                     _StatItem(
-                        label: 'Massa Grassa',
+                        label: context.l10n.homePlicoMassaGrassa,
                         value:
                             '${session.risultati.massaGrassaKg.toStringAsFixed(1)} kg'),
                     Container(
                         width: 1, height: 36, color: p.cardBorder),
                     _StatItem(
-                        label: 'Massa Magra',
+                        label: context.l10n.homePlicoMassaMagra,
                         value:
                             '${session.risultati.massaMagraKg.toStringAsFixed(1)} kg'),
                   ],
@@ -828,7 +829,7 @@ class _PlicometriaCard extends StatelessWidget {
                 Divider(height: 1, color: p.cardBorder),
                 const SizedBox(height: 14),
               ] else ...[
-                Text('Nessuna sessione registrata',
+                Text(context.l10n.homeNessunaSessionePlico,
                     style:
                         TextStyle(color: p.textMuted, fontSize: 13)),
                 const SizedBox(height: 14),
@@ -843,7 +844,7 @@ class _PlicometriaCard extends StatelessWidget {
                               const MethodSelectionScreen())),
                   icon: Icon(Icons.add_rounded,
                       size: 16, color: p.accent),
-                  label: Text('Nuova misurazione',
+                  label: Text(context.l10n.homePlicoNuovaMisurazione,
                       style: TextStyle(
                           color: p.accent,
                           fontSize: 13,
@@ -900,13 +901,13 @@ class _ProgressiCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('PROGRESSI',
+                  Text(context.l10n.homeProgressiLabel,
                       style: TextStyle(
                           color: p.textMuted,
                           fontSize: 11,
                           letterSpacing: 2)),
                   const SizedBox(height: 2),
-                  Text('Composizione e misurazioni nel tempo',
+                  Text(context.l10n.homeProgressiSubtitle,
                       style: TextStyle(
                           color: p.textPrimary,
                           fontSize: 15,
@@ -1074,15 +1075,16 @@ class _WeeklyRecapCardState extends State<_WeeklyRecapCard> {
     if (current == null) return const SizedBox.shrink();
     final p = context.palette;
 
+    final l10n = context.l10n;
     final kcalLabel = current.avgKcal == null
-        ? 'Nessun dato'
-        : '${current.avgKcal!.round()} kcal/g';
+        ? l10n.homeNessunDato
+        : l10n.homeWeeklyAvgKcal('${current.avgKcal!.round()}');
     final kcalDelta = (current.avgKcal != null && _previous?.avgKcal != null)
         ? current.avgKcal! - _previous!.avgKcal!
         : null;
 
     final pesoLabel = _weightChangeCurrent == null
-        ? 'Nessun dato'
+        ? l10n.homeNessunDato
         : '${_weightChangeCurrent! >= 0 ? '+' : ''}${_weightChangeCurrent!.toStringAsFixed(1)} kg';
     final pesoDelta =
         (_weightChangeCurrent != null && _weightChangePrevious != null)
@@ -1108,7 +1110,7 @@ class _WeeklyRecapCardState extends State<_WeeklyRecapCard> {
                   Icon(Icons.calendar_view_week_rounded,
                       color: p.accent, size: 18),
                   const SizedBox(width: 8),
-                  Text('RIEPILOGO SETTIMANALE',
+                  Text(l10n.homeRiepilogoSettimanale,
                       style: TextStyle(
                           color: p.textMuted,
                           fontSize: 11,
@@ -1117,12 +1119,12 @@ class _WeeklyRecapCardState extends State<_WeeklyRecapCard> {
                 ],
               ),
               const SizedBox(height: 10),
-              _row(p, 'Media kcal', kcalLabel, kcalDelta,
+              _row(p, l10n.homeMediaKcal, kcalLabel, kcalDelta,
                   higherIsBetter: false),
-              _row(p, 'Variazione peso', pesoLabel, pesoDelta,
+              _row(p, l10n.homeVariazionePeso, pesoLabel, pesoDelta,
                   higherIsBetter: false),
               if (current.adherence != null)
-                _row(p, 'Aderenza al piano',
+                _row(p, l10n.homeAderenzaAlPiano,
                     '${(current.adherence! * 100).round()}%',
                     (_previous?.adherence != null)
                         ? current.adherence! - _previous!.adherence!
@@ -1240,7 +1242,7 @@ class _AderenzaCardState extends State<_AderenzaCard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('ADERENZA AL PIANO',
+                Text(context.l10n.homeAderenzaHeader,
                     style: TextStyle(
                         color: p.textMuted,
                         fontSize: 11,
@@ -1265,7 +1267,7 @@ class _AderenzaCardState extends State<_AderenzaCard> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 4, left: 6),
                   child: Text(
-                    'pasti oggi',
+                    context.l10n.homePastiOggi,
                     style: TextStyle(color: p.textMuted, fontSize: 13),
                   ),
                 ),
@@ -1294,7 +1296,7 @@ class _AderenzaCardState extends State<_AderenzaCard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('ultimi 7 giorni',
+                Text(context.l10n.homeUltimiSetteGiorni,
                     style:
                         TextStyle(color: p.textMuted, fontSize: 11)),
                 Row(
@@ -1340,12 +1342,12 @@ class _AderenzaCardState extends State<_AderenzaCard> {
 
 // ── Streak + badge traguardi ────────────────────────────────────────
 
-const _badgeInfo = {
-  AchievementType.firstKgLost: (Icons.scale_rounded, '1° kg perso'),
-  AchievementType.streak7: (Icons.local_fire_department_rounded, 'Streak 7gg'),
-  AchievementType.days30Logged: (Icons.calendar_month_rounded, '30 giorni'),
-  AchievementType.weekOnTarget: (Icons.flag_rounded, 'Settimana in target'),
-};
+List<(AchievementType, IconData, String)> _buildBadgeInfo(BuildContext context) => [
+  (AchievementType.firstKgLost, Icons.scale_rounded, context.l10n.homeBadge1KgPerso),
+  (AchievementType.streak7, Icons.local_fire_department_rounded, context.l10n.homeBadgeStreak7),
+  (AchievementType.days30Logged, Icons.calendar_month_rounded, context.l10n.homeBadge30Giorni),
+  (AchievementType.weekOnTarget, Icons.flag_rounded, context.l10n.homeBadgeSettimanaTarget),
+];
 
 class _StreakCard extends StatelessWidget {
   const _StreakCard();
@@ -1404,8 +1406,8 @@ class _StreakCard extends StatelessWidget {
                             const SizedBox(height: 2),
                             Text(
                               active
-                                  ? '$streak giorni di fila'
-                                  : 'Inizia oggi la tua streak',
+                                  ? context.l10n.homeStreakGiorni('$streak')
+                                  : context.l10n.homeStreakInizia,
                               style: TextStyle(
                                   color: p.textPrimary,
                                   fontSize: 15,
@@ -1419,13 +1421,12 @@ class _StreakCard extends StatelessWidget {
                   const SizedBox(height: 14),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: _badgeInfo.entries.map((e) {
-                      final isUnlocked = unlocked.contains(e.key);
-                      final (icon, label) = e.value;
+                    children: _buildBadgeInfo(context).map((entry) {
+                      final (type, icon, label) = entry;
                       return _BadgeIcon(
                         icon: icon,
                         label: label,
-                        unlocked: isUnlocked,
+                        unlocked: unlocked.contains(type),
                         p: p,
                       );
                     }).toList(),

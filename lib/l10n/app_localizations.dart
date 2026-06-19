@@ -541,6 +541,246 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Scuro'**
   String get onboardingTemaScuro;
+
+  /// No description provided for @homeSalutoBuongiorno.
+  ///
+  /// In it, this message translates to:
+  /// **'Buongiorno'**
+  String get homeSalutoBuongiorno;
+
+  /// No description provided for @homeSalutoBuonPomeriggio.
+  ///
+  /// In it, this message translates to:
+  /// **'Buon pomeriggio'**
+  String get homeSalutoBuonPomeriggio;
+
+  /// No description provided for @homeSalutoBuonasera.
+  ///
+  /// In it, this message translates to:
+  /// **'Buonasera'**
+  String get homeSalutoBuonasera;
+
+  /// No description provided for @homeFallbackNome.
+  ///
+  /// In it, this message translates to:
+  /// **'Benvenuto'**
+  String get homeFallbackNome;
+
+  /// No description provided for @homeDiarioDiOggi.
+  ///
+  /// In it, this message translates to:
+  /// **'DIARIO DI OGGI'**
+  String get homeDiarioDiOggi;
+
+  /// No description provided for @homePianoLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'PIANO ALIMENTARE'**
+  String get homePianoLabel;
+
+  /// No description provided for @homePianoSubtitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Visualizza e genera il piano'**
+  String get homePianoSubtitle;
+
+  /// No description provided for @homeTdeeKcalGiorno.
+  ///
+  /// In it, this message translates to:
+  /// **'{kcal} kcal/giorno'**
+  String homeTdeeKcalGiorno(String kcal);
+
+  /// No description provided for @homeTdeeCalcola.
+  ///
+  /// In it, this message translates to:
+  /// **'Calcola il tuo fabbisogno'**
+  String get homeTdeeCalcola;
+
+  /// No description provided for @homePesoLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'PESO'**
+  String get homePesoLabel;
+
+  /// No description provided for @homeNessunaPesata.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessuna pesata registrata'**
+  String get homeNessunaPesata;
+
+  /// No description provided for @homeBmiSottopeso.
+  ///
+  /// In it, this message translates to:
+  /// **'Sottopeso'**
+  String get homeBmiSottopeso;
+
+  /// No description provided for @homeBmiNormopeso.
+  ///
+  /// In it, this message translates to:
+  /// **'Normopeso'**
+  String get homeBmiNormopeso;
+
+  /// No description provided for @homeBmiSovrappeso.
+  ///
+  /// In it, this message translates to:
+  /// **'Sovrappeso'**
+  String get homeBmiSovrappeso;
+
+  /// No description provided for @homeBmiObesitaI.
+  ///
+  /// In it, this message translates to:
+  /// **'Obesità I'**
+  String get homeBmiObesitaI;
+
+  /// No description provided for @homeBmiObesitaII.
+  ///
+  /// In it, this message translates to:
+  /// **'Obesità II+'**
+  String get homeBmiObesitaII;
+
+  /// No description provided for @homePesoObiettivoRaggiunto.
+  ///
+  /// In it, this message translates to:
+  /// **'Obiettivo raggiunto 🎉'**
+  String get homePesoObiettivoRaggiunto;
+
+  /// No description provided for @homePesoAlObiettivo.
+  ///
+  /// In it, this message translates to:
+  /// **'{delta} kg dall\'obiettivo'**
+  String homePesoAlObiettivo(String delta);
+
+  /// No description provided for @homePlicoLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'PLICOMETRIA'**
+  String get homePlicoLabel;
+
+  /// No description provided for @homePlicoMassaGrassa.
+  ///
+  /// In it, this message translates to:
+  /// **'Massa Grassa'**
+  String get homePlicoMassaGrassa;
+
+  /// No description provided for @homePlicoMassaMagra.
+  ///
+  /// In it, this message translates to:
+  /// **'Massa Magra'**
+  String get homePlicoMassaMagra;
+
+  /// No description provided for @homeNessunaSessionePlico.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessuna sessione registrata'**
+  String get homeNessunaSessionePlico;
+
+  /// No description provided for @homePlicoNuovaMisurazione.
+  ///
+  /// In it, this message translates to:
+  /// **'Nuova misurazione'**
+  String get homePlicoNuovaMisurazione;
+
+  /// No description provided for @homeProgressiLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'PROGRESSI'**
+  String get homeProgressiLabel;
+
+  /// No description provided for @homeProgressiSubtitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Composizione e misurazioni nel tempo'**
+  String get homeProgressiSubtitle;
+
+  /// No description provided for @homeRiepilogoSettimanale.
+  ///
+  /// In it, this message translates to:
+  /// **'RIEPILOGO SETTIMANALE'**
+  String get homeRiepilogoSettimanale;
+
+  /// No description provided for @homeNessunDato.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessun dato'**
+  String get homeNessunDato;
+
+  /// No description provided for @homeMediaKcal.
+  ///
+  /// In it, this message translates to:
+  /// **'Media kcal'**
+  String get homeMediaKcal;
+
+  /// No description provided for @homeWeeklyAvgKcal.
+  ///
+  /// In it, this message translates to:
+  /// **'{kcal} kcal/g'**
+  String homeWeeklyAvgKcal(String kcal);
+
+  /// No description provided for @homeVariazionePeso.
+  ///
+  /// In it, this message translates to:
+  /// **'Variazione peso'**
+  String get homeVariazionePeso;
+
+  /// No description provided for @homeAderenzaAlPiano.
+  ///
+  /// In it, this message translates to:
+  /// **'Aderenza al piano'**
+  String get homeAderenzaAlPiano;
+
+  /// No description provided for @homeAderenzaHeader.
+  ///
+  /// In it, this message translates to:
+  /// **'ADERENZA AL PIANO'**
+  String get homeAderenzaHeader;
+
+  /// No description provided for @homePastiOggi.
+  ///
+  /// In it, this message translates to:
+  /// **'pasti oggi'**
+  String get homePastiOggi;
+
+  /// No description provided for @homeUltimiSetteGiorni.
+  ///
+  /// In it, this message translates to:
+  /// **'ultimi 7 giorni'**
+  String get homeUltimiSetteGiorni;
+
+  /// No description provided for @homeStreakGiorni.
+  ///
+  /// In it, this message translates to:
+  /// **'{count} giorni di fila'**
+  String homeStreakGiorni(String count);
+
+  /// No description provided for @homeStreakInizia.
+  ///
+  /// In it, this message translates to:
+  /// **'Inizia oggi la tua streak'**
+  String get homeStreakInizia;
+
+  /// No description provided for @homeBadge1KgPerso.
+  ///
+  /// In it, this message translates to:
+  /// **'1° kg perso'**
+  String get homeBadge1KgPerso;
+
+  /// No description provided for @homeBadgeStreak7.
+  ///
+  /// In it, this message translates to:
+  /// **'Streak 7gg'**
+  String get homeBadgeStreak7;
+
+  /// No description provided for @homeBadge30Giorni.
+  ///
+  /// In it, this message translates to:
+  /// **'30 giorni'**
+  String get homeBadge30Giorni;
+
+  /// No description provided for @homeBadgeSettimanaTarget.
+  ///
+  /// In it, this message translates to:
+  /// **'Settimana in target'**
+  String get homeBadgeSettimanaTarget;
 }
 
 class _AppLocalizationsDelegate
