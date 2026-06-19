@@ -293,6 +293,19 @@ class DatabaseService {
     });
   }
 
+  Future<bool> getTourCompleted() async {
+    final settings = await _isar.appSettings.get(1);
+    return settings?.tourCompleted ?? false;
+  }
+
+  Future<void> setTourCompleted() async {
+    await _isar.writeTxn(() async {
+      final settings = await _isar.appSettings.get(1) ?? AppSettings();
+      settings.tourCompleted = true;
+      await _isar.appSettings.put(settings);
+    });
+  }
+
   Future<DateTime?> getGoalSetDate() async {
     final settings = await _isar.appSettings.get(1);
     return settings?.goalSetDate;

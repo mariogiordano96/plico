@@ -57,7 +57,7 @@ L'utente deve sentire che l'app è "sua" e che sta andando da qualche parte.
 
 L'utente deve capire il valore entro i primi 3 minuti.
 
-- **Primo pasto guidato** — dopo l'onboarding, mostrare subito come aggiungere un alimento con un tutorial interattivo
+- ✅ ~~**Primo pasto guidato** — dopo l'onboarding, mostrare subito come aggiungere un alimento con un tutorial interattivo~~ — implementato come tooltip tour (spotlight sul nav item + card descrittiva, 4 step, salta/avanti/inizia)
 - **Pre-popolare il diario** — suggerire "cosa hai mangiato a colazione stamattina?" subito dopo l'onboarding per far sentire l'app già utile
 - **Mostrare subito il piano** — se il piano è generato, farlo vedere prima di qualsiasi altra schermata
 - **Ridurre i campi obbligatori** — permettere di usare l'app anche senza inserire peso/obiettivo, rimandando la personalizzazione

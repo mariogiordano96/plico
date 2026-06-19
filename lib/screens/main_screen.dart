@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../widgets/app_tour.dart';
 import 'home_screen.dart';
 import 'diario/diario_screen.dart';
 import 'progressi/progressi_screen.dart';
@@ -20,7 +21,9 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    return Scaffold(
+    return AppTour(
+      onSwitchTab: _switchTab,
+      child: Scaffold(
       body: IndexedStack(
         index: _index,
         children: [
@@ -68,6 +71,6 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
       ),
-    );
+    ));
   }
 }

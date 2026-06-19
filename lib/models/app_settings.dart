@@ -28,4 +28,6 @@ class AppSettings {
   int notSpuntinoMin = 630; // 10:30
   int notPostWoMin = 1020;  // 17:00
   int notSorMin = 1260;     // 21:00
+
+  bool tourCompleted = false;
 }
