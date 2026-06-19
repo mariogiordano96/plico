@@ -9,21 +9,23 @@ import '../../services/tdee_calibration_service.dart';
 
 // ── Costanti attività ──────────────────────────────────────────
 
-const _attivitaLabels = [
-  'Sedentario',
-  'Legg. attivo',
-  'Mod. attivo',
-  'Molto attivo',
-  'Atleta',
-];
-const _attivitaDescrizioni = [
-  'Lavoro sedentario, poco o nessun esercizio',
-  'Esercizio leggero 1–3 giorni/settimana',
-  'Esercizio moderato 3–5 giorni/settimana',
-  'Esercizio intenso 6–7 giorni/settimana',
-  'Lavoro fisico intenso o doppio allenamento',
-];
 const _attivitaMultipli = [1.2, 1.375, 1.55, 1.725, 1.9];
+
+List<String> _getAttivitaLabels(BuildContext context) => [
+  context.l10n.tdeeAttSedentario,
+  context.l10n.tdeeAttLegg,
+  context.l10n.tdeeAttMod,
+  context.l10n.tdeeAttMolto,
+  context.l10n.tdeeAttAtleta,
+];
+
+List<String> _getAttivitaDescrizioni(BuildContext context) => [
+  context.l10n.tdeeAttSedentarioDesc,
+  context.l10n.tdeeAttLeggDesc,
+  context.l10n.tdeeAttModDesc,
+  context.l10n.tdeeAttMoltoDesc,
+  context.l10n.tdeeAttAtletaDesc,
+];
 
 // ── Metodi di calcolo ──────────────────────────────────────────
 
@@ -37,16 +39,25 @@ class _Metodo {
 }
 
 const _metodi = [
-  _Metodo(0, 'Automatico',
-      'Usa la formula più precisa disponibile: Katch-McArdle se hai una plicometria, altrimenti Mifflin-St Jeor.'),
-  _Metodo(1, 'Katch-McArdle',
-      'BMR = 370 + 21,6 × massa magra. La più precisa: considera solo la massa metabolicamente attiva.',
-      richiedeLbm: true),
-  _Metodo(2, 'Mifflin-St Jeor',
-      'Formula raccomandata dall\'American Dietetic Association. Accurata per la maggior parte delle persone.'),
-  _Metodo(3, 'Harris-Benedict',
-      'Formula classica revisionata (Roza & Shizgal, 1984). Tende a sovrastimare leggermente.'),
+  _Metodo(0, '', '', ),
+  _Metodo(1, 'Katch-McArdle', '', richiedeLbm: true),
+  _Metodo(2, 'Mifflin-St Jeor', ''),
+  _Metodo(3, 'Harris-Benedict', ''),
 ];
+
+String _metodoNome(int id, BuildContext context) => switch (id) {
+  0 => context.l10n.tdeeMetodoAutomaticoNome,
+  1 => 'Katch-McArdle',
+  2 => 'Mifflin-St Jeor',
+  _ => 'Harris-Benedict',
+};
+
+String _metodoDesc(int id, BuildContext context) => switch (id) {
+  0 => context.l10n.tdeeMetodoAutomaticoDesc,
+  1 => context.l10n.tdeeMetodoKatchDesc,
+  2 => context.l10n.tdeeMetodoMifflinDesc,
+  _ => context.l10n.tdeeMetodoHarrisDesc,
+};
 
 // ── Calcolo TDEE ────────────────────────────────────────────────
 
@@ -274,23 +285,22 @@ class _TdeeScreenState extends State<TdeeScreen> {
             backgroundColor: p.surface,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: Text('Ricalcola obiettivo',
+            title: Text(ctx.l10n.tdeeRicalcolaObiettivo,
                 style: TextStyle(color: p.textPrimary, fontSize: 16, fontWeight: FontWeight.w700)),
             content: Text(
-              'Hai attivato il piano $giorni ${giorni == 1 ? 'giorno' : 'giorni'} fa.\n\n'
-              'Puoi ricalcolarlo in qualsiasi momento, ma ti consigliamo di farlo dopo almeno 30 giorni per valutare i progressi.',
+              ctx.l10n.tdeeRicalcolaBody(giorni),
               style: TextStyle(color: p.textSecondary, fontSize: 14, height: 1.5),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx, false),
-                child: Text('Annulla',
+                child: Text(ctx.l10n.diarioAnnulla,
                     style: TextStyle(color: p.textMuted)),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('Ricalcola',
-                    style: TextStyle(color: Color(0xFFFF6B35), fontWeight: FontWeight.w700)),
+                child: Text(ctx.l10n.tdeeRicalcolaBtn,
+                    style: const TextStyle(color: Color(0xFFFF6B35), fontWeight: FontWeight.w700)),
               ),
             ],
           );
@@ -316,7 +326,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('IL MIO PIANO',
+        title: Text(context.l10n.tdeeTitolo,
             style: TextStyle(
                 color: p.accent,
                 fontSize: 17,
@@ -365,7 +375,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Configura il tuo piano nutrizionale. Una volta attivato, i valori verranno usati nel diario alimentare.',
+                    context.l10n.tdeeIntroTesto,
                     style: TextStyle(color: p.textSecondary, fontSize: 13, height: 1.4),
                   ),
                 ),
@@ -374,7 +384,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
           ),
           const SizedBox(height: 24),
 
-          _SectionLabel('OBIETTIVO', p),
+          _SectionLabel(context.l10n.tdeeSezObiettivo, p),
           const SizedBox(height: 12),
           _ObiettivoSelector(
             selected: _goal,
@@ -390,7 +400,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
                   const TextInputType.numberWithOptions(decimal: true),
               style: TextStyle(color: p.textPrimary, fontSize: 15),
               decoration: InputDecoration(
-                labelText: 'Peso obiettivo (kg)',
+                labelText: context.l10n.tdeePesoObiettivo,
                 labelStyle: TextStyle(color: p.textMuted, fontSize: 13),
                 filled: true,
                 fillColor: p.surface,
@@ -413,7 +423,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
           ],
           const SizedBox(height: 20),
 
-          _SectionLabel('LIVELLO DI ATTIVITÀ', p),
+          _SectionLabel(context.l10n.tdeeSezAttivita, p),
           const SizedBox(height: 12),
           _AttivitaSelector(
             selected: _livello,
@@ -422,7 +432,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
           ),
           const SizedBox(height: 20),
 
-          _SectionLabel('METODO DI CALCOLO', p),
+          _SectionLabel(context.l10n.tdeeSezMetodo, p),
           const SizedBox(height: 12),
           _MetodoSelector(
             selected: _metodo,
@@ -434,7 +444,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
 
           // Anteprima risultato
           if (result != null && macro != null) ...[
-            _SectionLabel('ANTEPRIMA PIANO', p),
+            _SectionLabel(context.l10n.tdeeSezAnteprima, p),
             const SizedBox(height: 12),
             _PreviewCard(
               result: result,
@@ -459,7 +469,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Registra una pesata per calcolare il piano.',
+                      context.l10n.tdeeNessunaPesata,
                       style: TextStyle(color: p.textMuted, fontSize: 13),
                     ),
                   ),
@@ -487,8 +497,8 @@ class _TdeeScreenState extends State<TdeeScreen> {
                       height: 20,
                       child: CircularProgressIndicator(
                           color: Colors.black, strokeWidth: 2))
-                  : const Text('ATTIVA PIANO',
-                      style: TextStyle(
+                  : Text(context.l10n.tdeeAttivaPiano,
+                      style: const TextStyle(
                           fontWeight: FontWeight.w800,
                           fontSize: 15,
                           letterSpacing: 1.5)),
@@ -511,7 +521,11 @@ class _TdeeScreenState extends State<TdeeScreen> {
     final giorni = _giorniDallaAttivazione;
     final scaduto = giorni >= 30;
 
-    final obiettivoLabel = ['Deficit −20%', 'Mantenimento', 'Surplus +15%'][_goal.clamp(0, 2)];
+    final obiettivoLabel = [
+      context.l10n.tdeeObjDeficitBadge,
+      context.l10n.tdeeObjMantenimento,
+      context.l10n.tdeeObjSurplusBadge,
+    ][_goal.clamp(0, 2)];
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
@@ -535,7 +549,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
                       Icon(Icons.calendar_today_rounded,
                           color: p.accent, size: 18),
                       const SizedBox(width: 8),
-                      Text('Sono passati $giorni giorni',
+                      Text(context.l10n.tdeeSonoPassati(giorni),
                           style: TextStyle(
                               color: p.accent,
                               fontSize: 14,
@@ -544,7 +558,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Potrebbe essere il momento di aggiornare il tuo piano in base ai progressi.',
+                    context.l10n.tdeeBannerSub,
                     style: TextStyle(
                         color: p.textSecondary, fontSize: 13, height: 1.4),
                   ),
@@ -560,8 +574,8 @@ class _TdeeScreenState extends State<TdeeScreen> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
                       ),
-                      child: const Text('AGGIORNA PIANO',
-                          style: TextStyle(
+                      child: Text(context.l10n.tdeeAggiornaPiano,
+                          style: const TextStyle(
                               fontWeight: FontWeight.w700, letterSpacing: 1.2)),
                     ),
                   ),
@@ -596,9 +610,11 @@ class _TdeeScreenState extends State<TdeeScreen> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'In base ai tuoi dati delle ultime ${cal.days} giorni, '
-                            'il tuo TDEE reale potrebbe essere ~${cal.suggestedTdee} kcal '
-                            '(stimato: ${cal.currentTdee} kcal).',
+                            context.l10n.tdeeCalibrazione(
+                              '${cal.days}',
+                              '${cal.suggestedTdee}',
+                              '${cal.currentTdee}',
+                            ),
                             style: TextStyle(
                                 color: p.textSecondary,
                                 fontSize: 13,
@@ -653,8 +669,8 @@ class _TdeeScreenState extends State<TdeeScreen> {
                             ),
                           ),
                           const SizedBox(width: 6),
-                          const Text('PIANO ATTIVO',
-                              style: TextStyle(
+                          Text(context.l10n.tdeePianoAttivoLabel,
+                              style: const TextStyle(
                                   color: Color(0xFF00C48C),
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
@@ -664,7 +680,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
                     ),
                     const Spacer(),
                     Text(
-                      'dal ${_formatDate(_goalSetDate!)}',
+                      context.l10n.tdeeAttivatoDal(_formatDate(_goalSetDate!)),
                       style: TextStyle(color: p.textMuted, fontSize: 12),
                     ),
                   ],
@@ -672,7 +688,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
                 const SizedBox(height: 20),
 
                 if (result == null || kcal == null)
-                  Text('Dati insufficienti',
+                  Text(context.l10n.tdeeDatiInsufficienti,
                       style: TextStyle(color: p.textMuted, fontSize: 14))
                 else ...[
                   Row(
@@ -691,7 +707,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
                       ),
                       Padding(
                         padding: const EdgeInsets.only(bottom: 5, left: 4),
-                        child: Text('kcal/giorno',
+                        child: Text(context.l10n.tdeeKcalGiornoUnit,
                             style:
                                 TextStyle(color: p.textMuted, fontSize: 13)),
                       ),
@@ -699,7 +715,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    '$obiettivoLabel  ·  ${_attivitaLabels[_livello.clamp(0, 4)]}',
+                    '$obiettivoLabel  ·  ${_getAttivitaLabels(context)[_livello.clamp(0, 4)]}',
                     style: TextStyle(
                         color: p.textSecondary,
                         fontSize: 13,
@@ -726,7 +742,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
 
           // Macro breakdown
           if (macro != null) ...[
-            _SectionLabel('RIPARTIZIONE MACRO', p),
+            _SectionLabel(context.l10n.tdeeSezRipartizione, p),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(16),
@@ -738,7 +754,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
               child: Column(
                 children: [
                   _MacroRow(
-                    label: 'Proteine',
+                    label: context.l10n.progressiProteine,
                     grams: macro.proteinG,
                     pct: macro.proteinPct,
                     color: const Color(0xFF3B9FF2),
@@ -751,7 +767,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
                     child: Divider(height: 1, color: p.cardBorder),
                   ),
                   _MacroRow(
-                    label: 'Grassi',
+                    label: context.l10n.progressiGrassi,
                     grams: macro.fatG,
                     pct: macro.fatPct,
                     color: const Color(0xFFFFB800),
@@ -763,11 +779,11 @@ class _TdeeScreenState extends State<TdeeScreen> {
                     child: Divider(height: 1, color: p.cardBorder),
                   ),
                   _MacroRow(
-                    label: 'Carboidrati',
+                    label: context.l10n.progressiCarboidrati,
                     grams: macro.carbsG,
                     pct: macro.carbsPct,
                     color: const Color(0xFF4CAF8E),
-                    note: 'calorie rimanenti',
+                    note: context.l10n.tdeeCarbsNote,
                     p: p,
                   ),
                 ],
@@ -782,7 +798,7 @@ class _TdeeScreenState extends State<TdeeScreen> {
               child: TextButton(
                 onPressed: _ricalcola,
                 child: Text(
-                  'Ricalcola obiettivo',
+                  context.l10n.tdeeRicalcolaObiettivo,
                   style: TextStyle(
                       color: p.textMuted,
                       fontSize: 13,
@@ -810,12 +826,6 @@ class _ObiettivoSelector extends StatelessWidget {
     required this.p,
   });
 
-  static const _items = [
-    (label: 'Deficit', sub: '−20%', color: Color(0xFF3B9FF2), id: 0),
-    (label: 'Mantenimento', sub: 'TDEE', color: Color(0xFF00C48C), id: 1),
-    (label: 'Surplus', sub: '+15%', color: Color(0xFFFF8C42), id: 2),
-  ];
-
   int _kcal(int tdee, int id) => switch (id) {
         0 => (tdee * 0.80).round(),
         2 => (tdee * 1.15).round(),
@@ -824,6 +834,11 @@ class _ObiettivoSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final items = [
+      (label: context.l10n.tdeeObjDeficit, sub: '−20%', color: const Color(0xFF3B9FF2), id: 0),
+      (label: context.l10n.tdeeObjMantenimento, sub: 'TDEE', color: const Color(0xFF00C48C), id: 1),
+      (label: context.l10n.tdeeObjSurplus, sub: '+15%', color: const Color(0xFFFF8C42), id: 2),
+    ];
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -832,7 +847,7 @@ class _ObiettivoSelector extends StatelessWidget {
         border: Border.all(color: p.cardBorder),
       ),
       child: Row(
-        children: _items.map((item) {
+        children: items.map((item) {
           final isSelected = selected == item.id;
           return Expanded(
             child: GestureDetector(
@@ -930,7 +945,7 @@ class _PreviewCard extends StatelessWidget {
                       fontWeight: FontWeight.w800)),
               Padding(
                 padding: const EdgeInsets.only(bottom: 4, left: 4),
-                child: Text('kcal/giorno',
+                child: Text(context.l10n.tdeeKcalGiornoUnit,
                     style: TextStyle(color: p.textMuted, fontSize: 13)),
               ),
             ],
@@ -955,7 +970,7 @@ class _PreviewCard extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            'Formula: ${result.nomeFormula}  ·  TDEE: ${result.tdee} kcal',
+            context.l10n.tdeePreviewFormula(result.nomeFormula, '${result.tdee}'),
             style: TextStyle(color: p.textMuted, fontSize: 11),
             textAlign: TextAlign.center,
           ),
@@ -1054,7 +1069,7 @@ class _MetodoSelector extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              Text(m.nome,
+                              Text(_metodoNome(m.id, context),
                                   style: TextStyle(
                                       color: isSelected
                                           ? const Color(0xFFFF6B35)
@@ -1072,7 +1087,7 @@ class _MetodoSelector extends StatelessWidget {
                                     color: p.cardBorder,
                                     borderRadius: BorderRadius.circular(4),
                                   ),
-                                  child: Text('richiede plicometria',
+                                  child: Text(context.l10n.tdeeRichiedePlic,
                                       style: TextStyle(
                                           color: p.textMuted, fontSize: 10)),
                                 ),
@@ -1080,7 +1095,7 @@ class _MetodoSelector extends StatelessWidget {
                             ],
                           ),
                           const SizedBox(height: 2),
-                          Text(m.descrizione,
+                          Text(_metodoDesc(m.id, context),
                               style:
                                   TextStyle(color: p.textMuted, fontSize: 12)),
                         ],
@@ -1115,9 +1130,11 @@ class _AttivitaSelector extends StatelessWidget {
         border: Border.all(color: p.cardBorder),
       ),
       child: Column(
-        children: List.generate(_attivitaLabels.length, (i) {
+        children: List.generate(5, (i) {
+          final labels = _getAttivitaLabels(context);
+          final descrizioni = _getAttivitaDescrizioni(context);
           final isSelected = selected == i;
-          final isLast = i == _attivitaLabels.length - 1;
+          final isLast = i == 4;
           return GestureDetector(
             onTap: () => onSelect(i),
             child: Container(
@@ -1150,7 +1167,7 @@ class _AttivitaSelector extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(_attivitaLabels[i],
+                        Text(labels[i],
                             style: TextStyle(
                                 color: isSelected
                                     ? const Color(0xFFFF6B35)
@@ -1159,7 +1176,7 @@ class _AttivitaSelector extends StatelessWidget {
                                 fontWeight: isSelected
                                     ? FontWeight.w700
                                     : FontWeight.w500)),
-                        Text(_attivitaDescrizioni[i],
+                        Text(descrizioni[i],
                             style:
                                 TextStyle(color: p.textMuted, fontSize: 12)),
                       ],
