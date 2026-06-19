@@ -59,7 +59,9 @@ class _PlicoAppState extends State<PlicoApp> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _widgetClickSub = HomeWidget.widgetClicked.listen(_handleWidgetUri);
-    HomeWidget.initiallyLaunchedFromHomeWidget().then(_handleWidgetUri);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      HomeWidget.initiallyLaunchedFromHomeWidget().then(_handleWidgetUri);
+    });
   }
 
   @override
@@ -76,6 +78,16 @@ class _PlicoAppState extends State<PlicoApp> with WidgetsBindingObserver {
       NotificationService.instance.refreshMorningRecap();
       NotificationService.instance.refreshWeighInReminder();
     }
+  }
+
+  @override
+  Future<bool> didPushRouteInformation(RouteInformation routeInformation) async {
+    final uri = routeInformation.uri;
+    if (uri.scheme == 'plico' && uri.host == 'add-meal') {
+      await _handleWidgetUri(uri);
+      return true;
+    }
+    return super.didPushRouteInformation(routeInformation);
   }
 
   Future<void> _handleWidgetUri(Uri? uri) async {
