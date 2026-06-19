@@ -1,0 +1,7 @@
+{
+  "@@locale": "it",
+  "appName": "Plico",
+  "@appName": {
+    "description": "Nome dell'applicazione"
+  }
+}

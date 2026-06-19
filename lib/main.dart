@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:home_widget/home_widget.dart';
 import 'theme/app_theme.dart';
@@ -117,14 +118,12 @@ class _PlicoAppState extends State<PlicoApp> with WidgetsBindingObserver {
           darkTheme: darkTheme,
           themeMode: mode,
           localizationsDelegates: const [
+            AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: const [
-            Locale('it', 'IT'),
-            Locale('en', 'US'),
-          ],
+          supportedLocales: AppLocalizations.supportedLocales,
           home: FutureBuilder<bool>(
             future: DatabaseService.instance.hasUserProfile(),
             builder: (context, snapshot) {

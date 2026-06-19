@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 
 // ──────────────────────────────────────────────
 // ColorPalette — accesso ai colori tema-aware
@@ -58,6 +59,10 @@ const _light = ColorPalette(
 extension PaletteX on BuildContext {
   ColorPalette get palette =>
       Theme.of(this).brightness == Brightness.dark ? _dark : _light;
+}
+
+extension L10nX on BuildContext {
+  AppLocalizations get l10n => AppLocalizations.of(this)!;
 }
 
 // ──────────────────────────────────────────────
