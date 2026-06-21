@@ -510,6 +510,9 @@
   "@pdfGenerato": {
     "placeholders": { "created": { "type": "String" } }
   },
+  "pdfSchedaTitle": "Scheda Allenamento",
+  "pdfProgrammaTitle": "Programma di Allenamento",
+  "pdfStoricoTitle": "Storico Esercizio",
 
   "muscleGroupAll": "Tutti",
   "muscleGroupChest": "Petto",

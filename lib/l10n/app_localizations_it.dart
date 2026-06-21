@@ -1229,6 +1229,15 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get pdfSchedaTitle => 'Scheda Allenamento';
+
+  @override
+  String get pdfProgrammaTitle => 'Programma di Allenamento';
+
+  @override
+  String get pdfStoricoTitle => 'Storico Esercizio';
+
+  @override
   String get muscleGroupAll => 'Tutti';
 
   @override

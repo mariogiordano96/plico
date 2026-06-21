@@ -2300,6 +2300,24 @@ abstract class AppLocalizations {
   /// **'Generato il {created}'**
   String pdfGenerato(String created);
 
+  /// No description provided for @pdfSchedaTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Scheda Allenamento'**
+  String get pdfSchedaTitle;
+
+  /// No description provided for @pdfProgrammaTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Programma di Allenamento'**
+  String get pdfProgrammaTitle;
+
+  /// No description provided for @pdfStoricoTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Storico Esercizio'**
+  String get pdfStoricoTitle;
+
   /// No description provided for @muscleGroupAll.
   ///
   /// In it, this message translates to:

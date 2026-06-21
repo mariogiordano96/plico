@@ -391,6 +391,9 @@
   "pdfTargetPrefix": "Target:",
   "pdfPianoTitle": "Meal Plan",
   "pdfGenerato": "Generated on {created}",
+  "pdfSchedaTitle": "Workout Plan",
+  "pdfProgrammaTitle": "Workout Program",
+  "pdfStoricoTitle": "Exercise History",
 
   "muscleGroupAll": "All",
   "muscleGroupChest": "Chest",

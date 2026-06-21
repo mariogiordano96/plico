@@ -1826,10 +1826,47 @@ posizionamento/stile già visto in Progressi.
 > senza segnalazioni), rimossi dopo la verifica per restare coerenti con le fasi
 > precedenti.
 
-### Fase 19 — Export PDF scheda/storico
-- [ ] Template PDF scheda/programma (riuso `pdf_export_service.dart`)
-- [ ] Template PDF storico esercizio (tabella sessioni + grafico se riusabile)
-- [ ] Bottone "Esporta PDF" nelle schermate scheda e storico esercizio
+### Fase 19 — Export PDF scheda/storico ✅ completata
+- [x] Template PDF scheda/programma (riuso `pdf_export_service.dart`)
+  - `PdfExportService.generateScheda(WorkoutTemplate, ...)`: tabella esercizi (nome +
+    target serie×rip×kg, o durata per il cardio, stesso formato già usato in
+    `crea_scheda_screen.dart`/`target_esercizio_dialog.dart`). Nessuna chiamata a
+    `DatabaseService`: i dati arrivano già caricati dalla UI (stesso pattern di
+    `generatePiano`, che riceve un `MealPlan` già pronto).
+  - `PdfExportService.generateProgramma(WorkoutProgram, List<WorkoutTemplate> giorni, ...)`:
+    riusa lo stesso renderer tabellare per ciascun giorno, con un header di sezione per
+    giorno (stesso stile della sezione-giorno del diario PDF).
+- [x] Template PDF storico esercizio (tabella sessioni + grafico se riusabile)
+  - `PdfExportService.generateStoricoEsercizio({exerciseName, history, ...})`: tabella
+    data/dettaglio serie (o durata per cardio)/badge PR, riusando
+    `WorkoutProgressService.isNewPersonalRecord` (stessa logica della UI in
+    `StoricoEsercizioScreen`).
+- [x] Bottone "Esporta PDF" nelle schermate scheda e storico esercizio
+  - `LeMieSchedeScreen`: icona PDF su ogni `_TemplateCard` (schede autonome, sia preset
+    sia personali) → `generateScheda`.
+  - `ProgrammaDetailScreen`: icona PDF in AppBar (visibile solo se il programma ha
+    almeno un giorno) → `generateProgramma` con tutti i giorni del programma.
+  - `StoricoEsercizioScreen`: icona PDF in AppBar (visibile solo con storico non vuoto)
+    → `generateStoricoEsercizio`.
+  - Stesso pattern di gestione errori già usato in `piano_tab.dart`/`progressi_screen.dart`
+    (try/catch con `SnackBar` su `l10n.pianoErrorePdf`, riusato qui come messaggio
+    generico "errore generazione PDF" invece di introdurne uno specifico per
+    l'allenamento).
+
+> **Correzione rispetto al piano originale**: il grafico carico/tempo non è stato
+> incluso nel PDF storico (il piano lo richiedeva "se riusabile"). `fl_chart` e il
+> package `pdf` usano due alberi di widget completamente separati e non
+> interoperabili (Flutter/Skia vs. il renderer interno di `pdf`): per riusare il
+> grafico servirebbe rasterizzarlo offscreen in un'immagine, un lavoro non banale e
+> sproporzionato per un PDF che resta comunque leggibile con la sola tabella sessioni
+> (stesso giudizio implicito già nel piano, che marcava il grafico come opzionale).
+
+> nessun nuovo test temporaneo lasciato nel repository — 4 test scritti e verificati
+> durante l'implementazione (`generateScheda` con esercizi a target serie/rip/peso e
+> cardio a durata, `generateProgramma` con più giorni, `generateStoricoEsercizio` con
+> storico vuoto e con sessioni/PR), tutti basati su modelli passati direttamente al
+> servizio (nessuna dipendenza da Isar, a differenza dei test delle fasi precedenti),
+> rimossi dopo la verifica per restare coerenti con le fasi precedenti.
 
 ### Fase 20 — Rifinitura
 - [ ] Cronologia allenamenti in Progressi (ultimi 7 giorni)

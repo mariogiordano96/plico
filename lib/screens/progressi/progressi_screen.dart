@@ -223,6 +223,13 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
         l10n.slotProteina, l10n.slotCarboidrati, l10n.slotVerdura,
         l10n.slotGrassi, l10n.slotExtra, l10n.slotFrutta,
       ],
+      schedaPdfTitle: l10n.pdfSchedaTitle,
+      programmaPdfTitle: l10n.pdfProgrammaTitle,
+      storicoPdfTitle: l10n.pdfStoricoTitle,
+      nEsercizi: l10n.schedeNEsercizi,
+      nessunaSessione: l10n.storicoNessunaSessione,
+      prBadge: l10n.storicoPrBadge,
+      durataMin: l10n.allenamentoDurataMin,
     );
 
     if (!mounted) return;
