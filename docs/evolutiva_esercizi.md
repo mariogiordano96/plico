@@ -1261,9 +1261,27 @@ posizionamento/stile già visto in Progressi.
       shoulders`, non documentato in origine ma necessario: 8 esercizi nel dataset reale)
 - [x] Verificato con test temporaneo: 873 esercizi seedati, mapping corretto, idempotente
 
-### Fase 2 — Traduzione iniziale
-- [ ] Creare `assets/data/exercises_it.json` con ~150 esercizi comuni
-- [ ] Popolare `nameIt` al seed
+### Fase 2 — Traduzione iniziale ✅ completata
+- [x] Creato `tool/exercises_it_overrides.json` con 141 esercizi comuni tradotti (curati a
+      mano, non tramite API di traduzione — terminologia da palestra spesso non coincide
+      con la traduzione letterale, vedi nota sotto). File in `tool/`, non in `assets/`,
+      perché consumato solo a generazione (build-time), non a runtime
+- [x] `tool/seed_exercises.dart` applica gli override durante la generazione di
+      `exercises_seed.json` (non più un merge a runtime in `seedExercises()`): più semplice,
+      un solo asset da seedare, nessuna logica di merge nel service
+- [x] Verificato: 141/873 esercizi con `nameIt` popolato, fallback a `name` per gli altri
+
+> **Nota di design**: rispetto al piano originale (file `exercises_it.json` separato,
+> mergiato a runtime), si è scelto di mergere gli override **a generazione** dell'asset
+> (nel tool Dart), perché `exercises_seed.json` è già una trasformazione del dataset
+> originale (non il file upstream letterale) — il motivo per cui il piano originale
+> separava i due file (evitare di forkare il dataset) non si applica più.
+>
+> **Esercizi noti per nome comune ma assenti/diversi nel dataset reale** (utile per la
+> Fase 6, mapping preset): "Jumping Jack", "Burpee", "Wall Sit", "Seated Row" (generico) e
+> "French Press" (nome non usato dal dataset, mappato su `EZ-Bar_Skullcrusher`) non esistono
+> con questo nome esatto in `free-exercise-db` — andranno gestiti con esercizi custom o
+> il più vicino equivalente reale in fase di mapping preset.
 
 ### Fase 3 — UI catalogo
 - [ ] Bottom sheet con chip filtro gruppo muscolare + barra di ricerca

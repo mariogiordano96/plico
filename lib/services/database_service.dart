@@ -788,6 +788,7 @@ class DatabaseService {
     return ExerciseDefinition()
       ..externalId = j['externalId'] as String
       ..name = j['name'] as String
+      ..nameIt = j['nameIt'] as String?
       ..muscleGroup = j['muscleGroup'] as String
       ..category = j['category'] as String
       ..equipment = j['equipment'] as String?
