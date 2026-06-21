@@ -22,103 +22,108 @@ const AppSettingsSchema = CollectionSchema(
       name: r'creaSeeded',
       type: IsarType.bool,
     ),
-    r'goalSetDate': PropertySchema(
+    r'exercisesSeeded': PropertySchema(
       id: 1,
+      name: r'exercisesSeeded',
+      type: IsarType.bool,
+    ),
+    r'goalSetDate': PropertySchema(
+      id: 2,
       name: r'goalSetDate',
       type: IsarType.dateTime,
     ),
     r'isDarkMode': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'isDarkMode',
       type: IsarType.bool,
     ),
     r'livelloAttivita': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'livelloAttivita',
       type: IsarType.long,
     ),
     r'metodoTdee': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'metodoTdee',
       type: IsarType.long,
     ),
     r'notCenaAttiva': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'notCenaAttiva',
       type: IsarType.bool,
     ),
     r'notCenaMin': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'notCenaMin',
       type: IsarType.long,
     ),
     r'notColAttiva': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'notColAttiva',
       type: IsarType.bool,
     ),
     r'notColMin': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'notColMin',
       type: IsarType.long,
     ),
     r'notPostWoAttiva': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'notPostWoAttiva',
       type: IsarType.bool,
     ),
     r'notPostWoMin': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'notPostWoMin',
       type: IsarType.long,
     ),
     r'notPranzoAttiva': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'notPranzoAttiva',
       type: IsarType.bool,
     ),
     r'notPranzoMin': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'notPranzoMin',
       type: IsarType.long,
     ),
     r'notSorAttiva': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'notSorAttiva',
       type: IsarType.bool,
     ),
     r'notSorMin': PropertySchema(
-      id: 14,
+      id: 15,
       name: r'notSorMin',
       type: IsarType.long,
     ),
     r'notSpuntinoAttiva': PropertySchema(
-      id: 15,
+      id: 16,
       name: r'notSpuntinoAttiva',
       type: IsarType.bool,
     ),
     r'notSpuntinoMin': PropertySchema(
-      id: 16,
+      id: 17,
       name: r'notSpuntinoMin',
       type: IsarType.long,
     ),
     r'notificheAttive': PropertySchema(
-      id: 17,
+      id: 18,
       name: r'notificheAttive',
       type: IsarType.bool,
     ),
     r'obiettivo': PropertySchema(
-      id: 18,
+      id: 19,
       name: r'obiettivo',
       type: IsarType.long,
     ),
     r'pesoObiettivo': PropertySchema(
-      id: 19,
+      id: 20,
       name: r'pesoObiettivo',
       type: IsarType.double,
     ),
     r'tourCompleted': PropertySchema(
-      id: 20,
+      id: 21,
       name: r'tourCompleted',
       type: IsarType.bool,
     )
@@ -153,26 +158,27 @@ void _appSettingsSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeBool(offsets[0], object.creaSeeded);
-  writer.writeDateTime(offsets[1], object.goalSetDate);
-  writer.writeBool(offsets[2], object.isDarkMode);
-  writer.writeLong(offsets[3], object.livelloAttivita);
-  writer.writeLong(offsets[4], object.metodoTdee);
-  writer.writeBool(offsets[5], object.notCenaAttiva);
-  writer.writeLong(offsets[6], object.notCenaMin);
-  writer.writeBool(offsets[7], object.notColAttiva);
-  writer.writeLong(offsets[8], object.notColMin);
-  writer.writeBool(offsets[9], object.notPostWoAttiva);
-  writer.writeLong(offsets[10], object.notPostWoMin);
-  writer.writeBool(offsets[11], object.notPranzoAttiva);
-  writer.writeLong(offsets[12], object.notPranzoMin);
-  writer.writeBool(offsets[13], object.notSorAttiva);
-  writer.writeLong(offsets[14], object.notSorMin);
-  writer.writeBool(offsets[15], object.notSpuntinoAttiva);
-  writer.writeLong(offsets[16], object.notSpuntinoMin);
-  writer.writeBool(offsets[17], object.notificheAttive);
-  writer.writeLong(offsets[18], object.obiettivo);
-  writer.writeDouble(offsets[19], object.pesoObiettivo);
-  writer.writeBool(offsets[20], object.tourCompleted);
+  writer.writeBool(offsets[1], object.exercisesSeeded);
+  writer.writeDateTime(offsets[2], object.goalSetDate);
+  writer.writeBool(offsets[3], object.isDarkMode);
+  writer.writeLong(offsets[4], object.livelloAttivita);
+  writer.writeLong(offsets[5], object.metodoTdee);
+  writer.writeBool(offsets[6], object.notCenaAttiva);
+  writer.writeLong(offsets[7], object.notCenaMin);
+  writer.writeBool(offsets[8], object.notColAttiva);
+  writer.writeLong(offsets[9], object.notColMin);
+  writer.writeBool(offsets[10], object.notPostWoAttiva);
+  writer.writeLong(offsets[11], object.notPostWoMin);
+  writer.writeBool(offsets[12], object.notPranzoAttiva);
+  writer.writeLong(offsets[13], object.notPranzoMin);
+  writer.writeBool(offsets[14], object.notSorAttiva);
+  writer.writeLong(offsets[15], object.notSorMin);
+  writer.writeBool(offsets[16], object.notSpuntinoAttiva);
+  writer.writeLong(offsets[17], object.notSpuntinoMin);
+  writer.writeBool(offsets[18], object.notificheAttive);
+  writer.writeLong(offsets[19], object.obiettivo);
+  writer.writeDouble(offsets[20], object.pesoObiettivo);
+  writer.writeBool(offsets[21], object.tourCompleted);
 }
 
 AppSettings _appSettingsDeserialize(
@@ -183,27 +189,28 @@ AppSettings _appSettingsDeserialize(
 ) {
   final object = AppSettings();
   object.creaSeeded = reader.readBool(offsets[0]);
-  object.goalSetDate = reader.readDateTimeOrNull(offsets[1]);
+  object.exercisesSeeded = reader.readBool(offsets[1]);
+  object.goalSetDate = reader.readDateTimeOrNull(offsets[2]);
   object.id = id;
-  object.isDarkMode = reader.readBool(offsets[2]);
-  object.livelloAttivita = reader.readLong(offsets[3]);
-  object.metodoTdee = reader.readLong(offsets[4]);
-  object.notCenaAttiva = reader.readBool(offsets[5]);
-  object.notCenaMin = reader.readLong(offsets[6]);
-  object.notColAttiva = reader.readBool(offsets[7]);
-  object.notColMin = reader.readLong(offsets[8]);
-  object.notPostWoAttiva = reader.readBool(offsets[9]);
-  object.notPostWoMin = reader.readLong(offsets[10]);
-  object.notPranzoAttiva = reader.readBool(offsets[11]);
-  object.notPranzoMin = reader.readLong(offsets[12]);
-  object.notSorAttiva = reader.readBool(offsets[13]);
-  object.notSorMin = reader.readLong(offsets[14]);
-  object.notSpuntinoAttiva = reader.readBool(offsets[15]);
-  object.notSpuntinoMin = reader.readLong(offsets[16]);
-  object.notificheAttive = reader.readBool(offsets[17]);
-  object.obiettivo = reader.readLong(offsets[18]);
-  object.pesoObiettivo = reader.readDoubleOrNull(offsets[19]);
-  object.tourCompleted = reader.readBool(offsets[20]);
+  object.isDarkMode = reader.readBool(offsets[3]);
+  object.livelloAttivita = reader.readLong(offsets[4]);
+  object.metodoTdee = reader.readLong(offsets[5]);
+  object.notCenaAttiva = reader.readBool(offsets[6]);
+  object.notCenaMin = reader.readLong(offsets[7]);
+  object.notColAttiva = reader.readBool(offsets[8]);
+  object.notColMin = reader.readLong(offsets[9]);
+  object.notPostWoAttiva = reader.readBool(offsets[10]);
+  object.notPostWoMin = reader.readLong(offsets[11]);
+  object.notPranzoAttiva = reader.readBool(offsets[12]);
+  object.notPranzoMin = reader.readLong(offsets[13]);
+  object.notSorAttiva = reader.readBool(offsets[14]);
+  object.notSorMin = reader.readLong(offsets[15]);
+  object.notSpuntinoAttiva = reader.readBool(offsets[16]);
+  object.notSpuntinoMin = reader.readLong(offsets[17]);
+  object.notificheAttive = reader.readBool(offsets[18]);
+  object.obiettivo = reader.readLong(offsets[19]);
+  object.pesoObiettivo = reader.readDoubleOrNull(offsets[20]);
+  object.tourCompleted = reader.readBool(offsets[21]);
   return object;
 }
 
@@ -217,44 +224,46 @@ P _appSettingsDeserializeProp<P>(
     case 0:
       return (reader.readBool(offset)) as P;
     case 1:
-      return (reader.readDateTimeOrNull(offset)) as P;
-    case 2:
       return (reader.readBool(offset)) as P;
+    case 2:
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 3:
-      return (reader.readLong(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 4:
       return (reader.readLong(offset)) as P;
     case 5:
-      return (reader.readBool(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 6:
-      return (reader.readLong(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 7:
-      return (reader.readBool(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 8:
-      return (reader.readLong(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 9:
-      return (reader.readBool(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 10:
-      return (reader.readLong(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 11:
-      return (reader.readBool(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 12:
-      return (reader.readLong(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 13:
-      return (reader.readBool(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 14:
-      return (reader.readLong(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 15:
-      return (reader.readBool(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 16:
-      return (reader.readLong(offset)) as P;
-    case 17:
       return (reader.readBool(offset)) as P;
-    case 18:
+    case 17:
       return (reader.readLong(offset)) as P;
+    case 18:
+      return (reader.readBool(offset)) as P;
     case 19:
-      return (reader.readDoubleOrNull(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 20:
+      return (reader.readDoubleOrNull(offset)) as P;
+    case 21:
       return (reader.readBool(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -359,6 +368,16 @@ extension AppSettingsQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'creaSeeded',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      exercisesSeededEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'exercisesSeeded',
         value: value,
       ));
     });
@@ -1190,6 +1209,19 @@ extension AppSettingsQuerySortBy
     });
   }
 
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> sortByExercisesSeeded() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'exercisesSeeded', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByExercisesSeededDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'exercisesSeeded', Sort.desc);
+    });
+  }
+
   QueryBuilder<AppSettings, AppSettings, QAfterSortBy> sortByGoalSetDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'goalSetDate', Sort.asc);
@@ -1456,6 +1488,19 @@ extension AppSettingsQuerySortThenBy
   QueryBuilder<AppSettings, AppSettings, QAfterSortBy> thenByCreaSeededDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'creaSeeded', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy> thenByExercisesSeeded() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'exercisesSeeded', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByExercisesSeededDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'exercisesSeeded', Sort.desc);
     });
   }
 
@@ -1734,6 +1779,13 @@ extension AppSettingsQueryWhereDistinct
     });
   }
 
+  QueryBuilder<AppSettings, AppSettings, QDistinct>
+      distinctByExercisesSeeded() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'exercisesSeeded');
+    });
+  }
+
   QueryBuilder<AppSettings, AppSettings, QDistinct> distinctByGoalSetDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'goalSetDate');
@@ -1871,6 +1923,12 @@ extension AppSettingsQueryProperty
   QueryBuilder<AppSettings, bool, QQueryOperations> creaSeededProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'creaSeeded');
+    });
+  }
+
+  QueryBuilder<AppSettings, bool, QQueryOperations> exercisesSeededProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'exercisesSeeded');
     });
   }
 

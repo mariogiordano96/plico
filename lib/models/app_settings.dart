@@ -11,6 +11,7 @@ class AppSettings {
   int metodoTdee = 0;     // 0=auto 1=katch-mcArdle 2=mifflin-stJeor 3=harris-benedict
   int obiettivo = 1;      // 0=deficit 1=mantenimento 2=surplus
   bool creaSeeded = false;
+  bool exercisesSeeded = false;
   DateTime? goalSetDate;
   double? pesoObiettivo;
 

@@ -12,8 +12,14 @@ La sezione esercizi copre tre funzionalità core:
 1. **Catalogo esercizi** — database precompilato con schede descrittive, muscoli coinvolti, istruzioni
 2. **Scheda allenamento** — l'utente registra serie/ripetizioni/peso (o durata per cardio) per giorno
 3. **Impatto calorico** — stima kcal bruciate integrata nel bilancio giornaliero in Home
+4. **Schede di allenamento personali** — l'utente censisce routine riutilizzabili (lista di esercizi con target serie/rip/peso)
+5. **Storico progressi** — andamento di carico/ripetizioni per esercizio nel tempo, con suggerimento di progressive overload
 
-Fuori scope per v1: routine precalcolate, progressione automatica dei carichi, integrazione HealthKit/Google Fit.
+Dettaglio dei punti 4 e 5 in `evolutiva_esercizi.md`.
+
+Fuori scope per v1: routine precaricate dall'app (programmi prefatti tipo 5×5/PPL — diverse
+dalle schede create dall'utente), applicazione automatica della progressione senza conferma
+dell'utente, integrazione HealthKit/Google Fit.
 
 ---
 
@@ -146,15 +152,12 @@ class ExerciseDefinition {
 
 ### 4.1 Nuovo tab "Allenamento"
 
-Aggiungere un 5° tab al `BottomNavigationBar` tra Progressi e TDEE:
+Aggiungere un 5° tab al `BottomNavigationBar` tra Diario e Progressi:
 
 ```
 Home  |  Diario  |  Allenamento  |  Progressi  |  TDEE
  0          1           2              3             4
 ```
-
-> Alternativa meno invasiva: integrare il log allenamento nella schermata Diario
-> (come terzo tab accanto a Piano/Diario). Da decidere in base all'importanza data alla feature.
 
 ### 4.2 Schermata Allenamento (tab principale)
 

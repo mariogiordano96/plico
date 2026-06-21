@@ -20,6 +20,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DatabaseService.instance.init();
   await DatabaseService.instance.seedCreaFoods();
+  await DatabaseService.instance.seedExercises();
   final isDark = await DatabaseService.instance.getIsDarkMode();
   themeNotifier.value = isDark ? ThemeMode.dark : ThemeMode.light;
   await NotificationService.instance.init();

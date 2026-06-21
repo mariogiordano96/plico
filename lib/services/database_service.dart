@@ -19,6 +19,7 @@ import '../models/user_food_preferences.dart';
 import '../models/meal_plan.dart';
 import '../models/achievement.dart';
 import '../models/meal_combo.dart';
+import '../models/exercise_definition.dart';
 
 class DatabaseService {
   static final DatabaseService instance = DatabaseService._();
@@ -30,7 +31,7 @@ class DatabaseService {
     UserProfileSchema, BodySnapshotSchema, PlicometrySessionSchema,
     AppSettingsSchema, MeasurementSnapshotSchema, FoodItemSchema,
     DailyLogSchema, UserFoodPreferencesSchema, MealPlanSchema,
-    AchievementSchema, MealComboSchema,
+    AchievementSchema, MealComboSchema, ExerciseDefinitionSchema,
   ];
 
   Future<void> init() async {
@@ -760,6 +761,43 @@ class DatabaseService {
     await _isar.writeTxn(() async {
       await _isar.appSettings.put(settings);
     });
+  }
+
+  // ──────────────────────────────────────────────
+  // ExerciseDefinition
+  // ──────────────────────────────────────────────
+
+  Future<void> seedExercises() async {
+    final settings = await _isar.appSettings.get(1);
+    if (settings?.exercisesSeeded == true) return;
+
+    final raw = await rootBundle.loadString('assets/data/exercises_seed.json');
+    final list = jsonDecode(raw) as List<dynamic>;
+
+    final exercises = list.map((e) => _exerciseFromJson(e as Map<String, dynamic>)).toList();
+
+    await _isar.writeTxn(() async {
+      await _isar.exerciseDefinitions.putAll(exercises);
+      final s = await _isar.appSettings.get(1) ?? AppSettings();
+      s.exercisesSeeded = true;
+      await _isar.appSettings.put(s);
+    });
+  }
+
+  ExerciseDefinition _exerciseFromJson(Map<String, dynamic> j) {
+    return ExerciseDefinition()
+      ..externalId = j['externalId'] as String
+      ..name = j['name'] as String
+      ..muscleGroup = j['muscleGroup'] as String
+      ..category = j['category'] as String
+      ..equipment = j['equipment'] as String?
+      ..level = j['level'] as String?
+      ..mechanic = j['mechanic'] as String?
+      ..instructions = (j['instructions'] as List<dynamic>?)?.cast<String>() ?? [];
+  }
+
+  Future<List<ExerciseDefinition>> getAllExercises() async {
+    return _isar.exerciseDefinitions.filter().isDeletedEqualTo(false).findAll();
   }
 
   // ──────────────────────────────────────────────
