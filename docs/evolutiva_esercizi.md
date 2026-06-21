@@ -754,15 +754,16 @@ Future<List<WorkoutExercise>> getHistoryForExercise(String exerciseId) {
 }
 ```
 
-### Metriche derivate (calcolate a runtime, non persistite)
+### Metriche derivate (calcolate a runtime, non persistite) ✅ implementate
 
-- **Volume per sessione**: `Σ (serie.reps × serie.weightKg)`
-- **Carico massimo per sessione**: `max(serie.weightKg)`
+- **Volume per sessione**: `Σ (serie.reps × serie.weightKg)`, escluse le serie `isWarmup`
+- **Carico massimo per sessione**: `max(serie.weightKg)`, escluse le serie `isWarmup`
 - **Stima 1RM (formula di Epley)**: `peso × (1 + rip / 30)`, sulla serie migliore
-- **Record personale (PR)**: peso massimo mai sollevato per quell'esercizio, o volume
-  massimo di sessione — evidenziato con badge "🏆 Nuovo record" quando una sessione lo supera
+- **Record personale (PR)**: peso massimo mai sollevato per quell'esercizio (confrontato
+  solo con le sessioni precedenti a quella in esame, non con l'intero storico incluso il
+  futuro) — evidenziato con badge "🏆 Nuovo record" quando una sessione lo supera
 
-### Suggerimento progressive overload
+### Suggerimento progressive overload ✅ implementato
 
 All'avvio di un esercizio (da scheda o da catalogo) si recupera l'ultima sessione
 registrata e si propone un incremento, **senza applicarlo automaticamente**:
@@ -785,7 +786,12 @@ si è avvicinato o no al target nella sessione precedente:
 L'utente conferma il suggerimento (⬆️/➡️/⬇️) con un tap o inserisce valori propri: non viene
 mai applicato automaticamente senza una sua azione.
 
-### Settimana di scarico (deload) suggerita
+> **Nota implementativa**: la "prima serie" dell'ultima sessione è usata come riferimento
+> del target (baseline reps), dato che i preset prescrivono rip uniformi tra le serie
+> (es. "3×8"). Il suggerimento pre-compila solo la **prima** serie del nuovo log; le serie
+> successive restano da inserire manualmente (l'utente le copia o le modifica).
+
+### Settimana di scarico (deload) suggerita ✅ implementata
 
 Estensione dell'algoritmo di suggerimento: se per un esercizio si rilevano **N settimane
 consecutive** (default 4, configurabile) di sessioni con carico in aumento o stabile senza
@@ -815,7 +821,7 @@ su carico o volume) invece del consueto incremento, con un banner informativo:
 Anche qui nessuna applicazione automatica: è solo un suggerimento, calcolato a runtime
 sullo storico esistente (nessun nuovo campo persistito).
 
-### UI — Storico esercizio
+### UI — Storico esercizio ✅ implementata (`StoricoEsercizioScreen`)
 
 ```
 ┌─────────────────────────────┐
@@ -830,10 +836,12 @@ sullo storico esistente (nessun nuovo campo persistito).
 └─────────────────────────────┘
 ```
 
-Accessibile da: dettaglio esercizio nel catalogo, e da una nuova voce nella sezione
-Progressi esistente ("Andamento esercizi").
+Accessibile tappando il nome dell'esercizio nella card di `AllenamentoScreen`.
+**Non ancora** accessibile dal catalogo esercizi né da una voce dedicata in Progressi —
+questi due entry point aggiuntivi sono deferiti, non bloccanti per l'uso della feature
+(la Bacheca record personali di Fase 17 è il punto naturale per l'integrazione in Progressi).
 
-### Libreria grafico
+### Libreria grafico — ✅ riusato `fl_chart` (già dipendenza del progetto)
 
 Verificare se `fl_chart` è già una dipendenza del progetto (usata altrove in
 Progressi/TDEE) e riusarla per coerenza visiva; altrimenti introdurla come nuova
@@ -1409,13 +1417,26 @@ posizionamento/stile già visto in Progressi.
       ultimo giorno, duplicazione, seed preset (8 programmi + 2 schede, idempotente) e
       flusso end-to-end "Inizia" → log del giorno popolato correttamente
 
-### Fase 7 — Storico progressi e progressive overload
-- [ ] `WorkoutHistoryService.getHistoryForExercise(exerciseId)` (query indicizzata)
-- [ ] Calcolo metriche derivate: volume sessione, carico massimo, stima 1RM (Epley), PR
-- [ ] Algoritmo di suggerimento progressive overload (peso/rip rispetto all'ultima sessione)
-- [ ] Algoritmo `needsDeload()` (4 settimane senza riduzione → suggerisci scarico)
-- [ ] Schermata "Storico esercizio" (lista sessioni + badge PR + grafico, valutare `fl_chart`)
-- [ ] Integrazione suggerimento (overload/deload) nel dialog di log serie
+### Fase 7 — Storico progressi e progressive overload ✅ completata
+- [x] `DatabaseService.getHistoryForExercise(exerciseId)` (query indicizzata, no service
+      dedicato — stessa scelta delle fasi precedenti)
+- [x] `WorkoutProgressService` (puro, no DB): `sessionVolume`, `sessionMaxWeight`,
+      `estimatedOneRepMax` (Epley), `isNewPersonalRecord`
+- [x] `suggestNextSession()`: confronta le serie dell'ultima sessione con la prima serie
+      come riferimento del target (baseline reps), copre le 4 casistiche della tabella
+      (aumenta/mantieni per fatica RPE/mantieni per rip sotto target/riduci)
+- [x] `needsDeload()` (4 settimane consecutive senza riduzione del carico massimo
+      settimanale) + `deloadSuggestion()` (-40%, sostituisce il suggerimento normale)
+- [x] `StoricoEsercizioScreen`: grafico `fl_chart` del carico massimo nel tempo (solo
+      forza), lista sessioni con badge 🏆PR, vista semplificata per esercizi cardio
+      (nessun grafico/PR: l'algoritmo di overload è specifico della forza). Accessibile
+      tappando il nome esercizio in `AllenamentoScreen` — non ancora integrato in
+      Progressi (previsto solo nella Fase 17, Bacheca record personali)
+- [x] Integrazione nel dialog log serie: `AllenamentoScreen` calcola storico+suggerimento
+      (o deload se rilevato) prima di apre `showLogSerieDialog`, che mostra il banner
+      "Ultima volta: ..." + suggerimento (⬆️/➡️/⬇️/💡 scarico) e pre-compila la prima serie
+- [x] Verificato: `flutter analyze` pulito; 11 test sulle metriche/overload/deload/PR/
+      esclusione riscaldamento; test di integrazione storico→suggerimento→nuovo PR
 
 ### Fase 8 — Modalità esecuzione guidata + timer di recupero
 - [ ] Campo `restSeconds` già su `WorkoutTemplateExercise`/`WorkoutExercise` (da Fase 4/6)

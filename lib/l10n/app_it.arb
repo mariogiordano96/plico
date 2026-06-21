@@ -587,5 +587,25 @@
   "targetDialogSerie": "Serie",
   "targetDialogRip": "Rip",
   "targetDialogKg": "Kg (opzionale)",
-  "targetDialogDurataMin": "Durata (minuti)"
+  "targetDialogDurataMin": "Durata (minuti)",
+
+  "storicoTitle": "Storico — {nome}",
+  "@storicoTitle": { "placeholders": { "nome": { "type": "String" } } },
+  "storicoNessunaSessione": "Nessuna sessione registrata per questo esercizio",
+  "storicoPrBadge": "PR",
+  "storicoVolumeSessione": "Volume: {volume} kg",
+  "@storicoVolumeSessione": { "placeholders": { "volume": { "type": "String" } } },
+
+  "overloadUltimaVolta": "Ultima volta: {detail}",
+  "@overloadUltimaVolta": { "placeholders": { "detail": { "type": "String" } } },
+  "overloadSuggeritoUp": "Suggerito: aumenta a {kg} kg",
+  "@overloadSuggeritoUp": { "placeholders": { "kg": { "type": "String" } } },
+  "overloadSuggeritoSame": "Suggerito: mantieni {kg} kg",
+  "@overloadSuggeritoSame": { "placeholders": { "kg": { "type": "String" } } },
+  "overloadSuggeritoDown": "Suggerito: riduci a {kg} kg",
+  "@overloadSuggeritoDown": { "placeholders": { "kg": { "type": "String" } } },
+  "overloadDeload": "Stai progredendo da {weeks} settimane: valuta uno scarico a {kg} kg",
+  "@overloadDeload": {
+    "placeholders": { "weeks": { "type": "int" }, "kg": { "type": "String" } }
+  }
 }

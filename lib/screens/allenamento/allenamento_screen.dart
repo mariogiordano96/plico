@@ -5,10 +5,12 @@ import '../../l10n/app_localizations.dart';
 import '../../models/workout_exercise.dart';
 import '../../services/calorie_estimation_service.dart';
 import '../../services/database_service.dart';
+import '../../services/workout_progress_service.dart';
 import '../esercizi/catalogo_esercizi_screen.dart';
 import 'le_mie_schede_screen.dart';
 import 'log_cardio_dialog.dart';
 import 'log_serie_dialog.dart';
+import 'storico_esercizio_screen.dart';
 
 class AllenamentoScreen extends StatefulWidget {
   const AllenamentoScreen({super.key});
@@ -24,9 +26,26 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
     final exercise = await showCatalogoEserciziSheet(context);
     if (exercise == null || !mounted) return;
 
-    final workoutExercise = exercise.category == 'cardio'
-        ? await showLogCardioDialog(context, exercise)
-        : await showLogSerieDialog(context, exercise);
+    WorkoutExercise? workoutExercise;
+    if (exercise.category == 'cardio') {
+      workoutExercise = await showLogCardioDialog(context, exercise);
+    } else {
+      final history = await DatabaseService.instance.getHistoryForExercise(exercise.externalId);
+      final lastSession = history.isNotEmpty ? history.first : null;
+      OverloadSuggestion? suggestion;
+      if (lastSession != null) {
+        suggestion = WorkoutProgressService.needsDeload(history)
+            ? WorkoutProgressService.deloadSuggestion(lastSession)
+            : WorkoutProgressService.suggestNextSession(lastSession);
+      }
+      if (!mounted) return;
+      workoutExercise = await showLogSerieDialog(
+        context,
+        exercise,
+        lastSession: lastSession,
+        suggestion: suggestion,
+      );
+    }
 
     if (workoutExercise != null) {
       final bodySnapshot = await DatabaseService.instance.getLatestBodySnapshot();
@@ -201,7 +220,17 @@ class _ExerciseCard extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Column(
+            child: GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => StoricoEsercizioScreen(
+                    exerciseId: exercise.exerciseId,
+                    exerciseName: exercise.exerciseName,
+                  ),
+                ),
+              ),
+              child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(exercise.exerciseName,
@@ -221,6 +250,7 @@ class _ExerciseCard extends StatelessWidget {
                   Text(kcalLabel, style: TextStyle(color: p.accent, fontSize: 12)),
                 ],
               ],
+              ),
             ),
           ),
           IconButton(

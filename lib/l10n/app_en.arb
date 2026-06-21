@@ -459,5 +459,16 @@
   "targetDialogSerie": "Sets",
   "targetDialogRip": "Reps",
   "targetDialogKg": "Kg (optional)",
-  "targetDialogDurataMin": "Duration (minutes)"
+  "targetDialogDurataMin": "Duration (minutes)",
+
+  "storicoTitle": "History — {nome}",
+  "storicoNessunaSessione": "No session logged for this exercise yet",
+  "storicoPrBadge": "PR",
+  "storicoVolumeSessione": "Volume: {volume} kg",
+
+  "overloadUltimaVolta": "Last time: {detail}",
+  "overloadSuggeritoUp": "Suggested: increase to {kg} kg",
+  "overloadSuggeritoSame": "Suggested: keep {kg} kg",
+  "overloadSuggeritoDown": "Suggested: reduce to {kg} kg",
+  "overloadDeload": "You've progressed for {weeks} weeks: consider a deload at {kg} kg"
 }

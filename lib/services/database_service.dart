@@ -881,6 +881,14 @@ class DatabaseService {
     });
   }
 
+  Future<List<WorkoutExercise>> getHistoryForExercise(String exerciseId) async {
+    return _isar.workoutExercises
+        .filter()
+        .exerciseIdEqualTo(exerciseId)
+        .sortByDateDesc()
+        .findAll();
+  }
+
   Future<int> getWorkoutKcalForDay(DateTime date) async {
     final esercizi = await getWorkoutExercisesForDay(date);
     return esercizi.fold<int>(0, (sum, e) => sum + (e.estimatedKcal ?? 0));

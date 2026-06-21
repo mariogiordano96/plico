@@ -1403,4 +1403,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get targetDialogDurataMin => 'Duration (minutes)';
+
+  @override
+  String storicoTitle(String nome) {
+    return 'History — $nome';
+  }
+
+  @override
+  String get storicoNessunaSessione =>
+      'No session logged for this exercise yet';
+
+  @override
+  String get storicoPrBadge => 'PR';
+
+  @override
+  String storicoVolumeSessione(String volume) {
+    return 'Volume: $volume kg';
+  }
+
+  @override
+  String overloadUltimaVolta(String detail) {
+    return 'Last time: $detail';
+  }
+
+  @override
+  String overloadSuggeritoUp(String kg) {
+    return 'Suggested: increase to $kg kg';
+  }
+
+  @override
+  String overloadSuggeritoSame(String kg) {
+    return 'Suggested: keep $kg kg';
+  }
+
+  @override
+  String overloadSuggeritoDown(String kg) {
+    return 'Suggested: reduce to $kg kg';
+  }
+
+  @override
+  String overloadDeload(int weeks, String kg) {
+    return 'You\'ve progressed for $weeks weeks: consider a deload at $kg kg';
+  }
 }

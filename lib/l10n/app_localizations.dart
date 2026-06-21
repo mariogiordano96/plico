@@ -2641,6 +2641,60 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Durata (minuti)'**
   String get targetDialogDurataMin;
+
+  /// No description provided for @storicoTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Storico — {nome}'**
+  String storicoTitle(String nome);
+
+  /// No description provided for @storicoNessunaSessione.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessuna sessione registrata per questo esercizio'**
+  String get storicoNessunaSessione;
+
+  /// No description provided for @storicoPrBadge.
+  ///
+  /// In it, this message translates to:
+  /// **'PR'**
+  String get storicoPrBadge;
+
+  /// No description provided for @storicoVolumeSessione.
+  ///
+  /// In it, this message translates to:
+  /// **'Volume: {volume} kg'**
+  String storicoVolumeSessione(String volume);
+
+  /// No description provided for @overloadUltimaVolta.
+  ///
+  /// In it, this message translates to:
+  /// **'Ultima volta: {detail}'**
+  String overloadUltimaVolta(String detail);
+
+  /// No description provided for @overloadSuggeritoUp.
+  ///
+  /// In it, this message translates to:
+  /// **'Suggerito: aumenta a {kg} kg'**
+  String overloadSuggeritoUp(String kg);
+
+  /// No description provided for @overloadSuggeritoSame.
+  ///
+  /// In it, this message translates to:
+  /// **'Suggerito: mantieni {kg} kg'**
+  String overloadSuggeritoSame(String kg);
+
+  /// No description provided for @overloadSuggeritoDown.
+  ///
+  /// In it, this message translates to:
+  /// **'Suggerito: riduci a {kg} kg'**
+  String overloadSuggeritoDown(String kg);
+
+  /// No description provided for @overloadDeload.
+  ///
+  /// In it, this message translates to:
+  /// **'Stai progredendo da {weeks} settimane: valuta uno scarico a {kg} kg'**
+  String overloadDeload(int weeks, String kg);
 }
 
 class _AppLocalizationsDelegate

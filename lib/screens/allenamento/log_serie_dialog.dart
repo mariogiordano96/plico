@@ -3,24 +3,35 @@ import '../../theme/app_theme.dart';
 import '../../models/exercise_definition.dart';
 import '../../models/workout_exercise.dart';
 import '../../models/workout_set.dart';
+import '../../services/workout_progress_service.dart';
 
-/// Mostra il dialog di log serie per un esercizio di forza.
+/// Mostra il dialog di log serie per un esercizio di forza. Se [lastSession] è
+/// disponibile, mostra il suggerimento di progressive overload (o di scarico, se
+/// [suggestion] ha `isDeload = true`) e pre-compila la prima serie.
 /// Ritorna il WorkoutExercise compilato, o null se annullato.
 Future<WorkoutExercise?> showLogSerieDialog(
   BuildContext context,
-  ExerciseDefinition exercise,
-) {
+  ExerciseDefinition exercise, {
+  WorkoutExercise? lastSession,
+  OverloadSuggestion? suggestion,
+}) {
   return showModalBottomSheet<WorkoutExercise>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => _LogSerieDialog(exercise: exercise),
+    builder: (_) => _LogSerieDialog(
+      exercise: exercise,
+      lastSession: lastSession,
+      suggestion: suggestion,
+    ),
   );
 }
 
 class _LogSerieDialog extends StatefulWidget {
   final ExerciseDefinition exercise;
-  const _LogSerieDialog({required this.exercise});
+  final WorkoutExercise? lastSession;
+  final OverloadSuggestion? suggestion;
+  const _LogSerieDialog({required this.exercise, this.lastSession, this.suggestion});
 
   @override
   State<_LogSerieDialog> createState() => _LogSerieDialogState();
@@ -34,6 +45,11 @@ class _LogSerieDialogState extends State<_LogSerieDialog> {
   void initState() {
     super.initState();
     _addSerie();
+    final s = widget.suggestion;
+    if (s != null) {
+      if (s.suggestedReps != null) _repsCtrls.first.text = s.suggestedReps.toString();
+      if (s.suggestedWeightKg != null) _kgCtrls.first.text = s.suggestedWeightKg.toString();
+    }
   }
 
   @override
@@ -101,6 +117,10 @@ class _LogSerieDialogState extends State<_LogSerieDialog> {
               widget.exercise.nameIt ?? widget.exercise.name,
               style: TextStyle(color: p.accent, fontSize: 17, fontWeight: FontWeight.w700),
             ),
+            if (widget.lastSession != null || widget.suggestion != null) ...[
+              const SizedBox(height: 10),
+              _OverloadBanner(lastSession: widget.lastSession, suggestion: widget.suggestion, p: p),
+            ],
             const SizedBox(height: 16),
             for (var i = 0; i < _repsCtrls.length; i++)
               Padding(
@@ -151,6 +171,57 @@ class _LogSerieDialogState extends State<_LogSerieDialog> {
         ),
       ),
     );
+  }
+}
+
+class _OverloadBanner extends StatelessWidget {
+  final WorkoutExercise? lastSession;
+  final OverloadSuggestion? suggestion;
+  final ColorPalette p;
+  const _OverloadBanner({required this.lastSession, required this.suggestion, required this.p});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final lines = <Widget>[];
+
+    final last = lastSession;
+    if (last != null && last.sets.isNotEmpty) {
+      final detail = '${last.sets.length}×${last.sets.first.reps ?? '-'}'
+          '${last.sets.first.weightKg != null ? '×${last.sets.first.weightKg}kg' : ''}';
+      lines.add(Text(l10n.overloadUltimaVolta(detail),
+          style: TextStyle(color: p.textMuted, fontSize: 12)));
+    }
+
+    final s = suggestion;
+    if (s != null && s.suggestedWeightKg != null) {
+      final kg = s.suggestedWeightKg!.toStringAsFixed(
+          s.suggestedWeightKg! % 1 == 0 ? 0 : 1);
+      String text;
+      String icon;
+      if (s.isDeload) {
+        text = l10n.overloadDeload(4, kg);
+        icon = '💡';
+      } else {
+        switch (s.direction) {
+          case OverloadDirection.increase:
+            text = l10n.overloadSuggeritoUp(kg);
+            icon = '⬆️';
+          case OverloadDirection.maintain:
+            text = l10n.overloadSuggeritoSame(kg);
+            icon = '➡️';
+          case OverloadDirection.decrease:
+            text = l10n.overloadSuggeritoDown(kg);
+            icon = '⬇️';
+        }
+      }
+      lines.add(const SizedBox(height: 2));
+      lines.add(Text('$icon $text',
+          style: TextStyle(color: p.accent, fontSize: 13, fontWeight: FontWeight.w600)));
+    }
+
+    if (lines.isEmpty) return const SizedBox.shrink();
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: lines);
   }
 }
 
