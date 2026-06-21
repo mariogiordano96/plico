@@ -35,4 +35,7 @@ class AppSettings {
 
   // Allenamento — Fase 8
   int restTimerDefaultSeconds = 90;
+
+  // Allenamento — Fase 10
+  bool notWorkoutAttiva = false;
 }

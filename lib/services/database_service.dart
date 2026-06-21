@@ -889,6 +889,11 @@ class DatabaseService {
         .findAll();
   }
 
+  Future<DateTime?> getLastWorkoutDate() async {
+    final log = await _isar.workoutLogs.where().sortByDateDesc().findFirst();
+    return log?.date;
+  }
+
   Future<int> getWorkoutKcalForDay(DateTime date) async {
     final esercizi = await getWorkoutExercisesForDay(date);
     return esercizi.fold<int>(0, (sum, e) => sum + (e.estimatedKcal ?? 0));

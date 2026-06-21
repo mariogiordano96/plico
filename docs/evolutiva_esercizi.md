@@ -1501,10 +1501,23 @@ posizionamento/stile già visto in Progressi.
 > e non anche nella modalità esecuzione guidata (Fase 8) per mantenere lo
 > scope di questa fase circoscritto a quanto descritto in checklist.
 
-### Fase 10 — Reminder allenamento
-- [ ] Nuova voce "Promemoria allenamento" in `notifiche_screen.dart`
-- [ ] Check giorni di inattività riusando `notification_service`
-- [ ] Testo notifica localizzato (coerente con i18n già completata)
+### Fase 10 — Reminder allenamento ✅ completata
+- [x] Nuova voce "Promemoria allenamento" in `notifiche_screen.dart`
+      (`_workoutReminderCard`, toggle `AppSettings.notWorkoutAttiva`),
+      coerente con lo stile esistente della schermata (stringhe hardcoded
+      in italiano, non tradotta — come il resto del file)
+- [x] Check giorni di inattività riusando `notification_service`:
+      `NotificationService.refreshWorkoutReminder`/`scheduleWorkoutReminder`,
+      stesso pattern di `refreshWeighInReminder` (soglia 3 giorni, basata su
+      `DatabaseService.getLastWorkoutDate`, nuovo metodo che legge l'ultima
+      `WorkoutLog.date`); richiamato all'avvio (`main.dart`) e al resume
+      dell'app, oltre che al toggle dalla UI
+- [x] Testo notifica localizzato: nuove chiavi `notifChannelWorkout`,
+      `notifChannelWorkoutDesc`, `notifWorkoutBody` in `app_it.arb`/`app_en.arb`
+- [x] Verificato: `flutter analyze` pulito (21 issue pre-esistenti, 0 nuove);
+      nessun nuovo test temporaneo (la logica di soglia giorni è analoga a
+      quella già non testata di `refreshWeighInReminder`, accoppiata a Isar
+      e al plugin di notifiche)
 
 ### Fase 11 — Streak e achievement allenamento
 - [ ] Estendere `streak_service` con streak basata su `WorkoutLog` registrati

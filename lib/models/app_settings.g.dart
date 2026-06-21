@@ -107,33 +107,38 @@ const AppSettingsSchema = CollectionSchema(
       name: r'notSpuntinoMin',
       type: IsarType.long,
     ),
-    r'notificheAttive': PropertySchema(
+    r'notWorkoutAttiva': PropertySchema(
       id: 18,
+      name: r'notWorkoutAttiva',
+      type: IsarType.bool,
+    ),
+    r'notificheAttive': PropertySchema(
+      id: 19,
       name: r'notificheAttive',
       type: IsarType.bool,
     ),
     r'obiettivo': PropertySchema(
-      id: 19,
+      id: 20,
       name: r'obiettivo',
       type: IsarType.long,
     ),
     r'pesoObiettivo': PropertySchema(
-      id: 20,
+      id: 21,
       name: r'pesoObiettivo',
       type: IsarType.double,
     ),
     r'restTimerDefaultSeconds': PropertySchema(
-      id: 21,
+      id: 22,
       name: r'restTimerDefaultSeconds',
       type: IsarType.long,
     ),
     r'tourCompleted': PropertySchema(
-      id: 22,
+      id: 23,
       name: r'tourCompleted',
       type: IsarType.bool,
     ),
     r'workoutPresetsSeeded': PropertySchema(
-      id: 23,
+      id: 24,
       name: r'workoutPresetsSeeded',
       type: IsarType.bool,
     )
@@ -185,12 +190,13 @@ void _appSettingsSerialize(
   writer.writeLong(offsets[15], object.notSorMin);
   writer.writeBool(offsets[16], object.notSpuntinoAttiva);
   writer.writeLong(offsets[17], object.notSpuntinoMin);
-  writer.writeBool(offsets[18], object.notificheAttive);
-  writer.writeLong(offsets[19], object.obiettivo);
-  writer.writeDouble(offsets[20], object.pesoObiettivo);
-  writer.writeLong(offsets[21], object.restTimerDefaultSeconds);
-  writer.writeBool(offsets[22], object.tourCompleted);
-  writer.writeBool(offsets[23], object.workoutPresetsSeeded);
+  writer.writeBool(offsets[18], object.notWorkoutAttiva);
+  writer.writeBool(offsets[19], object.notificheAttive);
+  writer.writeLong(offsets[20], object.obiettivo);
+  writer.writeDouble(offsets[21], object.pesoObiettivo);
+  writer.writeLong(offsets[22], object.restTimerDefaultSeconds);
+  writer.writeBool(offsets[23], object.tourCompleted);
+  writer.writeBool(offsets[24], object.workoutPresetsSeeded);
 }
 
 AppSettings _appSettingsDeserialize(
@@ -219,12 +225,13 @@ AppSettings _appSettingsDeserialize(
   object.notSorMin = reader.readLong(offsets[15]);
   object.notSpuntinoAttiva = reader.readBool(offsets[16]);
   object.notSpuntinoMin = reader.readLong(offsets[17]);
-  object.notificheAttive = reader.readBool(offsets[18]);
-  object.obiettivo = reader.readLong(offsets[19]);
-  object.pesoObiettivo = reader.readDoubleOrNull(offsets[20]);
-  object.restTimerDefaultSeconds = reader.readLong(offsets[21]);
-  object.tourCompleted = reader.readBool(offsets[22]);
-  object.workoutPresetsSeeded = reader.readBool(offsets[23]);
+  object.notWorkoutAttiva = reader.readBool(offsets[18]);
+  object.notificheAttive = reader.readBool(offsets[19]);
+  object.obiettivo = reader.readLong(offsets[20]);
+  object.pesoObiettivo = reader.readDoubleOrNull(offsets[21]);
+  object.restTimerDefaultSeconds = reader.readLong(offsets[22]);
+  object.tourCompleted = reader.readBool(offsets[23]);
+  object.workoutPresetsSeeded = reader.readBool(offsets[24]);
   return object;
 }
 
@@ -274,14 +281,16 @@ P _appSettingsDeserializeProp<P>(
     case 18:
       return (reader.readBool(offset)) as P;
     case 19:
-      return (reader.readLong(offset)) as P;
-    case 20:
-      return (reader.readDoubleOrNull(offset)) as P;
-    case 21:
-      return (reader.readLong(offset)) as P;
-    case 22:
       return (reader.readBool(offset)) as P;
+    case 20:
+      return (reader.readLong(offset)) as P;
+    case 21:
+      return (reader.readDoubleOrNull(offset)) as P;
+    case 22:
+      return (reader.readLong(offset)) as P;
     case 23:
+      return (reader.readBool(offset)) as P;
+    case 24:
       return (reader.readBool(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1047,6 +1056,16 @@ extension AppSettingsQueryFilter
   }
 
   QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      notWorkoutAttivaEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'notWorkoutAttiva',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
       notificheAttiveEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -1509,6 +1528,20 @@ extension AppSettingsQuerySortBy
     });
   }
 
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByNotWorkoutAttiva() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'notWorkoutAttiva', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByNotWorkoutAttivaDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'notWorkoutAttiva', Sort.desc);
+    });
+  }
+
   QueryBuilder<AppSettings, AppSettings, QAfterSortBy> sortByNotificheAttive() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'notificheAttive', Sort.asc);
@@ -1831,6 +1864,20 @@ extension AppSettingsQuerySortThenBy
     });
   }
 
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByNotWorkoutAttiva() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'notWorkoutAttiva', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByNotWorkoutAttivaDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'notWorkoutAttiva', Sort.desc);
+    });
+  }
+
   QueryBuilder<AppSettings, AppSettings, QAfterSortBy> thenByNotificheAttive() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'notificheAttive', Sort.asc);
@@ -2027,6 +2074,13 @@ extension AppSettingsQueryWhereDistinct
   }
 
   QueryBuilder<AppSettings, AppSettings, QDistinct>
+      distinctByNotWorkoutAttiva() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'notWorkoutAttiva');
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QDistinct>
       distinctByNotificheAttive() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'notificheAttive');
@@ -2180,6 +2234,12 @@ extension AppSettingsQueryProperty
   QueryBuilder<AppSettings, int, QQueryOperations> notSpuntinoMinProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'notSpuntinoMin');
+    });
+  }
+
+  QueryBuilder<AppSettings, bool, QQueryOperations> notWorkoutAttivaProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'notWorkoutAttiva');
     });
   }
 

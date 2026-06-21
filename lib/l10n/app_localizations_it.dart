@@ -1100,6 +1100,12 @@ class AppLocalizationsIt extends AppLocalizations {
       'Riposo terminato — pronto per la prossima serie?';
 
   @override
+  String get notifChannelWorkout => 'Promemoria allenamento';
+
+  @override
+  String get notifChannelWorkoutDesc => 'Ricordati di allenarti';
+
+  @override
   String notifPastoBody(String pasto) {
     return 'Hai registrato $pasto?';
   }
@@ -1141,6 +1147,11 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String notifPesataBody(int days) {
     return 'Non ti pesi da $days giorni. Vuoi registrare il tuo peso?';
+  }
+
+  @override
+  String notifWorkoutBody(int days) {
+    return 'Non ti alleni da $days giorni. Pronto a riprendere?';
   }
 
   @override

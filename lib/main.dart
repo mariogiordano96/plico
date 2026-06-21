@@ -31,6 +31,7 @@ void main() async {
   await NotificationService.instance.refreshEveningRecap();
   await NotificationService.instance.refreshMorningRecap();
   await NotificationService.instance.refreshWeighInReminder();
+  await NotificationService.instance.refreshWorkoutReminder();
   await HomeWidget.setAppGroupId(WidgetService.iOSGroupId);
   await WidgetService.refresh();
   runApp(const PlicoApp());
@@ -80,6 +81,7 @@ class _PlicoAppState extends State<PlicoApp> with WidgetsBindingObserver {
       NotificationService.instance.refreshEveningRecap();
       NotificationService.instance.refreshMorningRecap();
       NotificationService.instance.refreshWeighInReminder();
+      NotificationService.instance.refreshWorkoutReminder();
     }
   }
 

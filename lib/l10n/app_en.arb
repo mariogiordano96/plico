@@ -357,6 +357,8 @@
   "notifChannelRestTimer": "Rest timer",
   "notifChannelRestTimerDesc": "Alert when the rest between sets ends",
   "notifRestTimerBody": "Rest is over — ready for the next set?",
+  "notifChannelWorkout": "Workout reminder",
+  "notifChannelWorkoutDesc": "Remember to work out",
   "notifPastoBody": "Did you log {pasto}?",
   "notifRecapNuovaStreak": "Log your meals today to start a new streak.",
   "notifRecapMantieni": "You've logged every day for {streak} days. Keep your streak going? 🔥",
@@ -366,6 +368,7 @@
   "notifMattinoOffTarget": "Yesterday you logged {kcal} kcal out of {target} target.",
   "notifMattinoNoTarget": "Yesterday you logged {kcal} kcal.",
   "notifPesataBody": "You haven't weighed in for {days} days. Want to log your weight?",
+  "notifWorkoutBody": "You haven't worked out for {days} days. Ready to get back to it?",
 
   "pdfDiarioTitle": "Food Diary",
   "pdfTargetLabel": "target",

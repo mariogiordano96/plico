@@ -1095,6 +1095,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifRestTimerBody => 'Rest is over — ready for the next set?';
 
   @override
+  String get notifChannelWorkout => 'Workout reminder';
+
+  @override
+  String get notifChannelWorkoutDesc => 'Remember to work out';
+
+  @override
   String notifPastoBody(String pasto) {
     return 'Did you log $pasto?';
   }
@@ -1136,6 +1142,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String notifPesataBody(int days) {
     return 'You haven\'t weighed in for $days days. Want to log your weight?';
+  }
+
+  @override
+  String notifWorkoutBody(int days) {
+    return 'You haven\'t worked out for $days days. Ready to get back to it?';
   }
 
   @override

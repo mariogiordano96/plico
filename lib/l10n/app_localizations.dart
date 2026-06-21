@@ -2102,6 +2102,18 @@ abstract class AppLocalizations {
   /// **'Riposo terminato — pronto per la prossima serie?'**
   String get notifRestTimerBody;
 
+  /// No description provided for @notifChannelWorkout.
+  ///
+  /// In it, this message translates to:
+  /// **'Promemoria allenamento'**
+  String get notifChannelWorkout;
+
+  /// No description provided for @notifChannelWorkoutDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'Ricordati di allenarti'**
+  String get notifChannelWorkoutDesc;
+
   /// No description provided for @notifPastoBody.
   ///
   /// In it, this message translates to:
@@ -2155,6 +2167,12 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Non ti pesi da {days} giorni. Vuoi registrare il tuo peso?'**
   String notifPesataBody(int days);
+
+  /// No description provided for @notifWorkoutBody.
+  ///
+  /// In it, this message translates to:
+  /// **'Non ti alleni da {days} giorni. Pronto a riprendere?'**
+  String notifWorkoutBody(int days);
 
   /// No description provided for @pdfDiarioTitle.
   ///

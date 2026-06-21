@@ -33,6 +33,10 @@ class NotificationService {
   static const _restTimerChannelId = 'rest_timer';
   static const _restTimerChannelName = 'Timer di recupero';
   static const _restTimerId = 210;
+  static const _workoutReminderChannelId = 'workout_reminder';
+  static const _workoutReminderChannelName = 'Promemoria allenamento';
+  static const _workoutReminderId = 211;
+  static const _workoutReminderThresholdDays = 3;
 
   Future<void> init() async {
     tzdata.initializeTimeZones();
@@ -346,6 +350,64 @@ class NotificationService {
   }
 
   Future<void> cancelRestTimer() => _plugin.cancel(id: _restTimerId);
+
+  /// Promemoria se sono passati almeno [_workoutReminderThresholdDays] giorni
+  /// dall'ultimo allenamento registrato, analogo a [refreshWeighInReminder].
+  Future<void> refreshWorkoutReminder() async {
+    final settings = await DatabaseService.instance.getAppSettings();
+    if (!settings.notificheAttive || !settings.notWorkoutAttiva) {
+      await _plugin.cancel(id: _workoutReminderId);
+      return;
+    }
+    final lastDate = await DatabaseService.instance.getLastWorkoutDate();
+    if (lastDate == null) {
+      await _plugin.cancel(id: _workoutReminderId);
+      return;
+    }
+    final today = DateTime.now();
+    final lastDay = DateTime(lastDate.year, lastDate.month, lastDate.day);
+    final daysSince =
+        DateTime(today.year, today.month, today.day).difference(lastDay).inDays;
+    if (daysSince < _workoutReminderThresholdDays) {
+      await _plugin.cancel(id: _workoutReminderId);
+      return;
+    }
+    await scheduleWorkoutReminder(daysSince: daysSince);
+  }
+
+  Future<void> scheduleWorkoutReminder({required int daysSince}) async {
+    await _plugin.cancel(id: _workoutReminderId);
+
+    final now = tz.TZDateTime.now(tz.local);
+    final today18 = tz.TZDateTime(tz.local, now.year, now.month, now.day, 18, 0);
+    if (!today18.isAfter(now.add(const Duration(seconds: 30)))) return;
+
+    final details = NotificationDetails(
+      android: AndroidNotificationDetails(
+        _workoutReminderChannelId,
+        _l10n?.notifChannelWorkout ?? _workoutReminderChannelName,
+        channelDescription: _l10n?.notifChannelWorkoutDesc ?? 'Ricordati di allenarti',
+        importance: Importance.defaultImportance,
+        priority: Priority.defaultPriority,
+        playSound: true,
+      ),
+      iOS: const DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: false,
+        presentSound: true,
+      ),
+    );
+
+    await _plugin.zonedSchedule(
+      id: _workoutReminderId,
+      title: 'Plico',
+      body: _l10n?.notifWorkoutBody(daysSince) ??
+          'Non ti alleni da $daysSince giorni. Pronto a riprendere?',
+      scheduledDate: today18,
+      notificationDetails: details,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+    );
+  }
 
   tz.TZDateTime _nextOccurrence(int hour, int minute) {
     final now = tz.TZDateTime.now(tz.local);
