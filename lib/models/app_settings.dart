@@ -12,6 +12,7 @@ class AppSettings {
   int obiettivo = 1;      // 0=deficit 1=mantenimento 2=surplus
   bool creaSeeded = false;
   bool exercisesSeeded = false;
+  bool workoutPresetsSeeded = false;
   DateTime? goalSetDate;
   double? pesoObiettivo;
 

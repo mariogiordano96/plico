@@ -5602,7 +5602,7 @@
   {
     "externalId": "Incline_Dumbbell_Press",
     "name": "Incline Dumbbell Press",
-    "nameIt": null,
+    "nameIt": "Panca inclinata con manubri",
     "muscleGroup": "chest",
     "category": "strength",
     "equipment": "dumbbell",
@@ -9108,7 +9108,7 @@
   {
     "externalId": "Pullups",
     "name": "Pullups",
-    "nameIt": null,
+    "nameIt": "Trazioni alla sbarra (presa prona)",
     "muscleGroup": "back",
     "category": "strength",
     "equipment": "body only",
@@ -14191,5 +14191,27 @@
       "Squeeze the biceps hard for a second at the contracted position and rotate your wrists so that the palms are facing down again.",
       "Repeat for the recommended amount of repetitions."
     ]
+  },
+  {
+    "externalId": "Jumping_Jack",
+    "name": "Jumping Jack",
+    "nameIt": "Jumping jack",
+    "muscleGroup": "cardio",
+    "category": "cardio",
+    "equipment": "body only",
+    "level": "beginner",
+    "mechanic": null,
+    "instructions": []
+  },
+  {
+    "externalId": "Burpee",
+    "name": "Burpee",
+    "nameIt": "Burpee",
+    "muscleGroup": "cardio",
+    "category": "cardio",
+    "equipment": "body only",
+    "level": "intermediate",
+    "mechanic": "compound",
+    "instructions": []
   }
 ]

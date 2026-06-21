@@ -22,6 +22,10 @@ import '../models/meal_combo.dart';
 import '../models/exercise_definition.dart';
 import '../models/workout_log.dart';
 import '../models/workout_exercise.dart';
+import '../models/workout_template.dart';
+import '../models/workout_template_exercise.dart';
+import '../models/workout_program.dart';
+import '../models/workout_set.dart';
 
 class DatabaseService {
   static final DatabaseService instance = DatabaseService._();
@@ -35,6 +39,7 @@ class DatabaseService {
     DailyLogSchema, UserFoodPreferencesSchema, MealPlanSchema,
     AchievementSchema, MealComboSchema, ExerciseDefinitionSchema,
     WorkoutLogSchema, WorkoutExerciseSchema,
+    WorkoutTemplateSchema, WorkoutProgramSchema,
   ];
 
   Future<void> init() async {
@@ -889,6 +894,200 @@ class DatabaseService {
       final log = await _isar.workoutLogs.filter().dateEqualTo(day).findFirst();
       if (log != null) await _isar.workoutLogs.delete(log.id);
     });
+  }
+
+  // ──────────────────────────────────────────────
+  // WorkoutTemplate / WorkoutProgram
+  // ──────────────────────────────────────────────
+
+  Future<void> seedWorkoutPresets() async {
+    final settings = await _isar.appSettings.get(1);
+    if (settings?.workoutPresetsSeeded == true) return;
+
+    final raw = await rootBundle.loadString('assets/data/workout_presets.json');
+    final json = jsonDecode(raw) as Map<String, dynamic>;
+
+    await _isar.writeTxn(() async {
+      for (final t in (json['templates'] as List).cast<Map<String, dynamic>>()) {
+        await _isar.workoutTemplates.put(_presetTemplateFromJson(t));
+      }
+      for (final p in (json['programs'] as List).cast<Map<String, dynamic>>()) {
+        final program = WorkoutProgram()
+          ..name = p['name'] as String
+          ..createdAt = DateTime.now()
+          ..isPreset = true;
+        final programId = await _isar.workoutPrograms.put(program);
+
+        final days = (p['days'] as List).cast<Map<String, dynamic>>();
+        for (var i = 0; i < days.length; i++) {
+          final day = _presetTemplateFromJson(days[i])
+            ..programId = programId
+            ..order = i;
+          await _isar.workoutTemplates.put(day);
+        }
+      }
+      final s = await _isar.appSettings.get(1) ?? AppSettings();
+      s.workoutPresetsSeeded = true;
+      await _isar.appSettings.put(s);
+    });
+  }
+
+  WorkoutTemplate _presetTemplateFromJson(Map<String, dynamic> j) {
+    return WorkoutTemplate()
+      ..name = j['name'] as String
+      ..createdAt = DateTime.now()
+      ..isPreset = true
+      ..exercises = (j['exercises'] as List)
+          .cast<Map<String, dynamic>>()
+          .map((e) => WorkoutTemplateExercise()
+            ..exerciseId = e['exerciseId'] as String
+            ..exerciseName = e['exerciseName'] as String
+            ..targetSets = e['targetSets'] as int?
+            ..targetReps = e['targetReps'] as int?
+            ..targetWeightKg = (e['targetWeightKg'] as num?)?.toDouble()
+            ..targetDurationSeconds = e['targetDurationSeconds'] as int?
+            ..supersetGroupId = e['supersetGroupId'] as int?
+            ..restSeconds = e['restSeconds'] as int?)
+          .toList();
+  }
+
+  Future<List<WorkoutTemplate>> getStandaloneTemplates() async {
+    return _isar.workoutTemplates.filter().programIdIsNull().findAll();
+  }
+
+  Future<List<WorkoutProgram>> getAllPrograms() async {
+    return _isar.workoutPrograms.where().findAll();
+  }
+
+  Future<List<WorkoutTemplate>> getProgramDays(int programId) async {
+    return _isar.workoutTemplates
+        .filter()
+        .programIdEqualTo(programId)
+        .sortByOrder()
+        .findAll();
+  }
+
+  /// Sceglie il giorno con `lastUsedAt` meno recente (o mai eseguito), così la
+  /// rotazione si auto-corregge anche se l'utente salta o ripete un giorno fuori
+  /// sequenza. Tie-break sull'`order` per il primo utilizzo (tutti `lastUsedAt` null).
+  Future<WorkoutTemplate?> getNextDayForProgram(int programId) async {
+    final days = await getProgramDays(programId);
+    if (days.isEmpty) return null;
+    days.sort((a, b) {
+      if (a.lastUsedAt == null && b.lastUsedAt == null) {
+        return a.order.compareTo(b.order);
+      }
+      if (a.lastUsedAt == null) return -1;
+      if (b.lastUsedAt == null) return 1;
+      return a.lastUsedAt!.compareTo(b.lastUsedAt!);
+    });
+    return days.first;
+  }
+
+  Future<Id> saveWorkoutTemplate(WorkoutTemplate template) async {
+    late Id id;
+    await _isar.writeTxn(() async {
+      id = await _isar.workoutTemplates.put(template);
+    });
+    return id;
+  }
+
+  Future<Id> saveWorkoutProgram(WorkoutProgram program) async {
+    late Id id;
+    await _isar.writeTxn(() async {
+      id = await _isar.workoutPrograms.put(program);
+    });
+    return id;
+  }
+
+  /// Impedisce di eliminare l'ultimo giorno rimasto di un programma (lo lascerebbe
+  /// vuoto). Ritorna `false` senza eliminare in quel caso.
+  Future<bool> deleteWorkoutTemplate(Id id) async {
+    final template = await _isar.workoutTemplates.get(id);
+    if (template == null) return true;
+    if (template.programId != null) {
+      final days = await getProgramDays(template.programId!);
+      if (days.length <= 1) return false;
+    }
+    await _isar.writeTxn(() async {
+      await _isar.workoutTemplates.delete(id);
+    });
+    return true;
+  }
+
+  Future<void> deleteWorkoutProgram(Id id) async {
+    await _isar.writeTxn(() async {
+      final days = await _isar.workoutTemplates.filter().programIdEqualTo(id).findAll();
+      await _isar.workoutTemplates.deleteAll(days.map((d) => d.id).toList());
+      await _isar.workoutPrograms.delete(id);
+    });
+  }
+
+  Future<WorkoutTemplate> duplicateTemplate(WorkoutTemplate original, {int? programId}) async {
+    final copy = WorkoutTemplate()
+      ..name = original.name
+      ..createdAt = DateTime.now()
+      ..isPreset = false
+      ..programId = programId
+      ..order = original.order
+      ..exercises = original.exercises
+          .map((e) => WorkoutTemplateExercise()
+            ..exerciseId = e.exerciseId
+            ..exerciseName = e.exerciseName
+            ..targetSets = e.targetSets
+            ..targetReps = e.targetReps
+            ..targetWeightKg = e.targetWeightKg
+            ..targetDurationSeconds = e.targetDurationSeconds
+            ..supersetGroupId = e.supersetGroupId
+            ..restSeconds = e.restSeconds)
+          .toList();
+    copy.id = await saveWorkoutTemplate(copy);
+    return copy;
+  }
+
+  Future<WorkoutProgram> duplicateProgram(WorkoutProgram original) async {
+    final copy = WorkoutProgram()
+      ..name = original.name
+      ..createdAt = DateTime.now()
+      ..isPreset = false;
+    copy.id = await saveWorkoutProgram(copy);
+
+    final days = await getProgramDays(original.id);
+    for (final day in days) {
+      await duplicateTemplate(day, programId: copy.id);
+    }
+    return copy;
+  }
+
+  /// Genera il log del giorno a partire dai target della scheda (la pre-compilazione
+  /// con il suggerimento di progressive overload è Fase 7/8). Aggiorna `lastUsedAt`.
+  Future<List<WorkoutExercise>> startWorkoutFromTemplate(
+      WorkoutTemplate template, DateTime date) async {
+    final day = _logDate(date);
+    final created = <WorkoutExercise>[];
+    for (final te in template.exercises) {
+      final isCardio = te.targetDurationSeconds != null;
+      final we = WorkoutExercise()
+        ..exerciseId = te.exerciseId
+        ..exerciseName = te.exerciseName
+        ..date = day
+        ..supersetGroupId = te.supersetGroupId
+        ..restSeconds = te.restSeconds
+        ..durationSeconds = te.targetDurationSeconds
+        ..sets = isCardio
+            ? []
+            : List.generate(
+                te.targetSets ?? 1,
+                (_) => WorkoutSet()
+                  ..reps = te.targetReps
+                  ..weightKg = te.targetWeightKg,
+              );
+      await addWorkoutExercise(day, we);
+      created.add(we);
+    }
+    template.lastUsedAt = day;
+    await saveWorkoutTemplate(template);
+    return created;
   }
 
   // ──────────────────────────────────────────────

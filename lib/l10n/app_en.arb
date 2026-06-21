@@ -424,5 +424,40 @@
   "homeAttivitaTitle": "Activity",
   "homeAttivitaKcalIngerite": "Calories eaten",
   "homeAttivitaKcalBruciate": "Calories burned",
-  "homeAttivitaBilancioNetto": "Net balance"
+  "homeAttivitaBilancioNetto": "Net balance",
+
+  "schedeTitle": "My templates",
+  "schedeSezionePreimpostate": "Presets",
+  "schedeSezioneMie": "My templates",
+  "schedeNuovaScheda": "New template",
+  "schedeNuovoProgramma": "Program",
+  "schedeInizia": "Start",
+  "schedeProssimo": "Next: {giorno}",
+  "schedeDuplica": "Duplicate and customize",
+  "schedeNGiorni": "{n} days",
+  "schedeNEsercizi": "{n} exercises",
+  "schedeEliminaTitle": "Delete template?",
+  "schedeEliminaSub": "This action cannot be undone.",
+  "schedeUltimoGiornoErrore": "You can't delete the last day of the program",
+
+  "creaSchedaTitleNuova": "New template",
+  "creaSchedaTitleModifica": "Edit template",
+  "creaSchedaNomeLabel": "Template name",
+  "creaSchedaNomeHint": "E.g. Push Day",
+  "creaSchedaAggiungiEsercizio": "Add exercise",
+  "creaSchedaNessunEsercizio": "Add at least one exercise",
+  "creaSchedaNomeObbligatorio": "Name is required",
+
+  "creaProgrammaTitle": "New program",
+  "creaProgrammaNomeLabel": "Program name",
+  "creaProgrammaNomeHint": "E.g. Upper/Lower",
+
+  "programmaDetailAggiungiGiorno": "Add day",
+  "programmaDetailNessunGiorno": "No days yet",
+
+  "targetDialogTitle": "Target — {nome}",
+  "targetDialogSerie": "Sets",
+  "targetDialogRip": "Reps",
+  "targetDialogKg": "Kg (optional)",
+  "targetDialogDurataMin": "Duration (minutes)"
 }

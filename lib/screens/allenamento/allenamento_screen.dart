@@ -6,6 +6,7 @@ import '../../models/workout_exercise.dart';
 import '../../services/calorie_estimation_service.dart';
 import '../../services/database_service.dart';
 import '../esercizi/catalogo_esercizi_screen.dart';
+import 'le_mie_schede_screen.dart';
 import 'log_cardio_dialog.dart';
 import 'log_serie_dialog.dart';
 
@@ -91,6 +92,16 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
         backgroundColor: p.background,
         elevation: 0,
         centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const LeMieSchedeScreen()),
+            ),
+            icon: Icon(Icons.list_alt_rounded, color: p.accent),
+            tooltip: l10n.schedeTitle,
+          ),
+        ],
       ),
       body: StreamBuilder<List<WorkoutExercise>>(
         stream: DatabaseService.instance.watchWorkoutExercisesForDay(_oggi),

@@ -548,5 +548,44 @@
   "homeAttivitaTitle": "Attività",
   "homeAttivitaKcalIngerite": "Kcal ingerite",
   "homeAttivitaKcalBruciate": "Kcal bruciate",
-  "homeAttivitaBilancioNetto": "Bilancio netto"
+  "homeAttivitaBilancioNetto": "Bilancio netto",
+
+  "schedeTitle": "Le mie schede",
+  "schedeSezionePreimpostate": "Preimpostate",
+  "schedeSezioneMie": "Le mie schede",
+  "schedeNuovaScheda": "Nuova scheda",
+  "schedeNuovoProgramma": "Programma",
+  "schedeInizia": "Inizia",
+  "schedeProssimo": "Prossimo: {giorno}",
+  "@schedeProssimo": { "placeholders": { "giorno": { "type": "String" } } },
+  "schedeDuplica": "Duplica e personalizza",
+  "schedeNGiorni": "{n} giorni",
+  "@schedeNGiorni": { "placeholders": { "n": { "type": "int" } } },
+  "schedeNEsercizi": "{n} esercizi",
+  "@schedeNEsercizi": { "placeholders": { "n": { "type": "int" } } },
+  "schedeEliminaTitle": "Eliminare la scheda?",
+  "schedeEliminaSub": "L'azione non è reversibile.",
+  "schedeUltimoGiornoErrore": "Non puoi eliminare l'ultimo giorno del programma",
+
+  "creaSchedaTitleNuova": "Nuova scheda",
+  "creaSchedaTitleModifica": "Modifica scheda",
+  "creaSchedaNomeLabel": "Nome scheda",
+  "creaSchedaNomeHint": "Es. Push Day",
+  "creaSchedaAggiungiEsercizio": "Aggiungi esercizio",
+  "creaSchedaNessunEsercizio": "Aggiungi almeno un esercizio",
+  "creaSchedaNomeObbligatorio": "Il nome è obbligatorio",
+
+  "creaProgrammaTitle": "Nuovo programma",
+  "creaProgrammaNomeLabel": "Nome programma",
+  "creaProgrammaNomeHint": "Es. Upper/Lower",
+
+  "programmaDetailAggiungiGiorno": "Aggiungi giorno",
+  "programmaDetailNessunGiorno": "Nessun giorno ancora",
+
+  "targetDialogTitle": "Target — {nome}",
+  "@targetDialogTitle": { "placeholders": { "nome": { "type": "String" } } },
+  "targetDialogSerie": "Serie",
+  "targetDialogRip": "Rip",
+  "targetDialogKg": "Kg (opzionale)",
+  "targetDialogDurataMin": "Durata (minuti)"
 }

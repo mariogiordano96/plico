@@ -393,7 +393,7 @@ Una scheda (`WorkoutTemplate`) rappresenta **una singola sessione** (es. "Push D
 Quando un programma alterna più sessioni diverse (es. Upper/Lower, PPL), le sessioni sono
 raggruppate in un `WorkoutProgram` — vedi sezione "Programmi multi-giorno" più sotto.
 
-### Modello dati
+### Modello dati ✅ implementato
 
 ```dart
 @collection
@@ -404,19 +404,16 @@ class WorkoutTemplate {
   DateTime? lastUsedAt;
   bool isPreset = false;             // true per le schede precaricate dall'app (read-only)
 
-  @Backlink(to: 'days')
-  final program = IsarLink<WorkoutProgram>();  // null se la scheda è autonoma
-  int order = 0;                     // posizione nella rotazione del programma (ignorato se program è null)
+  int? programId;                    // WorkoutProgram.id, null se la scheda è autonoma
+  int order = 0;                     // posizione nella rotazione/visualizzazione del programma
 
-  final exercises = IsarLinks<WorkoutTemplateExercise>();
+  List<WorkoutTemplateExercise> exercises = [];  // embedded, ordine = posizione in lista
 }
 
-@collection
+@embedded
 class WorkoutTemplateExercise {
-  Id id = Isar.autoIncrement;
-  late String exerciseId;           // ExerciseDefinition.externalId
-  late String exerciseName;         // snapshot
-  late int order;                   // ordine nella scheda (IsarLinks non garantisce ordine)
+  String exerciseId = '';           // ExerciseDefinition.externalId
+  String exerciseName = '';         // snapshot
   int? targetSets;
   int? targetReps;
   double? targetWeightKg;
@@ -426,7 +423,16 @@ class WorkoutTemplateExercise {
 }
 ```
 
-### Programmi multi-giorno (`WorkoutProgram`)
+> **Correzione rispetto al piano originale**: niente `IsarLinks`/`@Backlink`. Stessa
+> logica già applicata in Fase 4 (`WorkoutExercise.sets`): `WorkoutTemplateExercise` è
+> `@embedded` (Isar non permette `IsarLinks` su tipi embedded), quindi `exercises` è una
+> `List` semplice che preserva l'ordine di inserimento — il campo `order` separato non
+> serve più. Il legame con il programma è una FK denormalizzata (`programId`, come
+> `WorkoutExercise.date` per il log), non un `IsarLink`: più semplice da interrogare
+> (`filter().programIdEqualTo(x)`) e coerente col resto dell'app, che non usa IsarLinks
+> da nessuna parte.
+
+### Programmi multi-giorno (`WorkoutProgram`) ✅ implementato
 
 ```dart
 @collection
@@ -435,26 +441,30 @@ class WorkoutProgram {
   late String name;                 // es. "Upper/Lower", "Push Pull Legs"
   late DateTime createdAt;
   bool isPreset = false;
-
-  final days = IsarLinks<WorkoutTemplate>();  // ogni WorkoutTemplate è un "giorno" del programma
 }
 ```
 
-### Rotazione: "qual è il prossimo giorno?"
+`WorkoutTemplate` resta `@collection` (non embeddable in `WorkoutProgram`): serve poter
+interrogare/elencare/aggiornare (`lastUsedAt`) ogni giorno individualmente, sia che
+appartenga a un programma sia che sia una scheda autonoma — stessa collection per
+entrambi i casi, distinti solo da `programId` null o non null.
+
+### Rotazione: "qual è il prossimo giorno?" ✅ implementato
 
 Si determina il prossimo giorno da proporre scegliendo quello con `lastUsedAt` meno
 recente (o mai eseguito), così la rotazione si auto-corregge anche se l'utente salta o
 ripete un giorno fuori sequenza:
 
 ```dart
-WorkoutTemplate getNextDay(WorkoutProgram program) {
-  final days = program.days.toList()
-    ..sort((a, b) {
-      if (a.lastUsedAt == null && b.lastUsedAt == null) return a.order.compareTo(b.order);
-      if (a.lastUsedAt == null) return -1;
-      if (b.lastUsedAt == null) return 1;
-      return a.lastUsedAt!.compareTo(b.lastUsedAt!);
-    });
+Future<WorkoutTemplate?> getNextDayForProgram(int programId) async {
+  final days = await getProgramDays(programId); // filter().programIdEqualTo(programId)
+  if (days.isEmpty) return null;
+  days.sort((a, b) {
+    if (a.lastUsedAt == null && b.lastUsedAt == null) return a.order.compareTo(b.order);
+    if (a.lastUsedAt == null) return -1;
+    if (b.lastUsedAt == null) return 1;
+    return a.lastUsedAt!.compareTo(b.lastUsedAt!);
+  });
   return days.first;
 }
 ```
@@ -577,8 +587,9 @@ editabile.
 > commerciali brandizzati né le loro prescrizioni esatte (es. niente percentuali stile
 > "5/3/1" o branding "StrongLifts").
 
-7 dei 10 preset alternano giorni diversi e vengono quindi seedati come `WorkoutProgram`
-(con i relativi `WorkoutTemplate` figli); i restanti 3 ripetono lo stesso allenamento ogni
+8 dei 10 preset alternano giorni diversi e vengono quindi seedati come `WorkoutProgram`
+(con i relativi `WorkoutTemplate` figli, incluso Cardio Misto: 3 giorni con attività
+diverse); i restanti 2 (Calisthenics Full Body, Circuito Cardio/HIIT) ripetono lo stesso allenamento ogni
 volta e restano `WorkoutTemplate` singole.
 
 ### Forza / Palestra
@@ -699,7 +710,7 @@ volta al primo avvio (idempotente, controllo su `isPreset` esistente):
 ```
 assets/
   data/
-    workout_presets.json   ← 7 programmi (multi-giorno) + 3 schede singole,
+    workout_presets.json   ← 8 programmi (multi-giorno) + 2 schede singole,
                               esercizi referenziati per externalId
 ```
 
@@ -707,13 +718,13 @@ Ogni voce del JSON referenzia l'`externalId` di `free-exercise-db` (lo stesso us
 `ExerciseDefinition`); va quindi fatta una mappatura manuale una tantum tra i nomi generici
 sopra e gli id reali del dataset (es. "Squat con bilanciere" → `Barbell_Squat`), così come
 già previsto per `exercises_it.json`. Le voci cardio/circuito usano `targetDurationSeconds`
-invece di `targetSets`/`targetReps`. Per i 7 programmi, il seed crea un `WorkoutProgram`
+invece di `targetSets`/`targetReps`. Per gli 8 programmi, il seed crea un `WorkoutProgram`
 con `isPreset = true` e i suoi `WorkoutTemplate` figli con `order` crescente.
 
 ### Flusso di utilizzo
 
 1. La schermata "Le mie schede" mostra due sezioni: **Preimpostate** (i 10, badge "Preset",
-   filtrabili per categoria Forza/Corpo libero/Cardio — i 7 programmi espandibili nei
+   filtrabili per categoria Forza/Corpo libero/Cardio — gli 8 programmi espandibili nei
    relativi giorni) e **Le mie schede** (custom dell'utente)
 2. Da una preset l'utente può: **Inizia** (usarla/il giorno suggerito direttamente) o
    **Duplica e personalizza** → crea una copia editabile con `isPreset = false` (un
@@ -1368,22 +1379,35 @@ posizionamento/stile già visto in Progressi.
 - [x] Verificato: `flutter analyze` pulito; test su ordine di grandezza delle stime
       (squat 3×8×80kg ≈ 20-150 kcal, corsa 30min ≈ 300-600 kcal) e su aggregazione giornaliera
 
-### Fase 6 — Schede di allenamento e programmi multi-giorno
-- [ ] Modelli Isar `WorkoutTemplate` (con `isPreset`, `program`/`order`),
-      `WorkoutTemplateExercise` (con `supersetGroupId`, `restSeconds`), `WorkoutProgram`
-      + codegen
-- [ ] `WorkoutTemplateService` con CRUD (crea/modifica/elimina scheda, riordino esercizi)
-- [ ] `WorkoutProgramService` con CRUD programma + `getNextDay()` (rotazione su `lastUsedAt`)
-- [ ] Schermata "Le mie schede" con sezioni Preimpostate / Le mie schede, programmi
-      espandibili nei giorni interni con giorno suggerito evidenziato
-- [ ] Flusso "Inizia allenamento" → se programma, propone `getNextDay()` (override manuale
-      possibile) → genera `WorkoutLog` del giorno pre-compilato → aggiorna `lastUsedAt`
-- [ ] Mappare i 10 preset (7 come `WorkoutProgram`: Full Body Principianti, Full Body 5×5,
-      Upper/Lower, Power+Ipertrofia, PPL 3gg, PPL 6gg, Bro Split; 3 come `WorkoutTemplate`
-      singole: Calisthenics Full Body, Circuito Cardio/HIIT, Cardio Misto) sugli
-      `externalId` del catalogo e creare `assets/data/workout_presets.json`
-- [ ] `seedWorkoutPresetsIfNeeded()` (idempotente, analogo al seed esercizi)
-- [ ] Flusso "Duplica e personalizza" da preset a scheda/programma proprio
+### Fase 6 — Schede di allenamento e programmi multi-giorno ✅ completata
+- [x] Modelli Isar `WorkoutTemplate` (con `isPreset`, `programId`/`order`),
+      `WorkoutTemplateExercise` (`@embedded`: niente `IsarLinks`, vedi correzione sopra),
+      `WorkoutProgram` + codegen
+- [x] CRUD in `DatabaseService` (no service dedicati, stessa scelta della Fase 4):
+      `getStandaloneTemplates`, `getAllPrograms`, `getProgramDays`, `getNextDayForProgram`
+      (rotazione su `lastUsedAt`), `save/deleteWorkoutTemplate` (con guardia ultimo giorno),
+      `save/deleteWorkoutProgram`, `duplicateTemplate`/`duplicateProgram`,
+      `startWorkoutFromTemplate`
+- [x] `LeMieSchedeScreen`: sezioni Preimpostate / Le mie schede, programmi con giorno
+      suggerito mostrato in anteprima; `ProgrammaDetailScreen` per i giorni espansi
+      (suggerito evidenziato, aggiungi/elimina giorno se non preset)
+- [x] `CreaSchedaScreen` (nome + esercizi con target via catalogo + `TargetEsercizioDialog`)
+      per creare/modificare schede singole o giorni di un programma
+- [x] Flusso "Inizia" → `startWorkoutFromTemplate` genera il log del giorno dai target
+      della scheda (pre-compilazione con suggerimento overload: Fase 7/8) e aggiorna
+      `lastUsedAt`
+- [x] Mappati i 10 preset (8 come `WorkoutProgram`, 2 come `WorkoutTemplate` singole) sugli
+      `externalId` reali del catalogo — script Python di validazione + `assets/data/workout_presets.json`
+      scritto direttamente (non generato da un tool Dart: è contenuto originale curato, non
+      una trasformazione di un dataset esterno come per gli esercizi)
+- [x] `seedWorkoutPresets()` (idempotente, flag `AppSettings.workoutPresetsSeeded`)
+- [x] Flusso "Duplica e personalizza" da preset a scheda/programma proprio
+      (`duplicateTemplate`/`duplicateProgram`)
+- [x] Aggiunti 2 esercizi sintetici (Jumping_Jack, Burpee) assenti dal dataset upstream,
+      necessari per il preset Circuito Cardio/HIIT — vedi Considerazioni aperte
+- [x] Verificato: `flutter analyze` pulito; test di servizio su CRUD, rotazione, guardia
+      ultimo giorno, duplicazione, seed preset (8 programmi + 2 schede, idempotente) e
+      flusso end-to-end "Inizia" → log del giorno popolato correttamente
 
 ### Fase 7 — Storico progressi e progressive overload
 - [ ] `WorkoutHistoryService.getHistoryForExercise(exerciseId)` (query indicizzata)
@@ -1499,4 +1523,19 @@ preset, test manuale su device — vedi nota a inizio sezione)**
   `WorkoutProgram` fino a lasciarne uno solo, `getNextDay()` resta valida (ritorna sempre
   l'unico giorno) ma il programma si comporta di fatto come una scheda singola; non serve
   gestione speciale, ma va evitato di permettere l'eliminazione dell'ultimo giorno rimasto
-  (altrimenti il programma resterebbe vuoto).
+  (altrimenti il programma resterebbe vuoto). ✅ Implementato come guardia in
+  `deleteWorkoutTemplate()`: ritorna `false` senza eliminare se è l'ultimo giorno.
+- **Esercizi isometrici nei preset (Plank ecc.)** — il modello non ha un campo dedicato
+  per "N serie da M secondi" (solo `targetReps` per la forza o `targetDurationSeconds`
+  per un singolo blocco continuo, usato per cardio/circuiti). Convenzione adottata nei
+  preset: per le voci isometriche usate come accessorio in una scheda di forza (es.
+  "Plank 3×30s"), `targetReps` esprime i **secondi di hold**, non le ripetizioni
+  (`targetSets=3, targetReps=30`) — crea comunque 3 `WorkoutSet` reali nel log, consistente
+  col resto del flusso forza. Per le voci di un circuito a tempo (es. Circuito Cardio/HIIT),
+  si usa invece `targetDurationSeconds` per blocco, senza serie. Da rivedere se si vuole
+  un campo dedicato (es. `targetHoldSeconds` su `WorkoutSet`) in una fase futura.
+- **Due esercizi sintetici aggiunti al catalogo** — `Jumping_Jack` e `Burpee` non esistono
+  nel dataset `free-exercise-db` (verificato in Fase 2) ma sono usati nel preset Circuito
+  Cardio/HIIT. Aggiunti come voci extra in `tool/seed_exercises.dart` (categoria cardio),
+  seedate insieme al resto del catalogo — non sono esercizi "custom" dell'utente, sono
+  parte del seed standard dell'app.

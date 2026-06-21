@@ -42,12 +42,41 @@ void main() async {
   final exercises =
       list.map((e) => _buildExercise(e as Map<String, dynamic>, overrides)).toList();
 
+  // Esercizi cardio assenti dal dataset upstream ma necessari per i preset Circuito
+  // Cardio/HIIT (vedi docs/evolutiva_esercizi.md, Fase 2 e Fase 6).
+  exercises.addAll(_syntheticExercises);
+
   final jsonStr = const JsonEncoder.withIndent('  ').convert(exercises);
   File('assets/data/exercises_seed.json').writeAsStringSync(jsonStr);
   final translated = exercises.where((e) => e['nameIt'] != null).length;
   print('Generati ${exercises.length} esercizi ($translated tradotti) -> '
       'assets/data/exercises_seed.json');
 }
+
+const _syntheticExercises = [
+  {
+    'externalId': 'Jumping_Jack',
+    'name': 'Jumping Jack',
+    'nameIt': 'Jumping jack',
+    'muscleGroup': 'cardio',
+    'category': 'cardio',
+    'equipment': 'body only',
+    'level': 'beginner',
+    'mechanic': null,
+    'instructions': <String>[],
+  },
+  {
+    'externalId': 'Burpee',
+    'name': 'Burpee',
+    'nameIt': 'Burpee',
+    'muscleGroup': 'cardio',
+    'category': 'cardio',
+    'equipment': 'body only',
+    'level': 'intermediate',
+    'mechanic': 'compound',
+    'instructions': <String>[],
+  },
+];
 
 Map<String, dynamic> _buildExercise(Map<String, dynamic> e, Map<String, String> overrides) {
   final category = e['category'] as String;

@@ -1304,4 +1304,103 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeAttivitaBilancioNetto => 'Net balance';
+
+  @override
+  String get schedeTitle => 'My templates';
+
+  @override
+  String get schedeSezionePreimpostate => 'Presets';
+
+  @override
+  String get schedeSezioneMie => 'My templates';
+
+  @override
+  String get schedeNuovaScheda => 'New template';
+
+  @override
+  String get schedeNuovoProgramma => 'Program';
+
+  @override
+  String get schedeInizia => 'Start';
+
+  @override
+  String schedeProssimo(String giorno) {
+    return 'Next: $giorno';
+  }
+
+  @override
+  String get schedeDuplica => 'Duplicate and customize';
+
+  @override
+  String schedeNGiorni(int n) {
+    return '$n days';
+  }
+
+  @override
+  String schedeNEsercizi(int n) {
+    return '$n exercises';
+  }
+
+  @override
+  String get schedeEliminaTitle => 'Delete template?';
+
+  @override
+  String get schedeEliminaSub => 'This action cannot be undone.';
+
+  @override
+  String get schedeUltimoGiornoErrore =>
+      'You can\'t delete the last day of the program';
+
+  @override
+  String get creaSchedaTitleNuova => 'New template';
+
+  @override
+  String get creaSchedaTitleModifica => 'Edit template';
+
+  @override
+  String get creaSchedaNomeLabel => 'Template name';
+
+  @override
+  String get creaSchedaNomeHint => 'E.g. Push Day';
+
+  @override
+  String get creaSchedaAggiungiEsercizio => 'Add exercise';
+
+  @override
+  String get creaSchedaNessunEsercizio => 'Add at least one exercise';
+
+  @override
+  String get creaSchedaNomeObbligatorio => 'Name is required';
+
+  @override
+  String get creaProgrammaTitle => 'New program';
+
+  @override
+  String get creaProgrammaNomeLabel => 'Program name';
+
+  @override
+  String get creaProgrammaNomeHint => 'E.g. Upper/Lower';
+
+  @override
+  String get programmaDetailAggiungiGiorno => 'Add day';
+
+  @override
+  String get programmaDetailNessunGiorno => 'No days yet';
+
+  @override
+  String targetDialogTitle(String nome) {
+    return 'Target — $nome';
+  }
+
+  @override
+  String get targetDialogSerie => 'Sets';
+
+  @override
+  String get targetDialogRip => 'Reps';
+
+  @override
+  String get targetDialogKg => 'Kg (optional)';
+
+  @override
+  String get targetDialogDurataMin => 'Duration (minutes)';
 }

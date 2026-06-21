@@ -26,6 +26,8 @@ class CalorieEstimationService {
     'Step_Mill': 9.0,
     'Trail_Running_Walking': 6.0,
     'Walking_Treadmill': 3.5,
+    'Jumping_Jack': 8.0,
+    'Burpee': 10.0,
   };
   static const _defaultCardioMet = 6.0;
 

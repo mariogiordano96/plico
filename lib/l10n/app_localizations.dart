@@ -2461,6 +2461,186 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Bilancio netto'**
   String get homeAttivitaBilancioNetto;
+
+  /// No description provided for @schedeTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Le mie schede'**
+  String get schedeTitle;
+
+  /// No description provided for @schedeSezionePreimpostate.
+  ///
+  /// In it, this message translates to:
+  /// **'Preimpostate'**
+  String get schedeSezionePreimpostate;
+
+  /// No description provided for @schedeSezioneMie.
+  ///
+  /// In it, this message translates to:
+  /// **'Le mie schede'**
+  String get schedeSezioneMie;
+
+  /// No description provided for @schedeNuovaScheda.
+  ///
+  /// In it, this message translates to:
+  /// **'Nuova scheda'**
+  String get schedeNuovaScheda;
+
+  /// No description provided for @schedeNuovoProgramma.
+  ///
+  /// In it, this message translates to:
+  /// **'Programma'**
+  String get schedeNuovoProgramma;
+
+  /// No description provided for @schedeInizia.
+  ///
+  /// In it, this message translates to:
+  /// **'Inizia'**
+  String get schedeInizia;
+
+  /// No description provided for @schedeProssimo.
+  ///
+  /// In it, this message translates to:
+  /// **'Prossimo: {giorno}'**
+  String schedeProssimo(String giorno);
+
+  /// No description provided for @schedeDuplica.
+  ///
+  /// In it, this message translates to:
+  /// **'Duplica e personalizza'**
+  String get schedeDuplica;
+
+  /// No description provided for @schedeNGiorni.
+  ///
+  /// In it, this message translates to:
+  /// **'{n} giorni'**
+  String schedeNGiorni(int n);
+
+  /// No description provided for @schedeNEsercizi.
+  ///
+  /// In it, this message translates to:
+  /// **'{n} esercizi'**
+  String schedeNEsercizi(int n);
+
+  /// No description provided for @schedeEliminaTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Eliminare la scheda?'**
+  String get schedeEliminaTitle;
+
+  /// No description provided for @schedeEliminaSub.
+  ///
+  /// In it, this message translates to:
+  /// **'L\'azione non è reversibile.'**
+  String get schedeEliminaSub;
+
+  /// No description provided for @schedeUltimoGiornoErrore.
+  ///
+  /// In it, this message translates to:
+  /// **'Non puoi eliminare l\'ultimo giorno del programma'**
+  String get schedeUltimoGiornoErrore;
+
+  /// No description provided for @creaSchedaTitleNuova.
+  ///
+  /// In it, this message translates to:
+  /// **'Nuova scheda'**
+  String get creaSchedaTitleNuova;
+
+  /// No description provided for @creaSchedaTitleModifica.
+  ///
+  /// In it, this message translates to:
+  /// **'Modifica scheda'**
+  String get creaSchedaTitleModifica;
+
+  /// No description provided for @creaSchedaNomeLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'Nome scheda'**
+  String get creaSchedaNomeLabel;
+
+  /// No description provided for @creaSchedaNomeHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Es. Push Day'**
+  String get creaSchedaNomeHint;
+
+  /// No description provided for @creaSchedaAggiungiEsercizio.
+  ///
+  /// In it, this message translates to:
+  /// **'Aggiungi esercizio'**
+  String get creaSchedaAggiungiEsercizio;
+
+  /// No description provided for @creaSchedaNessunEsercizio.
+  ///
+  /// In it, this message translates to:
+  /// **'Aggiungi almeno un esercizio'**
+  String get creaSchedaNessunEsercizio;
+
+  /// No description provided for @creaSchedaNomeObbligatorio.
+  ///
+  /// In it, this message translates to:
+  /// **'Il nome è obbligatorio'**
+  String get creaSchedaNomeObbligatorio;
+
+  /// No description provided for @creaProgrammaTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Nuovo programma'**
+  String get creaProgrammaTitle;
+
+  /// No description provided for @creaProgrammaNomeLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'Nome programma'**
+  String get creaProgrammaNomeLabel;
+
+  /// No description provided for @creaProgrammaNomeHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Es. Upper/Lower'**
+  String get creaProgrammaNomeHint;
+
+  /// No description provided for @programmaDetailAggiungiGiorno.
+  ///
+  /// In it, this message translates to:
+  /// **'Aggiungi giorno'**
+  String get programmaDetailAggiungiGiorno;
+
+  /// No description provided for @programmaDetailNessunGiorno.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessun giorno ancora'**
+  String get programmaDetailNessunGiorno;
+
+  /// No description provided for @targetDialogTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Target — {nome}'**
+  String targetDialogTitle(String nome);
+
+  /// No description provided for @targetDialogSerie.
+  ///
+  /// In it, this message translates to:
+  /// **'Serie'**
+  String get targetDialogSerie;
+
+  /// No description provided for @targetDialogRip.
+  ///
+  /// In it, this message translates to:
+  /// **'Rip'**
+  String get targetDialogRip;
+
+  /// No description provided for @targetDialogKg.
+  ///
+  /// In it, this message translates to:
+  /// **'Kg (opzionale)'**
+  String get targetDialogKg;
+
+  /// No description provided for @targetDialogDurataMin.
+  ///
+  /// In it, this message translates to:
+  /// **'Durata (minuti)'**
+  String get targetDialogDurataMin;
 }
 
 class _AppLocalizationsDelegate

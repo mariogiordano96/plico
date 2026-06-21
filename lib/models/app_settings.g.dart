@@ -126,6 +126,11 @@ const AppSettingsSchema = CollectionSchema(
       id: 21,
       name: r'tourCompleted',
       type: IsarType.bool,
+    ),
+    r'workoutPresetsSeeded': PropertySchema(
+      id: 22,
+      name: r'workoutPresetsSeeded',
+      type: IsarType.bool,
     )
   },
   estimateSize: _appSettingsEstimateSize,
@@ -179,6 +184,7 @@ void _appSettingsSerialize(
   writer.writeLong(offsets[19], object.obiettivo);
   writer.writeDouble(offsets[20], object.pesoObiettivo);
   writer.writeBool(offsets[21], object.tourCompleted);
+  writer.writeBool(offsets[22], object.workoutPresetsSeeded);
 }
 
 AppSettings _appSettingsDeserialize(
@@ -211,6 +217,7 @@ AppSettings _appSettingsDeserialize(
   object.obiettivo = reader.readLong(offsets[19]);
   object.pesoObiettivo = reader.readDoubleOrNull(offsets[20]);
   object.tourCompleted = reader.readBool(offsets[21]);
+  object.workoutPresetsSeeded = reader.readBool(offsets[22]);
   return object;
 }
 
@@ -264,6 +271,8 @@ P _appSettingsDeserializeProp<P>(
     case 20:
       return (reader.readDoubleOrNull(offset)) as P;
     case 21:
+      return (reader.readBool(offset)) as P;
+    case 22:
       return (reader.readBool(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1187,6 +1196,16 @@ extension AppSettingsQueryFilter
       ));
     });
   }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      workoutPresetsSeededEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'workoutPresetsSeeded',
+        value: value,
+      ));
+    });
+  }
 }
 
 extension AppSettingsQueryObject
@@ -1473,6 +1492,20 @@ extension AppSettingsQuerySortBy
       sortByTourCompletedDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'tourCompleted', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByWorkoutPresetsSeeded() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'workoutPresetsSeeded', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByWorkoutPresetsSeededDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'workoutPresetsSeeded', Sort.desc);
     });
   }
 }
@@ -1769,6 +1802,20 @@ extension AppSettingsQuerySortThenBy
       return query.addSortBy(r'tourCompleted', Sort.desc);
     });
   }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByWorkoutPresetsSeeded() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'workoutPresetsSeeded', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByWorkoutPresetsSeededDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'workoutPresetsSeeded', Sort.desc);
+    });
+  }
 }
 
 extension AppSettingsQueryWhereDistinct
@@ -1908,6 +1955,13 @@ extension AppSettingsQueryWhereDistinct
   QueryBuilder<AppSettings, AppSettings, QDistinct> distinctByTourCompleted() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'tourCompleted');
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QDistinct>
+      distinctByWorkoutPresetsSeeded() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'workoutPresetsSeeded');
     });
   }
 }
@@ -2050,6 +2104,13 @@ extension AppSettingsQueryProperty
   QueryBuilder<AppSettings, bool, QQueryOperations> tourCompletedProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'tourCompleted');
+    });
+  }
+
+  QueryBuilder<AppSettings, bool, QQueryOperations>
+      workoutPresetsSeededProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'workoutPresetsSeeded');
     });
   }
 }

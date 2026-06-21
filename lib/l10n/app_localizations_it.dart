@@ -1310,4 +1310,103 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get homeAttivitaBilancioNetto => 'Bilancio netto';
+
+  @override
+  String get schedeTitle => 'Le mie schede';
+
+  @override
+  String get schedeSezionePreimpostate => 'Preimpostate';
+
+  @override
+  String get schedeSezioneMie => 'Le mie schede';
+
+  @override
+  String get schedeNuovaScheda => 'Nuova scheda';
+
+  @override
+  String get schedeNuovoProgramma => 'Programma';
+
+  @override
+  String get schedeInizia => 'Inizia';
+
+  @override
+  String schedeProssimo(String giorno) {
+    return 'Prossimo: $giorno';
+  }
+
+  @override
+  String get schedeDuplica => 'Duplica e personalizza';
+
+  @override
+  String schedeNGiorni(int n) {
+    return '$n giorni';
+  }
+
+  @override
+  String schedeNEsercizi(int n) {
+    return '$n esercizi';
+  }
+
+  @override
+  String get schedeEliminaTitle => 'Eliminare la scheda?';
+
+  @override
+  String get schedeEliminaSub => 'L\'azione non è reversibile.';
+
+  @override
+  String get schedeUltimoGiornoErrore =>
+      'Non puoi eliminare l\'ultimo giorno del programma';
+
+  @override
+  String get creaSchedaTitleNuova => 'Nuova scheda';
+
+  @override
+  String get creaSchedaTitleModifica => 'Modifica scheda';
+
+  @override
+  String get creaSchedaNomeLabel => 'Nome scheda';
+
+  @override
+  String get creaSchedaNomeHint => 'Es. Push Day';
+
+  @override
+  String get creaSchedaAggiungiEsercizio => 'Aggiungi esercizio';
+
+  @override
+  String get creaSchedaNessunEsercizio => 'Aggiungi almeno un esercizio';
+
+  @override
+  String get creaSchedaNomeObbligatorio => 'Il nome è obbligatorio';
+
+  @override
+  String get creaProgrammaTitle => 'Nuovo programma';
+
+  @override
+  String get creaProgrammaNomeLabel => 'Nome programma';
+
+  @override
+  String get creaProgrammaNomeHint => 'Es. Upper/Lower';
+
+  @override
+  String get programmaDetailAggiungiGiorno => 'Aggiungi giorno';
+
+  @override
+  String get programmaDetailNessunGiorno => 'Nessun giorno ancora';
+
+  @override
+  String targetDialogTitle(String nome) {
+    return 'Target — $nome';
+  }
+
+  @override
+  String get targetDialogSerie => 'Serie';
+
+  @override
+  String get targetDialogRip => 'Rip';
+
+  @override
+  String get targetDialogKg => 'Kg (opzionale)';
+
+  @override
+  String get targetDialogDurataMin => 'Durata (minuti)';
 }

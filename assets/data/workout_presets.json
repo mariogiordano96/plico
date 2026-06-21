@@ -1,0 +1,1331 @@
+{
+  "templates": [
+    {
+      "name": "Calisthenics Full Body",
+      "exercises": [
+        {
+          "exerciseId": "Pushups",
+          "exerciseName": "Piegamenti",
+          "targetSets": 3,
+          "targetReps": 12,
+          "targetWeightKg": null,
+          "targetDurationSeconds": null,
+          "supersetGroupId": null,
+          "restSeconds": null
+        },
+        {
+          "exerciseId": "Bodyweight_Squat",
+          "exerciseName": "Squat a corpo libero",
+          "targetSets": 3,
+          "targetReps": 15,
+          "targetWeightKg": null,
+          "targetDurationSeconds": null,
+          "supersetGroupId": null,
+          "restSeconds": null
+        },
+        {
+          "exerciseId": "Pullups",
+          "exerciseName": "Trazioni alla sbarra (presa prona)",
+          "targetSets": 3,
+          "targetReps": 8,
+          "targetWeightKg": null,
+          "targetDurationSeconds": null,
+          "supersetGroupId": null,
+          "restSeconds": null
+        },
+        {
+          "exerciseId": "Plank",
+          "exerciseName": "Plank",
+          "targetSets": 3,
+          "targetReps": 40,
+          "targetWeightKg": null,
+          "targetDurationSeconds": null,
+          "supersetGroupId": null,
+          "restSeconds": null
+        },
+        {
+          "exerciseId": "Bodyweight_Walking_Lunge",
+          "exerciseName": "Affondi in camminata a corpo libero",
+          "targetSets": 3,
+          "targetReps": 12,
+          "targetWeightKg": null,
+          "targetDurationSeconds": null,
+          "supersetGroupId": null,
+          "restSeconds": null
+        },
+        {
+          "exerciseId": "Single_Leg_Glute_Bridge",
+          "exerciseName": "Glute bridge a una gamba",
+          "targetSets": 3,
+          "targetReps": 15,
+          "targetWeightKg": null,
+          "targetDurationSeconds": null,
+          "supersetGroupId": null,
+          "restSeconds": null
+        }
+      ]
+    },
+    {
+      "name": "Circuito Cardio/HIIT",
+      "exercises": [
+        {
+          "exerciseId": "Jumping_Jack",
+          "exerciseName": "Jumping_Jack",
+          "targetSets": null,
+          "targetReps": null,
+          "targetWeightKg": null,
+          "targetDurationSeconds": 40,
+          "supersetGroupId": null,
+          "restSeconds": null
+        },
+        {
+          "exerciseId": "Bodyweight_Squat",
+          "exerciseName": "Squat a corpo libero",
+          "targetSets": null,
+          "targetReps": null,
+          "targetWeightKg": null,
+          "targetDurationSeconds": 40,
+          "supersetGroupId": null,
+          "restSeconds": null
+        },
+        {
+          "exerciseId": "Mountain_Climbers",
+          "exerciseName": "Mountain climber",
+          "targetSets": null,
+          "targetReps": null,
+          "targetWeightKg": null,
+          "targetDurationSeconds": 40,
+          "supersetGroupId": null,
+          "restSeconds": null
+        },
+        {
+          "exerciseId": "Plank",
+          "exerciseName": "Plank",
+          "targetSets": null,
+          "targetReps": null,
+          "targetWeightKg": null,
+          "targetDurationSeconds": 40,
+          "supersetGroupId": null,
+          "restSeconds": null
+        },
+        {
+          "exerciseId": "Burpee",
+          "exerciseName": "Burpee",
+          "targetSets": null,
+          "targetReps": null,
+          "targetWeightKg": null,
+          "targetDurationSeconds": 40,
+          "supersetGroupId": null,
+          "restSeconds": null
+        }
+      ]
+    }
+  ],
+  "programs": [
+    {
+      "name": "Full Body Principianti",
+      "days": [
+        {
+          "name": "Giorno A",
+          "exercises": [
+            {
+              "exerciseId": "Barbell_Squat",
+              "exerciseName": "Squat con bilanciere",
+              "targetSets": 3,
+              "targetReps": 8,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Barbell_Bench_Press_-_Medium_Grip",
+              "exerciseName": "Panca piana con bilanciere (presa media)",
+              "targetSets": 3,
+              "targetReps": 8,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Bent_Over_Barbell_Row",
+              "exerciseName": "Rematore con bilanciere",
+              "targetSets": 3,
+              "targetReps": 8,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Plank",
+              "exerciseName": "Plank",
+              "targetSets": 3,
+              "targetReps": 30,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        },
+        {
+          "name": "Giorno B",
+          "exercises": [
+            {
+              "exerciseId": "Barbell_Deadlift",
+              "exerciseName": "Stacco da terra con bilanciere",
+              "targetSets": 3,
+              "targetReps": 8,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Standing_Military_Press",
+              "exerciseName": "Military press in piedi",
+              "targetSets": 3,
+              "targetReps": 8,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Wide-Grip_Lat_Pulldown",
+              "exerciseName": "Lat machine presa larga",
+              "targetSets": 3,
+              "targetReps": 8,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Crunch_-_Hands_Overhead",
+              "exerciseName": "Crunch (mani dietro la testa)",
+              "targetSets": 3,
+              "targetReps": 15,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Full Body 5×5",
+      "days": [
+        {
+          "name": "Giorno A",
+          "exercises": [
+            {
+              "exerciseId": "Barbell_Squat",
+              "exerciseName": "Squat con bilanciere",
+              "targetSets": 5,
+              "targetReps": 5,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Barbell_Bench_Press_-_Medium_Grip",
+              "exerciseName": "Panca piana con bilanciere (presa media)",
+              "targetSets": 5,
+              "targetReps": 5,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Bent_Over_Barbell_Row",
+              "exerciseName": "Rematore con bilanciere",
+              "targetSets": 5,
+              "targetReps": 5,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        },
+        {
+          "name": "Giorno B",
+          "exercises": [
+            {
+              "exerciseId": "Barbell_Squat",
+              "exerciseName": "Squat con bilanciere",
+              "targetSets": 5,
+              "targetReps": 5,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Standing_Military_Press",
+              "exerciseName": "Military press in piedi",
+              "targetSets": 5,
+              "targetReps": 5,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Barbell_Deadlift",
+              "exerciseName": "Stacco da terra con bilanciere",
+              "targetSets": 1,
+              "targetReps": 5,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Upper/Lower",
+      "days": [
+        {
+          "name": "Upper 1",
+          "exercises": [
+            {
+              "exerciseId": "Barbell_Bench_Press_-_Medium_Grip",
+              "exerciseName": "Panca piana con bilanciere (presa media)",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Bent_Over_Barbell_Row",
+              "exerciseName": "Rematore con bilanciere",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Standing_Military_Press",
+              "exerciseName": "Military press in piedi",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Barbell_Curl",
+              "exerciseName": "Curl per bicipiti con bilanciere",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        },
+        {
+          "name": "Lower 1",
+          "exercises": [
+            {
+              "exerciseId": "Barbell_Squat",
+              "exerciseName": "Squat con bilanciere",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Leg_Press",
+              "exerciseName": "Leg press",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Lying_Leg_Curls",
+              "exerciseName": "Leg curl sdraiato",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Standing_Calf_Raises",
+              "exerciseName": "Calf raise in piedi",
+              "targetSets": 3,
+              "targetReps": 15,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        },
+        {
+          "name": "Upper 2",
+          "exercises": [
+            {
+              "exerciseId": "Incline_Dumbbell_Press",
+              "exerciseName": "Panca inclinata con manubri",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Wide-Grip_Lat_Pulldown",
+              "exerciseName": "Lat machine presa larga",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Side_Lateral_Raise",
+              "exerciseName": "Alzate laterali",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Triceps_Pushdown",
+              "exerciseName": "Push down per tricipiti",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        },
+        {
+          "name": "Lower 2",
+          "exercises": [
+            {
+              "exerciseId": "Romanian_Deadlift",
+              "exerciseName": "Stacco rumeno",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Dumbbell_Lunges",
+              "exerciseName": "Affondi con manubri",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Barbell_Hip_Thrust",
+              "exerciseName": "Hip thrust con bilanciere",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Plank",
+              "exerciseName": "Plank",
+              "targetSets": 3,
+              "targetReps": 40,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Power + Ipertrofia",
+      "days": [
+        {
+          "name": "Upper Power",
+          "exercises": [
+            {
+              "exerciseId": "Barbell_Bench_Press_-_Medium_Grip",
+              "exerciseName": "Panca piana con bilanciere (presa media)",
+              "targetSets": 4,
+              "targetReps": 6,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Bent_Over_Barbell_Row",
+              "exerciseName": "Rematore con bilanciere",
+              "targetSets": 4,
+              "targetReps": 6,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Standing_Military_Press",
+              "exerciseName": "Military press in piedi",
+              "targetSets": 3,
+              "targetReps": 8,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Barbell_Curl",
+              "exerciseName": "Curl per bicipiti con bilanciere",
+              "targetSets": 3,
+              "targetReps": 8,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        },
+        {
+          "name": "Lower Power",
+          "exercises": [
+            {
+              "exerciseId": "Barbell_Squat",
+              "exerciseName": "Squat con bilanciere",
+              "targetSets": 4,
+              "targetReps": 6,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Romanian_Deadlift",
+              "exerciseName": "Stacco rumeno",
+              "targetSets": 3,
+              "targetReps": 8,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Leg_Press",
+              "exerciseName": "Leg press",
+              "targetSets": 3,
+              "targetReps": 8,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Standing_Calf_Raises",
+              "exerciseName": "Calf raise in piedi",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        },
+        {
+          "name": "Upper Ipertrofia",
+          "exercises": [
+            {
+              "exerciseId": "Incline_Dumbbell_Press",
+              "exerciseName": "Panca inclinata con manubri",
+              "targetSets": 3,
+              "targetReps": 11,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Wide-Grip_Lat_Pulldown",
+              "exerciseName": "Lat machine presa larga",
+              "targetSets": 3,
+              "targetReps": 11,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Side_Lateral_Raise",
+              "exerciseName": "Alzate laterali",
+              "targetSets": 3,
+              "targetReps": 13,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Triceps_Pushdown",
+              "exerciseName": "Push down per tricipiti",
+              "targetSets": 3,
+              "targetReps": 13,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        },
+        {
+          "name": "Lower Ipertrofia",
+          "exercises": [
+            {
+              "exerciseId": "Dumbbell_Lunges",
+              "exerciseName": "Affondi con manubri",
+              "targetSets": 3,
+              "targetReps": 11,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Lying_Leg_Curls",
+              "exerciseName": "Leg curl sdraiato",
+              "targetSets": 3,
+              "targetReps": 13,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Barbell_Hip_Thrust",
+              "exerciseName": "Hip thrust con bilanciere",
+              "targetSets": 3,
+              "targetReps": 13,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Plank",
+              "exerciseName": "Plank",
+              "targetSets": 3,
+              "targetReps": 45,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Push/Pull/Legs",
+      "days": [
+        {
+          "name": "Push",
+          "exercises": [
+            {
+              "exerciseId": "Barbell_Bench_Press_-_Medium_Grip",
+              "exerciseName": "Panca piana con bilanciere (presa media)",
+              "targetSets": 4,
+              "targetReps": 8,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Standing_Military_Press",
+              "exerciseName": "Military press in piedi",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Parallel_Bar_Dip",
+              "exerciseName": "Dip alle parallele",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Side_Lateral_Raise",
+              "exerciseName": "Alzate laterali",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Triceps_Pushdown",
+              "exerciseName": "Push down per tricipiti",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        },
+        {
+          "name": "Pull",
+          "exercises": [
+            {
+              "exerciseId": "Barbell_Deadlift",
+              "exerciseName": "Stacco da terra con bilanciere",
+              "targetSets": 4,
+              "targetReps": 6,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Wide-Grip_Lat_Pulldown",
+              "exerciseName": "Lat machine presa larga",
+              "targetSets": 4,
+              "targetReps": 8,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Bent_Over_Barbell_Row",
+              "exerciseName": "Rematore con bilanciere",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Barbell_Curl",
+              "exerciseName": "Curl per bicipiti con bilanciere",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Face_Pull",
+              "exerciseName": "Face pull ai cavi",
+              "targetSets": 3,
+              "targetReps": 15,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        },
+        {
+          "name": "Legs",
+          "exercises": [
+            {
+              "exerciseId": "Barbell_Squat",
+              "exerciseName": "Squat con bilanciere",
+              "targetSets": 4,
+              "targetReps": 8,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Leg_Press",
+              "exerciseName": "Leg press",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Lying_Leg_Curls",
+              "exerciseName": "Leg curl sdraiato",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Dumbbell_Lunges",
+              "exerciseName": "Affondi con manubri",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Standing_Calf_Raises",
+              "exerciseName": "Calf raise in piedi",
+              "targetSets": 4,
+              "targetReps": 15,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Push/Pull/Legs 6gg",
+      "days": [
+        {
+          "name": "Push (forza)",
+          "exercises": [
+            {
+              "exerciseId": "Barbell_Bench_Press_-_Medium_Grip",
+              "exerciseName": "Panca piana con bilanciere (presa media)",
+              "targetSets": 4,
+              "targetReps": 6,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Standing_Military_Press",
+              "exerciseName": "Military press in piedi",
+              "targetSets": 3,
+              "targetReps": 8,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Parallel_Bar_Dip",
+              "exerciseName": "Dip alle parallele",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        },
+        {
+          "name": "Pull (forza)",
+          "exercises": [
+            {
+              "exerciseId": "Barbell_Deadlift",
+              "exerciseName": "Stacco da terra con bilanciere",
+              "targetSets": 4,
+              "targetReps": 6,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Bent_Over_Barbell_Row",
+              "exerciseName": "Rematore con bilanciere",
+              "targetSets": 4,
+              "targetReps": 8,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Wide-Grip_Lat_Pulldown",
+              "exerciseName": "Lat machine presa larga",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        },
+        {
+          "name": "Legs (forza)",
+          "exercises": [
+            {
+              "exerciseId": "Barbell_Squat",
+              "exerciseName": "Squat con bilanciere",
+              "targetSets": 4,
+              "targetReps": 6,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Leg_Press",
+              "exerciseName": "Leg press",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Lying_Leg_Curls",
+              "exerciseName": "Leg curl sdraiato",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        },
+        {
+          "name": "Push (ipertrofia)",
+          "exercises": [
+            {
+              "exerciseId": "Incline_Dumbbell_Press",
+              "exerciseName": "Panca inclinata con manubri",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Side_Lateral_Raise",
+              "exerciseName": "Alzate laterali",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Triceps_Pushdown",
+              "exerciseName": "Push down per tricipiti",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        },
+        {
+          "name": "Pull (ipertrofia)",
+          "exercises": [
+            {
+              "exerciseId": "Wide-Grip_Lat_Pulldown",
+              "exerciseName": "Lat machine presa larga",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Barbell_Curl",
+              "exerciseName": "Curl per bicipiti con bilanciere",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Face_Pull",
+              "exerciseName": "Face pull ai cavi",
+              "targetSets": 3,
+              "targetReps": 15,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        },
+        {
+          "name": "Legs (ipertrofia)",
+          "exercises": [
+            {
+              "exerciseId": "Dumbbell_Lunges",
+              "exerciseName": "Affondi con manubri",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Lying_Leg_Curls",
+              "exerciseName": "Leg curl sdraiato",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Standing_Calf_Raises",
+              "exerciseName": "Calf raise in piedi",
+              "targetSets": 4,
+              "targetReps": 15,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bro Split",
+      "days": [
+        {
+          "name": "Petto",
+          "exercises": [
+            {
+              "exerciseId": "Barbell_Bench_Press_-_Medium_Grip",
+              "exerciseName": "Panca piana con bilanciere (presa media)",
+              "targetSets": 4,
+              "targetReps": 8,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Incline_Dumbbell_Press",
+              "exerciseName": "Panca inclinata con manubri",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Cable_Crossover",
+              "exerciseName": "Croci ai cavi",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Parallel_Bar_Dip",
+              "exerciseName": "Dip alle parallele",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        },
+        {
+          "name": "Dorso",
+          "exercises": [
+            {
+              "exerciseId": "Barbell_Deadlift",
+              "exerciseName": "Stacco da terra con bilanciere",
+              "targetSets": 4,
+              "targetReps": 6,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Wide-Grip_Lat_Pulldown",
+              "exerciseName": "Lat machine presa larga",
+              "targetSets": 4,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Bent_Over_Barbell_Row",
+              "exerciseName": "Rematore con bilanciere",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Seated_Cable_Rows",
+              "exerciseName": "Pulley basso (rematore ai cavi)",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        },
+        {
+          "name": "Gambe",
+          "exercises": [
+            {
+              "exerciseId": "Barbell_Squat",
+              "exerciseName": "Squat con bilanciere",
+              "targetSets": 4,
+              "targetReps": 8,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Leg_Press",
+              "exerciseName": "Leg press",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Lying_Leg_Curls",
+              "exerciseName": "Leg curl sdraiato",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Standing_Calf_Raises",
+              "exerciseName": "Calf raise in piedi",
+              "targetSets": 4,
+              "targetReps": 15,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        },
+        {
+          "name": "Spalle",
+          "exercises": [
+            {
+              "exerciseId": "Standing_Military_Press",
+              "exerciseName": "Military press in piedi",
+              "targetSets": 4,
+              "targetReps": 8,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Side_Lateral_Raise",
+              "exerciseName": "Alzate laterali",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Seated_Bent-Over_Rear_Delt_Raise",
+              "exerciseName": "Alzate posteriori da seduto chinato in avanti",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Barbell_Shrug",
+              "exerciseName": "Scrollate con bilanciere",
+              "targetSets": 3,
+              "targetReps": 15,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        },
+        {
+          "name": "Braccia",
+          "exercises": [
+            {
+              "exerciseId": "Barbell_Curl",
+              "exerciseName": "Curl per bicipiti con bilanciere",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Triceps_Pushdown",
+              "exerciseName": "Push down per tricipiti",
+              "targetSets": 3,
+              "targetReps": 10,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "Hammer_Curls",
+              "exerciseName": "Curl a martello",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            },
+            {
+              "exerciseId": "EZ-Bar_Skullcrusher",
+              "exerciseName": "French press con bilanciere EZ",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeightKg": null,
+              "targetDurationSeconds": null,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cardio Misto",
+      "days": [
+        {
+          "name": "Corsa",
+          "exercises": [
+            {
+              "exerciseId": "Jogging_Treadmill",
+              "exerciseName": "Jogging al tapis roulant",
+              "targetSets": null,
+              "targetReps": null,
+              "targetWeightKg": null,
+              "targetDurationSeconds": 1800,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        },
+        {
+          "name": "Bici",
+          "exercises": [
+            {
+              "exerciseId": "Bicycling_Stationary",
+              "exerciseName": "Cyclette",
+              "targetSets": null,
+              "targetReps": null,
+              "targetWeightKg": null,
+              "targetDurationSeconds": 2400,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        },
+        {
+          "name": "Camminata",
+          "exercises": [
+            {
+              "exerciseId": "Walking_Treadmill",
+              "exerciseName": "Camminata al tapis roulant",
+              "targetSets": null,
+              "targetReps": null,
+              "targetWeightKg": null,
+              "targetDurationSeconds": 2400,
+              "supersetGroupId": null,
+              "restSeconds": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
