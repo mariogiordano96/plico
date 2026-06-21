@@ -3,6 +3,7 @@ import '../../theme/app_theme.dart';
 import '../../models/workout_exercise.dart';
 import '../../models/workout_set.dart';
 import '../../models/workout_template.dart';
+import '../../services/achievement_service.dart';
 import '../../services/calorie_estimation_service.dart';
 import '../../services/database_service.dart';
 import '../../services/guided_session_service.dart';
@@ -164,7 +165,11 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     }
   }
 
-  void _termina() {
+  Future<void> _termina() async {
+    final prs =
+        GuidedSessionService.newPersonalRecords(widget.exercises, _priorHistoryByExerciseId);
+    await AchievementService.instance.checkAll(hasNewWorkoutPr: prs.isNotEmpty);
+    if (!mounted) return;
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(

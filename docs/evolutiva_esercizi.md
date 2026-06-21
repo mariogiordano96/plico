@@ -1519,10 +1519,43 @@ posizionamento/stile già visto in Progressi.
       quella già non testata di `refreshWeighInReminder`, accoppiata a Isar
       e al plugin di notifiche)
 
-### Fase 11 — Streak e achievement allenamento
-- [ ] Estendere `streak_service` con streak basata su `WorkoutLog` registrati
-- [ ] Nuovi achievement in `achievement.dart` (prima scheda, 7 di fila, nuovo PR, 10/50 sessioni)
-- [ ] Hook PR → `achievement_service` al salvataggio di `WorkoutExercise`
+### Fase 11 — Streak e achievement allenamento ✅ completata
+- [x] Streak allenamento in `streak_service.dart`: `currentWorkoutStreak`/
+      `watchCurrentWorkoutStreak`, riusano la stessa `_streakFromLoggedDays`
+      della streak diario ma sui "giorni allenati" (nuovi metodi
+      `DatabaseService.getWorkoutDaysRange`/`watchWorkoutDays`, basati su
+      `WorkoutExercise.date` e non su `WorkoutLog`, perché un `WorkoutLog` può
+      esistere con sola nota e senza esercizi — vedi correzione sotto)
+- [x] 5 nuovi `AchievementType` in `achievement.dart`: `firstWorkout`,
+      `workoutStreak7`, `newWorkoutPr`, `workoutSessions10`,
+      `workoutSessions50` (lo storage è una stringa via `.name`, quindi
+      nessuna migrazione necessaria); nuovo
+      `DatabaseService.getTotalWorkoutSessionsCount` (giorni distinti con
+      almeno un `WorkoutExercise`) per i check "prima scheda"/"10/50 sessioni"
+      in `achievement_service.dart`
+- [x] Hook "nuovo PR" → `AchievementService.checkAll(hasNewWorkoutPr: ...)`
+      (nuovo parametro opzionale): da `allenamento_screen.dart` dopo
+      `addWorkoutExercise` (confronto con lo storico già recuperato per il
+      suggerimento di sovraccarico) e da `sessione_guidata_screen.dart`
+      `_termina()`, riusando `GuidedSessionService.newPersonalRecords` già
+      calcolato per il riepilogo di sessione — un solo check a fine sessione
+      guidata, non ad ogni serie confermata
+- [x] UI: card streak in `home_screen.dart` (`_StreakCard`) estesa con una
+      seconda riga "ALLENAMENTO" (icona `fitness_center`) accanto alla streak
+      diario esistente; riga badge passata da `Row(spaceBetween)` a `Wrap`
+      per ospitare i 9 traguardi totali senza overflow (`_BadgeIcon` da
+      `Expanded` a `SizedBox(width: 60)`)
+- [x] Verificato: `flutter analyze` pulito (21 issue pre-esistenti, 0 nuove);
+      nessun nuovo test temporaneo — la logica nuova è interamente
+      orchestrazione DB (`StreakService`/`AchievementService`), la logica pura
+      riusata (`_streakFromLoggedDays`, `WorkoutProgressService.isNewPersonalRecord`)
+      non è cambiata
+
+> **Correzione rispetto al piano originale**: la streak allenamento è basata
+> sui giorni con almeno un `WorkoutExercise` registrato, non sulla semplice
+> esistenza di un `WorkoutLog` come indicato letteralmente dal piano —
+> `WorkoutLog` può esistere anche con sola nota (Fase 9) senza alcun esercizio
+> loggato, il che renderebbe la streak falsabile senza allenarsi davvero.
 
 ### Fase 12 — Superset / circuiti
 - [ ] Campo `supersetGroupId` già su `WorkoutTemplateExercise`/`WorkoutExercise` (da Fase 4/6)

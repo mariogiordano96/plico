@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/workout_exercise.dart';
+import '../../services/achievement_service.dart';
 import '../../services/calorie_estimation_service.dart';
 import '../../services/database_service.dart';
 import '../../services/workout_progress_service.dart';
@@ -111,10 +112,11 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
     if (exercise == null || !mounted) return;
 
     WorkoutExercise? workoutExercise;
+    List<WorkoutExercise> history = const [];
     if (exercise.category == 'cardio') {
       workoutExercise = await showLogCardioDialog(context, exercise);
     } else {
-      final history = await DatabaseService.instance.getHistoryForExercise(exercise.externalId);
+      history = await DatabaseService.instance.getHistoryForExercise(exercise.externalId);
       final lastSession = history.isNotEmpty ? history.first : null;
       OverloadSuggestion? suggestion;
       if (lastSession != null) {
@@ -150,7 +152,10 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
         );
       }
 
+      final isNewPr = exercise.category != 'cardio' &&
+          WorkoutProgressService.isNewPersonalRecord(workoutExercise, history);
       await DatabaseService.instance.addWorkoutExercise(_oggi, workoutExercise);
+      await AchievementService.instance.checkAll(hasNewWorkoutPr: isNewPr);
     }
   }
 

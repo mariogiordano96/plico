@@ -894,6 +894,31 @@ class DatabaseService {
     return log?.date;
   }
 
+  /// Giorni (normalizzati a mezzanotte) in cui è stato registrato almeno un
+  /// [WorkoutExercise], nel range indicato. Usato per la streak allenamento.
+  Future<Set<DateTime>> getWorkoutDaysRange(DateTime from, DateTime to) async {
+    final f = _logDate(from);
+    final t = _logDate(to);
+    final exercises = await _isar.workoutExercises.filter().dateBetween(f, t).findAll();
+    return exercises.map((e) => e.date).toSet();
+  }
+
+  /// Come [getWorkoutDaysRange], ma osservabile: emette ogni volta che cambia
+  /// un [WorkoutExercise] qualsiasi.
+  Stream<Set<DateTime>> watchWorkoutDays() {
+    return _isar.workoutExercises
+        .where()
+        .watch(fireImmediately: true)
+        .map((list) => list.map((e) => e.date).toSet());
+  }
+
+  /// Numero totale di sessioni allenamento mai registrate, dove una sessione
+  /// è un giorno con almeno un [WorkoutExercise].
+  Future<int> getTotalWorkoutSessionsCount() async {
+    final all = await _isar.workoutExercises.where().findAll();
+    return all.map((e) => e.date).toSet().length;
+  }
+
   Future<int> getWorkoutKcalForDay(DateTime date) async {
     final esercizi = await getWorkoutExercisesForDay(date);
     return esercizi.fold<int>(0, (sum, e) => sum + (e.estimatedKcal ?? 0));

@@ -31,11 +31,17 @@ class AchievementService {
     return (result.tdee * goalMult[obiettivo.clamp(0, 2)]).round();
   }
 
-  Future<void> checkAll() async {
+  Future<void> checkAll({bool hasNewWorkoutPr = false}) async {
     await _checkFirstKgLost();
     await _checkStreak7();
     await _checkDays30Logged();
     await _checkWeekOnTarget();
+    await _checkFirstWorkout();
+    await _checkWorkoutStreak7();
+    await _checkWorkoutSessions();
+    if (hasNewWorkoutPr) {
+      await DatabaseService.instance.unlockAchievement(AchievementType.newWorkoutPr);
+    }
   }
 
   Future<void> _checkFirstKgLost() async {
@@ -80,5 +86,29 @@ class AchievementService {
       if (pct < 0.9 || pct > 1.05) return;
     }
     await DatabaseService.instance.unlockAchievement(AchievementType.weekOnTarget);
+  }
+
+  Future<void> _checkFirstWorkout() async {
+    final count = await DatabaseService.instance.getTotalWorkoutSessionsCount();
+    if (count >= 1) {
+      await DatabaseService.instance.unlockAchievement(AchievementType.firstWorkout);
+    }
+  }
+
+  Future<void> _checkWorkoutStreak7() async {
+    final streak = await StreakService.instance.currentWorkoutStreak();
+    if (streak >= 7) {
+      await DatabaseService.instance.unlockAchievement(AchievementType.workoutStreak7);
+    }
+  }
+
+  Future<void> _checkWorkoutSessions() async {
+    final count = await DatabaseService.instance.getTotalWorkoutSessionsCount();
+    if (count >= 10) {
+      await DatabaseService.instance.unlockAchievement(AchievementType.workoutSessions10);
+    }
+    if (count >= 50) {
+      await DatabaseService.instance.unlockAchievement(AchievementType.workoutSessions50);
+    }
   }
 }

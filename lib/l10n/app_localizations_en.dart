@@ -359,6 +359,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeStreakInizia => 'Start your streak today';
 
   @override
+  String homeStreakAllenamentoGiorni(String count) {
+    return '$count days in a row';
+  }
+
+  @override
+  String get homeStreakAllenamentoInizia => 'Start your workout streak today';
+
+  @override
   String get homeBadge1KgPerso => '1st kg lost';
 
   @override
@@ -369,6 +377,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeBadgeSettimanaTarget => 'Week on target';
+
+  @override
+  String get homeBadgePrimaScheda => 'First workout';
+
+  @override
+  String get homeBadgeStreak7Allenamento => '7-day workout streak';
+
+  @override
+  String get homeBadgeNuovoPr => 'New PR';
+
+  @override
+  String get homeBadge10Sessioni => '10 sessions';
+
+  @override
+  String get homeBadge50Sessioni => '50 sessions';
 
   @override
   String get diarioTitolo => 'DIARY';

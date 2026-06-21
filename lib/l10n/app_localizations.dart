@@ -758,6 +758,18 @@ abstract class AppLocalizations {
   /// **'Inizia oggi la tua streak'**
   String get homeStreakInizia;
 
+  /// No description provided for @homeStreakAllenamentoGiorni.
+  ///
+  /// In it, this message translates to:
+  /// **'{count} giorni di fila'**
+  String homeStreakAllenamentoGiorni(String count);
+
+  /// No description provided for @homeStreakAllenamentoInizia.
+  ///
+  /// In it, this message translates to:
+  /// **'Inizia oggi la tua streak allenamento'**
+  String get homeStreakAllenamentoInizia;
+
   /// No description provided for @homeBadge1KgPerso.
   ///
   /// In it, this message translates to:
@@ -781,6 +793,36 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Settimana in target'**
   String get homeBadgeSettimanaTarget;
+
+  /// No description provided for @homeBadgePrimaScheda.
+  ///
+  /// In it, this message translates to:
+  /// **'Prima scheda'**
+  String get homeBadgePrimaScheda;
+
+  /// No description provided for @homeBadgeStreak7Allenamento.
+  ///
+  /// In it, this message translates to:
+  /// **'7gg allenamento'**
+  String get homeBadgeStreak7Allenamento;
+
+  /// No description provided for @homeBadgeNuovoPr.
+  ///
+  /// In it, this message translates to:
+  /// **'Nuovo PR'**
+  String get homeBadgeNuovoPr;
+
+  /// No description provided for @homeBadge10Sessioni.
+  ///
+  /// In it, this message translates to:
+  /// **'10 sessioni'**
+  String get homeBadge10Sessioni;
+
+  /// No description provided for @homeBadge50Sessioni.
+  ///
+  /// In it, this message translates to:
+  /// **'50 sessioni'**
+  String get homeBadge50Sessioni;
 
   /// No description provided for @diarioTitolo.
   ///

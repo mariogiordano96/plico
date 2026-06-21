@@ -1471,12 +1471,19 @@ List<(AchievementType, IconData, String)> _buildBadgeInfo(BuildContext context) 
   (AchievementType.streak7, Icons.local_fire_department_rounded, context.l10n.homeBadgeStreak7),
   (AchievementType.days30Logged, Icons.calendar_month_rounded, context.l10n.homeBadge30Giorni),
   (AchievementType.weekOnTarget, Icons.flag_rounded, context.l10n.homeBadgeSettimanaTarget),
+  (AchievementType.firstWorkout, Icons.fitness_center_rounded, context.l10n.homeBadgePrimaScheda),
+  (AchievementType.workoutStreak7, Icons.bolt_rounded, context.l10n.homeBadgeStreak7Allenamento),
+  (AchievementType.newWorkoutPr, Icons.emoji_events_rounded, context.l10n.homeBadgeNuovoPr),
+  (AchievementType.workoutSessions10, Icons.looks_one_rounded, context.l10n.homeBadge10Sessioni),
+  (AchievementType.workoutSessions50, Icons.military_tech_rounded, context.l10n.homeBadge50Sessioni),
 ];
 
 class _StreakCard extends StatelessWidget {
   const _StreakCard();
 
   static const _flame = Color(0xFFFF6B35);
+
+  static const _bolt = Color(0xFF4C8DFF);
 
   @override
   Widget build(BuildContext context) {
@@ -1486,77 +1493,125 @@ class _StreakCard extends StatelessWidget {
       builder: (context, streakSnap) {
         final streak = streakSnap.data ?? 0;
         final active = streak > 0;
-        return StreamBuilder<Set<AchievementType>>(
-          stream: DatabaseService.instance.watchUnlockedTypes(),
-          builder: (context, badgeSnap) {
-            final unlocked = badgeSnap.data ?? const <AchievementType>{};
-            return Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: p.surface,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                    color:
-                        active ? _flame.withValues(alpha: 0.35) : p.cardBorder),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+        return StreamBuilder<int>(
+          stream: StreakService.instance.watchCurrentWorkoutStreak(),
+          builder: (context, workoutStreakSnap) {
+            final workoutStreak = workoutStreakSnap.data ?? 0;
+            final workoutActive = workoutStreak > 0;
+            return StreamBuilder<Set<AchievementType>>(
+              stream: DatabaseService.instance.watchUnlockedTypes(),
+              builder: (context, badgeSnap) {
+                final unlocked = badgeSnap.data ?? const <AchievementType>{};
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: p.surface,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                        color: active ? _flame.withValues(alpha: 0.35) : p.cardBorder),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 42,
-                        height: 42,
-                        decoration: BoxDecoration(
-                          color: _flame.withValues(alpha: active ? 0.12 : 0.06),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                              color: _flame.withValues(
-                                  alpha: active ? 0.35 : 0.15)),
-                        ),
-                        child: Icon(Icons.local_fire_department_rounded,
-                            color: active ? _flame : p.textMuted, size: 20),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('STREAK',
-                                style: TextStyle(
-                                    color: p.textMuted,
-                                    fontSize: 11,
-                                    letterSpacing: 2)),
-                            const SizedBox(height: 2),
-                            Text(
-                              active
-                                  ? context.l10n.homeStreakGiorni('$streak')
-                                  : context.l10n.homeStreakInizia,
-                              style: TextStyle(
-                                  color: p.textPrimary,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600),
+                      Row(
+                        children: [
+                          Container(
+                            width: 42,
+                            height: 42,
+                            decoration: BoxDecoration(
+                              color: _flame.withValues(alpha: active ? 0.12 : 0.06),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                  color: _flame.withValues(
+                                      alpha: active ? 0.35 : 0.15)),
                             ),
-                          ],
-                        ),
+                            child: Icon(Icons.local_fire_department_rounded,
+                                color: active ? _flame : p.textMuted, size: 20),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('STREAK',
+                                    style: TextStyle(
+                                        color: p.textMuted,
+                                        fontSize: 11,
+                                        letterSpacing: 2)),
+                                const SizedBox(height: 2),
+                                Text(
+                                  active
+                                      ? context.l10n.homeStreakGiorni('$streak')
+                                      : context.l10n.homeStreakInizia,
+                                  style: TextStyle(
+                                      color: p.textPrimary,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Container(
+                            width: 42,
+                            height: 42,
+                            decoration: BoxDecoration(
+                              color: _bolt.withValues(alpha: workoutActive ? 0.12 : 0.06),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                  color: _bolt.withValues(
+                                      alpha: workoutActive ? 0.35 : 0.15)),
+                            ),
+                            child: Icon(Icons.fitness_center_rounded,
+                                color: workoutActive ? _bolt : p.textMuted, size: 20),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('ALLENAMENTO',
+                                    style: TextStyle(
+                                        color: p.textMuted,
+                                        fontSize: 11,
+                                        letterSpacing: 2)),
+                                const SizedBox(height: 2),
+                                Text(
+                                  workoutActive
+                                      ? context.l10n.homeStreakAllenamentoGiorni('$workoutStreak')
+                                      : context.l10n.homeStreakAllenamentoInizia,
+                                  style: TextStyle(
+                                      color: p.textPrimary,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 10,
+                        children: _buildBadgeInfo(context).map((entry) {
+                          final (type, icon, label) = entry;
+                          return _BadgeIcon(
+                            icon: icon,
+                            label: label,
+                            unlocked: unlocked.contains(type),
+                            p: p,
+                          );
+                        }).toList(),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 14),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: _buildBadgeInfo(context).map((entry) {
-                      final (type, icon, label) = entry;
-                      return _BadgeIcon(
-                        icon: icon,
-                        label: label,
-                        unlocked: unlocked.contains(type),
-                        p: p,
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
+                );
+              },
             );
           },
         );
@@ -1636,7 +1691,8 @@ class _BadgeIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = unlocked ? const Color(0xFFFFB800) : p.textMuted;
-    return Expanded(
+    return SizedBox(
+      width: 60,
       child: Column(
         children: [
           Container(
