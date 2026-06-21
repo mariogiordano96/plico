@@ -1334,6 +1334,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get allenamentoSostituisciVuoto => 'No alternatives available';
 
   @override
+  String get allenamentoModifica => 'Edit';
+
+  @override
+  String get allenamentoEliminaGiornataTitle => 'Delete this session?';
+
+  @override
+  String get allenamentoEliminaGiornataSub =>
+      'All exercises and the note for this day will be removed.';
+
+  @override
   String serieDialogSerieLabel(int n) {
     return 'Set $n';
   }

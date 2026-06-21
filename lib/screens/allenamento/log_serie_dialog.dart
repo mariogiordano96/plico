@@ -8,12 +8,16 @@ import '../../services/workout_progress_service.dart';
 /// Mostra il dialog di log serie per un esercizio di forza. Se [lastSession] è
 /// disponibile, mostra il suggerimento di progressive overload (o di scarico, se
 /// [suggestion] ha `isDeload = true`) e pre-compila la prima serie.
+/// Se [initial] è fornito (Fase 14, modifica di un esercizio già loggato), il
+/// dialog pre-compila le serie esistenti e ritorna la stessa istanza aggiornata
+/// (stesso `Id`) invece di crearne una nuova.
 /// Ritorna il WorkoutExercise compilato, o null se annullato.
 Future<WorkoutExercise?> showLogSerieDialog(
   BuildContext context,
   ExerciseDefinition exercise, {
   WorkoutExercise? lastSession,
   OverloadSuggestion? suggestion,
+  WorkoutExercise? initial,
 }) {
   return showModalBottomSheet<WorkoutExercise>(
     context: context,
@@ -23,6 +27,7 @@ Future<WorkoutExercise?> showLogSerieDialog(
       exercise: exercise,
       lastSession: lastSession,
       suggestion: suggestion,
+      initial: initial,
     ),
   );
 }
@@ -31,7 +36,13 @@ class _LogSerieDialog extends StatefulWidget {
   final ExerciseDefinition exercise;
   final WorkoutExercise? lastSession;
   final OverloadSuggestion? suggestion;
-  const _LogSerieDialog({required this.exercise, this.lastSession, this.suggestion});
+  final WorkoutExercise? initial;
+  const _LogSerieDialog({
+    required this.exercise,
+    this.lastSession,
+    this.suggestion,
+    this.initial,
+  });
 
   @override
   State<_LogSerieDialog> createState() => _LogSerieDialogState();
@@ -45,6 +56,15 @@ class _LogSerieDialogState extends State<_LogSerieDialog> {
   @override
   void initState() {
     super.initState();
+    final initial = widget.initial;
+    if (initial != null && initial.sets.isNotEmpty) {
+      for (final set in initial.sets) {
+        _repsCtrls.add(TextEditingController(text: set.reps?.toString() ?? ''));
+        _kgCtrls.add(TextEditingController(text: set.weightKg?.toString() ?? ''));
+        _rpeValues.add(set.rpe);
+      }
+      return;
+    }
     _addSerie();
     final s = widget.suggestion;
     if (s != null) {
@@ -93,11 +113,12 @@ class _LogSerieDialogState extends State<_LogSerieDialog> {
     }
     if (sets.isEmpty) return;
 
-    final result = WorkoutExercise()
-      ..exerciseId = widget.exercise.externalId
-      ..exerciseName = widget.exercise.nameIt ?? widget.exercise.name
-      ..date = DateTime.now()
-      ..sets = sets;
+    final result = widget.initial ??
+        (WorkoutExercise()
+          ..exerciseId = widget.exercise.externalId
+          ..exerciseName = widget.exercise.nameIt ?? widget.exercise.name
+          ..date = DateTime.now());
+    result.sets = sets;
     Navigator.pop(context, result);
   }
 

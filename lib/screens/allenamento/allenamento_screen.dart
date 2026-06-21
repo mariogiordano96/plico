@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
+import '../../models/exercise_definition.dart';
 import '../../models/workout_exercise.dart';
 import '../../services/achievement_service.dart';
 import '../../services/calorie_estimation_service.dart';
@@ -23,8 +23,11 @@ class AllenamentoScreen extends StatefulWidget {
 }
 
 class _AllenamentoScreenState extends State<AllenamentoScreen> {
-  final _oggi = DateTime.now();
+  DateTime _data = _dayStart(DateTime.now());
   String? _nota;
+
+  static DateTime _dayStart(DateTime d) => DateTime(d.year, d.month, d.day);
+  bool get _isToday => _data == _dayStart(DateTime.now());
 
   @override
   void initState() {
@@ -32,9 +35,27 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
     _loadNota();
   }
 
+  void _changeDate(DateTime date) {
+    setState(() => _data = date);
+    _loadNota();
+  }
+
   Future<void> _loadNota() async {
-    final log = await DatabaseService.instance.getWorkoutLog(_oggi);
+    final log = await DatabaseService.instance.getWorkoutLog(_data);
     if (mounted) setState(() => _nota = log?.note);
+  }
+
+  String _formatDate(DateTime d) {
+    final l10n = context.l10n;
+    const weekdays = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
+    const months = [
+      'gen', 'feb', 'mar', 'apr', 'mag', 'giu',
+      'lug', 'ago', 'set', 'ott', 'nov', 'dic'
+    ];
+    final today = _dayStart(DateTime.now());
+    if (d == today) return l10n.diarioOggi;
+    if (d == today.subtract(const Duration(days: 1))) return l10n.diarioIeri;
+    return '${weekdays[d.weekday - 1]} ${d.day} ${months[d.month - 1]}';
   }
 
   Future<void> _editNota() async {
@@ -103,7 +124,7 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
     );
     if (saved == true) {
       final text = ctrl.text.trim();
-      await DatabaseService.instance.setWorkoutNote(_oggi, text.isEmpty ? null : text);
+      await DatabaseService.instance.setWorkoutNote(_data, text.isEmpty ? null : text);
       if (mounted) setState(() => _nota = text.isEmpty ? null : text);
     }
   }
@@ -155,9 +176,39 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
 
       final isNewPr = exercise.category != 'cardio' &&
           WorkoutProgressService.isNewPersonalRecord(workoutExercise, history);
-      await DatabaseService.instance.addWorkoutExercise(_oggi, workoutExercise);
+      await DatabaseService.instance.addWorkoutExercise(_data, workoutExercise);
       await AchievementService.instance.checkAll(hasNewWorkoutPr: isNewPr);
     }
+  }
+
+  Future<void> _modifica(WorkoutExercise e) async {
+    final stub = ExerciseDefinition()
+      ..externalId = e.exerciseId
+      ..name = e.exerciseName
+      ..muscleGroup = ''
+      ..category = e.durationSeconds != null ? 'cardio' : 'strength';
+
+    final updated = e.durationSeconds != null
+        ? await showLogCardioDialog(context, stub, initial: e)
+        : await showLogSerieDialog(context, stub, initial: e);
+    if (updated == null || !mounted) return;
+
+    final bodySnapshot = await DatabaseService.instance.getLatestBodySnapshot();
+    final bodyWeightKg = bodySnapshot?.pesoKg;
+    if (updated.durationSeconds != null) {
+      updated.met = CalorieEstimationService.metForCardioExercise(updated.exerciseId).round();
+      updated.estimatedKcal = CalorieEstimationService.estimateCardioKcal(
+        exerciseId: updated.exerciseId,
+        durationSeconds: updated.durationSeconds!,
+        bodyWeightKg: bodyWeightKg,
+      );
+    } else {
+      updated.estimatedKcal = CalorieEstimationService.estimateStrengthKcal(
+        workingSetCount: updated.sets.length,
+        bodyWeightKg: bodyWeightKg,
+      );
+    }
+    await DatabaseService.instance.updateWorkoutExercise(updated);
   }
 
   Future<void> _elimina(WorkoutExercise e) async {
@@ -183,6 +234,35 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
     );
     if (confirmed == true) {
       await DatabaseService.instance.deleteWorkoutExercise(e.id);
+    }
+  }
+
+  Future<void> _eliminaGiornata() async {
+    final p = context.palette;
+    final l10n = context.l10n;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: p.surface,
+        title:
+            Text(l10n.allenamentoEliminaGiornataTitle, style: TextStyle(color: p.textPrimary)),
+        content:
+            Text(l10n.allenamentoEliminaGiornataSub, style: TextStyle(color: p.textSecondary)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.diarioAnnulla, style: TextStyle(color: p.textMuted)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n.appElimina, style: TextStyle(color: p.error)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await DatabaseService.instance.deleteWorkoutLog(_data);
+      if (mounted) setState(() => _nota = null);
     }
   }
 
@@ -215,13 +295,11 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
   Widget build(BuildContext context) {
     final p = context.palette;
     final l10n = context.l10n;
-    final locale = Localizations.localeOf(context).toString();
-    final dataLabel = DateFormat('d MMMM', locale).format(_oggi);
 
     return Scaffold(
       backgroundColor: p.background,
       appBar: AppBar(
-        title: Text('${l10n.tabAllenamento} · $dataLabel',
+        title: Text(l10n.tabAllenamento,
             style: TextStyle(color: p.accent, fontSize: 16, fontWeight: FontWeight.w600)),
         backgroundColor: p.background,
         elevation: 0,
@@ -250,10 +328,21 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
             icon: Icon(Icons.list_alt_rounded, color: p.accent),
             tooltip: l10n.schedeTitle,
           ),
+          IconButton(
+            onPressed: _eliminaGiornata,
+            icon: Icon(Icons.delete_sweep_rounded, color: p.accent),
+            tooltip: l10n.allenamentoEliminaGiornataTitle,
+          ),
         ],
       ),
       body: Column(
         children: [
+          _DateNav(
+            label: _formatDate(_data),
+            onPrev: () => _changeDate(_data.subtract(const Duration(days: 1))),
+            onNext: _isToday ? null : () => _changeDate(_data.add(const Duration(days: 1))),
+            p: p,
+          ),
           if (_nota != null && _nota!.isNotEmpty)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
@@ -282,7 +371,7 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
             ),
           Expanded(
             child: StreamBuilder<List<WorkoutExercise>>(
-              stream: DatabaseService.instance.watchWorkoutExercisesForDay(_oggi),
+              stream: DatabaseService.instance.watchWorkoutExercisesForDay(_data),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return Center(child: CircularProgressIndicator(color: p.accent));
@@ -324,6 +413,7 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
                           l10n: l10n,
                           onDelete: () => _elimina(e),
                           onSostituisci: () => _sostituisci(e),
+                          onModifica: () => _modifica(e),
                         ),
                       ],
                     );
@@ -382,6 +472,7 @@ class _ExerciseCard extends StatelessWidget {
   final AppLocalizations l10n;
   final VoidCallback onDelete;
   final VoidCallback onSostituisci;
+  final VoidCallback onModifica;
 
   const _ExerciseCard({
     required this.exercise,
@@ -389,6 +480,7 @@ class _ExerciseCard extends StatelessWidget {
     required this.l10n,
     required this.onDelete,
     required this.onSostituisci,
+    required this.onModifica,
   });
 
   @override
@@ -449,6 +541,8 @@ class _ExerciseCard extends StatelessWidget {
             color: p.surface,
             onSelected: (action) {
               switch (action) {
+                case _ExerciseCardAction.modifica:
+                  onModifica();
                 case _ExerciseCardAction.sostituisci:
                   onSostituisci();
                 case _ExerciseCardAction.elimina:
@@ -456,6 +550,10 @@ class _ExerciseCard extends StatelessWidget {
               }
             },
             itemBuilder: (context) => [
+              PopupMenuItem(
+                value: _ExerciseCardAction.modifica,
+                child: Text(l10n.allenamentoModifica, style: TextStyle(color: p.textPrimary)),
+              ),
               PopupMenuItem(
                 value: _ExerciseCardAction.sostituisci,
                 child: Text(l10n.allenamentoSostituisci, style: TextStyle(color: p.textPrimary)),
@@ -472,4 +570,34 @@ class _ExerciseCard extends StatelessWidget {
   }
 }
 
-enum _ExerciseCardAction { sostituisci, elimina }
+enum _ExerciseCardAction { modifica, sostituisci, elimina }
+
+class _DateNav extends StatelessWidget {
+  final String label;
+  final VoidCallback onPrev;
+  final VoidCallback? onNext;
+  final ColorPalette p;
+  const _DateNav({required this.label, required this.onPrev, required this.onNext, required this.p});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            icon: Icon(Icons.chevron_left_rounded, color: p.accent),
+            onPressed: onPrev,
+          ),
+          Text(label,
+              style: TextStyle(color: p.textPrimary, fontSize: 15, fontWeight: FontWeight.w600)),
+          IconButton(
+            icon: Icon(Icons.chevron_right_rounded, color: onNext != null ? p.accent : p.textMuted),
+            onPressed: onNext,
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -2510,6 +2510,24 @@ abstract class AppLocalizations {
   /// **'Nessuna alternativa disponibile'**
   String get allenamentoSostituisciVuoto;
 
+  /// No description provided for @allenamentoModifica.
+  ///
+  /// In it, this message translates to:
+  /// **'Modifica'**
+  String get allenamentoModifica;
+
+  /// No description provided for @allenamentoEliminaGiornataTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Eliminare la sessione?'**
+  String get allenamentoEliminaGiornataTitle;
+
+  /// No description provided for @allenamentoEliminaGiornataSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Tutti gli esercizi e la nota di questo giorno verranno rimossi.'**
+  String get allenamentoEliminaGiornataSub;
+
   /// No description provided for @serieDialogSerieLabel.
   ///
   /// In it, this message translates to:

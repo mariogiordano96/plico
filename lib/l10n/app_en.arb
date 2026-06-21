@@ -430,6 +430,9 @@
   "allenamentoSostituisci": "Substitute",
   "allenamentoSostituisciTitle": "Substitute exercise",
   "allenamentoSostituisciVuoto": "No alternatives available",
+  "allenamentoModifica": "Edit",
+  "allenamentoEliminaGiornataTitle": "Delete this session?",
+  "allenamentoEliminaGiornataSub": "All exercises and the note for this day will be removed.",
 
   "serieDialogSerieLabel": "Set {n}",
   "serieDialogRipHint": "reps",

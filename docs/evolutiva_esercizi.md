@@ -1631,11 +1631,48 @@ posizionamento/stile già visto in Progressi.
 > necessario gestire un mapping cardio/forza incrociato.
 
 ### Fase 14 — Modifica e cancellazione log passato
-- [ ] Cronologia/selettore data per navigare ai `WorkoutLog` passati
-- [ ] UI modifica serie/esercizi e cancellazione esercizio singolo
-- [ ] Cancellazione intero `WorkoutLog` con conferma
-- [ ] Verifica che storico/PR/streak/achievement si ricalcolino correttamente a runtime
+- [x] Cronologia/selettore data per navigare ai `WorkoutLog` passati
+  - `AllenamentoScreen` non è più ancorata a "oggi": lo stato `_data`
+    (default oggi) sostituisce il precedente campo `_oggi` fisso, con un
+    nuovo widget `_DateNav` (freccia avanti/indietro, etichetta "Oggi"/"Ieri"
+    o giorno/mese abbreviato) che ricalca lo stesso pattern già usato in
+    `diario_screen.dart` (`_DateNav`/`_formatDate`), per coerenza con il resto
+    dell'app. La freccia avanti è disabilitata quando `_data` è oggi (non si
+    naviga nel futuro).
+- [x] UI modifica serie/esercizi e cancellazione esercizio singolo
+  - `_ExerciseCard` ora espone un `PopupMenuButton` con tre azioni:
+    "Modifica", "Sostituisci" (Fase 13) ed "Elimina" (già esistente).
+  - "Modifica" riusa `showLogSerieDialog`/`showLogCardioDialog` (estesi con
+    un nuovo parametro opzionale `initial`): se fornito, il dialog
+    precompila i campi con i dati esistenti e, al salvataggio, aggiorna la
+    stessa istanza `WorkoutExercise` (stesso `Id`) invece di crearne una
+    nuova — `allenamento_screen.dart` ricalcola poi `estimatedKcal`/`met` e
+    chiama `updateWorkoutExercise`.
+- [x] Cancellazione intero `WorkoutLog` con conferma
+  - `DatabaseService.deleteWorkoutLog(date)` esisteva già (introdotto in una
+    fase precedente) e cancella sia tutti i `WorkoutExercise` del giorno sia
+    il `WorkoutLog`/nota; aggiunta solo l'azione UI: icona nell'AppBar con
+    dialog di conferma (`allenamentoEliminaGiornataTitle`/`Sub`).
+- [x] Verifica che storico/PR/streak/achievement si ricalcolino correttamente a runtime
       dopo una modifica (nessuno stato derivato persistito da invalidare manualmente)
+  - Confermato per ispezione: `StreakService`/`AchievementService` non
+    mantengono alcun campo "ultimo valore calcolato" — ogni chiamata
+    (`currentWorkoutStreak`, `checkAll`, gli stream `watch*`) interroga Isar
+    dal vivo, quindi modificare o cancellare un `WorkoutExercise` di un
+    giorno passato si riflette automaticamente su storico/streak/badge senza
+    bisogno di invalidazione manuale.
+
+> **Nota implementativa**: l'aggiunta di un nuovo esercizio (FAB "Aggiungi
+> esercizio") resta disponibile anche sui giorni passati, dato che
+> `_aggiungiEsercizio` già scrive su `_data` (il giorno selezionato, non più
+> "oggi" fisso) — utile per registrare a posteriori un esercizio dimenticato,
+> senza bisogno di nascondere il FAB sui giorni precedenti.
+
+> nessun nuovo test temporaneo — la logica nuova è interamente UI/stato di
+> schermata (`_data`, `_DateNav`, `_formatDate`, `_modifica`, `_eliminaGiornata`)
+> e dialog (`initial` in `log_serie_dialog.dart`/`log_cardio_dialog.dart`),
+> tutta accoppiata a `BuildContext`/`DatabaseService`, non estraibile in una
+> funzione pura.
 
 ### Fase 15 — Riscaldamento
 - [ ] Campo `isWarmup` su `WorkoutSet` (da Fase 4)

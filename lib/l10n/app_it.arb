@@ -555,6 +555,9 @@
   "allenamentoSostituisci": "Sostituisci",
   "allenamentoSostituisciTitle": "Sostituisci esercizio",
   "allenamentoSostituisciVuoto": "Nessuna alternativa disponibile",
+  "allenamentoModifica": "Modifica",
+  "allenamentoEliminaGiornataTitle": "Eliminare la sessione?",
+  "allenamentoEliminaGiornataSub": "Tutti gli esercizi e la nota di questo giorno verranno rimossi.",
 
   "serieDialogSerieLabel": "Serie {n}",
   "@serieDialogSerieLabel": {
