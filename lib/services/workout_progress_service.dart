@@ -50,6 +50,25 @@ class WorkoutProgressService {
     ];
   }
 
+  /// Gruppi muscolari (tra le chiavi di [volumeByGroup]) con volume nullo o
+  /// molto sotto la media degli altri gruppi allenati — usato per il banner
+  /// di avviso del grafico "Volume settimanale" (Fase 18). Un gruppo è
+  /// "trascurato" se il suo volume è sotto [thresholdFraction] della media dei
+  /// gruppi con volume positivo; se nessun gruppo ha volume positivo non c'è
+  /// nulla da segnalare.
+  static List<String> neglectedMuscleGroups(
+    Map<String, double> volumeByGroup, {
+    double thresholdFraction = 0.3,
+  }) {
+    final trained = volumeByGroup.values.where((v) => v > 0).toList();
+    if (trained.isEmpty) return [];
+    final avg = trained.reduce((a, b) => a + b) / trained.length;
+    return volumeByGroup.entries
+        .where((e) => e.value < avg * thresholdFraction)
+        .map((e) => e.key)
+        .toList();
+  }
+
   static double sessionVolume(WorkoutExercise e) {
     return _workSets(e).fold<double>(
         0, (sum, s) => sum + (s.reps ?? 0) * (s.weightKg ?? 0));

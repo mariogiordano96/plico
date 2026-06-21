@@ -1358,6 +1358,12 @@ abstract class AppLocalizations {
   /// **'I tuoi record'**
   String get progressiTooltipRecord;
 
+  /// No description provided for @progressiTooltipVolume.
+  ///
+  /// In it, this message translates to:
+  /// **'Volume settimanale'**
+  String get progressiTooltipVolume;
+
   /// No description provided for @progressiSezPeso.
   ///
   /// In it, this message translates to:
@@ -2569,6 +2575,24 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'{peso} kg'**
   String recordPersonaliKg(String peso);
+
+  /// No description provided for @volumeSettimanaleTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Volume settimanale'**
+  String get volumeSettimanaleTitle;
+
+  /// No description provided for @volumeSettimanaleVuoto.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessun allenamento ancora questa settimana.'**
+  String get volumeSettimanaleVuoto;
+
+  /// No description provided for @volumeSettimanaleTrascurato.
+  ///
+  /// In it, this message translates to:
+  /// **'{gruppo} trascurato questa settimana'**
+  String volumeSettimanaleTrascurato(String gruppo);
 
   /// No description provided for @serieDialogSerieLabel.
   ///

@@ -1791,11 +1791,40 @@ posizionamento/stile già visto in Progressi.
 > riduzione al massimo per gruppo riusa `WorkoutProgressService.sessionMaxWeight`, già
 > testato in Fase 7.
 
-### Fase 18 — Volume settimanale per gruppo muscolare
-- [ ] `getWeeklyVolumeByMuscleGroup(weekStart)` (aggrega `WorkoutExercise`/`WorkoutSet`
+### Fase 18 — Volume settimanale per gruppo muscolare ✅ completata
+- [x] `getWeeklyVolumeByMuscleGroup(weekStart)` (aggrega `WorkoutExercise`/`WorkoutSet`
       non-warmup tramite `ExerciseDefinition.muscleGroup`)
-- [ ] Grafico a barre per gruppo muscolare, in Progressi (valutare `fl_chart`, da Fase 7)
-- [ ] Banner di avviso se un gruppo ha volume nullo/molto sotto la media
+  - Aggiunto a `DatabaseService` (no service dedicato, stessa scelta delle fasi
+    precedenti). Filtra `WorkoutExercise` con `dateBetween(weekStart, weekStart+6gg)`
+    invece del solo `dateGreaterThan(weekStart)` del piano originale (vedi
+    correzione sotto), poi aggrega per `muscleGroup` con la stessa logica di
+    `getAllPersonalRecords()` (mappa `externalId → muscleGroup` da `getAllExercises()`).
+- [x] Grafico a barre per gruppo muscolare, in Progressi (valutare `fl_chart`, da Fase 7)
+  - Nuova `VolumeSettimanaleScreen` (`lib/screens/progressi/volume_settimanale_screen.dart`):
+    `BarChart` di `fl_chart` (già usato per `LineChart` in Fase 7), una barra per
+    gruppo allenabile a carico (`chest/back/legs/arms/shoulders/core`, escluso
+    `cardio`: un grafico di volume Σ rip×peso non ha senso per la categoria cardio).
+    Raggiunta da una nuova icona (`Icons.bar_chart_rounded`) nell'AppBar di
+    `ProgressiScreen`, accanto a quella della bacheca record (stesso pattern Fase 17).
+- [x] Banner di avviso se un gruppo ha volume nullo/molto sotto la media
+  - `WorkoutProgressService.neglectedMuscleGroups(volumeByGroup)` (logica pura, nessuna
+    query Isar): un gruppo è segnalato se il suo volume è sotto il 30% della media dei
+    gruppi con volume positivo. Mostrato come banner ⚠️ sotto il grafico, uno per
+    gruppo trascurato.
+
+> **Correzione rispetto al piano originale**: la query usa `dateBetween(weekStart,
+> weekStart + 6 giorni)` invece del solo `dateGreaterThan(weekStart)` indicato nello
+> pseudocodice del piano — quest'ultimo includerebbe anche le sessioni di settimane
+> successive a quella richiesta (bug se la funzione viene mai chiamata con una settimana
+> passata), oltre a non essere necessario per la sola settimana corrente attualmente usata
+> dalla UI.
+
+> nessun nuovo test temporaneo lasciato nel repository — 6 test scritti e verificati
+> durante l'implementazione (3 su `getWeeklyVolumeByMuscleGroup`: aggregazione per
+> gruppo, esclusione riscaldamento, esclusione sessioni fuori settimana; 3 su
+> `neglectedMuscleGroups`: caso vuoto, gruppo trascurato rilevato, volume uniforme
+> senza segnalazioni), rimossi dopo la verifica per restare coerenti con le fasi
+> precedenti.
 
 ### Fase 19 — Export PDF scheda/storico
 - [ ] Template PDF scheda/programma (riuso `pdf_export_service.dart`)

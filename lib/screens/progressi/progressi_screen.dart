@@ -12,6 +12,7 @@ import '../../services/database_service.dart';
 import '../../services/pdf_export_service.dart';
 import '../storico/storico_misurazioni_screen.dart';
 import 'record_personali_screen.dart';
+import 'volume_settimanale_screen.dart';
 
 // ── Data helpers ───────────────────────────────────────────────
 
@@ -288,6 +289,13 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
             onPressed: () => Navigator.push(context,
                 MaterialPageRoute(
                     builder: (_) => const RecordPersonaliScreen())),
+          ),
+          IconButton(
+            icon: Icon(Icons.bar_chart_rounded, color: p.accent),
+            tooltip: context.l10n.progressiTooltipVolume,
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(
+                    builder: (_) => const VolumeSettimanaleScreen())),
           ),
         ],
       ),

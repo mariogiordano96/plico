@@ -1017,6 +1017,30 @@ class DatabaseService {
     return days.isEmpty ? null : days.length;
   }
 
+  /// Volume totale (Σ rip × peso, escluse le serie di riscaldamento) della
+  /// settimana che inizia in [weekStart], aggregato per
+  /// `ExerciseDefinition.muscleGroup`. Usato dal grafico "Volume settimanale"
+  /// in Progressi (Fase 18).
+  Future<Map<String, double>> getWeeklyVolumeByMuscleGroup(DateTime weekStart) async {
+    final start = _logDate(weekStart);
+    final end = _logDate(start.add(const Duration(days: 6)));
+    final exercises = await _isar.workoutExercises.filter().dateBetween(start, end).findAll();
+    final muscleGroupById = {
+      for (final ex in await getAllExercises()) ex.externalId: ex.muscleGroup,
+    };
+
+    final volumeByGroup = <String, double>{};
+    for (final e in exercises) {
+      final group = muscleGroupById[e.exerciseId];
+      if (group == null) continue;
+      final volume = e.sets
+          .where((s) => !s.isWarmup)
+          .fold(0.0, (sum, s) => sum + (s.reps ?? 0) * (s.weightKg ?? 0));
+      volumeByGroup[group] = (volumeByGroup[group] ?? 0) + volume;
+    }
+    return volumeByGroup;
+  }
+
   Future<void> deleteWorkoutLog(DateTime date) async {
     final day = _logDate(date);
     await _isar.writeTxn(() async {

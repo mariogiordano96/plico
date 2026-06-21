@@ -227,6 +227,7 @@
   "progressiTooltipEsporta": "Export PDF",
   "progressiTooltipStorico": "Measurements history",
   "progressiTooltipRecord": "Your records",
+  "progressiTooltipVolume": "Weekly volume",
   "progressiSezPeso": "WEIGHT",
   "progressiSezDiario": "DIARY",
   "progressiSezComposizione": "BODY COMPOSITION",
@@ -442,6 +443,11 @@
   "recordPersonaliVuoto": "No records yet. Log a workout to get started!",
   "recordPersonaliKg": "{peso} kg",
   "@recordPersonaliKg": { "placeholders": { "peso": { "type": "String" } } },
+
+  "volumeSettimanaleTitle": "Weekly volume",
+  "volumeSettimanaleVuoto": "No workouts yet this week.",
+  "volumeSettimanaleTrascurato": "{gruppo} neglected this week",
+  "@volumeSettimanaleTrascurato": { "placeholders": { "gruppo": { "type": "String" } } },
 
   "serieDialogSerieLabel": "Set {n}",
   "serieDialogRipHint": "reps",

@@ -697,6 +697,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get progressiTooltipRecord => 'I tuoi record';
 
   @override
+  String get progressiTooltipVolume => 'Volume settimanale';
+
+  @override
   String get progressiSezPeso => 'PESO';
 
   @override
@@ -1376,6 +1379,18 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String recordPersonaliKg(String peso) {
     return '$peso kg';
+  }
+
+  @override
+  String get volumeSettimanaleTitle => 'Volume settimanale';
+
+  @override
+  String get volumeSettimanaleVuoto =>
+      'Nessun allenamento ancora questa settimana.';
+
+  @override
+  String volumeSettimanaleTrascurato(String gruppo) {
+    return '$gruppo trascurato questa settimana';
   }
 
   @override
