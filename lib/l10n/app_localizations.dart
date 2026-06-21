@@ -1352,6 +1352,12 @@ abstract class AppLocalizations {
   /// **'Storico misurazioni'**
   String get progressiTooltipStorico;
 
+  /// No description provided for @progressiTooltipRecord.
+  ///
+  /// In it, this message translates to:
+  /// **'I tuoi record'**
+  String get progressiTooltipRecord;
+
   /// No description provided for @progressiSezPeso.
   ///
   /// In it, this message translates to:
@@ -2545,6 +2551,24 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'{n} giorni'**
   String obiettivoSettimanaleGiorni(int n);
+
+  /// No description provided for @recordPersonaliTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'I tuoi record'**
+  String get recordPersonaliTitle;
+
+  /// No description provided for @recordPersonaliVuoto.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessun record ancora. Registra un allenamento per iniziare!'**
+  String get recordPersonaliVuoto;
+
+  /// No description provided for @recordPersonaliKg.
+  ///
+  /// In it, this message translates to:
+  /// **'{peso} kg'**
+  String recordPersonaliKg(String peso);
 
   /// No description provided for @serieDialogSerieLabel.
   ///

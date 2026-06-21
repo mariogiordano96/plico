@@ -297,6 +297,7 @@
   "progressiTitolo": "PROGRESSI",
   "progressiTooltipEsporta": "Esporta PDF",
   "progressiTooltipStorico": "Storico misurazioni",
+  "progressiTooltipRecord": "I tuoi record",
   "progressiSezPeso": "PESO",
   "progressiSezDiario": "DIARIO",
   "progressiSezComposizione": "COMPOSIZIONE CORPOREA",
@@ -567,6 +568,11 @@
   "@obiettivoSettimanaleGiorni": {
     "placeholders": { "n": { "type": "int" } }
   },
+
+  "recordPersonaliTitle": "I tuoi record",
+  "recordPersonaliVuoto": "Nessun record ancora. Registra un allenamento per iniziare!",
+  "recordPersonaliKg": "{peso} kg",
+  "@recordPersonaliKg": { "placeholders": { "peso": { "type": "String" } } },
 
   "serieDialogSerieLabel": "Serie {n}",
   "@serieDialogSerieLabel": {

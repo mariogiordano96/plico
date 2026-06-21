@@ -1764,10 +1764,32 @@ posizionamento/stile già visto in Progressi.
 > schermata (`_WeeklyGoalChip`, il bottom sheet delle impostazioni), non
 > estraibile in una funzione pura.
 
-### Fase 17 — Bacheca record personali
-- [ ] `getAllPersonalRecords()` (PR per ogni `exerciseId` distinto, esclude `isWarmup`)
-- [ ] Modello in memoria `PersonalRecord` (non persistito, calcolato a runtime)
-- [ ] Schermata "I tuoi record" con filtro per gruppo muscolare, in Progressi
+### Fase 17 — Bacheca record personali ✅ completata
+- [x] `getAllPersonalRecords()` (PR per ogni `exerciseId` distinto, esclude `isWarmup`)
+  > **Nota implementativa**: niente `distinctByExerciseId()` nativo di Isar (non usato
+  > altrove nel file) — si caricano tutti i `WorkoutExercise` con `where().findAll()` e si
+  > raggruppano in Dart per `exerciseId`, poi per ciascun gruppo si riduce al massimo con
+  > `WorkoutProgressService.sessionMaxWeight` (esclude già `isWarmup` internamente). Gli
+  > esercizi senza alcuna serie a peso (es. cardio) sono esclusi automaticamente. Il
+  > `muscleGroup` viene agganciato con un secondo giro su `getAllExercises()` indicizzato per
+  > `externalId`, stesso pattern già usato da `getAlternatives()`. Risultato ordinato per
+  > data più recente.
+- [x] Modello in memoria `PersonalRecord` (non persistito, calcolato a runtime)
+  - `lib/models/personal_record.dart`: classe Dart semplice (non `@collection` Isar),
+    campi `exerciseId`, `exerciseName`, `muscleGroup`, `maxWeightKg`, `achievedAt`.
+- [x] Schermata "I tuoi record" con filtro per gruppo muscolare, in Progressi
+  - Nuova `record_personali_screen.dart`: stessa riga di `ChoiceChip` orizzontali di
+    `catalogo_esercizi_screen.dart` (`muscleGroups`/`muscleGroupLabel`), card con 🏆 + nome
+    esercizio + data + peso massimo, tap che apre `StoricoEsercizioScreen` per
+    quell'esercizio (stesso pattern di navigazione già usato da `AllenamentoScreen`).
+    Raggiunta da una nuova icona (`Icons.emoji_events_rounded`) nell'AppBar di
+    `ProgressiScreen`, accanto a quella dello storico misurazioni.
+
+> nessun nuovo test temporaneo — `getAllPersonalRecords()` è accoppiato a Isar
+> (`_isar.workoutExercises.where().findAll()`, `getAllExercises()`), stesso caso già
+> documentato in Fase 16 per `getWorkoutsThisWeek`/`getActiveProgramDaysCount`; la
+> riduzione al massimo per gruppo riusa `WorkoutProgressService.sessionMaxWeight`, già
+> testato in Fase 7.
 
 ### Fase 18 — Volume settimanale per gruppo muscolare
 - [ ] `getWeeklyVolumeByMuscleGroup(weekStart)` (aggrega `WorkoutExercise`/`WorkoutSet`

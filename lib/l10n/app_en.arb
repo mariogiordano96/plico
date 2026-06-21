@@ -226,6 +226,7 @@
   "progressiTitolo": "PROGRESS",
   "progressiTooltipEsporta": "Export PDF",
   "progressiTooltipStorico": "Measurements history",
+  "progressiTooltipRecord": "Your records",
   "progressiSezPeso": "WEIGHT",
   "progressiSezDiario": "DIARY",
   "progressiSezComposizione": "BODY COMPOSITION",
@@ -436,6 +437,11 @@
   "allenamentoObiettivoSettimanale": "{done}/{target} this week",
   "obiettivoSettimanaleTitle": "Weekly goal",
   "obiettivoSettimanaleGiorni": "{n} days",
+
+  "recordPersonaliTitle": "Your records",
+  "recordPersonaliVuoto": "No records yet. Log a workout to get started!",
+  "recordPersonaliKg": "{peso} kg",
+  "@recordPersonaliKg": { "placeholders": { "peso": { "type": "String" } } },
 
   "serieDialogSerieLabel": "Set {n}",
   "serieDialogRipHint": "reps",

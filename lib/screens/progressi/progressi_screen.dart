@@ -11,6 +11,7 @@ import '../../models/measurement_snapshot.dart';
 import '../../services/database_service.dart';
 import '../../services/pdf_export_service.dart';
 import '../storico/storico_misurazioni_screen.dart';
+import 'record_personali_screen.dart';
 
 // ── Data helpers ───────────────────────────────────────────────
 
@@ -280,6 +281,13 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
             onPressed: () => Navigator.push(context,
                 MaterialPageRoute(
                     builder: (_) => const StoricoMisurazioniScreen())),
+          ),
+          IconButton(
+            icon: Icon(Icons.emoji_events_rounded, color: p.accent),
+            tooltip: context.l10n.progressiTooltipRecord,
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(
+                    builder: (_) => const RecordPersonaliScreen())),
           ),
         ],
       ),

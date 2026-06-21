@@ -689,6 +689,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get progressiTooltipStorico => 'Measurements history';
 
   @override
+  String get progressiTooltipRecord => 'Your records';
+
+  @override
   String get progressiSezPeso => 'WEIGHT';
 
   @override
@@ -1354,6 +1357,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String obiettivoSettimanaleGiorni(int n) {
     return '$n days';
+  }
+
+  @override
+  String get recordPersonaliTitle => 'Your records';
+
+  @override
+  String get recordPersonaliVuoto =>
+      'No records yet. Log a workout to get started!';
+
+  @override
+  String recordPersonaliKg(String peso) {
+    return '$peso kg';
   }
 
   @override

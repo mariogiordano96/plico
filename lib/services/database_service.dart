@@ -26,7 +26,9 @@ import '../models/workout_template.dart';
 import '../models/workout_template_exercise.dart';
 import '../models/workout_program.dart';
 import '../models/workout_set.dart';
+import '../models/personal_record.dart';
 import 'exercise_alternatives_service.dart';
+import 'workout_progress_service.dart';
 
 class DatabaseService {
   static final DatabaseService instance = DatabaseService._();
@@ -903,6 +905,47 @@ class DatabaseService {
         .exerciseIdEqualTo(exerciseId)
         .sortByDateDesc()
         .findAll();
+  }
+
+  /// Record personali (peso massimo storico, escluse le serie di riscaldamento)
+  /// per ogni esercizio di forza mai loggato — uno per `exerciseId` distinto,
+  /// ordinati dal più recente. Esclude esercizi senza serie a peso (es. cardio).
+  Future<List<PersonalRecord>> getAllPersonalRecords() async {
+    final all = await _isar.workoutExercises.where().findAll();
+    final byExercise = <String, List<WorkoutExercise>>{};
+    for (final e in all) {
+      byExercise.putIfAbsent(e.exerciseId, () => []).add(e);
+    }
+
+    final muscleGroupById = {
+      for (final ex in await getAllExercises()) ex.externalId: ex.muscleGroup,
+    };
+
+    final records = <PersonalRecord>[];
+    for (final entry in byExercise.entries) {
+      double? bestWeight;
+      DateTime? bestDate;
+      String? bestName;
+      for (final session in entry.value) {
+        final maxW = WorkoutProgressService.sessionMaxWeight(session);
+        if (maxW == null) continue;
+        if (bestWeight == null || maxW > bestWeight) {
+          bestWeight = maxW;
+          bestDate = session.date;
+          bestName = session.exerciseName;
+        }
+      }
+      if (bestWeight == null || bestDate == null || bestName == null) continue;
+      records.add(PersonalRecord(
+        exerciseId: entry.key,
+        exerciseName: bestName,
+        muscleGroup: muscleGroupById[entry.key],
+        maxWeightKg: bestWeight,
+        achievedAt: bestDate,
+      ));
+    }
+    records.sort((a, b) => b.achievedAt.compareTo(a.achievedAt));
+    return records;
   }
 
   Future<DateTime?> getLastWorkoutDate() async {
