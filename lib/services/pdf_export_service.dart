@@ -10,7 +10,12 @@ import '../models/meal_entry.dart';
 import '../models/meal_plan.dart';
 import '../models/user_profile.dart';
 import '../models/body_snapshot.dart';
+import '../models/workout_template.dart';
+import '../models/workout_template_exercise.dart';
+import '../models/workout_program.dart';
+import '../models/workout_exercise.dart';
 import '../services/database_service.dart';
+import '../services/workout_progress_service.dart';
 import '../screens/tdee/tdee_screen.dart' show calcolaTdee;
 
 const _goalMult = [0.80, 1.0, 1.15];
@@ -34,6 +39,15 @@ class PdfStrings {
   final String Function(String created) generato;
   final List<String> pianoSlotLabels;
 
+  // Fase 19: export scheda/programma/storico esercizio
+  final String schedaPdfTitle;
+  final String programmaPdfTitle;
+  final String storicoPdfTitle;
+  final String Function(int n) nEsercizi;
+  final String nessunaSessione;
+  final String prBadge;
+  final String Function(int min) durataMin;
+
   const PdfStrings({
     required this.diarioTitle,
     required this.targetLabel,
@@ -50,6 +64,13 @@ class PdfStrings {
     required this.pianoTitle,
     required this.generato,
     required this.pianoSlotLabels,
+    required this.schedaPdfTitle,
+    required this.programmaPdfTitle,
+    required this.storicoPdfTitle,
+    required this.nEsercizi,
+    required this.nessunaSessione,
+    required this.prBadge,
+    required this.durataMin,
   });
 }
 
@@ -676,6 +697,241 @@ class PdfExportService {
           );
         }),
         pw.SizedBox(height: 6),
+      ],
+    );
+  }
+
+  // ── Scheda allenamento PDF ──────────────────────────────────────
+
+  static Future<Uint8List> generateScheda(
+    WorkoutTemplate template, {
+    required PdfStrings strings,
+    required String locale,
+  }) async {
+    final font = await PdfGoogleFonts.notoSansRegular();
+    final bold = await PdfGoogleFonts.notoSansBold();
+
+    final doc = pw.Document(compress: true);
+    doc.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+        header: (_) => _buildDocHeader(
+          docTitle: strings.schedaPdfTitle,
+          subtitle: template.name,
+          detail: strings.nEsercizi(template.exercises.length),
+          font: font,
+          bold: bold,
+        ),
+        footer: (ctx) => _buildFooter(ctx, font, strings),
+        build: (_) => [
+          pw.SizedBox(height: 12),
+          _buildSchedaEsercizi(template.exercises, font, bold, strings),
+        ],
+      ),
+    );
+    return doc.save();
+  }
+
+  // ── Programma (più giorni/scheda) PDF ───────────────────────────
+
+  static Future<Uint8List> generateProgramma(
+    WorkoutProgram program,
+    List<WorkoutTemplate> giorni, {
+    required PdfStrings strings,
+    required String locale,
+  }) async {
+    final font = await PdfGoogleFonts.notoSansRegular();
+    final bold = await PdfGoogleFonts.notoSansBold();
+
+    final doc = pw.Document(compress: true);
+    doc.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+        header: (_) => _buildDocHeader(
+          docTitle: strings.programmaPdfTitle,
+          subtitle: program.name,
+          detail: null,
+          font: font,
+          bold: bold,
+        ),
+        footer: (ctx) => _buildFooter(ctx, font, strings),
+        build: (_) => [
+          pw.SizedBox(height: 12),
+          for (final giorno in giorni) ...[
+            pw.Container(
+              color: PdfColors.grey100,
+              padding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+              child: pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(giorno.name,
+                      style: pw.TextStyle(
+                          font: bold, fontSize: 9, color: PdfColors.grey900)),
+                  pw.Text(strings.nEsercizi(giorno.exercises.length),
+                      style: pw.TextStyle(
+                          font: font, fontSize: 9, color: PdfColors.grey700)),
+                ],
+              ),
+            ),
+            pw.SizedBox(height: 4),
+            _buildSchedaEsercizi(giorno.exercises, font, bold, strings),
+            pw.SizedBox(height: 10),
+          ],
+        ],
+      ),
+    );
+    return doc.save();
+  }
+
+  static pw.Widget _buildSchedaEsercizi(
+    List<WorkoutTemplateExercise> esercizi,
+    pw.Font font,
+    pw.Font bold,
+    PdfStrings strings,
+  ) {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: esercizi.map((e) {
+        final target = e.targetDurationSeconds != null
+            ? strings.durataMin(e.targetDurationSeconds! ~/ 60)
+            : '${e.targetSets ?? '-'}×${e.targetReps ?? '-'}'
+                '${e.targetWeightKg != null ? ' · ${e.targetWeightKg}kg' : ''}';
+        return pw.Padding(
+          padding: const pw.EdgeInsets.symmetric(vertical: 3),
+          child: pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Expanded(
+                child: pw.Text(e.exerciseName,
+                    style: pw.TextStyle(
+                        font: font, fontSize: 9.5, color: PdfColors.grey900)),
+              ),
+              pw.Text(target,
+                  style: pw.TextStyle(
+                      font: bold, fontSize: 9, color: PdfColors.grey700)),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  // ── Storico esercizio PDF ───────────────────────────────────────
+
+  static Future<Uint8List> generateStoricoEsercizio({
+    required String exerciseName,
+    required List<WorkoutExercise> history,
+    required PdfStrings strings,
+    required String locale,
+  }) async {
+    final font = await PdfGoogleFonts.notoSansRegular();
+    final bold = await PdfGoogleFonts.notoSansBold();
+    final dateFmt = DateFormat.yMd(locale);
+
+    final doc = pw.Document(compress: true);
+    doc.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+        header: (_) => _buildDocHeader(
+          docTitle: strings.storicoPdfTitle,
+          subtitle: exerciseName,
+          detail: null,
+          font: font,
+          bold: bold,
+        ),
+        footer: (ctx) => _buildFooter(ctx, font, strings),
+        build: (_) => [
+          pw.SizedBox(height: 12),
+          if (history.isEmpty)
+            pw.Text(strings.nessunaSessione,
+                style: pw.TextStyle(
+                    font: font,
+                    fontSize: 9,
+                    fontStyle: pw.FontStyle.italic,
+                    color: PdfColors.grey500))
+          else
+            for (var i = 0; i < history.length; i++)
+              _buildStoricoRow(
+                session: history[i],
+                isPr: WorkoutProgressService.isNewPersonalRecord(
+                    history[i], history.sublist(i + 1)),
+                dateFmt: dateFmt,
+                font: font,
+                bold: bold,
+                strings: strings,
+              ),
+        ],
+      ),
+    );
+    return doc.save();
+  }
+
+  static pw.Widget _buildStoricoRow({
+    required WorkoutExercise session,
+    required bool isPr,
+    required DateFormat dateFmt,
+    required pw.Font font,
+    required pw.Font bold,
+    required PdfStrings strings,
+  }) {
+    final isCardio = session.durationSeconds != null;
+    final detail = isCardio
+        ? strings.durataMin(session.durationSeconds! ~/ 60)
+        : session.sets.map((s) => '${s.reps ?? '-'}×${s.weightKg ?? '-'}kg').join(', ');
+
+    return pw.Padding(
+      padding: const pw.EdgeInsets.symmetric(vertical: 3),
+      child: pw.Row(
+        children: [
+          pw.SizedBox(
+            width: 64,
+            child: pw.Text(dateFmt.format(session.date),
+                style: pw.TextStyle(font: font, fontSize: 8.5, color: PdfColors.grey600)),
+          ),
+          pw.Expanded(
+            child: pw.Text(detail,
+                style: pw.TextStyle(font: font, fontSize: 9, color: PdfColors.grey900)),
+          ),
+          if (isPr && !isCardio)
+            pw.Text(strings.prBadge,
+                style: pw.TextStyle(font: bold, fontSize: 8.5, color: PdfColors.grey800)),
+        ],
+      ),
+    );
+  }
+
+  // ── Header generico documento (scheda/programma/storico) ───────
+
+  static pw.Widget _buildDocHeader({
+    required String docTitle,
+    required String subtitle,
+    required String? detail,
+    required pw.Font font,
+    required pw.Font bold,
+  }) {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          children: [
+            pw.Text('PLICO',
+                style: pw.TextStyle(font: bold, fontSize: 16, color: PdfColors.black)),
+            pw.Text(docTitle,
+                style: pw.TextStyle(font: font, fontSize: 11, color: PdfColors.grey600)),
+          ],
+        ),
+        pw.SizedBox(height: 2),
+        pw.Text(subtitle,
+            style: pw.TextStyle(font: bold, fontSize: 11, color: PdfColors.grey800)),
+        if (detail != null)
+          pw.Text(detail,
+              style: pw.TextStyle(font: font, fontSize: 9, color: PdfColors.grey600)),
+        pw.SizedBox(height: 6),
+        pw.Divider(thickness: 0.5, color: PdfColors.grey400),
       ],
     );
   }

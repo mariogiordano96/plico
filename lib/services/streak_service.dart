@@ -39,4 +39,17 @@ class StreakService {
       return _streakFromLoggedDays(loggedDays);
     });
   }
+
+  Future<int> currentWorkoutStreak() async {
+    final today = _dayStart(DateTime.now());
+    final days = await DatabaseService.instance
+        .getWorkoutDaysRange(today.subtract(const Duration(days: 365)), today);
+    return _streakFromLoggedDays(days);
+  }
+
+  Stream<int> watchCurrentWorkoutStreak() {
+    return DatabaseService.instance
+        .watchWorkoutDays()
+        .map((days) => _streakFromLoggedDays(days));
+  }
 }

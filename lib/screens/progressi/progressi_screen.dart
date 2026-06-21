@@ -8,9 +8,12 @@ import '../../models/body_snapshot.dart';
 import '../../models/daily_log.dart';
 import '../../models/plicometry_session.dart';
 import '../../models/measurement_snapshot.dart';
+import '../../models/workout_exercise.dart';
 import '../../services/database_service.dart';
 import '../../services/pdf_export_service.dart';
 import '../storico/storico_misurazioni_screen.dart';
+import 'record_personali_screen.dart';
+import 'volume_settimanale_screen.dart';
 
 // ── Data helpers ───────────────────────────────────────────────
 
@@ -221,6 +224,13 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
         l10n.slotProteina, l10n.slotCarboidrati, l10n.slotVerdura,
         l10n.slotGrassi, l10n.slotExtra, l10n.slotFrutta,
       ],
+      schedaPdfTitle: l10n.pdfSchedaTitle,
+      programmaPdfTitle: l10n.pdfProgrammaTitle,
+      storicoPdfTitle: l10n.pdfStoricoTitle,
+      nEsercizi: l10n.schedeNEsercizi,
+      nessunaSessione: l10n.storicoNessunaSessione,
+      prBadge: l10n.storicoPrBadge,
+      durataMin: l10n.allenamentoDurataMin,
     );
 
     if (!mounted) return;
@@ -280,6 +290,20 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
             onPressed: () => Navigator.push(context,
                 MaterialPageRoute(
                     builder: (_) => const StoricoMisurazioniScreen())),
+          ),
+          IconButton(
+            icon: Icon(Icons.emoji_events_rounded, color: p.accent),
+            tooltip: context.l10n.progressiTooltipRecord,
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(
+                    builder: (_) => const RecordPersonaliScreen())),
+          ),
+          IconButton(
+            icon: Icon(Icons.bar_chart_rounded, color: p.accent),
+            tooltip: context.l10n.progressiTooltipVolume,
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(
+                    builder: (_) => const VolumeSettimanaleScreen())),
           ),
         ],
       ),
@@ -387,6 +411,12 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
               startDate: start,
               p: p,
             ),
+            const SizedBox(height: 28),
+
+            // ── Cronologia allenamenti (ultimi 7 giorni) ──
+            _SectionLabel(context.l10n.progressiSezAllenamenti, p),
+            const SizedBox(height: 14),
+            _CronologiaAllenamenti(p: p),
           ],
         ),
       ),
@@ -516,6 +546,100 @@ class _MisurazioniChart extends StatelessWidget {
           p: p,
         );
       },
+    );
+  }
+}
+
+// ── Cronologia allenamenti (ultimi 7 giorni) ───────────────────
+
+class _CronologiaAllenamenti extends StatelessWidget {
+  final ColorPalette p;
+  const _CronologiaAllenamenti({required this.p});
+
+  static DateTime _dayOnly(DateTime d) => DateTime(d.year, d.month, d.day);
+
+  @override
+  Widget build(BuildContext context) {
+    final today = _dayOnly(DateTime.now());
+    final from = today.subtract(const Duration(days: 6));
+
+    return StreamBuilder<List<WorkoutExercise>>(
+      stream: DatabaseService.instance.watchWorkoutExercisesRange(from, today),
+      builder: (context, snap) {
+        final byDay = <DateTime, List<WorkoutExercise>>{};
+        for (final e in snap.data ?? <WorkoutExercise>[]) {
+          byDay.putIfAbsent(e.date, () => []).add(e);
+        }
+
+        final days = List.generate(7, (i) => today.subtract(Duration(days: i)));
+        final locale = Localizations.localeOf(context).toString();
+        final fmt = DateFormat.MMMd(locale);
+
+        return Container(
+          decoration: BoxDecoration(
+            color: p.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: p.cardBorder),
+          ),
+          child: Column(
+            children: [
+              for (var i = 0; i < days.length; i++)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: i == days.length - 1
+                      ? null
+                      : BoxDecoration(
+                          border: Border(bottom: BorderSide(color: p.cardBorder)),
+                        ),
+                  child: _CronologiaRow(
+                    label: fmt.format(days[i]),
+                    esercizi: byDay[days[i]] ?? const [],
+                    p: p,
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _CronologiaRow extends StatelessWidget {
+  final String label;
+  final List<WorkoutExercise> esercizi;
+  final ColorPalette p;
+  const _CronologiaRow({required this.label, required this.esercizi, required this.p});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final fatto = esercizi.isNotEmpty;
+    final kcal = esercizi.fold<int>(0, (s, e) => s + (e.estimatedKcal ?? 0));
+
+    return Row(
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: fatto ? p.accent : p.cardBorder,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(label, style: TextStyle(color: p.textPrimary, fontSize: 13)),
+        ),
+        Text(
+          fatto ? l10n.schedeNEsercizi(esercizi.length) : l10n.progressiNessunAllenamento,
+          style: TextStyle(color: p.textMuted, fontSize: 12),
+        ),
+        if (fatto && kcal > 0) ...[
+          const SizedBox(width: 8),
+          Text('≈ $kcal kcal', style: TextStyle(color: p.accent, fontSize: 12)),
+        ],
+      ],
     );
   }
 }

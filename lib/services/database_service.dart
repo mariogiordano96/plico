@@ -26,6 +26,9 @@ import '../models/workout_template.dart';
 import '../models/workout_template_exercise.dart';
 import '../models/workout_program.dart';
 import '../models/workout_set.dart';
+import '../models/personal_record.dart';
+import 'exercise_alternatives_service.dart';
+import 'workout_progress_service.dart';
 
 class DatabaseService {
   static final DatabaseService instance = DatabaseService._();
@@ -826,6 +829,21 @@ class DatabaseService {
     });
   }
 
+  /// Alternative per la sostituzione esercizio al volo (Fase 13), ordinate
+  /// per somiglianza a [exerciseId] (stesso muscleGroup, poi mechanic/equipment).
+  Future<List<ExerciseDefinition>> getAlternatives(String exerciseId) async {
+    final all = await getAllExercises();
+    ExerciseDefinition? source;
+    for (final e in all) {
+      if (e.externalId == exerciseId) {
+        source = e;
+        break;
+      }
+    }
+    if (source == null) return [];
+    return ExerciseAlternativesService.rank(source, all);
+  }
+
   // ──────────────────────────────────────────────
   // WorkoutLog / WorkoutExercise
   // ──────────────────────────────────────────────
@@ -889,9 +907,149 @@ class DatabaseService {
         .findAll();
   }
 
+  /// Record personali (peso massimo storico, escluse le serie di riscaldamento)
+  /// per ogni esercizio di forza mai loggato — uno per `exerciseId` distinto,
+  /// ordinati dal più recente. Esclude esercizi senza serie a peso (es. cardio).
+  Future<List<PersonalRecord>> getAllPersonalRecords() async {
+    final all = await _isar.workoutExercises.where().findAll();
+    final byExercise = <String, List<WorkoutExercise>>{};
+    for (final e in all) {
+      byExercise.putIfAbsent(e.exerciseId, () => []).add(e);
+    }
+
+    final muscleGroupById = {
+      for (final ex in await getAllExercises()) ex.externalId: ex.muscleGroup,
+    };
+
+    final records = <PersonalRecord>[];
+    for (final entry in byExercise.entries) {
+      double? bestWeight;
+      DateTime? bestDate;
+      String? bestName;
+      for (final session in entry.value) {
+        final maxW = WorkoutProgressService.sessionMaxWeight(session);
+        if (maxW == null) continue;
+        if (bestWeight == null || maxW > bestWeight) {
+          bestWeight = maxW;
+          bestDate = session.date;
+          bestName = session.exerciseName;
+        }
+      }
+      if (bestWeight == null || bestDate == null || bestName == null) continue;
+      records.add(PersonalRecord(
+        exerciseId: entry.key,
+        exerciseName: bestName,
+        muscleGroup: muscleGroupById[entry.key],
+        maxWeightKg: bestWeight,
+        achievedAt: bestDate,
+      ));
+    }
+    records.sort((a, b) => b.achievedAt.compareTo(a.achievedAt));
+    return records;
+  }
+
+  Future<DateTime?> getLastWorkoutDate() async {
+    final log = await _isar.workoutLogs.where().sortByDateDesc().findFirst();
+    return log?.date;
+  }
+
+  /// Giorni (normalizzati a mezzanotte) in cui è stato registrato almeno un
+  /// [WorkoutExercise], nel range indicato. Usato per la streak allenamento.
+  Future<Set<DateTime>> getWorkoutDaysRange(DateTime from, DateTime to) async {
+    final f = _logDate(from);
+    final t = _logDate(to);
+    final exercises = await _isar.workoutExercises.filter().dateBetween(f, t).findAll();
+    return exercises.map((e) => e.date).toSet();
+  }
+
+  /// Come [getWorkoutDaysRange], ma osservabile: emette ogni volta che cambia
+  /// un [WorkoutExercise] qualsiasi.
+  Stream<Set<DateTime>> watchWorkoutDays() {
+    return _isar.workoutExercises
+        .where()
+        .watch(fireImmediately: true)
+        .map((list) => list.map((e) => e.date).toSet());
+  }
+
+  /// Tutti i [WorkoutExercise] registrati nel range [from]-[to] (inclusi),
+  /// osservabile. Usato dalla cronologia allenamenti recenti in Progressi.
+  Stream<List<WorkoutExercise>> watchWorkoutExercisesRange(DateTime from, DateTime to) {
+    final f = _logDate(from);
+    final t = _logDate(to);
+    return _isar.workoutExercises
+        .filter()
+        .dateBetween(f, t)
+        .watch(fireImmediately: true);
+  }
+
+  /// Numero totale di sessioni allenamento mai registrate, dove una sessione
+  /// è un giorno con almeno un [WorkoutExercise].
+  Future<int> getTotalWorkoutSessionsCount() async {
+    final all = await _isar.workoutExercises.where().findAll();
+    return all.map((e) => e.date).toSet().length;
+  }
+
   Future<int> getWorkoutKcalForDay(DateTime date) async {
     final esercizi = await getWorkoutExercisesForDay(date);
     return esercizi.fold<int>(0, (sum, e) => sum + (e.estimatedKcal ?? 0));
+  }
+
+  /// Giorni con almeno un allenamento nella settimana corrente (lunedì-oggi,
+  /// stessa convenzione locale-aware di `WorkoutProgressService._weekKey`).
+  Future<int> getWorkoutsThisWeek() async {
+    final now = DateTime.now();
+    final monday = _logDate(now.subtract(Duration(days: now.weekday - 1)));
+    final days = await getWorkoutDaysRange(monday, now);
+    return days.length;
+  }
+
+  /// Come [getWorkoutsThisWeek], ma osservabile.
+  Stream<int> watchWorkoutsThisWeek() {
+    return watchWorkoutDays().map((allDays) {
+      final now = DateTime.now();
+      final monday = _logDate(now.subtract(Duration(days: now.weekday - 1)));
+      return allDays.where((d) => !d.isBefore(monday)).length;
+    });
+  }
+
+  /// Numero di giorni del "programma attivo": il programma a cui appartiene
+  /// la scheda con `lastUsedAt` più recente (quello che l'utente sta
+  /// effettivamente seguendo). Null se nessuna scheda di un programma è mai
+  /// stata eseguita.
+  Future<int?> getActiveProgramDaysCount() async {
+    final mostRecent = await _isar.workoutTemplates
+        .filter()
+        .programIdIsNotNull()
+        .lastUsedAtIsNotNull()
+        .sortByLastUsedAtDesc()
+        .findFirst();
+    if (mostRecent?.programId == null) return null;
+    final days = await getProgramDays(mostRecent!.programId!);
+    return days.isEmpty ? null : days.length;
+  }
+
+  /// Volume totale (Σ rip × peso, escluse le serie di riscaldamento) della
+  /// settimana che inizia in [weekStart], aggregato per
+  /// `ExerciseDefinition.muscleGroup`. Usato dal grafico "Volume settimanale"
+  /// in Progressi (Fase 18).
+  Future<Map<String, double>> getWeeklyVolumeByMuscleGroup(DateTime weekStart) async {
+    final start = _logDate(weekStart);
+    final end = _logDate(start.add(const Duration(days: 6)));
+    final exercises = await _isar.workoutExercises.filter().dateBetween(start, end).findAll();
+    final muscleGroupById = {
+      for (final ex in await getAllExercises()) ex.externalId: ex.muscleGroup,
+    };
+
+    final volumeByGroup = <String, double>{};
+    for (final e in exercises) {
+      final group = muscleGroupById[e.exerciseId];
+      if (group == null) continue;
+      final volume = e.sets
+          .where((s) => !s.isWarmup)
+          .fold(0.0, (sum, s) => sum + (s.reps ?? 0) * (s.weightKg ?? 0));
+      volumeByGroup[group] = (volumeByGroup[group] ?? 0) + volume;
+    }
+    return volumeByGroup;
   }
 
   Future<void> deleteWorkoutLog(DateTime date) async {

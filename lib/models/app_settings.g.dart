@@ -107,30 +107,50 @@ const AppSettingsSchema = CollectionSchema(
       name: r'notSpuntinoMin',
       type: IsarType.long,
     ),
-    r'notificheAttive': PropertySchema(
+    r'notWorkoutAttiva': PropertySchema(
       id: 18,
+      name: r'notWorkoutAttiva',
+      type: IsarType.bool,
+    ),
+    r'notificheAttive': PropertySchema(
+      id: 19,
       name: r'notificheAttive',
       type: IsarType.bool,
     ),
     r'obiettivo': PropertySchema(
-      id: 19,
+      id: 20,
       name: r'obiettivo',
       type: IsarType.long,
     ),
     r'pesoObiettivo': PropertySchema(
-      id: 20,
+      id: 21,
       name: r'pesoObiettivo',
       type: IsarType.double,
     ),
+    r'restTimerDefaultSeconds': PropertySchema(
+      id: 22,
+      name: r'restTimerDefaultSeconds',
+      type: IsarType.long,
+    ),
     r'tourCompleted': PropertySchema(
-      id: 21,
+      id: 23,
       name: r'tourCompleted',
       type: IsarType.bool,
     ),
     r'workoutPresetsSeeded': PropertySchema(
-      id: 22,
+      id: 24,
       name: r'workoutPresetsSeeded',
       type: IsarType.bool,
+    ),
+    r'workoutTargetAttivo': PropertySchema(
+      id: 25,
+      name: r'workoutTargetAttivo',
+      type: IsarType.bool,
+    ),
+    r'workoutTargetSettimanale': PropertySchema(
+      id: 26,
+      name: r'workoutTargetSettimanale',
+      type: IsarType.long,
     )
   },
   estimateSize: _appSettingsEstimateSize,
@@ -180,11 +200,15 @@ void _appSettingsSerialize(
   writer.writeLong(offsets[15], object.notSorMin);
   writer.writeBool(offsets[16], object.notSpuntinoAttiva);
   writer.writeLong(offsets[17], object.notSpuntinoMin);
-  writer.writeBool(offsets[18], object.notificheAttive);
-  writer.writeLong(offsets[19], object.obiettivo);
-  writer.writeDouble(offsets[20], object.pesoObiettivo);
-  writer.writeBool(offsets[21], object.tourCompleted);
-  writer.writeBool(offsets[22], object.workoutPresetsSeeded);
+  writer.writeBool(offsets[18], object.notWorkoutAttiva);
+  writer.writeBool(offsets[19], object.notificheAttive);
+  writer.writeLong(offsets[20], object.obiettivo);
+  writer.writeDouble(offsets[21], object.pesoObiettivo);
+  writer.writeLong(offsets[22], object.restTimerDefaultSeconds);
+  writer.writeBool(offsets[23], object.tourCompleted);
+  writer.writeBool(offsets[24], object.workoutPresetsSeeded);
+  writer.writeBool(offsets[25], object.workoutTargetAttivo);
+  writer.writeLong(offsets[26], object.workoutTargetSettimanale);
 }
 
 AppSettings _appSettingsDeserialize(
@@ -213,11 +237,15 @@ AppSettings _appSettingsDeserialize(
   object.notSorMin = reader.readLong(offsets[15]);
   object.notSpuntinoAttiva = reader.readBool(offsets[16]);
   object.notSpuntinoMin = reader.readLong(offsets[17]);
-  object.notificheAttive = reader.readBool(offsets[18]);
-  object.obiettivo = reader.readLong(offsets[19]);
-  object.pesoObiettivo = reader.readDoubleOrNull(offsets[20]);
-  object.tourCompleted = reader.readBool(offsets[21]);
-  object.workoutPresetsSeeded = reader.readBool(offsets[22]);
+  object.notWorkoutAttiva = reader.readBool(offsets[18]);
+  object.notificheAttive = reader.readBool(offsets[19]);
+  object.obiettivo = reader.readLong(offsets[20]);
+  object.pesoObiettivo = reader.readDoubleOrNull(offsets[21]);
+  object.restTimerDefaultSeconds = reader.readLong(offsets[22]);
+  object.tourCompleted = reader.readBool(offsets[23]);
+  object.workoutPresetsSeeded = reader.readBool(offsets[24]);
+  object.workoutTargetAttivo = reader.readBool(offsets[25]);
+  object.workoutTargetSettimanale = reader.readLongOrNull(offsets[26]);
   return object;
 }
 
@@ -267,13 +295,21 @@ P _appSettingsDeserializeProp<P>(
     case 18:
       return (reader.readBool(offset)) as P;
     case 19:
-      return (reader.readLong(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 20:
-      return (reader.readDoubleOrNull(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 21:
-      return (reader.readBool(offset)) as P;
+      return (reader.readDoubleOrNull(offset)) as P;
     case 22:
+      return (reader.readLong(offset)) as P;
+    case 23:
       return (reader.readBool(offset)) as P;
+    case 24:
+      return (reader.readBool(offset)) as P;
+    case 25:
+      return (reader.readBool(offset)) as P;
+    case 26:
+      return (reader.readLongOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -1038,6 +1074,16 @@ extension AppSettingsQueryFilter
   }
 
   QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      notWorkoutAttivaEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'notWorkoutAttiva',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
       notificheAttiveEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -1188,6 +1234,62 @@ extension AppSettingsQueryFilter
   }
 
   QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      restTimerDefaultSecondsEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'restTimerDefaultSeconds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      restTimerDefaultSecondsGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'restTimerDefaultSeconds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      restTimerDefaultSecondsLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'restTimerDefaultSeconds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      restTimerDefaultSecondsBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'restTimerDefaultSeconds',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
       tourCompletedEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -1203,6 +1305,90 @@ extension AppSettingsQueryFilter
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'workoutPresetsSeeded',
         value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      workoutTargetAttivoEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'workoutTargetAttivo',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      workoutTargetSettimanaleIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'workoutTargetSettimanale',
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      workoutTargetSettimanaleIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'workoutTargetSettimanale',
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      workoutTargetSettimanaleEqualTo(int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'workoutTargetSettimanale',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      workoutTargetSettimanaleGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'workoutTargetSettimanale',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      workoutTargetSettimanaleLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'workoutTargetSettimanale',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      workoutTargetSettimanaleBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'workoutTargetSettimanale',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
       ));
     });
   }
@@ -1444,6 +1630,20 @@ extension AppSettingsQuerySortBy
     });
   }
 
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByNotWorkoutAttiva() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'notWorkoutAttiva', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByNotWorkoutAttivaDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'notWorkoutAttiva', Sort.desc);
+    });
+  }
+
   QueryBuilder<AppSettings, AppSettings, QAfterSortBy> sortByNotificheAttive() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'notificheAttive', Sort.asc);
@@ -1482,6 +1682,20 @@ extension AppSettingsQuerySortBy
     });
   }
 
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByRestTimerDefaultSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'restTimerDefaultSeconds', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByRestTimerDefaultSecondsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'restTimerDefaultSeconds', Sort.desc);
+    });
+  }
+
   QueryBuilder<AppSettings, AppSettings, QAfterSortBy> sortByTourCompleted() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'tourCompleted', Sort.asc);
@@ -1506,6 +1720,34 @@ extension AppSettingsQuerySortBy
       sortByWorkoutPresetsSeededDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'workoutPresetsSeeded', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByWorkoutTargetAttivo() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'workoutTargetAttivo', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByWorkoutTargetAttivoDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'workoutTargetAttivo', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByWorkoutTargetSettimanale() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'workoutTargetSettimanale', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByWorkoutTargetSettimanaleDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'workoutTargetSettimanale', Sort.desc);
     });
   }
 }
@@ -1752,6 +1994,20 @@ extension AppSettingsQuerySortThenBy
     });
   }
 
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByNotWorkoutAttiva() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'notWorkoutAttiva', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByNotWorkoutAttivaDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'notWorkoutAttiva', Sort.desc);
+    });
+  }
+
   QueryBuilder<AppSettings, AppSettings, QAfterSortBy> thenByNotificheAttive() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'notificheAttive', Sort.asc);
@@ -1790,6 +2046,20 @@ extension AppSettingsQuerySortThenBy
     });
   }
 
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByRestTimerDefaultSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'restTimerDefaultSeconds', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByRestTimerDefaultSecondsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'restTimerDefaultSeconds', Sort.desc);
+    });
+  }
+
   QueryBuilder<AppSettings, AppSettings, QAfterSortBy> thenByTourCompleted() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'tourCompleted', Sort.asc);
@@ -1814,6 +2084,34 @@ extension AppSettingsQuerySortThenBy
       thenByWorkoutPresetsSeededDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'workoutPresetsSeeded', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByWorkoutTargetAttivo() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'workoutTargetAttivo', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByWorkoutTargetAttivoDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'workoutTargetAttivo', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByWorkoutTargetSettimanale() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'workoutTargetSettimanale', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByWorkoutTargetSettimanaleDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'workoutTargetSettimanale', Sort.desc);
     });
   }
 }
@@ -1934,6 +2232,13 @@ extension AppSettingsQueryWhereDistinct
   }
 
   QueryBuilder<AppSettings, AppSettings, QDistinct>
+      distinctByNotWorkoutAttiva() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'notWorkoutAttiva');
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QDistinct>
       distinctByNotificheAttive() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'notificheAttive');
@@ -1952,6 +2257,13 @@ extension AppSettingsQueryWhereDistinct
     });
   }
 
+  QueryBuilder<AppSettings, AppSettings, QDistinct>
+      distinctByRestTimerDefaultSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'restTimerDefaultSeconds');
+    });
+  }
+
   QueryBuilder<AppSettings, AppSettings, QDistinct> distinctByTourCompleted() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'tourCompleted');
@@ -1962,6 +2274,20 @@ extension AppSettingsQueryWhereDistinct
       distinctByWorkoutPresetsSeeded() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'workoutPresetsSeeded');
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QDistinct>
+      distinctByWorkoutTargetAttivo() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'workoutTargetAttivo');
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QDistinct>
+      distinctByWorkoutTargetSettimanale() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'workoutTargetSettimanale');
     });
   }
 }
@@ -2083,6 +2409,12 @@ extension AppSettingsQueryProperty
     });
   }
 
+  QueryBuilder<AppSettings, bool, QQueryOperations> notWorkoutAttivaProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'notWorkoutAttiva');
+    });
+  }
+
   QueryBuilder<AppSettings, bool, QQueryOperations> notificheAttiveProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'notificheAttive');
@@ -2101,6 +2433,13 @@ extension AppSettingsQueryProperty
     });
   }
 
+  QueryBuilder<AppSettings, int, QQueryOperations>
+      restTimerDefaultSecondsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'restTimerDefaultSeconds');
+    });
+  }
+
   QueryBuilder<AppSettings, bool, QQueryOperations> tourCompletedProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'tourCompleted');
@@ -2111,6 +2450,20 @@ extension AppSettingsQueryProperty
       workoutPresetsSeededProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'workoutPresetsSeeded');
+    });
+  }
+
+  QueryBuilder<AppSettings, bool, QQueryOperations>
+      workoutTargetAttivoProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'workoutTargetAttivo');
+    });
+  }
+
+  QueryBuilder<AppSettings, int?, QQueryOperations>
+      workoutTargetSettimanaleProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'workoutTargetSettimanale');
     });
   }
 }

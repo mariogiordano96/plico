@@ -48,6 +48,13 @@ class _NotificheScreenState extends State<NotificheScreen> {
     await NotificationService.instance.refreshEveningRecap();
   }
 
+  Future<void> _toggleWorkoutReminder(bool val) async {
+    if (_s == null) return;
+    setState(() => _s!.notWorkoutAttiva = val);
+    await DatabaseService.instance.saveAppSettings(_s!);
+    await NotificationService.instance.refreshWorkoutReminder();
+  }
+
   Future<void> _toggleMaster(bool val) async {
     if (_s == null) return;
     if (val) {
@@ -143,6 +150,15 @@ class _NotificheScreenState extends State<NotificheScreen> {
                     'Tocca l\'orario per modificarlo.',
                     style: TextStyle(color: p.textMuted, fontSize: 12),
                   ),
+                  const SizedBox(height: 24),
+                  Text('ALLENAMENTO',
+                      style: TextStyle(
+                          color: p.textMuted,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 2)),
+                  const SizedBox(height: 10),
+                  _workoutReminderCard(p),
                 ],
               ],
             ),
@@ -189,6 +205,45 @@ class _NotificheScreenState extends State<NotificheScreen> {
           Switch(
             value: _s!.notificheAttive,
             onChanged: _toggleMaster,
+            activeThumbColor: p.accent,
+            activeTrackColor: p.accent.withValues(alpha: 0.4),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _workoutReminderCard(ColorPalette p) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      decoration: BoxDecoration(
+        color: p.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: p.cardBorder),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.fitness_center_rounded,
+              color: _s!.notWorkoutAttiva ? p.accent : p.textMuted, size: 20),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Promemoria allenamento',
+                    style: TextStyle(
+                        color: p.textPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500)),
+                const SizedBox(height: 2),
+                Text('Avviso se non ti alleni da qualche giorno',
+                    style: TextStyle(color: p.textMuted, fontSize: 12)),
+              ],
+            ),
+          ),
+          Switch(
+            value: _s!.notWorkoutAttiva,
+            onChanged: _toggleWorkoutReminder,
             activeThumbColor: p.accent,
             activeTrackColor: p.accent.withValues(alpha: 0.4),
           ),

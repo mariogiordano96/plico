@@ -200,6 +200,18 @@ abstract class AppLocalizations {
   /// **'Registra ogni pasto della giornata. Tocca il \"+\" in alto per aggiungere un alimento o scannerizza un barcode.'**
   String get tourDiarioDesc;
 
+  /// Tour: titolo tab Allenamento
+  ///
+  /// In it, this message translates to:
+  /// **'Allenamento'**
+  String get tourAllenamentoTitle;
+
+  /// Tour: descrizione tab Allenamento
+  ///
+  /// In it, this message translates to:
+  /// **'Registra i tuoi allenamenti, crea schede e programmi, e monitora il volume settimanale per gruppo muscolare.'**
+  String get tourAllenamentoDesc;
+
   /// Tour: titolo tab Progressi
   ///
   /// In it, this message translates to:
@@ -758,6 +770,18 @@ abstract class AppLocalizations {
   /// **'Inizia oggi la tua streak'**
   String get homeStreakInizia;
 
+  /// No description provided for @homeStreakAllenamentoGiorni.
+  ///
+  /// In it, this message translates to:
+  /// **'{count} giorni di fila'**
+  String homeStreakAllenamentoGiorni(String count);
+
+  /// No description provided for @homeStreakAllenamentoInizia.
+  ///
+  /// In it, this message translates to:
+  /// **'Inizia oggi la tua streak allenamento'**
+  String get homeStreakAllenamentoInizia;
+
   /// No description provided for @homeBadge1KgPerso.
   ///
   /// In it, this message translates to:
@@ -781,6 +805,36 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Settimana in target'**
   String get homeBadgeSettimanaTarget;
+
+  /// No description provided for @homeBadgePrimaScheda.
+  ///
+  /// In it, this message translates to:
+  /// **'Prima scheda'**
+  String get homeBadgePrimaScheda;
+
+  /// No description provided for @homeBadgeStreak7Allenamento.
+  ///
+  /// In it, this message translates to:
+  /// **'7gg allenamento'**
+  String get homeBadgeStreak7Allenamento;
+
+  /// No description provided for @homeBadgeNuovoPr.
+  ///
+  /// In it, this message translates to:
+  /// **'Nuovo PR'**
+  String get homeBadgeNuovoPr;
+
+  /// No description provided for @homeBadge10Sessioni.
+  ///
+  /// In it, this message translates to:
+  /// **'10 sessioni'**
+  String get homeBadge10Sessioni;
+
+  /// No description provided for @homeBadge50Sessioni.
+  ///
+  /// In it, this message translates to:
+  /// **'50 sessioni'**
+  String get homeBadge50Sessioni;
 
   /// No description provided for @diarioTitolo.
   ///
@@ -1310,6 +1364,18 @@ abstract class AppLocalizations {
   /// **'Storico misurazioni'**
   String get progressiTooltipStorico;
 
+  /// No description provided for @progressiTooltipRecord.
+  ///
+  /// In it, this message translates to:
+  /// **'I tuoi record'**
+  String get progressiTooltipRecord;
+
+  /// No description provided for @progressiTooltipVolume.
+  ///
+  /// In it, this message translates to:
+  /// **'Volume settimanale'**
+  String get progressiTooltipVolume;
+
   /// No description provided for @progressiSezPeso.
   ///
   /// In it, this message translates to:
@@ -1333,6 +1399,18 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'MISURAZIONI'**
   String get progressiSezMisurazioni;
+
+  /// No description provided for @progressiSezAllenamenti.
+  ///
+  /// In it, this message translates to:
+  /// **'ALLENAMENTI RECENTI'**
+  String get progressiSezAllenamenti;
+
+  /// No description provided for @progressiNessunAllenamento.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessun allenamento'**
+  String get progressiNessunAllenamento;
 
   /// No description provided for @progressiRange1A.
   ///
@@ -2084,6 +2162,36 @@ abstract class AppLocalizations {
   /// **'Ricordati di registrare il tuo peso'**
   String get notifChannelPesataDesc;
 
+  /// No description provided for @notifChannelRestTimer.
+  ///
+  /// In it, this message translates to:
+  /// **'Timer di recupero'**
+  String get notifChannelRestTimer;
+
+  /// No description provided for @notifChannelRestTimerDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'Avviso a fine riposo tra le serie'**
+  String get notifChannelRestTimerDesc;
+
+  /// No description provided for @notifRestTimerBody.
+  ///
+  /// In it, this message translates to:
+  /// **'Riposo terminato — pronto per la prossima serie?'**
+  String get notifRestTimerBody;
+
+  /// No description provided for @notifChannelWorkout.
+  ///
+  /// In it, this message translates to:
+  /// **'Promemoria allenamento'**
+  String get notifChannelWorkout;
+
+  /// No description provided for @notifChannelWorkoutDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'Ricordati di allenarti'**
+  String get notifChannelWorkoutDesc;
+
   /// No description provided for @notifPastoBody.
   ///
   /// In it, this message translates to:
@@ -2137,6 +2245,12 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Non ti pesi da {days} giorni. Vuoi registrare il tuo peso?'**
   String notifPesataBody(int days);
+
+  /// No description provided for @notifWorkoutBody.
+  ///
+  /// In it, this message translates to:
+  /// **'Non ti alleni da {days} giorni. Pronto a riprendere?'**
+  String notifWorkoutBody(int days);
 
   /// No description provided for @pdfDiarioTitle.
   ///
@@ -2209,6 +2323,24 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Generato il {created}'**
   String pdfGenerato(String created);
+
+  /// No description provided for @pdfSchedaTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Scheda Allenamento'**
+  String get pdfSchedaTitle;
+
+  /// No description provided for @pdfProgrammaTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Programma di Allenamento'**
+  String get pdfProgrammaTitle;
+
+  /// No description provided for @pdfStoricoTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Storico Esercizio'**
+  String get pdfStoricoTitle;
 
   /// No description provided for @muscleGroupAll.
   ///
@@ -2402,6 +2534,108 @@ abstract class AppLocalizations {
   /// **'L\'esercizio e le serie registrate verranno rimossi.'**
   String get allenamentoEliminaSub;
 
+  /// No description provided for @allenamentoNotaTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Nota sessione'**
+  String get allenamentoNotaTitle;
+
+  /// No description provided for @allenamentoNotaHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Come è andata? Sensazioni, energia, dolori...'**
+  String get allenamentoNotaHint;
+
+  /// No description provided for @allenamentoSostituisci.
+  ///
+  /// In it, this message translates to:
+  /// **'Sostituisci'**
+  String get allenamentoSostituisci;
+
+  /// No description provided for @allenamentoSostituisciTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Sostituisci esercizio'**
+  String get allenamentoSostituisciTitle;
+
+  /// No description provided for @allenamentoSostituisciVuoto.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessuna alternativa disponibile'**
+  String get allenamentoSostituisciVuoto;
+
+  /// No description provided for @allenamentoModifica.
+  ///
+  /// In it, this message translates to:
+  /// **'Modifica'**
+  String get allenamentoModifica;
+
+  /// No description provided for @allenamentoEliminaGiornataTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Eliminare la sessione?'**
+  String get allenamentoEliminaGiornataTitle;
+
+  /// No description provided for @allenamentoEliminaGiornataSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Tutti gli esercizi e la nota di questo giorno verranno rimossi.'**
+  String get allenamentoEliminaGiornataSub;
+
+  /// No description provided for @allenamentoObiettivoSettimanale.
+  ///
+  /// In it, this message translates to:
+  /// **'{done}/{target} questa settimana'**
+  String allenamentoObiettivoSettimanale(int done, int target);
+
+  /// No description provided for @obiettivoSettimanaleTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Obiettivo settimanale'**
+  String get obiettivoSettimanaleTitle;
+
+  /// No description provided for @obiettivoSettimanaleGiorni.
+  ///
+  /// In it, this message translates to:
+  /// **'{n} giorni'**
+  String obiettivoSettimanaleGiorni(int n);
+
+  /// No description provided for @recordPersonaliTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'I tuoi record'**
+  String get recordPersonaliTitle;
+
+  /// No description provided for @recordPersonaliVuoto.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessun record ancora. Registra un allenamento per iniziare!'**
+  String get recordPersonaliVuoto;
+
+  /// No description provided for @recordPersonaliKg.
+  ///
+  /// In it, this message translates to:
+  /// **'{peso} kg'**
+  String recordPersonaliKg(String peso);
+
+  /// No description provided for @volumeSettimanaleTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Volume settimanale'**
+  String get volumeSettimanaleTitle;
+
+  /// No description provided for @volumeSettimanaleVuoto.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessun allenamento ancora questa settimana.'**
+  String get volumeSettimanaleVuoto;
+
+  /// No description provided for @volumeSettimanaleTrascurato.
+  ///
+  /// In it, this message translates to:
+  /// **'{gruppo} trascurato questa settimana'**
+  String volumeSettimanaleTrascurato(String gruppo);
+
   /// No description provided for @serieDialogSerieLabel.
   ///
   /// In it, this message translates to:
@@ -2419,6 +2653,12 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'kg'**
   String get serieDialogKgHint;
+
+  /// No description provided for @serieDialogRpeLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'RPE'**
+  String get serieDialogRpeLabel;
 
   /// No description provided for @serieDialogAggiungiSerie.
   ///
@@ -2461,6 +2701,12 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Bilancio netto'**
   String get homeAttivitaBilancioNetto;
+
+  /// No description provided for @homeAttivitaKcalDisclaimer.
+  ///
+  /// In it, this message translates to:
+  /// **'Stima indicativa, non un dato medico: basata sull\'ultimo peso registrato (o 75 kg di default se non disponibile).'**
+  String get homeAttivitaKcalDisclaimer;
 
   /// No description provided for @schedeTitle.
   ///
@@ -2582,6 +2828,18 @@ abstract class AppLocalizations {
   /// **'Il nome è obbligatorio'**
   String get creaSchedaNomeObbligatorio;
 
+  /// No description provided for @creaSchedaSupersetUnisci.
+  ///
+  /// In it, this message translates to:
+  /// **'Unisci in superset'**
+  String get creaSchedaSupersetUnisci;
+
+  /// No description provided for @creaSchedaSupersetUnito.
+  ///
+  /// In it, this message translates to:
+  /// **'Superset'**
+  String get creaSchedaSupersetUnito;
+
   /// No description provided for @creaProgrammaTitle.
   ///
   /// In it, this message translates to:
@@ -2666,6 +2924,12 @@ abstract class AppLocalizations {
   /// **'Volume: {volume} kg'**
   String storicoVolumeSessione(String volume);
 
+  /// No description provided for @storicoRpeMedio.
+  ///
+  /// In it, this message translates to:
+  /// **'RPE medio: {rpe}'**
+  String storicoRpeMedio(String rpe);
+
   /// No description provided for @overloadUltimaVolta.
   ///
   /// In it, this message translates to:
@@ -2695,6 +2959,114 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Stai progredendo da {weeks} settimane: valuta uno scarico a {kg} kg'**
   String overloadDeload(int weeks, String kg);
+
+  /// No description provided for @restTimerTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Recupero'**
+  String get restTimerTitle;
+
+  /// No description provided for @restTimerSalta.
+  ///
+  /// In it, this message translates to:
+  /// **'Salta'**
+  String get restTimerSalta;
+
+  /// No description provided for @restTimerSettingsTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Riposo di default tra le serie'**
+  String get restTimerSettingsTitle;
+
+  /// No description provided for @sessioneGuidataProgress.
+  ///
+  /// In it, this message translates to:
+  /// **'Esercizio {current}/{total}'**
+  String sessioneGuidataProgress(int current, int total);
+
+  /// No description provided for @sessioneGuidataPrecedente.
+  ///
+  /// In it, this message translates to:
+  /// **'Precedente'**
+  String get sessioneGuidataPrecedente;
+
+  /// No description provided for @sessioneGuidataSuccessivo.
+  ///
+  /// In it, this message translates to:
+  /// **'Successivo'**
+  String get sessioneGuidataSuccessivo;
+
+  /// No description provided for @sessioneGuidataTermina.
+  ///
+  /// In it, this message translates to:
+  /// **'Termina'**
+  String get sessioneGuidataTermina;
+
+  /// No description provided for @sessioneGuidataConferma.
+  ///
+  /// In it, this message translates to:
+  /// **'Conferma serie'**
+  String get sessioneGuidataConferma;
+
+  /// No description provided for @sessioneGuidataSuperset.
+  ///
+  /// In it, this message translates to:
+  /// **'SUPERSET'**
+  String get sessioneGuidataSuperset;
+
+  /// No description provided for @sessioneGuidataRiscaldamento.
+  ///
+  /// In it, this message translates to:
+  /// **'RISCALDAMENTO'**
+  String get sessioneGuidataRiscaldamento;
+
+  /// No description provided for @sessioneGuidataSaltaRiscaldamento.
+  ///
+  /// In it, this message translates to:
+  /// **'Salta riscaldamento'**
+  String get sessioneGuidataSaltaRiscaldamento;
+
+  /// No description provided for @sessioneGuidataRiscaldamentoSerieLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'Risc. {n}'**
+  String sessioneGuidataRiscaldamentoSerieLabel(int n);
+
+  /// No description provided for @sessioneRiepilogoTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Sessione completata'**
+  String get sessioneRiepilogoTitle;
+
+  /// No description provided for @sessioneRiepilogoKcal.
+  ///
+  /// In it, this message translates to:
+  /// **'{kcal} kcal stimate'**
+  String sessioneRiepilogoKcal(int kcal);
+
+  /// No description provided for @sessioneRiepilogoNuoviRecord.
+  ///
+  /// In it, this message translates to:
+  /// **'NUOVI RECORD PERSONALI'**
+  String get sessioneRiepilogoNuoviRecord;
+
+  /// No description provided for @sessioneRiepilogoNessunRecord.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessun nuovo record questa volta'**
+  String get sessioneRiepilogoNessunRecord;
+
+  /// No description provided for @sessioneRiepilogoRecordEsercizio.
+  ///
+  /// In it, this message translates to:
+  /// **'{esercizio}: {kg} kg'**
+  String sessioneRiepilogoRecordEsercizio(String esercizio, String kg);
+
+  /// No description provided for @sessioneRiepilogoChiudi.
+  ///
+  /// In it, this message translates to:
+  /// **'Fine'**
+  String get sessioneRiepilogoChiudi;
 }
 
 class _AppLocalizationsDelegate

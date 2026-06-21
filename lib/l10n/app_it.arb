@@ -39,6 +39,10 @@
   "@tourDiarioTitle": { "description": "Tour: titolo tab Diario" },
   "tourDiarioDesc": "Registra ogni pasto della giornata. Tocca il \"+\" in alto per aggiungere un alimento o scannerizza un barcode.",
   "@tourDiarioDesc": { "description": "Tour: descrizione tab Diario" },
+  "tourAllenamentoTitle": "Allenamento",
+  "@tourAllenamentoTitle": { "description": "Tour: titolo tab Allenamento" },
+  "tourAllenamentoDesc": "Registra i tuoi allenamenti, crea schede e programmi, e monitora il volume settimanale per gruppo muscolare.",
+  "@tourAllenamentoDesc": { "description": "Tour: descrizione tab Allenamento" },
   "tourProgressiTitle": "Progressi",
   "@tourProgressiTitle": { "description": "Tour: titolo tab Progressi" },
   "tourProgressiDesc": "Monitora il tuo peso nel tempo, guarda i badge guadagnati e il riepilogo settimanale.",
@@ -182,10 +186,18 @@
   "homeStreakGiorni": "{count} giorni di fila",
   "@homeStreakGiorni": { "placeholders": { "count": { "type": "String" } } },
   "homeStreakInizia": "Inizia oggi la tua streak",
+  "homeStreakAllenamentoGiorni": "{count} giorni di fila",
+  "@homeStreakAllenamentoGiorni": { "placeholders": { "count": { "type": "String" } } },
+  "homeStreakAllenamentoInizia": "Inizia oggi la tua streak allenamento",
   "homeBadge1KgPerso": "1° kg perso",
   "homeBadgeStreak7": "Streak 7gg",
   "homeBadge30Giorni": "30 giorni",
   "homeBadgeSettimanaTarget": "Settimana in target",
+  "homeBadgePrimaScheda": "Prima scheda",
+  "homeBadgeStreak7Allenamento": "7gg allenamento",
+  "homeBadgeNuovoPr": "Nuovo PR",
+  "homeBadge10Sessioni": "10 sessioni",
+  "homeBadge50Sessioni": "50 sessioni",
 
   "diarioTitolo": "DIARIO",
   "diarioTabPiano": "PIANO",
@@ -289,10 +301,14 @@
   "progressiTitolo": "PROGRESSI",
   "progressiTooltipEsporta": "Esporta PDF",
   "progressiTooltipStorico": "Storico misurazioni",
+  "progressiTooltipRecord": "I tuoi record",
+  "progressiTooltipVolume": "Volume settimanale",
   "progressiSezPeso": "PESO",
   "progressiSezDiario": "DIARIO",
   "progressiSezComposizione": "COMPOSIZIONE CORPOREA",
   "progressiSezMisurazioni": "MISURAZIONI",
+  "progressiSezAllenamenti": "ALLENAMENTI RECENTI",
+  "progressiNessunAllenamento": "Nessun allenamento",
   "progressiRange1A": "1A",
   "progressiRangeTutto": "Tutto",
   "progressiMassaGrassa": "Massa Grassa",
@@ -433,6 +449,11 @@
   "notifChannelMattinoDesc": "Riepilogo delle calorie di ieri",
   "notifChannelPesata": "Promemoria pesata",
   "notifChannelPesataDesc": "Ricordati di registrare il tuo peso",
+  "notifChannelRestTimer": "Timer di recupero",
+  "notifChannelRestTimerDesc": "Avviso a fine riposo tra le serie",
+  "notifRestTimerBody": "Riposo terminato — pronto per la prossima serie?",
+  "notifChannelWorkout": "Promemoria allenamento",
+  "notifChannelWorkoutDesc": "Ricordati di allenarti",
   "notifPastoBody": "Hai registrato {pasto}?",
   "@notifPastoBody": {
     "placeholders": { "pasto": { "type": "String" } }
@@ -466,6 +487,10 @@
   "@notifPesataBody": {
     "placeholders": { "days": { "type": "int" } }
   },
+  "notifWorkoutBody": "Non ti alleni da {days} giorni. Pronto a riprendere?",
+  "@notifWorkoutBody": {
+    "placeholders": { "days": { "type": "int" } }
+  },
 
   "pdfDiarioTitle": "Diario Alimentare",
   "pdfTargetLabel": "target",
@@ -491,6 +516,9 @@
   "@pdfGenerato": {
     "placeholders": { "created": { "type": "String" } }
   },
+  "pdfSchedaTitle": "Scheda Allenamento",
+  "pdfProgrammaTitle": "Programma di Allenamento",
+  "pdfStoricoTitle": "Storico Esercizio",
 
   "muscleGroupAll": "Tutti",
   "muscleGroupChest": "Petto",
@@ -533,6 +561,33 @@
   },
   "allenamentoEliminaTitle": "Eliminare l'esercizio?",
   "allenamentoEliminaSub": "L'esercizio e le serie registrate verranno rimossi.",
+  "allenamentoNotaTitle": "Nota sessione",
+  "allenamentoNotaHint": "Come è andata? Sensazioni, energia, dolori...",
+  "allenamentoSostituisci": "Sostituisci",
+  "allenamentoSostituisciTitle": "Sostituisci esercizio",
+  "allenamentoSostituisciVuoto": "Nessuna alternativa disponibile",
+  "allenamentoModifica": "Modifica",
+  "allenamentoEliminaGiornataTitle": "Eliminare la sessione?",
+  "allenamentoEliminaGiornataSub": "Tutti gli esercizi e la nota di questo giorno verranno rimossi.",
+  "allenamentoObiettivoSettimanale": "{done}/{target} questa settimana",
+  "@allenamentoObiettivoSettimanale": {
+    "placeholders": { "done": { "type": "int" }, "target": { "type": "int" } }
+  },
+  "obiettivoSettimanaleTitle": "Obiettivo settimanale",
+  "obiettivoSettimanaleGiorni": "{n} giorni",
+  "@obiettivoSettimanaleGiorni": {
+    "placeholders": { "n": { "type": "int" } }
+  },
+
+  "recordPersonaliTitle": "I tuoi record",
+  "recordPersonaliVuoto": "Nessun record ancora. Registra un allenamento per iniziare!",
+  "recordPersonaliKg": "{peso} kg",
+  "@recordPersonaliKg": { "placeholders": { "peso": { "type": "String" } } },
+
+  "volumeSettimanaleTitle": "Volume settimanale",
+  "volumeSettimanaleVuoto": "Nessun allenamento ancora questa settimana.",
+  "volumeSettimanaleTrascurato": "{gruppo} trascurato questa settimana",
+  "@volumeSettimanaleTrascurato": { "placeholders": { "gruppo": { "type": "String" } } },
 
   "serieDialogSerieLabel": "Serie {n}",
   "@serieDialogSerieLabel": {
@@ -540,6 +595,7 @@
   },
   "serieDialogRipHint": "rip",
   "serieDialogKgHint": "kg",
+  "serieDialogRpeLabel": "RPE",
   "serieDialogAggiungiSerie": "Aggiungi serie",
 
   "cardioDialogDurataLabel": "Durata (minuti)",
@@ -549,6 +605,7 @@
   "homeAttivitaKcalIngerite": "Kcal ingerite",
   "homeAttivitaKcalBruciate": "Kcal bruciate",
   "homeAttivitaBilancioNetto": "Bilancio netto",
+  "homeAttivitaKcalDisclaimer": "Stima indicativa, non un dato medico: basata sull'ultimo peso registrato (o 75 kg di default se non disponibile).",
 
   "schedeTitle": "Le mie schede",
   "schedeSezionePreimpostate": "Preimpostate",
@@ -574,6 +631,8 @@
   "creaSchedaAggiungiEsercizio": "Aggiungi esercizio",
   "creaSchedaNessunEsercizio": "Aggiungi almeno un esercizio",
   "creaSchedaNomeObbligatorio": "Il nome è obbligatorio",
+  "creaSchedaSupersetUnisci": "Unisci in superset",
+  "creaSchedaSupersetUnito": "Superset",
 
   "creaProgrammaTitle": "Nuovo programma",
   "creaProgrammaNomeLabel": "Nome programma",
@@ -595,6 +654,8 @@
   "storicoPrBadge": "PR",
   "storicoVolumeSessione": "Volume: {volume} kg",
   "@storicoVolumeSessione": { "placeholders": { "volume": { "type": "String" } } },
+  "storicoRpeMedio": "RPE medio: {rpe}",
+  "@storicoRpeMedio": { "placeholders": { "rpe": { "type": "String" } } },
 
   "overloadUltimaVolta": "Ultima volta: {detail}",
   "@overloadUltimaVolta": { "placeholders": { "detail": { "type": "String" } } },
@@ -607,5 +668,38 @@
   "overloadDeload": "Stai progredendo da {weeks} settimane: valuta uno scarico a {kg} kg",
   "@overloadDeload": {
     "placeholders": { "weeks": { "type": "int" }, "kg": { "type": "String" } }
-  }
+  },
+
+  "restTimerTitle": "Recupero",
+  "restTimerSalta": "Salta",
+  "restTimerSettingsTitle": "Riposo di default tra le serie",
+
+  "sessioneGuidataProgress": "Esercizio {current}/{total}",
+  "@sessioneGuidataProgress": {
+    "placeholders": { "current": { "type": "int" }, "total": { "type": "int" } }
+  },
+  "sessioneGuidataPrecedente": "Precedente",
+  "sessioneGuidataSuccessivo": "Successivo",
+  "sessioneGuidataTermina": "Termina",
+  "sessioneGuidataConferma": "Conferma serie",
+  "sessioneGuidataSuperset": "SUPERSET",
+  "sessioneGuidataRiscaldamento": "RISCALDAMENTO",
+  "sessioneGuidataSaltaRiscaldamento": "Salta riscaldamento",
+  "sessioneGuidataRiscaldamentoSerieLabel": "Risc. {n}",
+  "@sessioneGuidataRiscaldamentoSerieLabel": {
+    "placeholders": { "n": { "type": "int" } }
+  },
+
+  "sessioneRiepilogoTitle": "Sessione completata",
+  "sessioneRiepilogoKcal": "{kcal} kcal stimate",
+  "@sessioneRiepilogoKcal": {
+    "placeholders": { "kcal": { "type": "int" } }
+  },
+  "sessioneRiepilogoNuoviRecord": "NUOVI RECORD PERSONALI",
+  "sessioneRiepilogoNessunRecord": "Nessun nuovo record questa volta",
+  "sessioneRiepilogoRecordEsercizio": "{esercizio}: {kg} kg",
+  "@sessioneRiepilogoRecordEsercizio": {
+    "placeholders": { "esercizio": { "type": "String" }, "kg": { "type": "String" } }
+  },
+  "sessioneRiepilogoChiudi": "Fine"
 }

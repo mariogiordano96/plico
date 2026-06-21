@@ -4,29 +4,43 @@ import '../../models/exercise_definition.dart';
 import '../../models/workout_exercise.dart';
 
 /// Mostra il dialog di log durata per un esercizio cardio.
+/// Se [initial] è fornito (Fase 14, modifica di un esercizio già loggato), il
+/// dialog pre-compila la durata esistente e ritorna la stessa istanza
+/// aggiornata (stesso `Id`) invece di crearne una nuova.
 /// Ritorna il WorkoutExercise compilato, o null se annullato.
 Future<WorkoutExercise?> showLogCardioDialog(
   BuildContext context,
-  ExerciseDefinition exercise,
-) {
+  ExerciseDefinition exercise, {
+  WorkoutExercise? initial,
+}) {
   return showModalBottomSheet<WorkoutExercise>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => _LogCardioDialog(exercise: exercise),
+    builder: (_) => _LogCardioDialog(exercise: exercise, initial: initial),
   );
 }
 
 class _LogCardioDialog extends StatefulWidget {
   final ExerciseDefinition exercise;
-  const _LogCardioDialog({required this.exercise});
+  final WorkoutExercise? initial;
+  const _LogCardioDialog({required this.exercise, this.initial});
 
   @override
   State<_LogCardioDialog> createState() => _LogCardioDialogState();
 }
 
 class _LogCardioDialogState extends State<_LogCardioDialog> {
-  final _durataCtrl = TextEditingController();
+  late final TextEditingController _durataCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    final minutes = widget.initial?.durationSeconds != null
+        ? (widget.initial!.durationSeconds! ~/ 60).toString()
+        : '';
+    _durataCtrl = TextEditingController(text: minutes);
+  }
 
   @override
   void dispose() {
@@ -38,11 +52,12 @@ class _LogCardioDialogState extends State<_LogCardioDialog> {
     final minuti = int.tryParse(_durataCtrl.text);
     if (minuti == null || minuti <= 0) return;
 
-    final result = WorkoutExercise()
-      ..exerciseId = widget.exercise.externalId
-      ..exerciseName = widget.exercise.nameIt ?? widget.exercise.name
-      ..date = DateTime.now()
-      ..durationSeconds = minuti * 60;
+    final result = widget.initial ??
+        (WorkoutExercise()
+          ..exerciseId = widget.exercise.externalId
+          ..exerciseName = widget.exercise.nameIt ?? widget.exercise.name
+          ..date = DateTime.now());
+    result.durationSeconds = minuti * 60;
     Navigator.pop(context, result);
   }
 

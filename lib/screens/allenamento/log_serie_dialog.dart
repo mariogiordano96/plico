@@ -8,12 +8,16 @@ import '../../services/workout_progress_service.dart';
 /// Mostra il dialog di log serie per un esercizio di forza. Se [lastSession] è
 /// disponibile, mostra il suggerimento di progressive overload (o di scarico, se
 /// [suggestion] ha `isDeload = true`) e pre-compila la prima serie.
+/// Se [initial] è fornito (Fase 14, modifica di un esercizio già loggato), il
+/// dialog pre-compila le serie esistenti e ritorna la stessa istanza aggiornata
+/// (stesso `Id`) invece di crearne una nuova.
 /// Ritorna il WorkoutExercise compilato, o null se annullato.
 Future<WorkoutExercise?> showLogSerieDialog(
   BuildContext context,
   ExerciseDefinition exercise, {
   WorkoutExercise? lastSession,
   OverloadSuggestion? suggestion,
+  WorkoutExercise? initial,
 }) {
   return showModalBottomSheet<WorkoutExercise>(
     context: context,
@@ -23,6 +27,7 @@ Future<WorkoutExercise?> showLogSerieDialog(
       exercise: exercise,
       lastSession: lastSession,
       suggestion: suggestion,
+      initial: initial,
     ),
   );
 }
@@ -31,7 +36,13 @@ class _LogSerieDialog extends StatefulWidget {
   final ExerciseDefinition exercise;
   final WorkoutExercise? lastSession;
   final OverloadSuggestion? suggestion;
-  const _LogSerieDialog({required this.exercise, this.lastSession, this.suggestion});
+  final WorkoutExercise? initial;
+  const _LogSerieDialog({
+    required this.exercise,
+    this.lastSession,
+    this.suggestion,
+    this.initial,
+  });
 
   @override
   State<_LogSerieDialog> createState() => _LogSerieDialogState();
@@ -40,10 +51,20 @@ class _LogSerieDialog extends StatefulWidget {
 class _LogSerieDialogState extends State<_LogSerieDialog> {
   final List<TextEditingController> _repsCtrls = [];
   final List<TextEditingController> _kgCtrls = [];
+  final List<int?> _rpeValues = [];
 
   @override
   void initState() {
     super.initState();
+    final initial = widget.initial;
+    if (initial != null && initial.sets.isNotEmpty) {
+      for (final set in initial.sets) {
+        _repsCtrls.add(TextEditingController(text: set.reps?.toString() ?? ''));
+        _kgCtrls.add(TextEditingController(text: set.weightKg?.toString() ?? ''));
+        _rpeValues.add(set.rpe);
+      }
+      return;
+    }
     _addSerie();
     final s = widget.suggestion;
     if (s != null) {
@@ -67,6 +88,7 @@ class _LogSerieDialogState extends State<_LogSerieDialog> {
     setState(() {
       _repsCtrls.add(TextEditingController());
       _kgCtrls.add(TextEditingController());
+      _rpeValues.add(null);
     });
   }
 
@@ -74,6 +96,7 @@ class _LogSerieDialogState extends State<_LogSerieDialog> {
     setState(() {
       _repsCtrls.removeAt(i).dispose();
       _kgCtrls.removeAt(i).dispose();
+      _rpeValues.removeAt(i);
     });
   }
 
@@ -85,15 +108,17 @@ class _LogSerieDialogState extends State<_LogSerieDialog> {
       if (reps == null && kg == null) continue;
       sets.add(WorkoutSet()
         ..reps = reps
-        ..weightKg = kg);
+        ..weightKg = kg
+        ..rpe = _rpeValues[i]);
     }
     if (sets.isEmpty) return;
 
-    final result = WorkoutExercise()
-      ..exerciseId = widget.exercise.externalId
-      ..exerciseName = widget.exercise.nameIt ?? widget.exercise.name
-      ..date = DateTime.now()
-      ..sets = sets;
+    final result = widget.initial ??
+        (WorkoutExercise()
+          ..exerciseId = widget.exercise.externalId
+          ..exerciseName = widget.exercise.nameIt ?? widget.exercise.name
+          ..date = DateTime.now());
+    result.sets = sets;
     Navigator.pop(context, result);
   }
 
@@ -125,19 +150,33 @@ class _LogSerieDialogState extends State<_LogSerieDialog> {
             for (var i = 0; i < _repsCtrls.length; i++)
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(
-                      width: 70,
-                      child: Text(l10n.serieDialogSerieLabel(i + 1),
-                          style: TextStyle(color: p.textMuted, fontSize: 13)),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 70,
+                          child: Text(l10n.serieDialogSerieLabel(i + 1),
+                              style: TextStyle(color: p.textMuted, fontSize: 13)),
+                        ),
+                        Expanded(child: _NumberField(controller: _repsCtrls[i], hint: l10n.serieDialogRipHint, p: p)),
+                        const SizedBox(width: 10),
+                        Expanded(child: _NumberField(controller: _kgCtrls[i], hint: l10n.serieDialogKgHint, p: p)),
+                        IconButton(
+                          onPressed: _repsCtrls.length > 1 ? () => _removeSerie(i) : null,
+                          icon: Icon(Icons.close_rounded, color: p.textMuted, size: 18),
+                        ),
+                      ],
                     ),
-                    Expanded(child: _NumberField(controller: _repsCtrls[i], hint: l10n.serieDialogRipHint, p: p)),
-                    const SizedBox(width: 10),
-                    Expanded(child: _NumberField(controller: _kgCtrls[i], hint: l10n.serieDialogKgHint, p: p)),
-                    IconButton(
-                      onPressed: _repsCtrls.length > 1 ? () => _removeSerie(i) : null,
-                      icon: Icon(Icons.close_rounded, color: p.textMuted, size: 18),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 70),
+                      child: _RpeSelector(
+                        value: _rpeValues[i],
+                        p: p,
+                        label: l10n.serieDialogRpeLabel,
+                        onChanged: (v) => setState(() => _rpeValues[i] = v),
+                      ),
                     ),
                   ],
                 ),
@@ -222,6 +261,61 @@ class _OverloadBanner extends StatelessWidget {
 
     if (lines.isEmpty) return const SizedBox.shrink();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: lines);
+  }
+}
+
+class _RpeSelector extends StatelessWidget {
+  final int? value;
+  final String label;
+  final ColorPalette p;
+  final ValueChanged<int?> onChanged;
+
+  const _RpeSelector({
+    required this.value,
+    required this.label,
+    required this.p,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 30,
+      child: Row(
+        children: [
+          Text(label, style: TextStyle(color: p.textMuted, fontSize: 11)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: 10,
+              separatorBuilder: (_, _) => const SizedBox(width: 6),
+              itemBuilder: (_, idx) {
+                final n = idx + 1;
+                final selected = value == n;
+                return GestureDetector(
+                  onTap: () => onChanged(selected ? null : n),
+                  child: Container(
+                    width: 26,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: selected ? p.accent : p.surface,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: selected ? p.accent : p.cardBorder),
+                    ),
+                    child: Text('$n',
+                        style: TextStyle(
+                            color: selected ? p.background : p.textMuted,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600)),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

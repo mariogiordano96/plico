@@ -1,10 +1,12 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:printing/printing.dart';
 import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/workout_exercise.dart';
 import '../../services/database_service.dart';
+import '../../services/pdf_export_service.dart';
 import '../../services/workout_progress_service.dart';
 
 class StoricoEsercizioScreen extends StatefulWidget {
@@ -38,6 +40,54 @@ class _StoricoEsercizioScreenState extends State<StoricoEsercizioScreen> {
     });
   }
 
+  Future<void> _exportPdf() async {
+    final l10n = context.l10n;
+    final locale = Localizations.localeOf(context).toString();
+    try {
+      final bytes = await PdfExportService.generateStoricoEsercizio(
+        exerciseName: widget.exerciseName,
+        history: _history,
+        strings: PdfStrings(
+          diarioTitle: l10n.pdfDiarioTitle,
+          targetLabel: l10n.pdfTargetLabel,
+          kcalGiornoUnit: l10n.tdeeKcalGiornoUnit,
+          footerPage: l10n.pdfPagina,
+          nessunoRegistrato: l10n.pdfNessunDato,
+          pastoFallback: l10n.pdfPastoFallback,
+          pastoLabels: [
+            l10n.pastoColazione, l10n.pastoPranzo, l10n.pastoCena,
+            l10n.pastoSpuntino, l10n.pastoPostWo, l10n.pastoSpuntinoSerale,
+          ],
+          riepilogo: l10n.pdfRiepilogo,
+          giorniConDati: l10n.pdfGiorniConDati,
+          giorniOnTarget: l10n.pdfGiorniOnTarget,
+          mediaLabel: l10n.pdfMediaLabel,
+          targetPrefixLabel: l10n.pdfTargetPrefix,
+          pianoTitle: l10n.pdfPianoTitle,
+          generato: l10n.pdfGenerato,
+          pianoSlotLabels: [
+            l10n.slotProteina, l10n.slotCarboidrati, l10n.slotVerdura,
+            l10n.slotGrassi, l10n.slotExtra, l10n.slotFrutta,
+          ],
+          schedaPdfTitle: l10n.pdfSchedaTitle,
+          programmaPdfTitle: l10n.pdfProgrammaTitle,
+          storicoPdfTitle: l10n.pdfStoricoTitle,
+          nEsercizi: l10n.schedeNEsercizi,
+          nessunaSessione: l10n.storicoNessunaSessione,
+          prBadge: l10n.storicoPrBadge,
+          durataMin: l10n.allenamentoDurataMin,
+        ),
+        locale: locale,
+      );
+      await Printing.sharePdf(bytes: bytes, filename: 'plico_storico_esercizio.pdf');
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.pianoErrorePdf)),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
@@ -52,6 +102,14 @@ class _StoricoEsercizioScreenState extends State<StoricoEsercizioScreen> {
         backgroundColor: p.background,
         elevation: 0,
         iconTheme: IconThemeData(color: p.accent),
+        actions: [
+          if (_history.isNotEmpty)
+            IconButton(
+              onPressed: _exportPdf,
+              icon: Icon(Icons.picture_as_pdf_outlined, color: p.accent),
+              tooltip: l10n.pianoEsportaPdf,
+            ),
+        ],
       ),
       body: _loading
           ? Center(child: CircularProgressIndicator(color: p.accent))
@@ -165,6 +223,7 @@ class _SessionRow extends StatelessWidget {
     final detail = isCardio
         ? l10n.allenamentoDurataMin(session.durationSeconds! ~/ 60)
         : session.sets.map((s) => '${s.reps ?? '-'}×${s.weightKg ?? '-'}kg').join(', ');
+    final avgRpe = isCardio ? null : WorkoutProgressService.averageRpe(session);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -181,8 +240,18 @@ class _SessionRow extends StatelessWidget {
             child: Text(dataLabel, style: TextStyle(color: p.textMuted, fontSize: 12)),
           ),
           Expanded(
-            child: Text(detail,
-                style: TextStyle(color: p.textPrimary, fontSize: 13)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(detail, style: TextStyle(color: p.textPrimary, fontSize: 13)),
+                if (avgRpe != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(l10n.storicoRpeMedio(avgRpe.toStringAsFixed(1)),
+                        style: TextStyle(color: p.textMuted, fontSize: 11)),
+                  ),
+              ],
+            ),
           ),
           if (isPr)
             Container(

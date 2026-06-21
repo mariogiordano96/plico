@@ -281,8 +281,8 @@ durata_stimata_ora = (numero_serie_di_lavoro × 2.5 min) / 60
 Il peso corporeo usato è l'ultimo `BodySnapshot.pesoKg` registrato; se assente, default
 75 kg (`CalorieEstimationService.defaultBodyWeightKg`).
 
-> La stima resta puramente indicativa, su entrambe le formule. Disclaimer in UI: Fase 20
-> (Rifinitura) — non ancora mostrato.
+> La stima resta puramente indicativa, su entrambe le formule. Disclaimer in UI: aggiunto
+> in Fase 20 (Rifinitura), sotto la card "Attività" in `home_screen.dart`.
 
 ### Integrazione in Home ✅ implementata
 
@@ -1438,84 +1438,466 @@ posizionamento/stile già visto in Progressi.
 - [x] Verificato: `flutter analyze` pulito; 11 test sulle metriche/overload/deload/PR/
       esclusione riscaldamento; test di integrazione storico→suggerimento→nuovo PR
 
-### Fase 8 — Modalità esecuzione guidata + timer di recupero
-- [ ] Campo `restSeconds` già su `WorkoutTemplateExercise`/`WorkoutExercise` (da Fase 4/6)
-- [ ] Schermata sessione attiva: navigazione esercizio per esercizio (avanti/indietro,
-      rispetta `supersetGroupId`), indicatore di avanzamento
-- [ ] Pre-compilazione serie con suggerimento progressive overload (⬆️/➡️/⬇️, da Fase 7)
-- [ ] Widget countdown di recupero con vibrazione/suono a fine riposo, avvio automatico
-      a fine esercizio/blocco superset
-- [ ] Default riposo configurabile nelle impostazioni
-- [ ] Persistenza del timer in background durante il cambio schermata
-- [ ] Riepilogo di fine sessione (kcal stimate, PR raggiunti)
+### Fase 8 — Modalità esecuzione guidata + timer di recupero ✅ completata
+- [x] Campo `restSeconds` già su `WorkoutTemplateExercise`/`WorkoutExercise` (da Fase 4/6)
+- [x] Schermata sessione attiva (`SessioneGuidataScreen`): navigazione esercizio per
+      esercizio (avanti/indietro liberi, non bloccati dalla conferma delle serie), gli
+      step rispettano `supersetGroupId` (`GuidedSessionService.groupSteps`, esercizi
+      consecutivi con lo stesso gruppo formano un solo step/superset), indicatore di
+      avanzamento "Esercizio N/M" in AppBar
+- [x] Pre-compilazione serie con suggerimento progressive overload (⬆️/➡️/⬇️/💡 scarico,
+      da Fase 7), stessa logica `WorkoutProgressService` usata nel log manuale
+- [x] `RestTimerSheet` (bottom sheet non dismissibile): countdown, vibrazione
+      (`HapticFeedback.heavyImpact`) + suono di sistema (`SystemSound.play`) a fine
+      riposo — nessuna nuova dipendenza, riusate le API native di Flutter — avvio
+      automatico dopo ogni serie confermata (`_confirmSerie`/`_confirmCardio`)
+- [x] Default riposo configurabile: `AppSettings.restTimerDefaultSeconds`, dialog
+      dedicato (`RestTimerSettingsDialog`) apribile dall'icona ⏱️ in `AllenamentoScreen`
+- [x] Persistenza del timer in background: `NotificationService.scheduleRestTimer`
+      programma una notifica locale one-shot a fine riposo (riusa
+      `flutter_local_notifications`, già usato per i promemoria pasti), cancellata se il
+      riposo viene saltato/modificato o termina mentre il sheet è ancora aperto
+- [x] `SessioneRiepilogoScreen` a fine sessione: kcal totali stimate
+      (`GuidedSessionService.totalEstimatedKcal`) e nuovi record personali
+      (`GuidedSessionService.newPersonalRecords`, esclude i cardio)
+- [x] Verificato: `flutter analyze` pulito; 7 test temporanei su `GuidedSessionService`
+      (raggruppamento step/superset, somma kcal, individuazione PR escludendo i cardio),
+      rimossi dopo la verifica per restare coerenti con le fasi precedenti
 
-### Fase 9 — Note di sessione e RPE
-- [ ] Campo `note` su `WorkoutLog` (da Fase 4), UI riuso pattern `body_snapshot`/diario
-- [ ] Campo `rpe` su `WorkoutSet` (da Fase 4), selettore 1-10 nel dialog log serie
-- [ ] RPE medio di sessione nella schermata Storico esercizio
+> **Correzione rispetto al piano originale**: il timer di recupero parte dopo OGNI
+> serie confermata (non solo a fine esercizio/blocco), in linea con la sezione
+> "Timer di recupero tra le serie" del piano ("Dopo aver loggato una serie...").
+> Il blocco superset (timer solo a fine blocco, navigazione bloccata sul gruppo) resta
+> previsto per la Fase 12; qui i superset sono raggruppati solo come step visivi.
+>
+> **Correzione rispetto al piano originale**: `startWorkoutFromTemplate` (Fase 6)
+> persiste già il `WorkoutExercise` della sessione in corso prima che la modalità
+> guidata si apra, quindi `getHistoryForExercise` includerebbe la sessione corrente
+> stessa nello storico usato per il suggerimento di overload. `SessioneGuidataScreen`
+> esclude esplicitamente l'id della sessione corrente dallo storico recuperato
+> (`_priorHistoryByExerciseId`), che viene anche passato al riepilogo per il calcolo dei
+> PR (altrimenti ogni sessione risulterebbe banalmente un "nuovo record" rispetto a se
+> stessa).
 
-### Fase 10 — Reminder allenamento
-- [ ] Nuova voce "Promemoria allenamento" in `notifiche_screen.dart`
-- [ ] Check giorni di inattività riusando `notification_service`
-- [ ] Testo notifica localizzato (coerente con i18n già completata)
+### Fase 9 — Note di sessione e RPE ✅ completata
+- [x] Campo `note` su `WorkoutLog` (da Fase 4): icona dedicata nell'AppBar di
+      `AllenamentoScreen` (`_editNota`) apre un bottom sheet con `TextField`
+      multilinea, stesso pattern di `add_pesata_screen.dart`; la nota del
+      giorno, se presente, è mostrata anche come banner sopra la lista
+      esercizi (`DatabaseService.getWorkoutLog`/`setWorkoutNote`, già da Fase 4)
+- [x] Campo `rpe` su `WorkoutSet` (da Fase 4): selettore 1-10 a chip
+      orizzontali scorrevoli (`_RpeSelector`) sotto ogni riga serie nel
+      dialog log serie (`log_serie_dialog.dart`)
+- [x] RPE medio di sessione nella schermata Storico esercizio:
+      `WorkoutProgressService.averageRpe` (nuovo metodo, esclude le serie di
+      riscaldamento) mostrato come sottotitolo in `_SessionRow`
+      (`storico_esercizio_screen.dart`)
+- [x] Verificato: `flutter analyze` pulito (21 issue pre-esistenti, 0 nuove);
+      3 test temporanei su `WorkoutProgressService.averageRpe` rimossi dopo
+      la verifica per restare coerenti con le fasi precedenti
 
-### Fase 11 — Streak e achievement allenamento
-- [ ] Estendere `streak_service` con streak basata su `WorkoutLog` registrati
-- [ ] Nuovi achievement in `achievement.dart` (prima scheda, 7 di fila, nuovo PR, 10/50 sessioni)
-- [ ] Hook PR → `achievement_service` al salvataggio di `WorkoutExercise`
+> **Correzione rispetto al piano originale**: il selettore RPE è stato aggiunto
+> solo nel dialog log serie (`log_serie_dialog.dart`), come indicato dal piano,
+> e non anche nella modalità esecuzione guidata (Fase 8) per mantenere lo
+> scope di questa fase circoscritto a quanto descritto in checklist.
 
-### Fase 12 — Superset / circuiti
-- [ ] Campo `supersetGroupId` già su `WorkoutTemplateExercise`/`WorkoutExercise` (da Fase 4/6)
-- [ ] UI raggruppamento esercizi in creazione scheda
-- [ ] UI blocco superset durante il log + timer di recupero solo a fine blocco
-- [ ] Aggiornare il preset Circuito Cardio/HIIT per usare un singolo superset
+### Fase 10 — Reminder allenamento ✅ completata
+- [x] Nuova voce "Promemoria allenamento" in `notifiche_screen.dart`
+      (`_workoutReminderCard`, toggle `AppSettings.notWorkoutAttiva`),
+      coerente con lo stile esistente della schermata (stringhe hardcoded
+      in italiano, non tradotta — come il resto del file)
+- [x] Check giorni di inattività riusando `notification_service`:
+      `NotificationService.refreshWorkoutReminder`/`scheduleWorkoutReminder`,
+      stesso pattern di `refreshWeighInReminder` (soglia 3 giorni, basata su
+      `DatabaseService.getLastWorkoutDate`, nuovo metodo che legge l'ultima
+      `WorkoutLog.date`); richiamato all'avvio (`main.dart`) e al resume
+      dell'app, oltre che al toggle dalla UI
+- [x] Testo notifica localizzato: nuove chiavi `notifChannelWorkout`,
+      `notifChannelWorkoutDesc`, `notifWorkoutBody` in `app_it.arb`/`app_en.arb`
+- [x] Verificato: `flutter analyze` pulito (21 issue pre-esistenti, 0 nuove);
+      nessun nuovo test temporaneo (la logica di soglia giorni è analoga a
+      quella già non testata di `refreshWeighInReminder`, accoppiata a Isar
+      e al plugin di notifiche)
+
+### Fase 11 — Streak e achievement allenamento ✅ completata
+- [x] Streak allenamento in `streak_service.dart`: `currentWorkoutStreak`/
+      `watchCurrentWorkoutStreak`, riusano la stessa `_streakFromLoggedDays`
+      della streak diario ma sui "giorni allenati" (nuovi metodi
+      `DatabaseService.getWorkoutDaysRange`/`watchWorkoutDays`, basati su
+      `WorkoutExercise.date` e non su `WorkoutLog`, perché un `WorkoutLog` può
+      esistere con sola nota e senza esercizi — vedi correzione sotto)
+- [x] 5 nuovi `AchievementType` in `achievement.dart`: `firstWorkout`,
+      `workoutStreak7`, `newWorkoutPr`, `workoutSessions10`,
+      `workoutSessions50` (lo storage è una stringa via `.name`, quindi
+      nessuna migrazione necessaria); nuovo
+      `DatabaseService.getTotalWorkoutSessionsCount` (giorni distinti con
+      almeno un `WorkoutExercise`) per i check "prima scheda"/"10/50 sessioni"
+      in `achievement_service.dart`
+- [x] Hook "nuovo PR" → `AchievementService.checkAll(hasNewWorkoutPr: ...)`
+      (nuovo parametro opzionale): da `allenamento_screen.dart` dopo
+      `addWorkoutExercise` (confronto con lo storico già recuperato per il
+      suggerimento di sovraccarico) e da `sessione_guidata_screen.dart`
+      `_termina()`, riusando `GuidedSessionService.newPersonalRecords` già
+      calcolato per il riepilogo di sessione — un solo check a fine sessione
+      guidata, non ad ogni serie confermata
+- [x] UI: card streak in `home_screen.dart` (`_StreakCard`) estesa con una
+      seconda riga "ALLENAMENTO" (icona `fitness_center`) accanto alla streak
+      diario esistente; riga badge passata da `Row(spaceBetween)` a `Wrap`
+      per ospitare i 9 traguardi totali senza overflow (`_BadgeIcon` da
+      `Expanded` a `SizedBox(width: 60)`)
+- [x] Verificato: `flutter analyze` pulito (21 issue pre-esistenti, 0 nuove);
+      nessun nuovo test temporaneo — la logica nuova è interamente
+      orchestrazione DB (`StreakService`/`AchievementService`), la logica pura
+      riusata (`_streakFromLoggedDays`, `WorkoutProgressService.isNewPersonalRecord`)
+      non è cambiata
+
+> **Correzione rispetto al piano originale**: la streak allenamento è basata
+> sui giorni con almeno un `WorkoutExercise` registrato, non sulla semplice
+> esistenza di un `WorkoutLog` come indicato letteralmente dal piano —
+> `WorkoutLog` può esistere anche con sola nota (Fase 9) senza alcun esercizio
+> loggato, il che renderebbe la streak falsabile senza allenarsi davvero.
+
+### Fase 12 — Superset / circuiti ✅ completata
+- [x] Campo `supersetGroupId` già su `WorkoutTemplateExercise`/`WorkoutExercise`
+      (da Fase 4/6): confermato presente su entrambi i modelli, e già copiato
+      da `startWorkoutFromTemplate` (`database_service.dart`) dal template
+      al `WorkoutExercise` del giorno — nessuna modifica necessaria lì
+- [x] UI raggruppamento esercizi in `crea_scheda_screen.dart`: pulsante
+      "link/unlink" (`_SupersetConnector`) tra una riga esercizio e la
+      precedente per unirle/separarle in un gruppo; `_EsercizioRow` mostra
+      un'icona e un bordo evidenziato quando l'esercizio è in un gruppo.
+      I gruppi sono sempre per costruzione esercizi consecutivi (si può solo
+      unire al precedente), coerente con `GuidedSessionService.groupSteps`;
+      `_normalizeGroups` azzera i gruppi rimasti con un solo membro dopo
+      un'eliminazione
+- [x] UI blocco superset durante il log: in `sessione_guidata_screen.dart`,
+      etichetta "SUPERSET" sopra le card quando lo step corrente ha più di
+      un esercizio (i.e. blocco); stessa etichetta come indicatore visivo
+      (non interattivo) anche nella lista piatta di `allenamento_screen.dart`,
+      per coerenza quando gli esercizi del giorno provengono da una scheda
+      con superset ma sono visti fuori dalla modalità guidata
+- [x] Timer di recupero solo a fine blocco: nuovo `_isLastInStep` in
+      `sessione_guidata_screen.dart` — `_confirmSerie`/`_confirmCardio`
+      mostrano il timer di riposo solo se l'esercizio è l'ultimo dello step
+      corrente (gli esercizi singoli, non in superset, mantengono il
+      comportamento originale: riposo dopo ogni serie)
+- [x] Preset "Circuito Cardio/HIIT" aggiornato in `workout_presets.json`:
+      tutti i 5 esercizi condividono `supersetGroupId: 1`, `restSeconds: 120`
+      solo sull'ultimo (Burpee) per il riposo tra round del circuito
+- [x] Verificato: `flutter analyze` pulito (21 issue pre-esistenti, 0 nuove);
+      nessun nuovo test temporaneo — la logica nuova è UI/stato di schermata
+      (`_toggleSuperset`/`_normalizeGroups`/`_isLastInStep`), non logica pura
+      isolabile senza inizializzare il widget
+
+> **Correzione rispetto al piano originale**: i preset seedati una volta
+> (`workoutPresetsSeeded`) non vengono ri-seedati automaticamente sugli
+> installi esistenti — limite pre-esistente del meccanismo di seeding, non
+> specifico di questa fase; le installazioni nuove ottengono il preset
+> Circuito Cardio/HIIT già a superset unico.
 
 ### Fase 13 — Sostituzione esercizio al volo
-- [ ] Campo `mechanic` su `ExerciseDefinition` (da Fase 1, già nel JSON sorgente)
-- [ ] `getAlternatives(exerciseId)` con ranking per `muscleGroup`/`mechanic`/`equipment`
-- [ ] UI "Sostituisci esercizio" da modalità guidata e da lista del giorno
-- [ ] Sostituzione limitata al `WorkoutExercise` della sessione (scheda salvata invariata)
+- [x] Campo `mechanic` su `ExerciseDefinition` (da Fase 1, già nel JSON sorgente)
+- [x] `getAlternatives(exerciseId)` con ranking per `muscleGroup`/`mechanic`/`equipment`
+  - `DatabaseService.getAlternatives` recupera l'`ExerciseDefinition` sorgente per
+    `externalId` e delega il ranking a `ExerciseAlternativesService.rank`
+    (`lib/services/exercise_alternatives_service.dart`), nuovo servizio puro senza
+    accesso a Isar: filtro rigido per `muscleGroup` uguale (esclude l'esercizio
+    sorgente), poi punteggio decrescente per `mechanic` uguale (+2) ed `equipment`
+    uguale (+1).
+- [x] UI "Sostituisci esercizio" da modalità guidata e da lista del giorno
+  - Nuovo bottom sheet condiviso `showSostituisciEsercizioSheet` in
+    `lib/screens/allenamento/sostituisci_esercizio_sheet.dart`: mostra le
+    alternative già ordinate (niente ricerca/filtri, scelta rapida durante
+    l'allenamento) e ritorna l'`ExerciseDefinition` scelto.
+  - `allenamento_screen.dart`: `_ExerciseCard` ha ora un `PopupMenuButton`
+    ("Sostituisci"/"Elimina") al posto del solo pulsante elimina.
+  - `sessione_guidata_screen.dart`: `_ExerciseStepCard` ha un'icona
+    `swap_horiz` accanto al nome esercizio.
+- [x] Sostituzione limitata al `WorkoutExercise` della sessione (scheda salvata invariata)
+  - In entrambi i punti di ingresso, `_sostituisci` muta in place il
+    `WorkoutExercise` esistente (stesso `Id`: `exerciseId`/`exerciseName`
+    aggiornati, serie/durata mantenute invariate) e richiama
+    `updateWorkoutExercise` — non viene mai toccato `WorkoutTemplate`/
+    `WorkoutTemplateExercise`, quindi la scheda salvata resta invariata.
+  - Le kcal stimate vengono ricalcolate sul nuovo esercizio (MET cardio o
+    conteggio serie per la forza); in modalità guidata viene anche
+    ricalcolato il suggerimento di overload sullo storico del nuovo
+    `exerciseId` (o azzerato se non c'è storico), così il box suggerimento
+    non mostra dati relativi all'esercizio precedente.
+
+> **Nota implementativa**: il filtro per `muscleGroup` uguale separa già
+> naturalmente cardio (gruppo `cardio`) da forza, quindi la sostituzione non
+> può mai cambiare la "forma" dell'esercizio (serie↔durata) — non è stato
+> necessario gestire un mapping cardio/forza incrociato.
 
 ### Fase 14 — Modifica e cancellazione log passato
-- [ ] Cronologia/selettore data per navigare ai `WorkoutLog` passati
-- [ ] UI modifica serie/esercizi e cancellazione esercizio singolo
-- [ ] Cancellazione intero `WorkoutLog` con conferma
-- [ ] Verifica che storico/PR/streak/achievement si ricalcolino correttamente a runtime
+- [x] Cronologia/selettore data per navigare ai `WorkoutLog` passati
+  - `AllenamentoScreen` non è più ancorata a "oggi": lo stato `_data`
+    (default oggi) sostituisce il precedente campo `_oggi` fisso, con un
+    nuovo widget `_DateNav` (freccia avanti/indietro, etichetta "Oggi"/"Ieri"
+    o giorno/mese abbreviato) che ricalca lo stesso pattern già usato in
+    `diario_screen.dart` (`_DateNav`/`_formatDate`), per coerenza con il resto
+    dell'app. La freccia avanti è disabilitata quando `_data` è oggi (non si
+    naviga nel futuro).
+- [x] UI modifica serie/esercizi e cancellazione esercizio singolo
+  - `_ExerciseCard` ora espone un `PopupMenuButton` con tre azioni:
+    "Modifica", "Sostituisci" (Fase 13) ed "Elimina" (già esistente).
+  - "Modifica" riusa `showLogSerieDialog`/`showLogCardioDialog` (estesi con
+    un nuovo parametro opzionale `initial`): se fornito, il dialog
+    precompila i campi con i dati esistenti e, al salvataggio, aggiorna la
+    stessa istanza `WorkoutExercise` (stesso `Id`) invece di crearne una
+    nuova — `allenamento_screen.dart` ricalcola poi `estimatedKcal`/`met` e
+    chiama `updateWorkoutExercise`.
+- [x] Cancellazione intero `WorkoutLog` con conferma
+  - `DatabaseService.deleteWorkoutLog(date)` esisteva già (introdotto in una
+    fase precedente) e cancella sia tutti i `WorkoutExercise` del giorno sia
+    il `WorkoutLog`/nota; aggiunta solo l'azione UI: icona nell'AppBar con
+    dialog di conferma (`allenamentoEliminaGiornataTitle`/`Sub`).
+- [x] Verifica che storico/PR/streak/achievement si ricalcolino correttamente a runtime
       dopo una modifica (nessuno stato derivato persistito da invalidare manualmente)
+  - Confermato per ispezione: `StreakService`/`AchievementService` non
+    mantengono alcun campo "ultimo valore calcolato" — ogni chiamata
+    (`currentWorkoutStreak`, `checkAll`, gli stream `watch*`) interroga Isar
+    dal vivo, quindi modificare o cancellare un `WorkoutExercise` di un
+    giorno passato si riflette automaticamente su storico/streak/badge senza
+    bisogno di invalidazione manuale.
 
-### Fase 15 — Riscaldamento
-- [ ] Campo `isWarmup` su `WorkoutSet` (da Fase 4)
-- [ ] `suggestWarmupSets(targetWeightKg)` con soglia configurabile
-- [ ] Step preliminare nella modalità guidata, saltabile
-- [ ] Esclusione delle serie di riscaldamento da volume/PR/1RM/overload (Fase 7)
+> **Nota implementativa**: l'aggiunta di un nuovo esercizio (FAB "Aggiungi
+> esercizio") resta disponibile anche sui giorni passati, dato che
+> `_aggiungiEsercizio` già scrive su `_data` (il giorno selezionato, non più
+> "oggi" fisso) — utile per registrare a posteriori un esercizio dimenticato,
+> senza bisogno di nascondere il FAB sui giorni precedenti.
 
-### Fase 16 — Obiettivo settimanale di allenamenti
-- [ ] Preferenza utente per il target settimanale (pattern `target_service.dart`)
-- [ ] `getWorkoutsThisWeek()` (conteggio `WorkoutLog` distinti per data, settimana locale-aware)
-- [ ] Default suggerito = numero giorni del programma attivo, modificabile
-- [ ] Indicatore di progresso nel tab Allenamento ("2/3 questa settimana")
-- [ ] Toggle per disattivarlo nelle impostazioni
+> nessun nuovo test temporaneo — la logica nuova è interamente UI/stato di
+> schermata (`_data`, `_DateNav`, `_formatDate`, `_modifica`, `_eliminaGiornata`)
+> e dialog (`initial` in `log_serie_dialog.dart`/`log_cardio_dialog.dart`),
+> tutta accoppiata a `BuildContext`/`DatabaseService`, non estraibile in una
+> funzione pura.
 
-### Fase 17 — Bacheca record personali
-- [ ] `getAllPersonalRecords()` (PR per ogni `exerciseId` distinto, esclude `isWarmup`)
-- [ ] Modello in memoria `PersonalRecord` (non persistito, calcolato a runtime)
-- [ ] Schermata "I tuoi record" con filtro per gruppo muscolare, in Progressi
+### Fase 15 — Riscaldamento ✅ completata
+- [x] Campo `isWarmup` su `WorkoutSet` (da Fase 4)
+  - Il campo esisteva già (`lib/models/workout_set.dart`), introdotto in
+    anticipo in una fase precedente con un commento che già anticipava questa
+    fase.
+- [x] `suggestWarmupSets(targetWeightKg)` con soglia configurabile
+  - Aggiunto a `WorkoutProgressService` (logica pura, nessuna query Isar):
+    rampa fissa 50/70/90% del carico target con reps decrescenti (8/5/3),
+    arrotondata al multiplo di 2.5kg più vicino (`_roundToNearest`, già
+    usato per i suggerimenti di overload). Nessun suggerimento se il carico
+    target è sotto `warmupSkipThresholdKg` (20kg di default, parametro
+    `skipThresholdKg` configurabile) — carichi leggeri non richiedono una
+    rampa di avvicinamento.
+- [x] Step preliminare nella modalità guidata, saltabile
+  - In `sessione_guidata_screen.dart`, dopo aver applicato il suggerimento di
+    overload alla prima serie, se il carico target è noto e l'esercizio non
+    ha già serie di riscaldamento (evita doppia generazione se l'utente
+    torna sullo step), le serie suggerite vengono inserite in testa a
+    `e.sets` con `isWarmup = true`. La card (`_ExerciseStepCard`) le rende in
+    una sezione distinta ("RISCALDAMENTO", etichette "Risc. 1/2/3") sopra le
+    serie di lavoro, con un pulsante "Salta riscaldamento" che le rimuove
+    (`_skipWarmup`): non viene mai scritto nulla su Isar finché l'utente non
+    conferma almeno una serie (il riscaldamento esiste solo in memoria fino
+    a quel momento, coerente con il fatto che `_confirmSerie` persiste
+    l'intero `e.sets`).
+  - Estratto il pattern di riga serie (label + reps + kg + conferma), prima
+    inline, in un widget `_SetRow` condiviso fra riscaldamento e serie di
+    lavoro, per evitare duplicazione visto che la struttura è identica.
+- [x] Esclusione delle serie di riscaldamento da volume/PR/1RM/overload (Fase 7)
+  - Già implementato in una fase precedente: `WorkoutProgressService._workSets`
+    filtra `!s.isWarmup` ed è usato da tutti i metodi pubblici del servizio
+    (volume, max weight, RPE medio, 1RM stimato, PR, suggerimenti di
+    overload/deload); confermato per ispezione, nessuna modifica necessaria.
 
-### Fase 18 — Volume settimanale per gruppo muscolare
-- [ ] `getWeeklyVolumeByMuscleGroup(weekStart)` (aggrega `WorkoutExercise`/`WorkoutSet`
+> nessun nuovo test temporaneo oltre a quello già scritto e poi rimosso per
+> `suggestWarmupSets` (4 casi: rampa a 3 serie, soglia di default, soglia
+> personalizzabile, arrotondamento a 2.5kg) — la logica di inserimento/skip
+> nella modalità guidata è interamente UI/stato di schermata
+> (`_prepare`, `_skipWarmup`, `_ExerciseStepCard`), accoppiata a
+> `BuildContext`/controller di testo, non estraibile in una funzione pura.
+
+### Fase 16 — Obiettivo settimanale di allenamenti ✅ completata
+- [x] Preferenza utente per il target settimanale (pattern `target_service.dart`)
+  > **Correzione rispetto al piano originale**: `target_service.dart` (nutrizione)
+  > non è un servizio di "preferenza utente" generico — è un calcolo puro che
+  > legge input già salvati in `AppSettings` tramite getter dedicati. La
+  > preferenza vera e propria segue invece il pattern di `AppSettings` stesso:
+  > due nuovi campi, `int? workoutTargetSettimanale` (null = usa il default
+  > suggerito) e `bool workoutTargetAttivo`, letti/scritti con i metodi bulk
+  > già esistenti `getAppSettings()`/`saveAppSettings()` (lo stesso pattern di
+  > `restTimerDefaultSeconds`/`notWorkoutAttiva`), senza alcun nuovo servizio
+  > dedicato.
+- [x] `getWorkoutsThisWeek()` (conteggio `WorkoutLog` distinti per data, settimana locale-aware)
+  - Aggiunto a `DatabaseService`, riusa `getWorkoutDaysRange(monday, now)` già
+    esistente (Fase 11/streak) con lo stesso calcolo del lunedì usato da
+    `WorkoutProgressService._weekKey` (`date.subtract(Duration(days: date.weekday - 1))`).
+    Aggiunta anche la variante osservabile `watchWorkoutsThisWeek()` (filtra
+    `watchWorkoutDays()` lato client), usata dalla UI per aggiornarsi in tempo
+    reale.
+- [x] Default suggerito = numero giorni del programma attivo, modificabile
+  - Nessun concetto di "programma attivo" esisteva già: aggiunto
+    `getActiveProgramDaysCount()` che individua il programma a cui appartiene
+    la scheda con `lastUsedAt` più recente (quella che l'utente sta
+    effettivamente seguendo) e ne conta i giorni (`getProgramDays`). Fallback
+    a 3 se nessuna scheda di programma è mai stata eseguita.
+  - Il default è "modificabile" tramite uno stepper (+/- 1, range 1-7 giorni)
+    nel nuovo bottom sheet `obiettivo_settimanale_settings_dialog.dart`,
+    ricalcando esattamente il pattern di `rest_timer_settings_dialog.dart`
+    (stesso layout, stesso stile +/- ).
+- [x] Indicatore di progresso nel tab Allenamento ("2/3 questa settimana")
+  - Nuovo widget `_WeeklyGoalChip` in `allenamento_screen.dart`, mostrato
+    sotto `_DateNav` quando `workoutTargetAttivo` è true; usa
+    `StreamBuilder<int>` su `watchWorkoutsThisWeek()` e si colora con
+    `p.accent` (icona spunta) quando l'obiettivo è raggiunto. Tap sulla chip
+    apre lo stesso bottom sheet delle impostazioni.
+- [x] Toggle per disattivarlo nelle impostazioni
+  > **Nota implementativa**: l'app non ha una schermata "Impostazioni" hub
+  > generica — gli unici accessi alle preferenze esistenti (es. promemoria
+  > allenamento di Fase 10) sono icone dedicate raggiungibili dalla schermata
+  > pertinente. Per coerenza, il toggle "attiva/disattiva" vive nello stesso
+  > bottom sheet `obiettivo_settimanale_settings_dialog.dart`, raggiungibile
+  > da una nuova icona (`Icons.flag_outlined`) nell'AppBar di
+  > `AllenamentoScreen`, esattamente come l'icona del timer di recupero.
+
+> nessun nuovo test temporaneo — la logica nuova è interamente accoppiata a
+> Isar (`getWorkoutsThisWeek`, `watchWorkoutsThisWeek`,
+> `getActiveProgramDaysCount` in `database_service.dart`) o UI/stato di
+> schermata (`_WeeklyGoalChip`, il bottom sheet delle impostazioni), non
+> estraibile in una funzione pura.
+
+### Fase 17 — Bacheca record personali ✅ completata
+- [x] `getAllPersonalRecords()` (PR per ogni `exerciseId` distinto, esclude `isWarmup`)
+  > **Nota implementativa**: niente `distinctByExerciseId()` nativo di Isar (non usato
+  > altrove nel file) — si caricano tutti i `WorkoutExercise` con `where().findAll()` e si
+  > raggruppano in Dart per `exerciseId`, poi per ciascun gruppo si riduce al massimo con
+  > `WorkoutProgressService.sessionMaxWeight` (esclude già `isWarmup` internamente). Gli
+  > esercizi senza alcuna serie a peso (es. cardio) sono esclusi automaticamente. Il
+  > `muscleGroup` viene agganciato con un secondo giro su `getAllExercises()` indicizzato per
+  > `externalId`, stesso pattern già usato da `getAlternatives()`. Risultato ordinato per
+  > data più recente.
+- [x] Modello in memoria `PersonalRecord` (non persistito, calcolato a runtime)
+  - `lib/models/personal_record.dart`: classe Dart semplice (non `@collection` Isar),
+    campi `exerciseId`, `exerciseName`, `muscleGroup`, `maxWeightKg`, `achievedAt`.
+- [x] Schermata "I tuoi record" con filtro per gruppo muscolare, in Progressi
+  - Nuova `record_personali_screen.dart`: stessa riga di `ChoiceChip` orizzontali di
+    `catalogo_esercizi_screen.dart` (`muscleGroups`/`muscleGroupLabel`), card con 🏆 + nome
+    esercizio + data + peso massimo, tap che apre `StoricoEsercizioScreen` per
+    quell'esercizio (stesso pattern di navigazione già usato da `AllenamentoScreen`).
+    Raggiunta da una nuova icona (`Icons.emoji_events_rounded`) nell'AppBar di
+    `ProgressiScreen`, accanto a quella dello storico misurazioni.
+
+> nessun nuovo test temporaneo — `getAllPersonalRecords()` è accoppiato a Isar
+> (`_isar.workoutExercises.where().findAll()`, `getAllExercises()`), stesso caso già
+> documentato in Fase 16 per `getWorkoutsThisWeek`/`getActiveProgramDaysCount`; la
+> riduzione al massimo per gruppo riusa `WorkoutProgressService.sessionMaxWeight`, già
+> testato in Fase 7.
+
+### Fase 18 — Volume settimanale per gruppo muscolare ✅ completata
+- [x] `getWeeklyVolumeByMuscleGroup(weekStart)` (aggrega `WorkoutExercise`/`WorkoutSet`
       non-warmup tramite `ExerciseDefinition.muscleGroup`)
-- [ ] Grafico a barre per gruppo muscolare, in Progressi (valutare `fl_chart`, da Fase 7)
-- [ ] Banner di avviso se un gruppo ha volume nullo/molto sotto la media
+  - Aggiunto a `DatabaseService` (no service dedicato, stessa scelta delle fasi
+    precedenti). Filtra `WorkoutExercise` con `dateBetween(weekStart, weekStart+6gg)`
+    invece del solo `dateGreaterThan(weekStart)` del piano originale (vedi
+    correzione sotto), poi aggrega per `muscleGroup` con la stessa logica di
+    `getAllPersonalRecords()` (mappa `externalId → muscleGroup` da `getAllExercises()`).
+- [x] Grafico a barre per gruppo muscolare, in Progressi (valutare `fl_chart`, da Fase 7)
+  - Nuova `VolumeSettimanaleScreen` (`lib/screens/progressi/volume_settimanale_screen.dart`):
+    `BarChart` di `fl_chart` (già usato per `LineChart` in Fase 7), una barra per
+    gruppo allenabile a carico (`chest/back/legs/arms/shoulders/core`, escluso
+    `cardio`: un grafico di volume Σ rip×peso non ha senso per la categoria cardio).
+    Raggiunta da una nuova icona (`Icons.bar_chart_rounded`) nell'AppBar di
+    `ProgressiScreen`, accanto a quella della bacheca record (stesso pattern Fase 17).
+- [x] Banner di avviso se un gruppo ha volume nullo/molto sotto la media
+  - `WorkoutProgressService.neglectedMuscleGroups(volumeByGroup)` (logica pura, nessuna
+    query Isar): un gruppo è segnalato se il suo volume è sotto il 30% della media dei
+    gruppi con volume positivo. Mostrato come banner ⚠️ sotto il grafico, uno per
+    gruppo trascurato.
 
-### Fase 19 — Export PDF scheda/storico
-- [ ] Template PDF scheda/programma (riuso `pdf_export_service.dart`)
-- [ ] Template PDF storico esercizio (tabella sessioni + grafico se riusabile)
-- [ ] Bottone "Esporta PDF" nelle schermate scheda e storico esercizio
+> **Correzione rispetto al piano originale**: la query usa `dateBetween(weekStart,
+> weekStart + 6 giorni)` invece del solo `dateGreaterThan(weekStart)` indicato nello
+> pseudocodice del piano — quest'ultimo includerebbe anche le sessioni di settimane
+> successive a quella richiesta (bug se la funzione viene mai chiamata con una settimana
+> passata), oltre a non essere necessario per la sola settimana corrente attualmente usata
+> dalla UI.
 
-### Fase 20 — Rifinitura
-- [ ] Cronologia allenamenti in Progressi (ultimi 7 giorni)
-- [ ] Aggiornare tour guidato con il nuovo tab, le schede e le nuove feature
-- [ ] Disclaimer stima kcal in UI
+> nessun nuovo test temporaneo lasciato nel repository — 6 test scritti e verificati
+> durante l'implementazione (3 su `getWeeklyVolumeByMuscleGroup`: aggregazione per
+> gruppo, esclusione riscaldamento, esclusione sessioni fuori settimana; 3 su
+> `neglectedMuscleGroups`: caso vuoto, gruppo trascurato rilevato, volume uniforme
+> senza segnalazioni), rimossi dopo la verifica per restare coerenti con le fasi
+> precedenti.
+
+### Fase 19 — Export PDF scheda/storico ✅ completata
+- [x] Template PDF scheda/programma (riuso `pdf_export_service.dart`)
+  - `PdfExportService.generateScheda(WorkoutTemplate, ...)`: tabella esercizi (nome +
+    target serie×rip×kg, o durata per il cardio, stesso formato già usato in
+    `crea_scheda_screen.dart`/`target_esercizio_dialog.dart`). Nessuna chiamata a
+    `DatabaseService`: i dati arrivano già caricati dalla UI (stesso pattern di
+    `generatePiano`, che riceve un `MealPlan` già pronto).
+  - `PdfExportService.generateProgramma(WorkoutProgram, List<WorkoutTemplate> giorni, ...)`:
+    riusa lo stesso renderer tabellare per ciascun giorno, con un header di sezione per
+    giorno (stesso stile della sezione-giorno del diario PDF).
+- [x] Template PDF storico esercizio (tabella sessioni + grafico se riusabile)
+  - `PdfExportService.generateStoricoEsercizio({exerciseName, history, ...})`: tabella
+    data/dettaglio serie (o durata per cardio)/badge PR, riusando
+    `WorkoutProgressService.isNewPersonalRecord` (stessa logica della UI in
+    `StoricoEsercizioScreen`).
+- [x] Bottone "Esporta PDF" nelle schermate scheda e storico esercizio
+  - `LeMieSchedeScreen`: icona PDF su ogni `_TemplateCard` (schede autonome, sia preset
+    sia personali) → `generateScheda`.
+  - `ProgrammaDetailScreen`: icona PDF in AppBar (visibile solo se il programma ha
+    almeno un giorno) → `generateProgramma` con tutti i giorni del programma.
+  - `StoricoEsercizioScreen`: icona PDF in AppBar (visibile solo con storico non vuoto)
+    → `generateStoricoEsercizio`.
+  - Stesso pattern di gestione errori già usato in `piano_tab.dart`/`progressi_screen.dart`
+    (try/catch con `SnackBar` su `l10n.pianoErrorePdf`, riusato qui come messaggio
+    generico "errore generazione PDF" invece di introdurne uno specifico per
+    l'allenamento).
+
+> **Correzione rispetto al piano originale**: il grafico carico/tempo non è stato
+> incluso nel PDF storico (il piano lo richiedeva "se riusabile"). `fl_chart` e il
+> package `pdf` usano due alberi di widget completamente separati e non
+> interoperabili (Flutter/Skia vs. il renderer interno di `pdf`): per riusare il
+> grafico servirebbe rasterizzarlo offscreen in un'immagine, un lavoro non banale e
+> sproporzionato per un PDF che resta comunque leggibile con la sola tabella sessioni
+> (stesso giudizio implicito già nel piano, che marcava il grafico come opzionale).
+
+> nessun nuovo test temporaneo lasciato nel repository — 4 test scritti e verificati
+> durante l'implementazione (`generateScheda` con esercizi a target serie/rip/peso e
+> cardio a durata, `generateProgramma` con più giorni, `generateStoricoEsercizio` con
+> storico vuoto e con sessioni/PR), tutti basati su modelli passati direttamente al
+> servizio (nessuna dipendenza da Isar, a differenza dei test delle fasi precedenti),
+> rimossi dopo la verifica per restare coerenti con le fasi precedenti.
+
+### Fase 20 — Rifinitura ✅ completata
+- [x] Cronologia allenamenti in Progressi (ultimi 7 giorni)
+  - Nuovo `DatabaseService.watchWorkoutExercisesRange(from, to)`: variante osservabile di
+    `getWorkoutDaysRange` ma su `WorkoutExercise` completi (non solo le date), filtrati con
+    `dateBetween` — serve sia il conteggio esercizi che gli `estimatedKcal` per giorno, non
+    solo la presenza/assenza usata dalla streak.
+  - Nuova sezione `_CronologiaAllenamenti` in `progressi_screen.dart`: 7 righe (oggi e i 6
+    giorni precedenti, più recente in alto), ciascuna con un pallino di stato (colorato se
+    quel giorno ha almeno un `WorkoutExercise`, altrimenti `p.cardBorder`), il conteggio
+    esercizi (`l10n.schedeNEsercizi`, riusato da Fase 19) o "Nessun allenamento", e il totale
+    kcal stimate del giorno se presente.
+- [x] Aggiornare tour guidato con il nuovo tab, le schede e le nuove feature
+  - `app_tour.dart` aveva già un TODO esplicito lasciato da una fase precedente
+    (`_kTourTabIndices` saltava l'indice 2/Allenamento). Aggiunto il quarto step
+    (`tourAllenamentoTitle`/`tourAllenamentoDesc`) nella posizione corretta tra Diario e
+    Progressi, verificata via l'ordine reale dei tab in `main_screen.dart`
+    (Home/Diario/Allenamento/Progressi/TDEE).
+- [x] Disclaimer stima kcal in UI
+  - Nuova stringa `homeAttivitaKcalDisclaimer` mostrata sotto la card "Attività" in
+    `home_screen.dart` (bilancio kcal ingerite/bruciate del giorno) — il punto più
+    prominente in cui le kcal stimate da `CalorieEstimationService` vengono mostrate
+    all'utente, già individuato come riferimento esplicito nel piano (sezione "Stima
+    calorie bruciate"). Non aggiunto un disclaimer ripetuto anche per-esercizio in
+    `AllenamentoScreen` (dove il valore è già preceduto da "≈") per non appesantire la UI
+    con lo stesso testo lungo ripetuto su ogni riga.
+
+> nessun nuovo test temporaneo — la logica nuova è interamente accoppiata a Isar
+> (`watchWorkoutExercisesRange`) o UI/stato di schermata (raggruppamento per giorno e somma
+> kcal in `_CronologiaAllenamenti`, step del tour, testo del disclaimer), non estraibile in
+> una funzione pura (stesso giudizio già applicato in Fase 16).
 
 **Stima totale: ~30–37 giorni-persona stile tradizionale (con assistenza AI sulle fasi di
 codice, l'elapsed-time reale è dominato dai compiti non comprimibili: traduzioni, mapping

@@ -32,4 +32,15 @@ class AppSettings {
   int notSorMin = 1260;     // 21:00
 
   bool tourCompleted = false;
+
+  // Allenamento — Fase 8
+  int restTimerDefaultSeconds = 90;
+
+  // Allenamento — Fase 10
+  bool notWorkoutAttiva = false;
+
+  // Allenamento — Fase 16: target settimanale (null = usa il default
+  // suggerito, calcolato dal programma attivo)
+  int? workoutTargetSettimanale;
+  bool workoutTargetAttivo = true;
 }

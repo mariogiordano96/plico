@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:printing/printing.dart';
 import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/workout_program.dart';
 import '../../models/workout_template.dart';
 import '../../services/database_service.dart';
+import '../../services/pdf_export_service.dart';
 import 'crea_scheda_screen.dart';
 import 'programma_detail_screen.dart';
+import 'sessione_guidata_screen.dart';
 
 class LeMieSchedeScreen extends StatefulWidget {
   const LeMieSchedeScreen({super.key});
@@ -135,8 +138,66 @@ class _LeMieSchedeScreenState extends State<LeMieSchedeScreen> {
   }
 
   Future<void> _inizia(WorkoutTemplate t) async {
-    await DatabaseService.instance.startWorkoutFromTemplate(t, DateTime.now());
-    if (mounted) Navigator.pop(context);
+    final esercizi = await DatabaseService.instance.startWorkoutFromTemplate(t, DateTime.now());
+    if (!mounted) return;
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SessioneGuidataScreen(template: t, exercises: esercizi),
+      ),
+    );
+    _load();
+  }
+
+  PdfStrings _pdfStrings(AppLocalizations l10n) {
+    return PdfStrings(
+      diarioTitle: l10n.pdfDiarioTitle,
+      targetLabel: l10n.pdfTargetLabel,
+      kcalGiornoUnit: l10n.tdeeKcalGiornoUnit,
+      footerPage: l10n.pdfPagina,
+      nessunoRegistrato: l10n.pdfNessunDato,
+      pastoFallback: l10n.pdfPastoFallback,
+      pastoLabels: [
+        l10n.pastoColazione, l10n.pastoPranzo, l10n.pastoCena,
+        l10n.pastoSpuntino, l10n.pastoPostWo, l10n.pastoSpuntinoSerale,
+      ],
+      riepilogo: l10n.pdfRiepilogo,
+      giorniConDati: l10n.pdfGiorniConDati,
+      giorniOnTarget: l10n.pdfGiorniOnTarget,
+      mediaLabel: l10n.pdfMediaLabel,
+      targetPrefixLabel: l10n.pdfTargetPrefix,
+      pianoTitle: l10n.pdfPianoTitle,
+      generato: l10n.pdfGenerato,
+      pianoSlotLabels: [
+        l10n.slotProteina, l10n.slotCarboidrati, l10n.slotVerdura,
+        l10n.slotGrassi, l10n.slotExtra, l10n.slotFrutta,
+      ],
+      schedaPdfTitle: l10n.pdfSchedaTitle,
+      programmaPdfTitle: l10n.pdfProgrammaTitle,
+      storicoPdfTitle: l10n.pdfStoricoTitle,
+      nEsercizi: l10n.schedeNEsercizi,
+      nessunaSessione: l10n.storicoNessunaSessione,
+      prBadge: l10n.storicoPrBadge,
+      durataMin: l10n.allenamentoDurataMin,
+    );
+  }
+
+  Future<void> _exportTemplate(WorkoutTemplate t) async {
+    final l10n = context.l10n;
+    final locale = Localizations.localeOf(context).toString();
+    try {
+      final bytes = await PdfExportService.generateScheda(
+        t,
+        strings: _pdfStrings(l10n),
+        locale: locale,
+      );
+      await Printing.sharePdf(bytes: bytes, filename: 'plico_scheda.pdf');
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.pianoErrorePdf)),
+      );
+    }
   }
 
   @override
@@ -182,6 +243,7 @@ class _LeMieSchedeScreenState extends State<LeMieSchedeScreen> {
                 p: p,
                 l10n: l10n,
                 onTap: () => _inizia(t),
+                onExportPdf: () => _exportTemplate(t),
                 trailing: IconButton(
                   onPressed: () => _duplicaTemplate(t),
                   icon: Icon(Icons.copy_rounded, color: p.textMuted, size: 20),
@@ -211,6 +273,7 @@ class _LeMieSchedeScreenState extends State<LeMieSchedeScreen> {
               p: p,
               l10n: l10n,
               onTap: () => _inizia(t),
+              onExportPdf: () => _exportTemplate(t),
               trailing: IconButton(
                 onPressed: () => _eliminaTemplate(t),
                 icon: Icon(Icons.delete_outline_rounded, color: p.textMuted, size: 20),
@@ -259,6 +322,7 @@ class _TemplateCard extends StatelessWidget {
   final ColorPalette p;
   final AppLocalizations l10n;
   final VoidCallback onTap;
+  final VoidCallback? onExportPdf;
   final Widget? trailing;
 
   const _TemplateCard({
@@ -266,6 +330,7 @@ class _TemplateCard extends StatelessWidget {
     required this.p,
     required this.l10n,
     required this.onTap,
+    this.onExportPdf,
     this.trailing,
   });
 
@@ -286,6 +351,12 @@ class _TemplateCard extends StatelessWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (onExportPdf != null)
+              IconButton(
+                onPressed: onExportPdf,
+                icon: Icon(Icons.picture_as_pdf_outlined, color: p.textMuted, size: 20),
+                tooltip: l10n.pianoEsportaPdf,
+              ),
             if (trailing != null) trailing!,
             TextButton(
               onPressed: onTap,

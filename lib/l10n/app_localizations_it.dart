@@ -62,6 +62,13 @@ class AppLocalizationsIt extends AppLocalizations {
       'Registra ogni pasto della giornata. Tocca il \"+\" in alto per aggiungere un alimento o scannerizza un barcode.';
 
   @override
+  String get tourAllenamentoTitle => 'Allenamento';
+
+  @override
+  String get tourAllenamentoDesc =>
+      'Registra i tuoi allenamenti, crea schede e programmi, e monitora il volume settimanale per gruppo muscolare.';
+
+  @override
   String get tourProgressiTitle => 'Progressi';
 
   @override
@@ -362,6 +369,15 @@ class AppLocalizationsIt extends AppLocalizations {
   String get homeStreakInizia => 'Inizia oggi la tua streak';
 
   @override
+  String homeStreakAllenamentoGiorni(String count) {
+    return '$count giorni di fila';
+  }
+
+  @override
+  String get homeStreakAllenamentoInizia =>
+      'Inizia oggi la tua streak allenamento';
+
+  @override
   String get homeBadge1KgPerso => '1° kg perso';
 
   @override
@@ -372,6 +388,21 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get homeBadgeSettimanaTarget => 'Settimana in target';
+
+  @override
+  String get homeBadgePrimaScheda => 'Prima scheda';
+
+  @override
+  String get homeBadgeStreak7Allenamento => '7gg allenamento';
+
+  @override
+  String get homeBadgeNuovoPr => 'Nuovo PR';
+
+  @override
+  String get homeBadge10Sessioni => '10 sessioni';
+
+  @override
+  String get homeBadge50Sessioni => '50 sessioni';
 
   @override
   String get diarioTitolo => 'DIARIO';
@@ -670,6 +701,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get progressiTooltipStorico => 'Storico misurazioni';
 
   @override
+  String get progressiTooltipRecord => 'I tuoi record';
+
+  @override
+  String get progressiTooltipVolume => 'Volume settimanale';
+
+  @override
   String get progressiSezPeso => 'PESO';
 
   @override
@@ -680,6 +717,12 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get progressiSezMisurazioni => 'MISURAZIONI';
+
+  @override
+  String get progressiSezAllenamenti => 'ALLENAMENTI RECENTI';
+
+  @override
+  String get progressiNessunAllenamento => 'Nessun allenamento';
 
   @override
   String get progressiRange1A => '1A';
@@ -1090,6 +1133,22 @@ class AppLocalizationsIt extends AppLocalizations {
   String get notifChannelPesataDesc => 'Ricordati di registrare il tuo peso';
 
   @override
+  String get notifChannelRestTimer => 'Timer di recupero';
+
+  @override
+  String get notifChannelRestTimerDesc => 'Avviso a fine riposo tra le serie';
+
+  @override
+  String get notifRestTimerBody =>
+      'Riposo terminato — pronto per la prossima serie?';
+
+  @override
+  String get notifChannelWorkout => 'Promemoria allenamento';
+
+  @override
+  String get notifChannelWorkoutDesc => 'Ricordati di allenarti';
+
+  @override
   String notifPastoBody(String pasto) {
     return 'Hai registrato $pasto?';
   }
@@ -1131,6 +1190,11 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String notifPesataBody(int days) {
     return 'Non ti pesi da $days giorni. Vuoi registrare il tuo peso?';
+  }
+
+  @override
+  String notifWorkoutBody(int days) {
+    return 'Non ti alleni da $days giorni. Pronto a riprendere?';
   }
 
   @override
@@ -1176,6 +1240,15 @@ class AppLocalizationsIt extends AppLocalizations {
   String pdfGenerato(String created) {
     return 'Generato il $created';
   }
+
+  @override
+  String get pdfSchedaTitle => 'Scheda Allenamento';
+
+  @override
+  String get pdfProgrammaTitle => 'Programma di Allenamento';
+
+  @override
+  String get pdfStoricoTitle => 'Storico Esercizio';
 
   @override
   String get muscleGroupAll => 'Tutti';
@@ -1280,6 +1353,69 @@ class AppLocalizationsIt extends AppLocalizations {
       'L\'esercizio e le serie registrate verranno rimossi.';
 
   @override
+  String get allenamentoNotaTitle => 'Nota sessione';
+
+  @override
+  String get allenamentoNotaHint =>
+      'Come è andata? Sensazioni, energia, dolori...';
+
+  @override
+  String get allenamentoSostituisci => 'Sostituisci';
+
+  @override
+  String get allenamentoSostituisciTitle => 'Sostituisci esercizio';
+
+  @override
+  String get allenamentoSostituisciVuoto => 'Nessuna alternativa disponibile';
+
+  @override
+  String get allenamentoModifica => 'Modifica';
+
+  @override
+  String get allenamentoEliminaGiornataTitle => 'Eliminare la sessione?';
+
+  @override
+  String get allenamentoEliminaGiornataSub =>
+      'Tutti gli esercizi e la nota di questo giorno verranno rimossi.';
+
+  @override
+  String allenamentoObiettivoSettimanale(int done, int target) {
+    return '$done/$target questa settimana';
+  }
+
+  @override
+  String get obiettivoSettimanaleTitle => 'Obiettivo settimanale';
+
+  @override
+  String obiettivoSettimanaleGiorni(int n) {
+    return '$n giorni';
+  }
+
+  @override
+  String get recordPersonaliTitle => 'I tuoi record';
+
+  @override
+  String get recordPersonaliVuoto =>
+      'Nessun record ancora. Registra un allenamento per iniziare!';
+
+  @override
+  String recordPersonaliKg(String peso) {
+    return '$peso kg';
+  }
+
+  @override
+  String get volumeSettimanaleTitle => 'Volume settimanale';
+
+  @override
+  String get volumeSettimanaleVuoto =>
+      'Nessun allenamento ancora questa settimana.';
+
+  @override
+  String volumeSettimanaleTrascurato(String gruppo) {
+    return '$gruppo trascurato questa settimana';
+  }
+
+  @override
   String serieDialogSerieLabel(int n) {
     return 'Serie $n';
   }
@@ -1289,6 +1425,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get serieDialogKgHint => 'kg';
+
+  @override
+  String get serieDialogRpeLabel => 'RPE';
 
   @override
   String get serieDialogAggiungiSerie => 'Aggiungi serie';
@@ -1310,6 +1449,10 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get homeAttivitaBilancioNetto => 'Bilancio netto';
+
+  @override
+  String get homeAttivitaKcalDisclaimer =>
+      'Stima indicativa, non un dato medico: basata sull\'ultimo peso registrato (o 75 kg di default se non disponibile).';
 
   @override
   String get schedeTitle => 'Le mie schede';
@@ -1379,6 +1522,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get creaSchedaNomeObbligatorio => 'Il nome è obbligatorio';
 
   @override
+  String get creaSchedaSupersetUnisci => 'Unisci in superset';
+
+  @override
+  String get creaSchedaSupersetUnito => 'Superset';
+
+  @override
   String get creaProgrammaTitle => 'Nuovo programma';
 
   @override
@@ -1428,6 +1577,11 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String storicoRpeMedio(String rpe) {
+    return 'RPE medio: $rpe';
+  }
+
+  @override
   String overloadUltimaVolta(String detail) {
     return 'Ultima volta: $detail';
   }
@@ -1451,4 +1605,67 @@ class AppLocalizationsIt extends AppLocalizations {
   String overloadDeload(int weeks, String kg) {
     return 'Stai progredendo da $weeks settimane: valuta uno scarico a $kg kg';
   }
+
+  @override
+  String get restTimerTitle => 'Recupero';
+
+  @override
+  String get restTimerSalta => 'Salta';
+
+  @override
+  String get restTimerSettingsTitle => 'Riposo di default tra le serie';
+
+  @override
+  String sessioneGuidataProgress(int current, int total) {
+    return 'Esercizio $current/$total';
+  }
+
+  @override
+  String get sessioneGuidataPrecedente => 'Precedente';
+
+  @override
+  String get sessioneGuidataSuccessivo => 'Successivo';
+
+  @override
+  String get sessioneGuidataTermina => 'Termina';
+
+  @override
+  String get sessioneGuidataConferma => 'Conferma serie';
+
+  @override
+  String get sessioneGuidataSuperset => 'SUPERSET';
+
+  @override
+  String get sessioneGuidataRiscaldamento => 'RISCALDAMENTO';
+
+  @override
+  String get sessioneGuidataSaltaRiscaldamento => 'Salta riscaldamento';
+
+  @override
+  String sessioneGuidataRiscaldamentoSerieLabel(int n) {
+    return 'Risc. $n';
+  }
+
+  @override
+  String get sessioneRiepilogoTitle => 'Sessione completata';
+
+  @override
+  String sessioneRiepilogoKcal(int kcal) {
+    return '$kcal kcal stimate';
+  }
+
+  @override
+  String get sessioneRiepilogoNuoviRecord => 'NUOVI RECORD PERSONALI';
+
+  @override
+  String get sessioneRiepilogoNessunRecord =>
+      'Nessun nuovo record questa volta';
+
+  @override
+  String sessioneRiepilogoRecordEsercizio(String esercizio, String kg) {
+    return '$esercizio: $kg kg';
+  }
+
+  @override
+  String get sessioneRiepilogoChiudi => 'Fine';
 }

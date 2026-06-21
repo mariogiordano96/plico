@@ -75,7 +75,7 @@
           "targetReps": null,
           "targetWeightKg": null,
           "targetDurationSeconds": 40,
-          "supersetGroupId": null,
+          "supersetGroupId": 1,
           "restSeconds": null
         },
         {
@@ -85,7 +85,7 @@
           "targetReps": null,
           "targetWeightKg": null,
           "targetDurationSeconds": 40,
-          "supersetGroupId": null,
+          "supersetGroupId": 1,
           "restSeconds": null
         },
         {
@@ -95,7 +95,7 @@
           "targetReps": null,
           "targetWeightKg": null,
           "targetDurationSeconds": 40,
-          "supersetGroupId": null,
+          "supersetGroupId": 1,
           "restSeconds": null
         },
         {
@@ -105,7 +105,7 @@
           "targetReps": null,
           "targetWeightKg": null,
           "targetDurationSeconds": 40,
-          "supersetGroupId": null,
+          "supersetGroupId": 1,
           "restSeconds": null
         },
         {
@@ -115,8 +115,8 @@
           "targetReps": null,
           "targetWeightKg": null,
           "targetDurationSeconds": 40,
-          "supersetGroupId": null,
-          "restSeconds": null
+          "supersetGroupId": 1,
+          "restSeconds": 120
         }
       ]
     }

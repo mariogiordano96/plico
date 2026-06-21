@@ -28,6 +28,47 @@ class WorkoutProgressService {
   static List<WorkoutSet> _workSets(WorkoutExercise e) =>
       e.sets.where((s) => !s.isWarmup).toList();
 
+  /// Soglia minima di carico (kg) sotto la quale il riscaldamento non viene
+  /// suggerito: carichi leggeri non richiedono una rampa di avvicinamento.
+  static const double warmupSkipThresholdKg = 20;
+
+  /// Rampa di riscaldamento (50%/70%/90% di [targetWeightKg], reps decrescenti)
+  /// per avvicinarsi al carico di lavoro. Nessun suggerimento se [targetWeightKg]
+  /// è sotto [skipThresholdKg] (default [warmupSkipThresholdKg]).
+  static List<WorkoutSet> suggestWarmupSets(
+    double targetWeightKg, {
+    double skipThresholdKg = warmupSkipThresholdKg,
+  }) {
+    if (targetWeightKg < skipThresholdKg) return [];
+    const ramps = [(0.5, 8), (0.7, 5), (0.9, 3)];
+    return [
+      for (final ramp in ramps)
+        WorkoutSet()
+          ..isWarmup = true
+          ..weightKg = _roundToNearest(targetWeightKg * ramp.$1, 2.5)
+          ..reps = ramp.$2,
+    ];
+  }
+
+  /// Gruppi muscolari (tra le chiavi di [volumeByGroup]) con volume nullo o
+  /// molto sotto la media degli altri gruppi allenati — usato per il banner
+  /// di avviso del grafico "Volume settimanale" (Fase 18). Un gruppo è
+  /// "trascurato" se il suo volume è sotto [thresholdFraction] della media dei
+  /// gruppi con volume positivo; se nessun gruppo ha volume positivo non c'è
+  /// nulla da segnalare.
+  static List<String> neglectedMuscleGroups(
+    Map<String, double> volumeByGroup, {
+    double thresholdFraction = 0.3,
+  }) {
+    final trained = volumeByGroup.values.where((v) => v > 0).toList();
+    if (trained.isEmpty) return [];
+    final avg = trained.reduce((a, b) => a + b) / trained.length;
+    return volumeByGroup.entries
+        .where((e) => e.value < avg * thresholdFraction)
+        .map((e) => e.key)
+        .toList();
+  }
+
   static double sessionVolume(WorkoutExercise e) {
     return _workSets(e).fold<double>(
         0, (sum, s) => sum + (s.reps ?? 0) * (s.weightKg ?? 0));
@@ -36,6 +77,14 @@ class WorkoutProgressService {
   static double? sessionMaxWeight(WorkoutExercise e) {
     final weights = _workSets(e).map((s) => s.weightKg).whereType<double>();
     return weights.isEmpty ? null : weights.reduce((a, b) => a > b ? a : b);
+  }
+
+  /// RPE medio della sessione (solo serie con `rpe` impostato), o null se nessuna
+  /// serie ha un RPE registrato.
+  static double? averageRpe(WorkoutExercise e) {
+    final rpeValues = _workSets(e).map((s) => s.rpe).whereType<int>();
+    if (rpeValues.isEmpty) return null;
+    return rpeValues.reduce((a, b) => a + b) / rpeValues.length;
   }
 
   /// Stima 1RM (formula di Epley) sulla serie migliore della sessione.
