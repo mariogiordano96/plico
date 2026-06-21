@@ -231,7 +231,7 @@ Il dataset è in inglese. Strategia:
 
 ---
 
-## Stima calorie bruciate
+## Stima calorie bruciate ✅ implementata (`CalorieEstimationService`)
 
 ### Cardio — formula MET
 
@@ -239,39 +239,64 @@ Il dataset è in inglese. Strategia:
 kcal = MET × peso_kg × durata_ore
 ```
 
-Ogni esercizio cardio ha un MET predefinito (hardcodato per categoria o per singolo
-esercizio):
+MET per esercizio, mappato sui 14 esercizi cardio reali del dataset `free-exercise-db`
+(non sulle etichette generiche del piano originale, che non corrispondevano 1:1 ai nomi
+reali — vedi `lib/services/calorie_estimation_service.dart`):
 
-| Esercizio | MET |
+| externalId | MET |
 |---|---|
-| Corsa 8 km/h | 8.0 |
-| Ciclismo moderato | 6.0 |
-| Camminata veloce | 4.5 |
-| Nuoto | 7.0 |
-| Salto con la corda | 10.0 |
-| HIIT | 8.5 |
+| Bicycling | 8.0 |
+| Bicycling_Stationary | 6.8 |
+| Elliptical_Trainer | 5.0 |
+| Jogging_Treadmill | 8.0 |
+| Prowler_Sprint | 8.0 |
+| Recumbent_Bike | 5.0 |
+| Rope_Jumping | 10.0 |
+| Rowing_Stationary | 7.0 |
+| Running_Treadmill | 9.5 |
+| Skating | 7.0 |
+| Stairmaster | 9.0 |
+| Step_Mill | 9.0 |
+| Trail_Running_Walking | 6.0 |
+| Walking_Treadmill | 3.5 |
 
-### Strength — euristica volume
+Fallback MET 6.0 per esercizi cardio custom o non mappati (es. aggiunti dall'utente).
+
+### Strength — MET fisso (non euristica volume)
 
 ```
-kcal ≈ (serie × rip × peso_kg) × 0.0008
+kcal = 4.0 (MET fisso) × peso_kg × durata_stimata_ora
+durata_stimata_ora = (numero_serie_di_lavoro × 2.5 min) / 60
 ```
 
-Alternativa più semplice: MET fisso 4.0 × peso_kg × durata_stimata_ora
-(durata stimata = `numero_serie × 2.5 min`).
+> **Correzione rispetto al piano originale**: la prima euristica proposta
+> (`volume_kg × 0.0008`) aveva un coefficiente sbagliato di circa 40× — per uno squat
+> 3×8×80kg (volume 1920) dava ~1.5 kcal, un ordine di grandezza assurdo (un MET-check
+> indipendente stima ~60-90 kcal per lo stesso esercizio). Anziché ricalibrare un
+> coefficiente arbitrario, si usa direttamente la "alternativa più semplice" già descritta
+> nel piano originale (MET fisso × peso corporeo), che è anche più robusta: funziona
+> identica per esercizi a corpo libero (dove `weightKg` è spesso `null` e il volume
+> sarebbe comunque inaffidabile).
 
-> La stima è puramente indicativa. Un disclaimer in UI chiarisce che non è un dato medico.
+Il peso corporeo usato è l'ultimo `BodySnapshot.pesoKg` registrato; se assente, default
+75 kg (`CalorieEstimationService.defaultBodyWeightKg`).
 
-### Integrazione in Home
+> La stima resta puramente indicativa, su entrambe le formule. Disclaimer in UI: Fase 20
+> (Rifinitura) — non ancora mostrato.
 
-Il totale kcal allenamento appare nella card giornaliera:
+### Integrazione in Home ✅ implementata
+
+`_AttivitaCard` in `home_screen.dart`, visibile solo nei giorni con almeno un esercizio
+registrato (per non mostrare una riga "Attività: 0 kcal" nei giorni di riposo):
 
 ```
 Kcal ingerite    2.100
-Attività          –420
+Kcal bruciate     –420
 ──────────────────────
 Bilancio netto   1.680
 ```
+
+Tap sulla card → passa al tab Allenamento (indice 2).
 
 ---
 
@@ -1331,10 +1356,17 @@ posizionamento/stile già visto in Progressi.
 - [x] Verificato: `flutter analyze` pulito; test di servizio sul CRUD completo
       (creazione/lettura/nota/eliminazione esercizio/eliminazione intero log) passa
 
-### Fase 5 — Stima kcal + integrazione Home
-- [ ] `CalorieEstimationService` con MET per cardio + euristica strength
-- [ ] `DatabaseService.getWorkoutKcalForDay(date)`
-- [ ] Card "Attività" nella Home con bilancio netto
+### Fase 5 — Stima kcal + integrazione Home ✅ completata
+- [x] `CalorieEstimationService` con MET per cardio (14 esercizi reali + fallback) e MET
+      fisso per la forza (corretto il coefficiente errato dell'euristica volume — vedi nota)
+- [x] `DatabaseService.getWorkoutKcalForDay(date)` (somma `estimatedKcal` già persistiti)
+- [x] Stima calcolata e persistita al salvataggio in `AllenamentoScreen._aggiungiEsercizio`
+      (peso corporeo da `getLatestBodySnapshot()`, fallback 75kg)
+- [x] kcal stimate mostrate per esercizio in `_ExerciseCard`
+- [x] `_AttivitaCard` nella Home (kcal ingerite / bruciate / bilancio netto), visibile
+      solo nei giorni con allenamento registrato; tap → tab Allenamento
+- [x] Verificato: `flutter analyze` pulito; test su ordine di grandezza delle stime
+      (squat 3×8×80kg ≈ 20-150 kcal, corsa 30min ≈ 300-600 kcal) e su aggregazione giornaliera
 
 ### Fase 6 — Schede di allenamento e programmi multi-giorno
 - [ ] Modelli Isar `WorkoutTemplate` (con `isPreset`, `program`/`order`),

@@ -876,6 +876,11 @@ class DatabaseService {
     });
   }
 
+  Future<int> getWorkoutKcalForDay(DateTime date) async {
+    final esercizi = await getWorkoutExercisesForDay(date);
+    return esercizi.fold<int>(0, (sum, e) => sum + (e.estimatedKcal ?? 0));
+  }
+
   Future<void> deleteWorkoutLog(DateTime date) async {
     final day = _logDate(date);
     await _isar.writeTxn(() async {

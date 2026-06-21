@@ -10,6 +10,7 @@ import '../models/user_profile.dart';
 import '../models/daily_log.dart';
 import '../models/meal_plan.dart';
 import '../models/achievement.dart';
+import '../models/workout_exercise.dart';
 import '../services/database_service.dart';
 import '../services/streak_service.dart';
 import '../services/insights_service.dart';
@@ -76,6 +77,7 @@ class HomeScreen extends StatelessWidget {
             const _GreetingHeader(),
             const SizedBox(height: 20),
             _DiarioHeroCard(onSwitchTab: onSwitchTab),
+            _AttivitaCard(onSwitchTab: onSwitchTab),
             const _WeeklyRecapCard(),
             const SizedBox(height: 16),
             _AderenzaCard(onSwitchTab: onSwitchTab),
@@ -377,6 +379,121 @@ class _DiarioHeroCardState extends State<_DiarioHeroCard> {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ── Attività (allenamento) ───────────────────────────────────────
+
+class _AttivitaCard extends StatefulWidget {
+  final void Function(int)? onSwitchTab;
+  const _AttivitaCard({this.onSwitchTab});
+
+  @override
+  State<_AttivitaCard> createState() => _AttivitaCardState();
+}
+
+class _AttivitaCardState extends State<_AttivitaCard> {
+  DailyLog? _log;
+  List<WorkoutExercise> _esercizi = [];
+  StreamSubscription? _logSub;
+  StreamSubscription? _workoutSub;
+
+  static DateTime get _today {
+    final n = DateTime.now();
+    return DateTime(n.year, n.month, n.day);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _logSub = DatabaseService.instance.watchDailyLog(_today).listen((log) {
+      if (mounted) setState(() => _log = log);
+    });
+    _workoutSub =
+        DatabaseService.instance.watchWorkoutExercisesForDay(_today).listen((list) {
+      if (mounted) setState(() => _esercizi = list);
+    });
+  }
+
+  @override
+  void dispose() {
+    _logSub?.cancel();
+    _workoutSub?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_esercizi.isEmpty) return const SizedBox.shrink();
+
+    final p = context.palette;
+    final l10n = context.l10n;
+    final kcalIngerite = (_log?.kcalTotali ?? 0).round();
+    final kcalAttivita =
+        _esercizi.fold<int>(0, (s, e) => s + (e.estimatedKcal ?? 0));
+    final bilancioNetto = kcalIngerite - kcalAttivita;
+
+    return GestureDetector(
+      onTap: () => widget.onSwitchTab?.call(2),
+      child: Container(
+        margin: const EdgeInsets.only(top: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: p.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: p.cardBorder),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.fitness_center_rounded, color: p.accent, size: 16),
+                const SizedBox(width: 6),
+                Text(l10n.homeAttivitaTitle,
+                    style: TextStyle(
+                        color: p.textPrimary, fontWeight: FontWeight.w600, fontSize: 14)),
+              ],
+            ),
+            const SizedBox(height: 10),
+            _RigaBilancio(label: l10n.homeAttivitaKcalIngerite, value: kcalIngerite, p: p),
+            const SizedBox(height: 4),
+            _RigaBilancio(label: l10n.homeAttivitaKcalBruciate, value: -kcalAttivita, p: p),
+            Divider(color: p.cardBorder, height: 16),
+            _RigaBilancio(
+              label: l10n.homeAttivitaBilancioNetto,
+              value: bilancioNetto,
+              p: p,
+              bold: true,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RigaBilancio extends StatelessWidget {
+  final String label;
+  final int value;
+  final ColorPalette p;
+  final bool bold;
+  const _RigaBilancio({required this.label, required this.value, required this.p, this.bold = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final style = TextStyle(
+      color: bold ? p.textPrimary : p.textMuted,
+      fontSize: bold ? 14 : 13,
+      fontWeight: bold ? FontWeight.w700 : FontWeight.w400,
+    );
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: style),
+        Text('$value kcal', style: style),
+      ],
     );
   }
 }

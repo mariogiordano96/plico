@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/workout_exercise.dart';
+import '../../services/calorie_estimation_service.dart';
 import '../../services/database_service.dart';
 import '../esercizi/catalogo_esercizi_screen.dart';
 import 'log_cardio_dialog.dart';
@@ -27,6 +28,24 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
         : await showLogSerieDialog(context, exercise);
 
     if (workoutExercise != null) {
+      final bodySnapshot = await DatabaseService.instance.getLatestBodySnapshot();
+      final bodyWeightKg = bodySnapshot?.pesoKg;
+
+      if (workoutExercise.durationSeconds != null) {
+        workoutExercise.met =
+            CalorieEstimationService.metForCardioExercise(workoutExercise.exerciseId).round();
+        workoutExercise.estimatedKcal = CalorieEstimationService.estimateCardioKcal(
+          exerciseId: workoutExercise.exerciseId,
+          durationSeconds: workoutExercise.durationSeconds!,
+          bodyWeightKg: bodyWeightKg,
+        );
+      } else {
+        workoutExercise.estimatedKcal = CalorieEstimationService.estimateStrengthKcal(
+          workingSetCount: workoutExercise.sets.length,
+          bodyWeightKg: bodyWeightKg,
+        );
+      }
+
       await DatabaseService.instance.addWorkoutExercise(_oggi, workoutExercise);
     }
   }
@@ -159,6 +178,7 @@ class _ExerciseCard extends StatelessWidget {
         : exercise.sets
             .map((s) => '${s.reps ?? '-'}×${s.weightKg != null ? '${s.weightKg}kg' : '-'}')
             .join(', ');
+    final kcalLabel = exercise.estimatedKcal != null ? '≈ ${exercise.estimatedKcal} kcal' : null;
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -185,6 +205,10 @@ class _ExerciseCard extends StatelessWidget {
                           : sottotitolo),
                   style: TextStyle(color: p.textMuted, fontSize: 13),
                 ),
+                if (kcalLabel != null) ...[
+                  const SizedBox(height: 2),
+                  Text(kcalLabel, style: TextStyle(color: p.accent, fontSize: 12)),
+                ],
               ],
             ),
           ),

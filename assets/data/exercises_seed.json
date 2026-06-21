@@ -1416,7 +1416,7 @@
   {
     "externalId": "Bicycling",
     "name": "Bicycling",
-    "nameIt": null,
+    "nameIt": "Ciclismo",
     "muscleGroup": "cardio",
     "category": "cardio",
     "equipment": "other",
@@ -1429,7 +1429,7 @@
   {
     "externalId": "Bicycling_Stationary",
     "name": "Bicycling, Stationary",
-    "nameIt": null,
+    "nameIt": "Cyclette",
     "muscleGroup": "cardio",
     "category": "cardio",
     "equipment": "machine",
@@ -4243,7 +4243,7 @@
   {
     "externalId": "Elliptical_Trainer",
     "name": "Elliptical Trainer",
-    "nameIt": null,
+    "nameIt": "Ellittica",
     "muscleGroup": "cardio",
     "category": "cardio",
     "equipment": "machine",
@@ -6020,7 +6020,7 @@
   {
     "externalId": "Jogging_Treadmill",
     "name": "Jogging, Treadmill",
-    "nameIt": null,
+    "nameIt": "Jogging al tapis roulant",
     "muscleGroup": "cardio",
     "category": "cardio",
     "equipment": "machine",
@@ -9079,7 +9079,7 @@
   {
     "externalId": "Prowler_Sprint",
     "name": "Prowler Sprint",
-    "nameIt": null,
+    "nameIt": "Sprint con prowler",
     "muscleGroup": "cardio",
     "category": "cardio",
     "equipment": "other",
@@ -9383,7 +9383,7 @@
   {
     "externalId": "Recumbent_Bike",
     "name": "Recumbent Bike",
-    "nameIt": null,
+    "nameIt": "Cyclette reclinata",
     "muscleGroup": "cardio",
     "category": "cardio",
     "equipment": "machine",
@@ -9879,7 +9879,7 @@
   {
     "externalId": "Rope_Jumping",
     "name": "Rope Jumping",
-    "nameIt": null,
+    "nameIt": "Salto con la corda",
     "muscleGroup": "cardio",
     "category": "cardio",
     "equipment": "other",
@@ -9924,7 +9924,7 @@
   {
     "externalId": "Rowing_Stationary",
     "name": "Rowing, Stationary",
-    "nameIt": null,
+    "nameIt": "Canottaggio (vogatore)",
     "muscleGroup": "cardio",
     "category": "cardio",
     "equipment": "machine",
@@ -9954,7 +9954,7 @@
   {
     "externalId": "Running_Treadmill",
     "name": "Running, Treadmill",
-    "nameIt": null,
+    "nameIt": "Corsa al tapis roulant",
     "muscleGroup": "cardio",
     "category": "cardio",
     "equipment": "machine",
@@ -11174,7 +11174,7 @@
   {
     "externalId": "Skating",
     "name": "Skating",
-    "nameIt": null,
+    "nameIt": "Pattinaggio",
     "muscleGroup": "cardio",
     "category": "cardio",
     "equipment": "other",
@@ -12019,7 +12019,7 @@
   {
     "externalId": "Stairmaster",
     "name": "Stairmaster",
-    "nameIt": null,
+    "nameIt": "Stairmaster (scalatore)",
     "muscleGroup": "cardio",
     "category": "cardio",
     "equipment": "machine",
@@ -12827,7 +12827,7 @@
   {
     "externalId": "Step_Mill",
     "name": "Step Mill",
-    "nameIt": null,
+    "nameIt": "Step mill",
     "muscleGroup": "cardio",
     "category": "cardio",
     "equipment": "machine",
@@ -13328,7 +13328,7 @@
   {
     "externalId": "Trail_Running_Walking",
     "name": "Trail Running/Walking",
-    "nameIt": null,
+    "nameIt": "Corsa/camminata su sentiero",
     "muscleGroup": "cardio",
     "category": "cardio",
     "equipment": null,
@@ -13715,7 +13715,7 @@
   {
     "externalId": "Walking_Treadmill",
     "name": "Walking, Treadmill",
-    "nameIt": null,
+    "nameIt": "Camminata al tapis roulant",
     "muscleGroup": "cardio",
     "category": "cardio",
     "equipment": "machine",

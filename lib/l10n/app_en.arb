@@ -419,5 +419,10 @@
   "serieDialogAggiungiSerie": "Add set",
 
   "cardioDialogDurataLabel": "Duration (minutes)",
-  "cardioDialogDurataHint": "30"
+  "cardioDialogDurataHint": "30",
+
+  "homeAttivitaTitle": "Activity",
+  "homeAttivitaKcalIngerite": "Calories eaten",
+  "homeAttivitaKcalBruciate": "Calories burned",
+  "homeAttivitaBilancioNetto": "Net balance"
 }

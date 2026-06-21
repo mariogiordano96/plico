@@ -1292,4 +1292,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cardioDialogDurataHint => '30';
+
+  @override
+  String get homeAttivitaTitle => 'Activity';
+
+  @override
+  String get homeAttivitaKcalIngerite => 'Calories eaten';
+
+  @override
+  String get homeAttivitaKcalBruciate => 'Calories burned';
+
+  @override
+  String get homeAttivitaBilancioNetto => 'Net balance';
 }

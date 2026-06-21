@@ -543,5 +543,10 @@
   "serieDialogAggiungiSerie": "Aggiungi serie",
 
   "cardioDialogDurataLabel": "Durata (minuti)",
-  "cardioDialogDurataHint": "30"
+  "cardioDialogDurataHint": "30",
+
+  "homeAttivitaTitle": "Attività",
+  "homeAttivitaKcalIngerite": "Kcal ingerite",
+  "homeAttivitaKcalBruciate": "Kcal bruciate",
+  "homeAttivitaBilancioNetto": "Bilancio netto"
 }

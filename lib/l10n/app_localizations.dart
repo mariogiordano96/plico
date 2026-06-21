@@ -2437,6 +2437,30 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'30'**
   String get cardioDialogDurataHint;
+
+  /// No description provided for @homeAttivitaTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Attività'**
+  String get homeAttivitaTitle;
+
+  /// No description provided for @homeAttivitaKcalIngerite.
+  ///
+  /// In it, this message translates to:
+  /// **'Kcal ingerite'**
+  String get homeAttivitaKcalIngerite;
+
+  /// No description provided for @homeAttivitaKcalBruciate.
+  ///
+  /// In it, this message translates to:
+  /// **'Kcal bruciate'**
+  String get homeAttivitaKcalBruciate;
+
+  /// No description provided for @homeAttivitaBilancioNetto.
+  ///
+  /// In it, this message translates to:
+  /// **'Bilancio netto'**
+  String get homeAttivitaBilancioNetto;
 }
 
 class _AppLocalizationsDelegate
