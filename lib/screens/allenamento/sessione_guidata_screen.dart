@@ -10,6 +10,7 @@ import '../../services/guided_session_service.dart';
 import '../../services/workout_progress_service.dart';
 import 'rest_timer_sheet.dart';
 import 'sessione_riepilogo_screen.dart';
+import 'sostituisci_esercizio_sheet.dart';
 
 /// Modalità esecuzione guidata: schermo singolo che guida l'esecuzione di una
 /// scheda esercizio per esercizio, con timer di recupero automatico tra le serie.
@@ -164,6 +165,47 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     }
   }
 
+  Future<void> _sostituisci(WorkoutExercise e) async {
+    final alt = await showSostituisciEsercizioSheet(context, e.exerciseId);
+    if (alt == null || !mounted) return;
+
+    e.exerciseId = alt.externalId;
+    e.exerciseName = alt.nameIt ?? alt.name;
+
+    if (e.durationSeconds != null) {
+      e.met = CalorieEstimationService.metForCardioExercise(e.exerciseId).round();
+      e.estimatedKcal = CalorieEstimationService.estimateCardioKcal(
+        exerciseId: e.exerciseId,
+        durationSeconds: e.durationSeconds!,
+        bodyWeightKg: _bodyWeightKg,
+      );
+      await DatabaseService.instance.updateWorkoutExercise(e);
+      if (!mounted) return;
+      setState(() {});
+      return;
+    }
+
+    final history = (await DatabaseService.instance.getHistoryForExercise(e.exerciseId))
+        .where((h) => h.id != e.id)
+        .toList();
+    _priorHistoryByExerciseId[e.exerciseId] = history;
+    OverloadSuggestion? suggestion;
+    if (history.isNotEmpty) {
+      final lastSession = history.first;
+      suggestion = WorkoutProgressService.needsDeload(history)
+          ? WorkoutProgressService.deloadSuggestion(lastSession)
+          : WorkoutProgressService.suggestNextSession(lastSession);
+    }
+
+    e.estimatedKcal = CalorieEstimationService.estimateStrengthKcal(
+      workingSetCount: e.sets.where((s) => !s.isWarmup).length,
+      bodyWeightKg: _bodyWeightKg,
+    );
+    await DatabaseService.instance.updateWorkoutExercise(e);
+    if (!mounted) return;
+    setState(() => _suggestionById[e.id] = suggestion);
+  }
+
   void _prev() {
     if (_stepIndex > 0) setState(() => _stepIndex--);
   }
@@ -245,6 +287,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
             onAddSerie: () => _addSerie(e),
             onConfirmSerie: (i) => _confirmSerie(e, i),
             onConfirmCardio: () => _confirmCardio(e),
+            onSostituisci: () => _sostituisci(e),
             p: p,
             l10n: l10n,
           ),
@@ -292,6 +335,7 @@ class _ExerciseStepCard extends StatelessWidget {
   final VoidCallback onAddSerie;
   final void Function(int setIndex) onConfirmSerie;
   final VoidCallback onConfirmCardio;
+  final VoidCallback onSostituisci;
   final ColorPalette p;
   final dynamic l10n;
 
@@ -304,6 +348,7 @@ class _ExerciseStepCard extends StatelessWidget {
     required this.onAddSerie,
     required this.onConfirmSerie,
     required this.onConfirmCardio,
+    required this.onSostituisci,
     required this.p,
     required this.l10n,
   });
@@ -323,8 +368,21 @@ class _ExerciseStepCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(exercise.exerciseName,
-              style: TextStyle(color: p.textPrimary, fontSize: 17, fontWeight: FontWeight.w700)),
+          Row(
+            children: [
+              Expanded(
+                child: Text(exercise.exerciseName,
+                    style: TextStyle(
+                        color: p.textPrimary, fontSize: 17, fontWeight: FontWeight.w700)),
+              ),
+              IconButton(
+                onPressed: onSostituisci,
+                icon: Icon(Icons.swap_horiz_rounded, color: p.textMuted),
+                tooltip: l10n.allenamentoSostituisci,
+                visualDensity: VisualDensity.compact,
+              ),
+            ],
+          ),
           if (suggestion != null) ...[
             const SizedBox(height: 6),
             _SuggestionLine(suggestion: suggestion!, p: p, l10n: l10n),

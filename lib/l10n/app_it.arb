@@ -552,6 +552,9 @@
   "allenamentoEliminaSub": "L'esercizio e le serie registrate verranno rimossi.",
   "allenamentoNotaTitle": "Nota sessione",
   "allenamentoNotaHint": "Come è andata? Sensazioni, energia, dolori...",
+  "allenamentoSostituisci": "Sostituisci",
+  "allenamentoSostituisciTitle": "Sostituisci esercizio",
+  "allenamentoSostituisciVuoto": "Nessuna alternativa disponibile",
 
   "serieDialogSerieLabel": "Serie {n}",
   "@serieDialogSerieLabel": {

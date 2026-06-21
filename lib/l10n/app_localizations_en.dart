@@ -1325,6 +1325,15 @@ class AppLocalizationsEn extends AppLocalizations {
       'How did it go? Feelings, energy, soreness...';
 
   @override
+  String get allenamentoSostituisci => 'Substitute';
+
+  @override
+  String get allenamentoSostituisciTitle => 'Substitute exercise';
+
+  @override
+  String get allenamentoSostituisciVuoto => 'No alternatives available';
+
+  @override
   String serieDialogSerieLabel(int n) {
     return 'Set $n';
   }

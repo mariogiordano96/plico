@@ -2492,6 +2492,24 @@ abstract class AppLocalizations {
   /// **'Come è andata? Sensazioni, energia, dolori...'**
   String get allenamentoNotaHint;
 
+  /// No description provided for @allenamentoSostituisci.
+  ///
+  /// In it, this message translates to:
+  /// **'Sostituisci'**
+  String get allenamentoSostituisci;
+
+  /// No description provided for @allenamentoSostituisciTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Sostituisci esercizio'**
+  String get allenamentoSostituisciTitle;
+
+  /// No description provided for @allenamentoSostituisciVuoto.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessuna alternativa disponibile'**
+  String get allenamentoSostituisciVuoto;
+
   /// No description provided for @serieDialogSerieLabel.
   ///
   /// In it, this message translates to:

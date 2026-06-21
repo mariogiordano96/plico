@@ -12,6 +12,7 @@ import 'le_mie_schede_screen.dart';
 import 'log_cardio_dialog.dart';
 import 'log_serie_dialog.dart';
 import 'rest_timer_settings_dialog.dart';
+import 'sostituisci_esercizio_sheet.dart';
 import 'storico_esercizio_screen.dart';
 
 class AllenamentoScreen extends StatefulWidget {
@@ -185,6 +186,31 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
     }
   }
 
+  Future<void> _sostituisci(WorkoutExercise e) async {
+    final alt = await showSostituisciEsercizioSheet(context, e.exerciseId);
+    if (alt == null || !mounted) return;
+
+    e.exerciseId = alt.externalId;
+    e.exerciseName = alt.nameIt ?? alt.name;
+
+    final bodySnapshot = await DatabaseService.instance.getLatestBodySnapshot();
+    final bodyWeightKg = bodySnapshot?.pesoKg;
+    if (e.durationSeconds != null) {
+      e.met = CalorieEstimationService.metForCardioExercise(e.exerciseId).round();
+      e.estimatedKcal = CalorieEstimationService.estimateCardioKcal(
+        exerciseId: e.exerciseId,
+        durationSeconds: e.durationSeconds!,
+        bodyWeightKg: bodyWeightKg,
+      );
+    } else {
+      e.estimatedKcal = CalorieEstimationService.estimateStrengthKcal(
+        workingSetCount: e.sets.length,
+        bodyWeightKg: bodyWeightKg,
+      );
+    }
+    await DatabaseService.instance.updateWorkoutExercise(e);
+  }
+
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
@@ -297,6 +323,7 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
                           p: p,
                           l10n: l10n,
                           onDelete: () => _elimina(e),
+                          onSostituisci: () => _sostituisci(e),
                         ),
                       ],
                     );
@@ -354,12 +381,14 @@ class _ExerciseCard extends StatelessWidget {
   final ColorPalette p;
   final AppLocalizations l10n;
   final VoidCallback onDelete;
+  final VoidCallback onSostituisci;
 
   const _ExerciseCard({
     required this.exercise,
     required this.p,
     required this.l10n,
     required this.onDelete,
+    required this.onSostituisci,
   });
 
   @override
@@ -415,12 +444,32 @@ class _ExerciseCard extends StatelessWidget {
               ),
             ),
           ),
-          IconButton(
-            onPressed: onDelete,
-            icon: Icon(Icons.delete_outline_rounded, color: p.textMuted),
+          PopupMenuButton<_ExerciseCardAction>(
+            icon: Icon(Icons.more_vert_rounded, color: p.textMuted),
+            color: p.surface,
+            onSelected: (action) {
+              switch (action) {
+                case _ExerciseCardAction.sostituisci:
+                  onSostituisci();
+                case _ExerciseCardAction.elimina:
+                  onDelete();
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: _ExerciseCardAction.sostituisci,
+                child: Text(l10n.allenamentoSostituisci, style: TextStyle(color: p.textPrimary)),
+              ),
+              PopupMenuItem(
+                value: _ExerciseCardAction.elimina,
+                child: Text(l10n.appElimina, style: TextStyle(color: p.error)),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 }
+
+enum _ExerciseCardAction { sostituisci, elimina }

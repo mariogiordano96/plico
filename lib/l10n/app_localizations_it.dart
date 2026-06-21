@@ -1332,6 +1332,15 @@ class AppLocalizationsIt extends AppLocalizations {
       'Come è andata? Sensazioni, energia, dolori...';
 
   @override
+  String get allenamentoSostituisci => 'Sostituisci';
+
+  @override
+  String get allenamentoSostituisciTitle => 'Sostituisci esercizio';
+
+  @override
+  String get allenamentoSostituisciVuoto => 'Nessuna alternativa disponibile';
+
+  @override
   String serieDialogSerieLabel(int n) {
     return 'Serie $n';
   }

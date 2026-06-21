@@ -1596,10 +1596,39 @@ posizionamento/stile già visto in Progressi.
 > Circuito Cardio/HIIT già a superset unico.
 
 ### Fase 13 — Sostituzione esercizio al volo
-- [ ] Campo `mechanic` su `ExerciseDefinition` (da Fase 1, già nel JSON sorgente)
-- [ ] `getAlternatives(exerciseId)` con ranking per `muscleGroup`/`mechanic`/`equipment`
-- [ ] UI "Sostituisci esercizio" da modalità guidata e da lista del giorno
-- [ ] Sostituzione limitata al `WorkoutExercise` della sessione (scheda salvata invariata)
+- [x] Campo `mechanic` su `ExerciseDefinition` (da Fase 1, già nel JSON sorgente)
+- [x] `getAlternatives(exerciseId)` con ranking per `muscleGroup`/`mechanic`/`equipment`
+  - `DatabaseService.getAlternatives` recupera l'`ExerciseDefinition` sorgente per
+    `externalId` e delega il ranking a `ExerciseAlternativesService.rank`
+    (`lib/services/exercise_alternatives_service.dart`), nuovo servizio puro senza
+    accesso a Isar: filtro rigido per `muscleGroup` uguale (esclude l'esercizio
+    sorgente), poi punteggio decrescente per `mechanic` uguale (+2) ed `equipment`
+    uguale (+1).
+- [x] UI "Sostituisci esercizio" da modalità guidata e da lista del giorno
+  - Nuovo bottom sheet condiviso `showSostituisciEsercizioSheet` in
+    `lib/screens/allenamento/sostituisci_esercizio_sheet.dart`: mostra le
+    alternative già ordinate (niente ricerca/filtri, scelta rapida durante
+    l'allenamento) e ritorna l'`ExerciseDefinition` scelto.
+  - `allenamento_screen.dart`: `_ExerciseCard` ha ora un `PopupMenuButton`
+    ("Sostituisci"/"Elimina") al posto del solo pulsante elimina.
+  - `sessione_guidata_screen.dart`: `_ExerciseStepCard` ha un'icona
+    `swap_horiz` accanto al nome esercizio.
+- [x] Sostituzione limitata al `WorkoutExercise` della sessione (scheda salvata invariata)
+  - In entrambi i punti di ingresso, `_sostituisci` muta in place il
+    `WorkoutExercise` esistente (stesso `Id`: `exerciseId`/`exerciseName`
+    aggiornati, serie/durata mantenute invariate) e richiama
+    `updateWorkoutExercise` — non viene mai toccato `WorkoutTemplate`/
+    `WorkoutTemplateExercise`, quindi la scheda salvata resta invariata.
+  - Le kcal stimate vengono ricalcolate sul nuovo esercizio (MET cardio o
+    conteggio serie per la forza); in modalità guidata viene anche
+    ricalcolato il suggerimento di overload sullo storico del nuovo
+    `exerciseId` (o azzerato se non c'è storico), così il box suggerimento
+    non mostra dati relativi all'esercizio precedente.
+
+> **Nota implementativa**: il filtro per `muscleGroup` uguale separa già
+> naturalmente cardio (gruppo `cardio`) da forza, quindi la sostituzione non
+> può mai cambiare la "forma" dell'esercizio (serie↔durata) — non è stato
+> necessario gestire un mapping cardio/forza incrociato.
 
 ### Fase 14 — Modifica e cancellazione log passato
 - [ ] Cronologia/selettore data per navigare ai `WorkoutLog` passati

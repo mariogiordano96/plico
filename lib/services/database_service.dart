@@ -26,6 +26,7 @@ import '../models/workout_template.dart';
 import '../models/workout_template_exercise.dart';
 import '../models/workout_program.dart';
 import '../models/workout_set.dart';
+import 'exercise_alternatives_service.dart';
 
 class DatabaseService {
   static final DatabaseService instance = DatabaseService._();
@@ -824,6 +825,21 @@ class DatabaseService {
     await _isar.writeTxn(() async {
       await _isar.exerciseDefinitions.put(exercise);
     });
+  }
+
+  /// Alternative per la sostituzione esercizio al volo (Fase 13), ordinate
+  /// per somiglianza a [exerciseId] (stesso muscleGroup, poi mechanic/equipment).
+  Future<List<ExerciseDefinition>> getAlternatives(String exerciseId) async {
+    final all = await getAllExercises();
+    ExerciseDefinition? source;
+    for (final e in all) {
+      if (e.externalId == exerciseId) {
+        source = e;
+        break;
+      }
+    }
+    if (source == null) return [];
+    return ExerciseAlternativesService.rank(source, all);
   }
 
   // ──────────────────────────────────────────────
