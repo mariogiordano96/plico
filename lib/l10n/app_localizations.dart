@@ -2420,6 +2420,18 @@ abstract class AppLocalizations {
   /// **'L\'esercizio e le serie registrate verranno rimossi.'**
   String get allenamentoEliminaSub;
 
+  /// No description provided for @allenamentoNotaTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Nota sessione'**
+  String get allenamentoNotaTitle;
+
+  /// No description provided for @allenamentoNotaHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Come è andata? Sensazioni, energia, dolori...'**
+  String get allenamentoNotaHint;
+
   /// No description provided for @serieDialogSerieLabel.
   ///
   /// In it, this message translates to:
@@ -2437,6 +2449,12 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'kg'**
   String get serieDialogKgHint;
+
+  /// No description provided for @serieDialogRpeLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'RPE'**
+  String get serieDialogRpeLabel;
 
   /// No description provided for @serieDialogAggiungiSerie.
   ///
@@ -2683,6 +2701,12 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Volume: {volume} kg'**
   String storicoVolumeSessione(String volume);
+
+  /// No description provided for @storicoRpeMedio.
+  ///
+  /// In it, this message translates to:
+  /// **'RPE medio: {rpe}'**
+  String storicoRpeMedio(String rpe);
 
   /// No description provided for @overloadUltimaVolta.
   ///

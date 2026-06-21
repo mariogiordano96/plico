@@ -1290,6 +1290,13 @@ class AppLocalizationsIt extends AppLocalizations {
       'L\'esercizio e le serie registrate verranno rimossi.';
 
   @override
+  String get allenamentoNotaTitle => 'Nota sessione';
+
+  @override
+  String get allenamentoNotaHint =>
+      'Come è andata? Sensazioni, energia, dolori...';
+
+  @override
   String serieDialogSerieLabel(int n) {
     return 'Serie $n';
   }
@@ -1299,6 +1306,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get serieDialogKgHint => 'kg';
+
+  @override
+  String get serieDialogRpeLabel => 'RPE';
 
   @override
   String get serieDialogAggiungiSerie => 'Aggiungi serie';
@@ -1435,6 +1445,11 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String storicoVolumeSessione(String volume) {
     return 'Volume: $volume kg';
+  }
+
+  @override
+  String storicoRpeMedio(String rpe) {
+    return 'RPE medio: $rpe';
   }
 
   @override

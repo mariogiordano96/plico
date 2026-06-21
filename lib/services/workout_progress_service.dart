@@ -38,6 +38,14 @@ class WorkoutProgressService {
     return weights.isEmpty ? null : weights.reduce((a, b) => a > b ? a : b);
   }
 
+  /// RPE medio della sessione (solo serie con `rpe` impostato), o null se nessuna
+  /// serie ha un RPE registrato.
+  static double? averageRpe(WorkoutExercise e) {
+    final rpeValues = _workSets(e).map((s) => s.rpe).whereType<int>();
+    if (rpeValues.isEmpty) return null;
+    return rpeValues.reduce((a, b) => a + b) / rpeValues.length;
+  }
+
   /// Stima 1RM (formula di Epley) sulla serie migliore della sessione.
   static double? estimatedOneRepMax(WorkoutExercise e) {
     final sets = _workSets(e).where((s) => s.weightKg != null && s.reps != null);

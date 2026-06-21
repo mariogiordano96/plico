@@ -22,6 +22,89 @@ class AllenamentoScreen extends StatefulWidget {
 
 class _AllenamentoScreenState extends State<AllenamentoScreen> {
   final _oggi = DateTime.now();
+  String? _nota;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNota();
+  }
+
+  Future<void> _loadNota() async {
+    final log = await DatabaseService.instance.getWorkoutLog(_oggi);
+    if (mounted) setState(() => _nota = log?.note);
+  }
+
+  Future<void> _editNota() async {
+    final l10n = context.l10n;
+    final p = context.palette;
+    final ctrl = TextEditingController(text: _nota ?? '');
+    final saved = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+        child: Container(
+          decoration: BoxDecoration(
+            color: p.background,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.allenamentoNotaTitle,
+                  style: TextStyle(color: p.accent, fontSize: 17, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 16),
+              TextField(
+                controller: ctrl,
+                autofocus: true,
+                maxLines: 4,
+                style: TextStyle(color: p.textPrimary),
+                decoration: InputDecoration(
+                  hintText: l10n.allenamentoNotaHint,
+                  hintStyle: TextStyle(color: p.textMuted),
+                  filled: true,
+                  fillColor: p.surface,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: p.cardBorder),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      child: Text(l10n.diarioAnnulla, style: TextStyle(color: p.textMuted)),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: () => Navigator.pop(ctx, true),
+                      style: FilledButton.styleFrom(backgroundColor: p.accent),
+                      child: Text(l10n.eserciziSalva,
+                          style: const TextStyle(fontWeight: FontWeight.w700)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (saved == true) {
+      final text = ctrl.text.trim();
+      await DatabaseService.instance.setWorkoutNote(_oggi, text.isEmpty ? null : text);
+      if (mounted) setState(() => _nota = text.isEmpty ? null : text);
+    }
+  }
 
   Future<void> _aggiungiEsercizio() async {
     final exercise = await showCatalogoEserciziSheet(context);
@@ -114,6 +197,16 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
         centerTitle: true,
         actions: [
           IconButton(
+            onPressed: _editNota,
+            icon: Icon(
+              _nota != null && _nota!.isNotEmpty
+                  ? Icons.edit_note_rounded
+                  : Icons.note_add_outlined,
+              color: p.accent,
+            ),
+            tooltip: l10n.allenamentoNotaTitle,
+          ),
+          IconButton(
             onPressed: () => showRestTimerSettingsDialog(context),
             icon: Icon(Icons.timer_outlined, color: p.accent),
             tooltip: l10n.restTimerSettingsTitle,
@@ -128,28 +221,60 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
           ),
         ],
       ),
-      body: StreamBuilder<List<WorkoutExercise>>(
-        stream: DatabaseService.instance.watchWorkoutExercisesForDay(_oggi),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return Center(child: CircularProgressIndicator(color: p.accent));
-          }
-          final esercizi = snapshot.data!;
-          if (esercizi.isEmpty) {
-            return _EmptyState(onAdd: _aggiungiEsercizio);
-          }
-          return ListView.separated(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-            itemCount: esercizi.length,
-            separatorBuilder: (_, _) => const SizedBox(height: 10),
-            itemBuilder: (context, i) => _ExerciseCard(
-              exercise: esercizi[i],
-              p: p,
-              l10n: l10n,
-              onDelete: () => _elimina(esercizi[i]),
+      body: Column(
+        children: [
+          if (_nota != null && _nota!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: GestureDetector(
+                onTap: _editNota,
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: p.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: p.cardBorder),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.sticky_note_2_outlined, color: p.accent, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(_nota!, style: TextStyle(color: p.textSecondary, fontSize: 13)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          );
-        },
+          Expanded(
+            child: StreamBuilder<List<WorkoutExercise>>(
+              stream: DatabaseService.instance.watchWorkoutExercisesForDay(_oggi),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(child: CircularProgressIndicator(color: p.accent));
+                }
+                final esercizi = snapshot.data!;
+                if (esercizi.isEmpty) {
+                  return _EmptyState(onAdd: _aggiungiEsercizio);
+                }
+                return ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                  itemCount: esercizi.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 10),
+                  itemBuilder: (context, i) => _ExerciseCard(
+                    exercise: esercizi[i],
+                    p: p,
+                    l10n: l10n,
+                    onDelete: () => _elimina(esercizi[i]),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _aggiungiEsercizio,

@@ -1479,10 +1479,27 @@ posizionamento/stile già visto in Progressi.
 > PR (altrimenti ogni sessione risulterebbe banalmente un "nuovo record" rispetto a se
 > stessa).
 
-### Fase 9 — Note di sessione e RPE
-- [ ] Campo `note` su `WorkoutLog` (da Fase 4), UI riuso pattern `body_snapshot`/diario
-- [ ] Campo `rpe` su `WorkoutSet` (da Fase 4), selettore 1-10 nel dialog log serie
-- [ ] RPE medio di sessione nella schermata Storico esercizio
+### Fase 9 — Note di sessione e RPE ✅ completata
+- [x] Campo `note` su `WorkoutLog` (da Fase 4): icona dedicata nell'AppBar di
+      `AllenamentoScreen` (`_editNota`) apre un bottom sheet con `TextField`
+      multilinea, stesso pattern di `add_pesata_screen.dart`; la nota del
+      giorno, se presente, è mostrata anche come banner sopra la lista
+      esercizi (`DatabaseService.getWorkoutLog`/`setWorkoutNote`, già da Fase 4)
+- [x] Campo `rpe` su `WorkoutSet` (da Fase 4): selettore 1-10 a chip
+      orizzontali scorrevoli (`_RpeSelector`) sotto ogni riga serie nel
+      dialog log serie (`log_serie_dialog.dart`)
+- [x] RPE medio di sessione nella schermata Storico esercizio:
+      `WorkoutProgressService.averageRpe` (nuovo metodo, esclude le serie di
+      riscaldamento) mostrato come sottotitolo in `_SessionRow`
+      (`storico_esercizio_screen.dart`)
+- [x] Verificato: `flutter analyze` pulito (21 issue pre-esistenti, 0 nuove);
+      3 test temporanei su `WorkoutProgressService.averageRpe` rimossi dopo
+      la verifica per restare coerenti con le fasi precedenti
+
+> **Correzione rispetto al piano originale**: il selettore RPE è stato aggiunto
+> solo nel dialog log serie (`log_serie_dialog.dart`), come indicato dal piano,
+> e non anche nella modalità esecuzione guidata (Fase 8) per mantenere lo
+> scope di questa fase circoscritto a quanto descritto in checklist.
 
 ### Fase 10 — Reminder allenamento
 - [ ] Nuova voce "Promemoria allenamento" in `notifiche_screen.dart`

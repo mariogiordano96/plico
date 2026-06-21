@@ -165,6 +165,7 @@ class _SessionRow extends StatelessWidget {
     final detail = isCardio
         ? l10n.allenamentoDurataMin(session.durationSeconds! ~/ 60)
         : session.sets.map((s) => '${s.reps ?? '-'}×${s.weightKg ?? '-'}kg').join(', ');
+    final avgRpe = isCardio ? null : WorkoutProgressService.averageRpe(session);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -181,8 +182,18 @@ class _SessionRow extends StatelessWidget {
             child: Text(dataLabel, style: TextStyle(color: p.textMuted, fontSize: 12)),
           ),
           Expanded(
-            child: Text(detail,
-                style: TextStyle(color: p.textPrimary, fontSize: 13)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(detail, style: TextStyle(color: p.textPrimary, fontSize: 13)),
+                if (avgRpe != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(l10n.storicoRpeMedio(avgRpe.toStringAsFixed(1)),
+                        style: TextStyle(color: p.textMuted, fontSize: 11)),
+                  ),
+              ],
+            ),
           ),
           if (isPr)
             Container(

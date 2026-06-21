@@ -415,10 +415,13 @@
   "allenamentoDurataMin": "{min} min",
   "allenamentoEliminaTitle": "Delete exercise?",
   "allenamentoEliminaSub": "The exercise and its logged sets will be removed.",
+  "allenamentoNotaTitle": "Session note",
+  "allenamentoNotaHint": "How did it go? Feelings, energy, soreness...",
 
   "serieDialogSerieLabel": "Set {n}",
   "serieDialogRipHint": "reps",
   "serieDialogKgHint": "kg",
+  "serieDialogRpeLabel": "RPE",
   "serieDialogAggiungiSerie": "Add set",
 
   "cardioDialogDurataLabel": "Duration (minutes)",
@@ -468,6 +471,7 @@
   "storicoNessunaSessione": "No session logged for this exercise yet",
   "storicoPrBadge": "PR",
   "storicoVolumeSessione": "Volume: {volume} kg",
+  "storicoRpeMedio": "Avg RPE: {rpe}",
 
   "overloadUltimaVolta": "Last time: {detail}",
   "overloadSuggeritoUp": "Suggested: increase to {kg} kg",
