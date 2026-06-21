@@ -1674,11 +1674,46 @@ posizionamento/stile già visto in Progressi.
 > tutta accoppiata a `BuildContext`/`DatabaseService`, non estraibile in una
 > funzione pura.
 
-### Fase 15 — Riscaldamento
-- [ ] Campo `isWarmup` su `WorkoutSet` (da Fase 4)
-- [ ] `suggestWarmupSets(targetWeightKg)` con soglia configurabile
-- [ ] Step preliminare nella modalità guidata, saltabile
-- [ ] Esclusione delle serie di riscaldamento da volume/PR/1RM/overload (Fase 7)
+### Fase 15 — Riscaldamento ✅ completata
+- [x] Campo `isWarmup` su `WorkoutSet` (da Fase 4)
+  - Il campo esisteva già (`lib/models/workout_set.dart`), introdotto in
+    anticipo in una fase precedente con un commento che già anticipava questa
+    fase.
+- [x] `suggestWarmupSets(targetWeightKg)` con soglia configurabile
+  - Aggiunto a `WorkoutProgressService` (logica pura, nessuna query Isar):
+    rampa fissa 50/70/90% del carico target con reps decrescenti (8/5/3),
+    arrotondata al multiplo di 2.5kg più vicino (`_roundToNearest`, già
+    usato per i suggerimenti di overload). Nessun suggerimento se il carico
+    target è sotto `warmupSkipThresholdKg` (20kg di default, parametro
+    `skipThresholdKg` configurabile) — carichi leggeri non richiedono una
+    rampa di avvicinamento.
+- [x] Step preliminare nella modalità guidata, saltabile
+  - In `sessione_guidata_screen.dart`, dopo aver applicato il suggerimento di
+    overload alla prima serie, se il carico target è noto e l'esercizio non
+    ha già serie di riscaldamento (evita doppia generazione se l'utente
+    torna sullo step), le serie suggerite vengono inserite in testa a
+    `e.sets` con `isWarmup = true`. La card (`_ExerciseStepCard`) le rende in
+    una sezione distinta ("RISCALDAMENTO", etichette "Risc. 1/2/3") sopra le
+    serie di lavoro, con un pulsante "Salta riscaldamento" che le rimuove
+    (`_skipWarmup`): non viene mai scritto nulla su Isar finché l'utente non
+    conferma almeno una serie (il riscaldamento esiste solo in memoria fino
+    a quel momento, coerente con il fatto che `_confirmSerie` persiste
+    l'intero `e.sets`).
+  - Estratto il pattern di riga serie (label + reps + kg + conferma), prima
+    inline, in un widget `_SetRow` condiviso fra riscaldamento e serie di
+    lavoro, per evitare duplicazione visto che la struttura è identica.
+- [x] Esclusione delle serie di riscaldamento da volume/PR/1RM/overload (Fase 7)
+  - Già implementato in una fase precedente: `WorkoutProgressService._workSets`
+    filtra `!s.isWarmup` ed è usato da tutti i metodi pubblici del servizio
+    (volume, max weight, RPE medio, 1RM stimato, PR, suggerimenti di
+    overload/deload); confermato per ispezione, nessuna modifica necessaria.
+
+> nessun nuovo test temporaneo oltre a quello già scritto e poi rimosso per
+> `suggestWarmupSets` (4 casi: rampa a 3 serie, soglia di default, soglia
+> personalizzabile, arrotondamento a 2.5kg) — la logica di inserimento/skip
+> nella modalità guidata è interamente UI/stato di schermata
+> (`_prepare`, `_skipWarmup`, `_ExerciseStepCard`), accoppiata a
+> `BuildContext`/controller di testo, non estraibile in una funzione pura.
 
 ### Fase 16 — Obiettivo settimanale di allenamenti
 - [ ] Preferenza utente per il target settimanale (pattern `target_service.dart`)

@@ -652,6 +652,12 @@
   "sessioneGuidataTermina": "Termina",
   "sessioneGuidataConferma": "Conferma serie",
   "sessioneGuidataSuperset": "SUPERSET",
+  "sessioneGuidataRiscaldamento": "RISCALDAMENTO",
+  "sessioneGuidataSaltaRiscaldamento": "Salta riscaldamento",
+  "sessioneGuidataRiscaldamentoSerieLabel": "Risc. {n}",
+  "@sessioneGuidataRiscaldamentoSerieLabel": {
+    "placeholders": { "n": { "type": "int" } }
+  },
 
   "sessioneRiepilogoTitle": "Sessione completata",
   "sessioneRiepilogoKcal": "{kcal} kcal stimate",

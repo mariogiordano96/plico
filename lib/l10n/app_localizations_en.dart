@@ -1560,6 +1560,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sessioneGuidataSuperset => 'SUPERSET';
 
   @override
+  String get sessioneGuidataRiscaldamento => 'WARM-UP';
+
+  @override
+  String get sessioneGuidataSaltaRiscaldamento => 'Skip warm-up';
+
+  @override
+  String sessioneGuidataRiscaldamentoSerieLabel(int n) {
+    return 'Warm-up $n';
+  }
+
+  @override
   String get sessioneRiepilogoTitle => 'Session complete';
 
   @override

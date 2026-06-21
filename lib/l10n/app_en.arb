@@ -507,6 +507,9 @@
   "sessioneGuidataTermina": "Finish",
   "sessioneGuidataConferma": "Confirm set",
   "sessioneGuidataSuperset": "SUPERSET",
+  "sessioneGuidataRiscaldamento": "WARM-UP",
+  "sessioneGuidataSaltaRiscaldamento": "Skip warm-up",
+  "sessioneGuidataRiscaldamentoSerieLabel": "Warm-up {n}",
 
   "sessioneRiepilogoTitle": "Session complete",
   "sessioneRiepilogoKcal": "{kcal} kcal estimated",

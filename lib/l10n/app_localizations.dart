@@ -2900,6 +2900,24 @@ abstract class AppLocalizations {
   /// **'SUPERSET'**
   String get sessioneGuidataSuperset;
 
+  /// No description provided for @sessioneGuidataRiscaldamento.
+  ///
+  /// In it, this message translates to:
+  /// **'RISCALDAMENTO'**
+  String get sessioneGuidataRiscaldamento;
+
+  /// No description provided for @sessioneGuidataSaltaRiscaldamento.
+  ///
+  /// In it, this message translates to:
+  /// **'Salta riscaldamento'**
+  String get sessioneGuidataSaltaRiscaldamento;
+
+  /// No description provided for @sessioneGuidataRiscaldamentoSerieLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'Risc. {n}'**
+  String sessioneGuidataRiscaldamentoSerieLabel(int n);
+
   /// No description provided for @sessioneRiepilogoTitle.
   ///
   /// In it, this message translates to:

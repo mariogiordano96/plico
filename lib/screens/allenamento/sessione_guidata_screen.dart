@@ -96,6 +96,12 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
         }
       }
 
+      final targetWeightKg = e.sets.isNotEmpty ? e.sets.first.weightKg : null;
+      if (targetWeightKg != null && !e.sets.any((s) => s.isWarmup)) {
+        final warmup = WorkoutProgressService.suggestWarmupSets(targetWeightKg);
+        if (warmup.isNotEmpty) e.sets.insertAll(0, warmup);
+      }
+
       _repsCtrls[e.id] = [
         for (final s in e.sets) TextEditingController(text: s.reps?.toString() ?? '')
       ];
@@ -118,6 +124,33 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
       e.sets.add(WorkoutSet());
       _repsCtrls[e.id]!.add(TextEditingController());
       _kgCtrls[e.id]!.add(TextEditingController());
+    });
+  }
+
+  /// Rimuove tutte le serie di riscaldamento suggerite per [e] (step
+  /// preliminare saltabile, Fase 15): non persistito, dato che il
+  /// riscaldamento non viene mai scritto su DB finché non si conferma
+  /// almeno una serie.
+  void _skipWarmup(WorkoutExercise e) {
+    setState(() {
+      final reps = _repsCtrls[e.id]!;
+      final kg = _kgCtrls[e.id]!;
+      final keptSets = <WorkoutSet>[];
+      final keptReps = <TextEditingController>[];
+      final keptKg = <TextEditingController>[];
+      for (var i = 0; i < e.sets.length; i++) {
+        if (e.sets[i].isWarmup) {
+          reps[i].dispose();
+          kg[i].dispose();
+        } else {
+          keptSets.add(e.sets[i]);
+          keptReps.add(reps[i]);
+          keptKg.add(kg[i]);
+        }
+      }
+      e.sets = keptSets;
+      _repsCtrls[e.id] = keptReps;
+      _kgCtrls[e.id] = keptKg;
     });
   }
 
@@ -288,6 +321,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
             onConfirmSerie: (i) => _confirmSerie(e, i),
             onConfirmCardio: () => _confirmCardio(e),
             onSostituisci: () => _sostituisci(e),
+            onSkipWarmup: () => _skipWarmup(e),
             p: p,
             l10n: l10n,
           ),
@@ -336,6 +370,7 @@ class _ExerciseStepCard extends StatelessWidget {
   final void Function(int setIndex) onConfirmSerie;
   final VoidCallback onConfirmCardio;
   final VoidCallback onSostituisci;
+  final VoidCallback onSkipWarmup;
   final ColorPalette p;
   final dynamic l10n;
 
@@ -349,11 +384,22 @@ class _ExerciseStepCard extends StatelessWidget {
     required this.onConfirmSerie,
     required this.onConfirmCardio,
     required this.onSostituisci,
+    required this.onSkipWarmup,
     required this.p,
     required this.l10n,
   });
 
   bool get _isCardio => durataCtrl != null;
+
+  List<int> get _warmupIndices => [
+        for (var i = 0; i < exercise.sets.length; i++)
+          if (exercise.sets[i].isWarmup) i
+      ];
+
+  List<int> get _workIndices => [
+        for (var i = 0; i < exercise.sets.length; i++)
+          if (!exercise.sets[i].isWarmup) i
+      ];
 
   @override
   Widget build(BuildContext context) {
@@ -420,41 +466,46 @@ class _ExerciseStepCard extends StatelessWidget {
               ],
             )
           else ...[
-            for (var i = 0; i < (repsCtrls?.length ?? 0); i++)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 56,
-                      child: Text(l10n.serieDialogSerieLabel(i + 1),
-                          style: TextStyle(color: p.textMuted, fontSize: 12)),
-                    ),
-                    Expanded(
-                      child: _NumberField(
-                        controller: repsCtrls![i],
-                        hint: l10n.serieDialogRipHint,
-                        p: p,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: _NumberField(
-                        controller: kgCtrls![i],
-                        hint: l10n.serieDialogKgHint,
-                        p: p,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () => onConfirmSerie(i),
-                      icon: Icon(
-                        Icons.check_circle_rounded,
-                        color: exercise.sets[i].reps != null ? p.accent : p.textMuted,
-                      ),
-                      tooltip: l10n.sessioneGuidataConferma,
-                    ),
-                  ],
+            if (_warmupIndices.isNotEmpty) ...[
+              Row(
+                children: [
+                  Icon(Icons.whatshot_rounded, color: p.accent, size: 14),
+                  const SizedBox(width: 4),
+                  Text(l10n.sessioneGuidataRiscaldamento,
+                      style: TextStyle(
+                          color: p.accent,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1)),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: onSkipWarmup,
+                    child: Text(l10n.sessioneGuidataSaltaRiscaldamento,
+                        style: TextStyle(color: p.textMuted, fontSize: 12)),
+                  ),
+                ],
+              ),
+              for (var w = 0; w < _warmupIndices.length; w++)
+                _SetRow(
+                  label: l10n.sessioneGuidataRiscaldamentoSerieLabel(w + 1),
+                  reps: repsCtrls![_warmupIndices[w]],
+                  kg: kgCtrls![_warmupIndices[w]],
+                  done: exercise.sets[_warmupIndices[w]].reps != null,
+                  onConfirm: () => onConfirmSerie(_warmupIndices[w]),
+                  p: p,
                 ),
+              const SizedBox(height: 4),
+              Divider(color: p.cardBorder),
+              const SizedBox(height: 4),
+            ],
+            for (var i = 0; i < _workIndices.length; i++)
+              _SetRow(
+                label: l10n.serieDialogSerieLabel(i + 1),
+                reps: repsCtrls![_workIndices[i]],
+                kg: kgCtrls![_workIndices[i]],
+                done: exercise.sets[_workIndices[i]].reps != null,
+                onConfirm: () => onConfirmSerie(_workIndices[i]),
+                p: p,
               ),
             TextButton.icon(
               onPressed: onAddSerie,
@@ -499,6 +550,48 @@ class _SuggestionLine extends StatelessWidget {
     }
     return Text('$icon $text',
         style: TextStyle(color: p.accent, fontSize: 13, fontWeight: FontWeight.w600));
+  }
+}
+
+class _SetRow extends StatelessWidget {
+  final String label;
+  final TextEditingController reps;
+  final TextEditingController kg;
+  final bool done;
+  final VoidCallback onConfirm;
+  final ColorPalette p;
+
+  const _SetRow({
+    required this.label,
+    required this.reps,
+    required this.kg,
+    required this.done,
+    required this.onConfirm,
+    required this.p,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 56,
+            child: Text(label, style: TextStyle(color: p.textMuted, fontSize: 12)),
+          ),
+          Expanded(child: _NumberField(controller: reps, hint: l10n.serieDialogRipHint, p: p)),
+          const SizedBox(width: 8),
+          Expanded(child: _NumberField(controller: kg, hint: l10n.serieDialogKgHint, p: p)),
+          IconButton(
+            onPressed: onConfirm,
+            icon: Icon(Icons.check_circle_rounded, color: done ? p.accent : p.textMuted),
+            tooltip: l10n.sessioneGuidataConferma,
+          ),
+        ],
+      ),
+    );
   }
 }
 

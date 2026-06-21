@@ -28,6 +28,28 @@ class WorkoutProgressService {
   static List<WorkoutSet> _workSets(WorkoutExercise e) =>
       e.sets.where((s) => !s.isWarmup).toList();
 
+  /// Soglia minima di carico (kg) sotto la quale il riscaldamento non viene
+  /// suggerito: carichi leggeri non richiedono una rampa di avvicinamento.
+  static const double warmupSkipThresholdKg = 20;
+
+  /// Rampa di riscaldamento (50%/70%/90% di [targetWeightKg], reps decrescenti)
+  /// per avvicinarsi al carico di lavoro. Nessun suggerimento se [targetWeightKg]
+  /// è sotto [skipThresholdKg] (default [warmupSkipThresholdKg]).
+  static List<WorkoutSet> suggestWarmupSets(
+    double targetWeightKg, {
+    double skipThresholdKg = warmupSkipThresholdKg,
+  }) {
+    if (targetWeightKg < skipThresholdKg) return [];
+    const ramps = [(0.5, 8), (0.7, 5), (0.9, 3)];
+    return [
+      for (final ramp in ramps)
+        WorkoutSet()
+          ..isWarmup = true
+          ..weightKg = _roundToNearest(targetWeightKg * ramp.$1, 2.5)
+          ..reps = ramp.$2,
+    ];
+  }
+
   static double sessionVolume(WorkoutExercise e) {
     return _workSets(e).fold<double>(
         0, (sum, s) => sum + (s.reps ?? 0) * (s.weightKg ?? 0));
