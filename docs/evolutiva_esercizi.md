@@ -1283,10 +1283,26 @@ posizionamento/stile già visto in Progressi.
 > con questo nome esatto in `free-exercise-db` — andranno gestiti con esercizi custom o
 > il più vicino equivalente reale in fase di mapping preset.
 
-### Fase 3 — UI catalogo
-- [ ] Bottom sheet con chip filtro gruppo muscolare + barra di ricerca
-- [ ] Lista esercizi con nome IT, gruppo, equipment
-- [ ] Schermata aggiunta esercizio custom
+### Fase 3 — UI catalogo ✅ completata
+- [x] `showCatalogoEserciziSheet()` (`lib/screens/esercizi/catalogo_esercizi_screen.dart`):
+      bottom sheet con chip filtro gruppo muscolare + barra di ricerca (debounce 350ms)
+- [x] Lista esercizi con nome IT (fallback EN), gruppo, equipment; badge "Il mio" per i
+      personalizzati; tap su un esercizio ritorna l'`ExerciseDefinition` selezionato
+      (consumato dalla Fase 4, non ancora wired a nessuna schermata "log del giorno")
+- [x] `AggiungiEsercizioPersonalizzatoScreen`: form nome/gruppo/tipo/attrezzatura,
+      salva con `isCustom = true` e `externalId` generato (`custom_<timestamp>`)
+- [x] `DatabaseService.searchExercises()`/`addCustomExercise()` aggiunti
+- [x] Nuove chiavi `.arb` (it/en) per le due schermate; `flutter gen-l10n` rieseguito
+      (ha anche risolto 67 errori pre-esistenti di chiavi `.arb` non sincronizzate)
+- [x] Verificato: `flutter analyze` pulito; test di servizio (`searchExercises`,
+      `addCustomExercise`, filtro per gruppo) passano in modo affidabile
+
+> **Nota tecnica**: `Isar.open()` va in deadlock se invocato dentro la zona `FakeAsync` di
+> `flutter_test` (va isolato con `tester.runAsync`); le query Isar triggerate da
+> interazioni utente (tap/debounce) durante `pump()` non si risolvono in modo affidabile
+> nello stesso ambiente — limite noto del binding nativo, non un bug applicativo. La
+> logica è verificata a livello di servizio (test diretti su `DatabaseService`); la
+> verifica interattiva della UI va fatta manualmente su device/emulatore.
 
 ### Fase 4 — Log allenamento
 - [ ] Modelli Isar `WorkoutLog` (con `note`), `WorkoutExercise` (con `exerciseId`/`date`

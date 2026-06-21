@@ -652,4 +652,595 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pianoStileSalata => '🧀 Savoury';
+
+  @override
+  String get appElimina => 'Delete';
+
+  @override
+  String get progressiTitolo => 'PROGRESS';
+
+  @override
+  String get progressiTooltipEsporta => 'Export PDF';
+
+  @override
+  String get progressiTooltipStorico => 'Measurements history';
+
+  @override
+  String get progressiSezPeso => 'WEIGHT';
+
+  @override
+  String get progressiSezDiario => 'DIARY';
+
+  @override
+  String get progressiSezComposizione => 'BODY COMPOSITION';
+
+  @override
+  String get progressiSezMisurazioni => 'MEASUREMENTS';
+
+  @override
+  String get progressiRange1A => '1Y';
+
+  @override
+  String get progressiRangeTutto => 'All';
+
+  @override
+  String get progressiMassaGrassa => 'Fat Mass';
+
+  @override
+  String get progressiMassaMagra => 'Lean Mass';
+
+  @override
+  String get progressiProteine => 'Protein';
+
+  @override
+  String get progressiGrassi => 'Fats';
+
+  @override
+  String get progressiCarboidrati => 'Carbs';
+
+  @override
+  String get progressiNessunDato => 'No data in the selected period';
+
+  @override
+  String progressiMedia7gg(String val, String unit) {
+    return '7d avg: $val $unit';
+  }
+
+  @override
+  String get progressiStatUltimo => 'Last';
+
+  @override
+  String get progressiStatMedia => 'Avg';
+
+  @override
+  String get progressiStatVariazione => 'Change';
+
+  @override
+  String get progressiStatGiorni => 'Days';
+
+  @override
+  String get progressiStatRilevazioni => 'Readings';
+
+  @override
+  String get progressiGenerazionePdf => 'Generating PDF...';
+
+  @override
+  String get progressiEsportaDiario => 'Export Diary';
+
+  @override
+  String get progressiEsportaSub => 'Select the period to export as PDF';
+
+  @override
+  String get progressiUltimaSettimana => 'Last week';
+
+  @override
+  String get progressiUltimoMese => 'Last month';
+
+  @override
+  String get progressi7Giorni => '7 days';
+
+  @override
+  String get progressi30Giorni => '30 days';
+
+  @override
+  String progressiErrEsportazione(String err) {
+    return 'Export error: $err';
+  }
+
+  @override
+  String get pesateTitolo => 'WEIGH-INS';
+
+  @override
+  String get pesateEliminaTitle => 'Delete weigh-in';
+
+  @override
+  String get pesateEliminaSub =>
+      'Are you sure you want to delete this measurement?';
+
+  @override
+  String get pesateNessuna => 'No weigh-ins';
+
+  @override
+  String get pesateNessunaSub => 'Tap + to add\nyour first measurement';
+
+  @override
+  String get pesateNuova => 'NEW WEIGH-IN';
+
+  @override
+  String get pesateData => 'DATE';
+
+  @override
+  String get pesatePeso => 'WEIGHT *';
+
+  @override
+  String get pesateCampoObb => 'Required field';
+
+  @override
+  String get pesatePesoInvalido => 'Invalid weight';
+
+  @override
+  String get pesateAltezzaOpz => 'HEIGHT (optional)';
+
+  @override
+  String get pesateAltezzaHint => 'Only if different from profile';
+
+  @override
+  String get pesateAltezzaInvalida => 'Invalid height';
+
+  @override
+  String get pesateBodyFatOpz => 'BODY FAT (optional)';
+
+  @override
+  String get pesateBodyFatHint => 'E.g. from smart scale';
+
+  @override
+  String get pesateBodyFatInvalido => 'Invalid value (1–70%)';
+
+  @override
+  String get pesateNoteOpz => 'NOTES (optional)';
+
+  @override
+  String get pesateNoteHint => 'E.g. morning, fasted...';
+
+  @override
+  String get pesateSalva => 'SAVE WEIGH-IN';
+
+  @override
+  String get storicoMisurazioni => 'MEASUREMENTS';
+
+  @override
+  String get storicoEliminaTitle => 'Delete measurement';
+
+  @override
+  String get storicoEliminaSub => 'Delete data for this day?';
+
+  @override
+  String get storicoFonteManuale => 'Manual';
+
+  @override
+  String get storicoNessuna => 'No measurements';
+
+  @override
+  String get storicoNessunaSub =>
+      'Measurements will appear here\nafter a session or manual entry.';
+
+  @override
+  String get misurazioneNuova => 'NEW MEASUREMENT';
+
+  @override
+  String get misurazioneModifica => 'Edit';
+
+  @override
+  String get misurazioneTabPliche => 'SKINFOLDS';
+
+  @override
+  String get misurazioneTabCirconferenze => 'CIRCUMFERENCES';
+
+  @override
+  String get misurazioneSalva => 'SAVE MEASUREMENT';
+
+  @override
+  String get misurazioneInserisciValore => 'Enter at least one value';
+
+  @override
+  String get misurazioneCalibrazione => 'Point calibration';
+
+  @override
+  String misurazioneContPliche(String count) {
+    return '$count skinfolds';
+  }
+
+  @override
+  String misurazioneContCirconferenze(String count) {
+    return '$count circ.';
+  }
+
+  @override
+  String get misuraVita => 'Waist';
+
+  @override
+  String get misuraFianchi => 'Hips';
+
+  @override
+  String get misuraBraccio => 'Arm';
+
+  @override
+  String get misuraCollo => 'Neck';
+
+  @override
+  String get misuraCoscia => 'Thigh';
+
+  @override
+  String get misuraPolpaccio => 'Calf';
+
+  @override
+  String get misuraTorace => 'Chest';
+
+  @override
+  String get misuraSpalle => 'Shoulders';
+
+  @override
+  String get misuraTricipite => 'Triceps';
+
+  @override
+  String get misuraBicipite => 'Biceps';
+
+  @override
+  String get misuraSottoscap => 'Subscap.';
+
+  @override
+  String get misuraSottoscapolare => 'Subscapular';
+
+  @override
+  String get misuraSovrailiaca => 'Suprailiac';
+
+  @override
+  String get misuraAddome => 'Abdomen';
+
+  @override
+  String get misuraCosciaPlica => 'Thigh (SK)';
+
+  @override
+  String get misuraPettorale => 'Pectoral';
+
+  @override
+  String get misuraAscellare => 'Axillary';
+
+  @override
+  String get tdeeTitolo => 'MY PLAN';
+
+  @override
+  String get tdeeIntroTesto =>
+      'Configure your nutrition plan. Once activated, these values will be used in the food diary.';
+
+  @override
+  String get tdeeSezObiettivo => 'GOAL';
+
+  @override
+  String get tdeeSezAttivita => 'ACTIVITY LEVEL';
+
+  @override
+  String get tdeeSezMetodo => 'CALCULATION METHOD';
+
+  @override
+  String get tdeeSezAnteprima => 'PLAN PREVIEW';
+
+  @override
+  String get tdeeSezRipartizione => 'MACRO BREAKDOWN';
+
+  @override
+  String get tdeePesoObiettivo => 'Target weight (kg)';
+
+  @override
+  String get tdeeNessunaPesata => 'Log a weigh-in to calculate your plan.';
+
+  @override
+  String get tdeeAttivaPiano => 'ACTIVATE PLAN';
+
+  @override
+  String get tdeeAggiornaPiano => 'UPDATE PLAN';
+
+  @override
+  String get tdeeKcalGiornoUnit => 'kcal/day';
+
+  @override
+  String get tdeePianoAttivoLabel => 'ACTIVE PLAN';
+
+  @override
+  String tdeeAttivatoDal(String date) {
+    return 'since $date';
+  }
+
+  @override
+  String get tdeeDatiInsufficienti => 'Insufficient data';
+
+  @override
+  String get tdeeCarbsNote => 'remaining calories';
+
+  @override
+  String tdeeSonoPassati(int n) {
+    return '$n days have passed';
+  }
+
+  @override
+  String get tdeeBannerSub =>
+      'It might be time to update your plan based on your progress.';
+
+  @override
+  String get tdeeRicalcolaObiettivo => 'Recalculate goal';
+
+  @override
+  String get tdeeRicalcolaBtn => 'Recalculate';
+
+  @override
+  String tdeeRicalcolaBody(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'You activated the plan $n days ago.',
+      one: 'You activated the plan $n day ago.',
+    );
+    return '$_temp0\n\nYou can recalculate at any time, but we recommend doing so after at least 30 days to evaluate progress.';
+  }
+
+  @override
+  String tdeeCalibrazione(String days, String suggested, String current) {
+    return 'Based on your last $days days of data, your real TDEE might be ~$suggested kcal (estimated: $current kcal).';
+  }
+
+  @override
+  String tdeePreviewFormula(String nome, String tdee) {
+    return 'Formula: $nome  ·  TDEE: $tdee kcal';
+  }
+
+  @override
+  String get tdeeObjDeficit => 'Deficit';
+
+  @override
+  String get tdeeObjMantenimento => 'Maintenance';
+
+  @override
+  String get tdeeObjSurplus => 'Surplus';
+
+  @override
+  String get tdeeObjDeficitBadge => 'Deficit −20%';
+
+  @override
+  String get tdeeObjSurplusBadge => 'Surplus +15%';
+
+  @override
+  String get tdeeAttSedentario => 'Sedentary';
+
+  @override
+  String get tdeeAttLegg => 'Lightly active';
+
+  @override
+  String get tdeeAttMod => 'Moderately active';
+
+  @override
+  String get tdeeAttMolto => 'Very active';
+
+  @override
+  String get tdeeAttAtleta => 'Athlete';
+
+  @override
+  String get tdeeAttSedentarioDesc => 'Sedentary job, little or no exercise';
+
+  @override
+  String get tdeeAttLeggDesc => 'Light exercise 1–3 days/week';
+
+  @override
+  String get tdeeAttModDesc => 'Moderate exercise 3–5 days/week';
+
+  @override
+  String get tdeeAttMoltoDesc => 'Intense exercise 6–7 days/week';
+
+  @override
+  String get tdeeAttAtletaDesc => 'Intense physical job or double training';
+
+  @override
+  String get tdeeMetodoAutomaticoNome => 'Automatic';
+
+  @override
+  String get tdeeMetodoAutomaticoDesc =>
+      'Uses the most accurate formula available: Katch-McArdle if you have skinfold data, otherwise Mifflin-St Jeor.';
+
+  @override
+  String get tdeeMetodoKatchDesc =>
+      'BMR = 370 + 21.6 × lean mass. The most accurate: considers only metabolically active mass.';
+
+  @override
+  String get tdeeMetodoMifflinDesc =>
+      'Formula recommended by the American Dietetic Association. Accurate for most people.';
+
+  @override
+  String get tdeeMetodoHarrisDesc =>
+      'Revised classic formula (Roza & Shizgal, 1984). Tends to slightly overestimate.';
+
+  @override
+  String get tdeeRichiedePlic => 'requires skinfold test';
+
+  @override
+  String get notifChannelPasti => 'Meal reminders';
+
+  @override
+  String get notifChannelPastiDesc => 'Remember to log your meals';
+
+  @override
+  String get notifChannelRecap => 'Evening recap';
+
+  @override
+  String get notifChannelRecapDesc => 'Evening summary of your progress';
+
+  @override
+  String get notifChannelMattino => 'Morning recap';
+
+  @override
+  String get notifChannelMattinoDesc => 'Yesterday\'s calorie summary';
+
+  @override
+  String get notifChannelPesata => 'Weigh-in reminder';
+
+  @override
+  String get notifChannelPesataDesc => 'Remember to log your weight';
+
+  @override
+  String notifPastoBody(String pasto) {
+    return 'Did you log $pasto?';
+  }
+
+  @override
+  String get notifRecapNuovaStreak =>
+      'Log your meals today to start a new streak.';
+
+  @override
+  String notifRecapMantieni(int streak) {
+    return 'You\'ve logged every day for $streak days. Keep your streak going? 🔥';
+  }
+
+  @override
+  String notifRecapObiettivo(int streak) {
+    return 'Today you hit your goal for $streak days in a row 🔥';
+  }
+
+  @override
+  String notifRecapStreak(int streak) {
+    return 'You\'ve logged $streak days in a row! Keep it up 💪';
+  }
+
+  @override
+  String notifMattinoOnTarget(int kcal, int target) {
+    return 'Yesterday you ate $kcal kcal out of $target. Great job! 💪';
+  }
+
+  @override
+  String notifMattinoOffTarget(int kcal, int target) {
+    return 'Yesterday you logged $kcal kcal out of $target target.';
+  }
+
+  @override
+  String notifMattinoNoTarget(int kcal) {
+    return 'Yesterday you logged $kcal kcal.';
+  }
+
+  @override
+  String notifPesataBody(int days) {
+    return 'You haven\'t weighed in for $days days. Want to log your weight?';
+  }
+
+  @override
+  String get pdfDiarioTitle => 'Food Diary';
+
+  @override
+  String get pdfTargetLabel => 'target';
+
+  @override
+  String pdfPagina(int page, int total) {
+    return 'page $page of $total';
+  }
+
+  @override
+  String get pdfNessunDato => 'No data recorded';
+
+  @override
+  String get pdfPastoFallback => 'Meal';
+
+  @override
+  String get pdfRiepilogo => 'SUMMARY';
+
+  @override
+  String pdfGiorniConDati(int withData, int days) {
+    return 'Days with data: $withData/$days';
+  }
+
+  @override
+  String pdfGiorniOnTarget(int onTarget, int total) {
+    return 'Days on-target (90–105%): $onTarget/$total';
+  }
+
+  @override
+  String get pdfMediaLabel => 'Daily average:';
+
+  @override
+  String get pdfTargetPrefix => 'Target:';
+
+  @override
+  String get pdfPianoTitle => 'Meal Plan';
+
+  @override
+  String pdfGenerato(String created) {
+    return 'Generated on $created';
+  }
+
+  @override
+  String get muscleGroupAll => 'All';
+
+  @override
+  String get muscleGroupChest => 'Chest';
+
+  @override
+  String get muscleGroupBack => 'Back';
+
+  @override
+  String get muscleGroupLegs => 'Legs';
+
+  @override
+  String get muscleGroupArms => 'Arms';
+
+  @override
+  String get muscleGroupShoulders => 'Shoulders';
+
+  @override
+  String get muscleGroupCore => 'Core';
+
+  @override
+  String get muscleGroupCardio => 'Cardio';
+
+  @override
+  String get eserciziCatalogoTitle => 'Exercise catalog';
+
+  @override
+  String get eserciziCercaHint => 'Search exercise...';
+
+  @override
+  String get eserciziNessunRisultato => 'No exercise found';
+
+  @override
+  String get eserciziAggiungiPersonalizzato => 'Add custom exercise';
+
+  @override
+  String get eserciziPersonalizzatoBadge => 'Mine';
+
+  @override
+  String get eserciziNuovoTitle => 'New exercise';
+
+  @override
+  String get eserciziNomeLabel => 'Name';
+
+  @override
+  String get eserciziNomeHint => 'E.g. Machine chest press';
+
+  @override
+  String get eserciziGruppoMuscolareLabel => 'Muscle group';
+
+  @override
+  String get eserciziTipoLabel => 'Type';
+
+  @override
+  String get eserciziTipoForza => 'Strength';
+
+  @override
+  String get eserciziTipoCardio => 'Cardio';
+
+  @override
+  String get eserciziAttrezzaturaLabel => 'Equipment (optional)';
+
+  @override
+  String get eserciziAttrezzaturaHint => 'E.g. Dumbbells, bodyweight...';
+
+  @override
+  String get eserciziSalva => 'Save';
+
+  @override
+  String get eserciziNomeObbligatorio => 'Name is required';
 }

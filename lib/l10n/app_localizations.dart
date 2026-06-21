@@ -1285,6 +1285,1074 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'🧀 Salata'**
   String get pianoStileSalata;
+
+  /// No description provided for @appElimina.
+  ///
+  /// In it, this message translates to:
+  /// **'Elimina'**
+  String get appElimina;
+
+  /// No description provided for @progressiTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'PROGRESSI'**
+  String get progressiTitolo;
+
+  /// No description provided for @progressiTooltipEsporta.
+  ///
+  /// In it, this message translates to:
+  /// **'Esporta PDF'**
+  String get progressiTooltipEsporta;
+
+  /// No description provided for @progressiTooltipStorico.
+  ///
+  /// In it, this message translates to:
+  /// **'Storico misurazioni'**
+  String get progressiTooltipStorico;
+
+  /// No description provided for @progressiSezPeso.
+  ///
+  /// In it, this message translates to:
+  /// **'PESO'**
+  String get progressiSezPeso;
+
+  /// No description provided for @progressiSezDiario.
+  ///
+  /// In it, this message translates to:
+  /// **'DIARIO'**
+  String get progressiSezDiario;
+
+  /// No description provided for @progressiSezComposizione.
+  ///
+  /// In it, this message translates to:
+  /// **'COMPOSIZIONE CORPOREA'**
+  String get progressiSezComposizione;
+
+  /// No description provided for @progressiSezMisurazioni.
+  ///
+  /// In it, this message translates to:
+  /// **'MISURAZIONI'**
+  String get progressiSezMisurazioni;
+
+  /// No description provided for @progressiRange1A.
+  ///
+  /// In it, this message translates to:
+  /// **'1A'**
+  String get progressiRange1A;
+
+  /// No description provided for @progressiRangeTutto.
+  ///
+  /// In it, this message translates to:
+  /// **'Tutto'**
+  String get progressiRangeTutto;
+
+  /// No description provided for @progressiMassaGrassa.
+  ///
+  /// In it, this message translates to:
+  /// **'Massa Grassa'**
+  String get progressiMassaGrassa;
+
+  /// No description provided for @progressiMassaMagra.
+  ///
+  /// In it, this message translates to:
+  /// **'Massa Magra'**
+  String get progressiMassaMagra;
+
+  /// No description provided for @progressiProteine.
+  ///
+  /// In it, this message translates to:
+  /// **'Proteine'**
+  String get progressiProteine;
+
+  /// No description provided for @progressiGrassi.
+  ///
+  /// In it, this message translates to:
+  /// **'Grassi'**
+  String get progressiGrassi;
+
+  /// No description provided for @progressiCarboidrati.
+  ///
+  /// In it, this message translates to:
+  /// **'Carboidrati'**
+  String get progressiCarboidrati;
+
+  /// No description provided for @progressiNessunDato.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessun dato nel periodo selezionato'**
+  String get progressiNessunDato;
+
+  /// No description provided for @progressiMedia7gg.
+  ///
+  /// In it, this message translates to:
+  /// **'media 7gg: {val} {unit}'**
+  String progressiMedia7gg(String val, String unit);
+
+  /// No description provided for @progressiStatUltimo.
+  ///
+  /// In it, this message translates to:
+  /// **'Ultimo'**
+  String get progressiStatUltimo;
+
+  /// No description provided for @progressiStatMedia.
+  ///
+  /// In it, this message translates to:
+  /// **'Media'**
+  String get progressiStatMedia;
+
+  /// No description provided for @progressiStatVariazione.
+  ///
+  /// In it, this message translates to:
+  /// **'Variazione'**
+  String get progressiStatVariazione;
+
+  /// No description provided for @progressiStatGiorni.
+  ///
+  /// In it, this message translates to:
+  /// **'Giorni'**
+  String get progressiStatGiorni;
+
+  /// No description provided for @progressiStatRilevazioni.
+  ///
+  /// In it, this message translates to:
+  /// **'Rilevazioni'**
+  String get progressiStatRilevazioni;
+
+  /// No description provided for @progressiGenerazionePdf.
+  ///
+  /// In it, this message translates to:
+  /// **'Generazione PDF...'**
+  String get progressiGenerazionePdf;
+
+  /// No description provided for @progressiEsportaDiario.
+  ///
+  /// In it, this message translates to:
+  /// **'Esporta Diario'**
+  String get progressiEsportaDiario;
+
+  /// No description provided for @progressiEsportaSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Seleziona il periodo da esportare in PDF'**
+  String get progressiEsportaSub;
+
+  /// No description provided for @progressiUltimaSettimana.
+  ///
+  /// In it, this message translates to:
+  /// **'Ultima settimana'**
+  String get progressiUltimaSettimana;
+
+  /// No description provided for @progressiUltimoMese.
+  ///
+  /// In it, this message translates to:
+  /// **'Ultimo mese'**
+  String get progressiUltimoMese;
+
+  /// No description provided for @progressi7Giorni.
+  ///
+  /// In it, this message translates to:
+  /// **'7 giorni'**
+  String get progressi7Giorni;
+
+  /// No description provided for @progressi30Giorni.
+  ///
+  /// In it, this message translates to:
+  /// **'30 giorni'**
+  String get progressi30Giorni;
+
+  /// No description provided for @progressiErrEsportazione.
+  ///
+  /// In it, this message translates to:
+  /// **'Errore nell\'esportazione: {err}'**
+  String progressiErrEsportazione(String err);
+
+  /// No description provided for @pesateTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'PESATE'**
+  String get pesateTitolo;
+
+  /// No description provided for @pesateEliminaTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Elimina pesata'**
+  String get pesateEliminaTitle;
+
+  /// No description provided for @pesateEliminaSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Sei sicuro di voler eliminare questa misurazione?'**
+  String get pesateEliminaSub;
+
+  /// No description provided for @pesateNessuna.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessuna pesata'**
+  String get pesateNessuna;
+
+  /// No description provided for @pesateNessunaSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Premi + per aggiungere\nla prima misurazione'**
+  String get pesateNessunaSub;
+
+  /// No description provided for @pesateNuova.
+  ///
+  /// In it, this message translates to:
+  /// **'NUOVA PESATA'**
+  String get pesateNuova;
+
+  /// No description provided for @pesateData.
+  ///
+  /// In it, this message translates to:
+  /// **'DATA'**
+  String get pesateData;
+
+  /// No description provided for @pesatePeso.
+  ///
+  /// In it, this message translates to:
+  /// **'PESO *'**
+  String get pesatePeso;
+
+  /// No description provided for @pesateCampoObb.
+  ///
+  /// In it, this message translates to:
+  /// **'Campo obbligatorio'**
+  String get pesateCampoObb;
+
+  /// No description provided for @pesatePesoInvalido.
+  ///
+  /// In it, this message translates to:
+  /// **'Peso non valido'**
+  String get pesatePesoInvalido;
+
+  /// No description provided for @pesateAltezzaOpz.
+  ///
+  /// In it, this message translates to:
+  /// **'ALTEZZA (opzionale)'**
+  String get pesateAltezzaOpz;
+
+  /// No description provided for @pesateAltezzaHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Solo se diversa dal profilo'**
+  String get pesateAltezzaHint;
+
+  /// No description provided for @pesateAltezzaInvalida.
+  ///
+  /// In it, this message translates to:
+  /// **'Altezza non valida'**
+  String get pesateAltezzaInvalida;
+
+  /// No description provided for @pesateBodyFatOpz.
+  ///
+  /// In it, this message translates to:
+  /// **'BODY FAT (opzionale)'**
+  String get pesateBodyFatOpz;
+
+  /// No description provided for @pesateBodyFatHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Es. da bilancia impedenziometrica'**
+  String get pesateBodyFatHint;
+
+  /// No description provided for @pesateBodyFatInvalido.
+  ///
+  /// In it, this message translates to:
+  /// **'Valore non valido (1–70%)'**
+  String get pesateBodyFatInvalido;
+
+  /// No description provided for @pesateNoteOpz.
+  ///
+  /// In it, this message translates to:
+  /// **'NOTE (opzionale)'**
+  String get pesateNoteOpz;
+
+  /// No description provided for @pesateNoteHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Es. mattina a digiuno...'**
+  String get pesateNoteHint;
+
+  /// No description provided for @pesateSalva.
+  ///
+  /// In it, this message translates to:
+  /// **'SALVA PESATA'**
+  String get pesateSalva;
+
+  /// No description provided for @storicoMisurazioni.
+  ///
+  /// In it, this message translates to:
+  /// **'MISURAZIONI'**
+  String get storicoMisurazioni;
+
+  /// No description provided for @storicoEliminaTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Elimina misurazione'**
+  String get storicoEliminaTitle;
+
+  /// No description provided for @storicoEliminaSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Eliminare i dati di questa giornata?'**
+  String get storicoEliminaSub;
+
+  /// No description provided for @storicoFonteManuale.
+  ///
+  /// In it, this message translates to:
+  /// **'Manuale'**
+  String get storicoFonteManuale;
+
+  /// No description provided for @storicoNessuna.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessuna misurazione'**
+  String get storicoNessuna;
+
+  /// No description provided for @storicoNessunaSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Le misurazioni appariranno qui\ndopo una sessione o un inserimento manuale.'**
+  String get storicoNessunaSub;
+
+  /// No description provided for @misurazioneNuova.
+  ///
+  /// In it, this message translates to:
+  /// **'NUOVA MISURAZIONE'**
+  String get misurazioneNuova;
+
+  /// No description provided for @misurazioneModifica.
+  ///
+  /// In it, this message translates to:
+  /// **'Modifica'**
+  String get misurazioneModifica;
+
+  /// No description provided for @misurazioneTabPliche.
+  ///
+  /// In it, this message translates to:
+  /// **'PLICHE'**
+  String get misurazioneTabPliche;
+
+  /// No description provided for @misurazioneTabCirconferenze.
+  ///
+  /// In it, this message translates to:
+  /// **'CIRCONFERENZE'**
+  String get misurazioneTabCirconferenze;
+
+  /// No description provided for @misurazioneSalva.
+  ///
+  /// In it, this message translates to:
+  /// **'SALVA MISURAZIONE'**
+  String get misurazioneSalva;
+
+  /// No description provided for @misurazioneInserisciValore.
+  ///
+  /// In it, this message translates to:
+  /// **'Inserisci almeno un valore'**
+  String get misurazioneInserisciValore;
+
+  /// No description provided for @misurazioneCalibrazione.
+  ///
+  /// In it, this message translates to:
+  /// **'Calibrazione punti'**
+  String get misurazioneCalibrazione;
+
+  /// No description provided for @misurazioneContPliche.
+  ///
+  /// In it, this message translates to:
+  /// **'{count} pliche'**
+  String misurazioneContPliche(String count);
+
+  /// No description provided for @misurazioneContCirconferenze.
+  ///
+  /// In it, this message translates to:
+  /// **'{count} circonf.'**
+  String misurazioneContCirconferenze(String count);
+
+  /// No description provided for @misuraVita.
+  ///
+  /// In it, this message translates to:
+  /// **'Vita'**
+  String get misuraVita;
+
+  /// No description provided for @misuraFianchi.
+  ///
+  /// In it, this message translates to:
+  /// **'Fianchi'**
+  String get misuraFianchi;
+
+  /// No description provided for @misuraBraccio.
+  ///
+  /// In it, this message translates to:
+  /// **'Braccio'**
+  String get misuraBraccio;
+
+  /// No description provided for @misuraCollo.
+  ///
+  /// In it, this message translates to:
+  /// **'Collo'**
+  String get misuraCollo;
+
+  /// No description provided for @misuraCoscia.
+  ///
+  /// In it, this message translates to:
+  /// **'Coscia'**
+  String get misuraCoscia;
+
+  /// No description provided for @misuraPolpaccio.
+  ///
+  /// In it, this message translates to:
+  /// **'Polpaccio'**
+  String get misuraPolpaccio;
+
+  /// No description provided for @misuraTorace.
+  ///
+  /// In it, this message translates to:
+  /// **'Torace'**
+  String get misuraTorace;
+
+  /// No description provided for @misuraSpalle.
+  ///
+  /// In it, this message translates to:
+  /// **'Spalle'**
+  String get misuraSpalle;
+
+  /// No description provided for @misuraTricipite.
+  ///
+  /// In it, this message translates to:
+  /// **'Tricipite'**
+  String get misuraTricipite;
+
+  /// No description provided for @misuraBicipite.
+  ///
+  /// In it, this message translates to:
+  /// **'Bicipite'**
+  String get misuraBicipite;
+
+  /// No description provided for @misuraSottoscap.
+  ///
+  /// In it, this message translates to:
+  /// **'Sottoscap.'**
+  String get misuraSottoscap;
+
+  /// No description provided for @misuraSottoscapolare.
+  ///
+  /// In it, this message translates to:
+  /// **'Sottoscapolare'**
+  String get misuraSottoscapolare;
+
+  /// No description provided for @misuraSovrailiaca.
+  ///
+  /// In it, this message translates to:
+  /// **'Sovrailiaca'**
+  String get misuraSovrailiaca;
+
+  /// No description provided for @misuraAddome.
+  ///
+  /// In it, this message translates to:
+  /// **'Addome'**
+  String get misuraAddome;
+
+  /// No description provided for @misuraCosciaPlica.
+  ///
+  /// In it, this message translates to:
+  /// **'Coscia (pl.)'**
+  String get misuraCosciaPlica;
+
+  /// No description provided for @misuraPettorale.
+  ///
+  /// In it, this message translates to:
+  /// **'Pettorale'**
+  String get misuraPettorale;
+
+  /// No description provided for @misuraAscellare.
+  ///
+  /// In it, this message translates to:
+  /// **'Ascellare'**
+  String get misuraAscellare;
+
+  /// No description provided for @tdeeTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'IL MIO PIANO'**
+  String get tdeeTitolo;
+
+  /// No description provided for @tdeeIntroTesto.
+  ///
+  /// In it, this message translates to:
+  /// **'Configura il tuo piano nutrizionale. Una volta attivato, i valori verranno usati nel diario alimentare.'**
+  String get tdeeIntroTesto;
+
+  /// No description provided for @tdeeSezObiettivo.
+  ///
+  /// In it, this message translates to:
+  /// **'OBIETTIVO'**
+  String get tdeeSezObiettivo;
+
+  /// No description provided for @tdeeSezAttivita.
+  ///
+  /// In it, this message translates to:
+  /// **'LIVELLO DI ATTIVITÀ'**
+  String get tdeeSezAttivita;
+
+  /// No description provided for @tdeeSezMetodo.
+  ///
+  /// In it, this message translates to:
+  /// **'METODO DI CALCOLO'**
+  String get tdeeSezMetodo;
+
+  /// No description provided for @tdeeSezAnteprima.
+  ///
+  /// In it, this message translates to:
+  /// **'ANTEPRIMA PIANO'**
+  String get tdeeSezAnteprima;
+
+  /// No description provided for @tdeeSezRipartizione.
+  ///
+  /// In it, this message translates to:
+  /// **'RIPARTIZIONE MACRO'**
+  String get tdeeSezRipartizione;
+
+  /// No description provided for @tdeePesoObiettivo.
+  ///
+  /// In it, this message translates to:
+  /// **'Peso obiettivo (kg)'**
+  String get tdeePesoObiettivo;
+
+  /// No description provided for @tdeeNessunaPesata.
+  ///
+  /// In it, this message translates to:
+  /// **'Registra una pesata per calcolare il piano.'**
+  String get tdeeNessunaPesata;
+
+  /// No description provided for @tdeeAttivaPiano.
+  ///
+  /// In it, this message translates to:
+  /// **'ATTIVA PIANO'**
+  String get tdeeAttivaPiano;
+
+  /// No description provided for @tdeeAggiornaPiano.
+  ///
+  /// In it, this message translates to:
+  /// **'AGGIORNA PIANO'**
+  String get tdeeAggiornaPiano;
+
+  /// No description provided for @tdeeKcalGiornoUnit.
+  ///
+  /// In it, this message translates to:
+  /// **'kcal/giorno'**
+  String get tdeeKcalGiornoUnit;
+
+  /// No description provided for @tdeePianoAttivoLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'PIANO ATTIVO'**
+  String get tdeePianoAttivoLabel;
+
+  /// No description provided for @tdeeAttivatoDal.
+  ///
+  /// In it, this message translates to:
+  /// **'dal {date}'**
+  String tdeeAttivatoDal(String date);
+
+  /// No description provided for @tdeeDatiInsufficienti.
+  ///
+  /// In it, this message translates to:
+  /// **'Dati insufficienti'**
+  String get tdeeDatiInsufficienti;
+
+  /// No description provided for @tdeeCarbsNote.
+  ///
+  /// In it, this message translates to:
+  /// **'calorie rimanenti'**
+  String get tdeeCarbsNote;
+
+  /// No description provided for @tdeeSonoPassati.
+  ///
+  /// In it, this message translates to:
+  /// **'Sono passati {n} giorni'**
+  String tdeeSonoPassati(int n);
+
+  /// No description provided for @tdeeBannerSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Potrebbe essere il momento di aggiornare il tuo piano in base ai progressi.'**
+  String get tdeeBannerSub;
+
+  /// No description provided for @tdeeRicalcolaObiettivo.
+  ///
+  /// In it, this message translates to:
+  /// **'Ricalcola obiettivo'**
+  String get tdeeRicalcolaObiettivo;
+
+  /// No description provided for @tdeeRicalcolaBtn.
+  ///
+  /// In it, this message translates to:
+  /// **'Ricalcola'**
+  String get tdeeRicalcolaBtn;
+
+  /// No description provided for @tdeeRicalcolaBody.
+  ///
+  /// In it, this message translates to:
+  /// **'{n, plural, one{Hai attivato il piano {n} giorno fa.} other{Hai attivato il piano {n} giorni fa.}}\n\nPuoi ricalcolarlo in qualsiasi momento, ma ti consigliamo di farlo dopo almeno 30 giorni per valutare i progressi.'**
+  String tdeeRicalcolaBody(int n);
+
+  /// No description provided for @tdeeCalibrazione.
+  ///
+  /// In it, this message translates to:
+  /// **'In base ai tuoi dati delle ultime {days} giorni, il tuo TDEE reale potrebbe essere ~{suggested} kcal (stimato: {current} kcal).'**
+  String tdeeCalibrazione(String days, String suggested, String current);
+
+  /// No description provided for @tdeePreviewFormula.
+  ///
+  /// In it, this message translates to:
+  /// **'Formula: {nome}  ·  TDEE: {tdee} kcal'**
+  String tdeePreviewFormula(String nome, String tdee);
+
+  /// No description provided for @tdeeObjDeficit.
+  ///
+  /// In it, this message translates to:
+  /// **'Deficit'**
+  String get tdeeObjDeficit;
+
+  /// No description provided for @tdeeObjMantenimento.
+  ///
+  /// In it, this message translates to:
+  /// **'Mantenimento'**
+  String get tdeeObjMantenimento;
+
+  /// No description provided for @tdeeObjSurplus.
+  ///
+  /// In it, this message translates to:
+  /// **'Surplus'**
+  String get tdeeObjSurplus;
+
+  /// No description provided for @tdeeObjDeficitBadge.
+  ///
+  /// In it, this message translates to:
+  /// **'Deficit −20%'**
+  String get tdeeObjDeficitBadge;
+
+  /// No description provided for @tdeeObjSurplusBadge.
+  ///
+  /// In it, this message translates to:
+  /// **'Surplus +15%'**
+  String get tdeeObjSurplusBadge;
+
+  /// No description provided for @tdeeAttSedentario.
+  ///
+  /// In it, this message translates to:
+  /// **'Sedentario'**
+  String get tdeeAttSedentario;
+
+  /// No description provided for @tdeeAttLegg.
+  ///
+  /// In it, this message translates to:
+  /// **'Legg. attivo'**
+  String get tdeeAttLegg;
+
+  /// No description provided for @tdeeAttMod.
+  ///
+  /// In it, this message translates to:
+  /// **'Mod. attivo'**
+  String get tdeeAttMod;
+
+  /// No description provided for @tdeeAttMolto.
+  ///
+  /// In it, this message translates to:
+  /// **'Molto attivo'**
+  String get tdeeAttMolto;
+
+  /// No description provided for @tdeeAttAtleta.
+  ///
+  /// In it, this message translates to:
+  /// **'Atleta'**
+  String get tdeeAttAtleta;
+
+  /// No description provided for @tdeeAttSedentarioDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'Lavoro sedentario, poco o nessun esercizio'**
+  String get tdeeAttSedentarioDesc;
+
+  /// No description provided for @tdeeAttLeggDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'Esercizio leggero 1–3 giorni/settimana'**
+  String get tdeeAttLeggDesc;
+
+  /// No description provided for @tdeeAttModDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'Esercizio moderato 3–5 giorni/settimana'**
+  String get tdeeAttModDesc;
+
+  /// No description provided for @tdeeAttMoltoDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'Esercizio intenso 6–7 giorni/settimana'**
+  String get tdeeAttMoltoDesc;
+
+  /// No description provided for @tdeeAttAtletaDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'Lavoro fisico intenso o doppio allenamento'**
+  String get tdeeAttAtletaDesc;
+
+  /// No description provided for @tdeeMetodoAutomaticoNome.
+  ///
+  /// In it, this message translates to:
+  /// **'Automatico'**
+  String get tdeeMetodoAutomaticoNome;
+
+  /// No description provided for @tdeeMetodoAutomaticoDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'Usa la formula più precisa disponibile: Katch-McArdle se hai una plicometria, altrimenti Mifflin-St Jeor.'**
+  String get tdeeMetodoAutomaticoDesc;
+
+  /// No description provided for @tdeeMetodoKatchDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'BMR = 370 + 21,6 × massa magra. La più precisa: considera solo la massa metabolicamente attiva.'**
+  String get tdeeMetodoKatchDesc;
+
+  /// No description provided for @tdeeMetodoMifflinDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'Formula raccomandata dall\'American Dietetic Association. Accurata per la maggior parte delle persone.'**
+  String get tdeeMetodoMifflinDesc;
+
+  /// No description provided for @tdeeMetodoHarrisDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'Formula classica revisionata (Roza & Shizgal, 1984). Tende a sovrastimare leggermente.'**
+  String get tdeeMetodoHarrisDesc;
+
+  /// No description provided for @tdeeRichiedePlic.
+  ///
+  /// In it, this message translates to:
+  /// **'richiede plicometria'**
+  String get tdeeRichiedePlic;
+
+  /// No description provided for @notifChannelPasti.
+  ///
+  /// In it, this message translates to:
+  /// **'Promemoria pasti'**
+  String get notifChannelPasti;
+
+  /// No description provided for @notifChannelPastiDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'Ricordati di registrare i tuoi pasti'**
+  String get notifChannelPastiDesc;
+
+  /// No description provided for @notifChannelRecap.
+  ///
+  /// In it, this message translates to:
+  /// **'Riepilogo serale'**
+  String get notifChannelRecap;
+
+  /// No description provided for @notifChannelRecapDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'Riepilogo serale dei tuoi progressi'**
+  String get notifChannelRecapDesc;
+
+  /// No description provided for @notifChannelMattino.
+  ///
+  /// In it, this message translates to:
+  /// **'Recap mattutino'**
+  String get notifChannelMattino;
+
+  /// No description provided for @notifChannelMattinoDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'Riepilogo delle calorie di ieri'**
+  String get notifChannelMattinoDesc;
+
+  /// No description provided for @notifChannelPesata.
+  ///
+  /// In it, this message translates to:
+  /// **'Promemoria pesata'**
+  String get notifChannelPesata;
+
+  /// No description provided for @notifChannelPesataDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'Ricordati di registrare il tuo peso'**
+  String get notifChannelPesataDesc;
+
+  /// No description provided for @notifPastoBody.
+  ///
+  /// In it, this message translates to:
+  /// **'Hai registrato {pasto}?'**
+  String notifPastoBody(String pasto);
+
+  /// No description provided for @notifRecapNuovaStreak.
+  ///
+  /// In it, this message translates to:
+  /// **'Registra i tuoi pasti di oggi per iniziare una nuova streak.'**
+  String get notifRecapNuovaStreak;
+
+  /// No description provided for @notifRecapMantieni.
+  ///
+  /// In it, this message translates to:
+  /// **'Hai registrato ogni giorno per {streak} giorni. Vuoi mantenere la streak? 🔥'**
+  String notifRecapMantieni(int streak);
+
+  /// No description provided for @notifRecapObiettivo.
+  ///
+  /// In it, this message translates to:
+  /// **'Oggi hai raggiunto il tuo obiettivo per {streak} giorni di fila 🔥'**
+  String notifRecapObiettivo(int streak);
+
+  /// No description provided for @notifRecapStreak.
+  ///
+  /// In it, this message translates to:
+  /// **'Hai registrato {streak} giorni di fila! Continua così 💪'**
+  String notifRecapStreak(int streak);
+
+  /// No description provided for @notifMattinoOnTarget.
+  ///
+  /// In it, this message translates to:
+  /// **'Ieri hai mangiato {kcal} kcal su {target}. Ottimo lavoro! 💪'**
+  String notifMattinoOnTarget(int kcal, int target);
+
+  /// No description provided for @notifMattinoOffTarget.
+  ///
+  /// In it, this message translates to:
+  /// **'Ieri hai registrato {kcal} kcal su {target} di obiettivo.'**
+  String notifMattinoOffTarget(int kcal, int target);
+
+  /// No description provided for @notifMattinoNoTarget.
+  ///
+  /// In it, this message translates to:
+  /// **'Ieri hai registrato {kcal} kcal.'**
+  String notifMattinoNoTarget(int kcal);
+
+  /// No description provided for @notifPesataBody.
+  ///
+  /// In it, this message translates to:
+  /// **'Non ti pesi da {days} giorni. Vuoi registrare il tuo peso?'**
+  String notifPesataBody(int days);
+
+  /// No description provided for @pdfDiarioTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Diario Alimentare'**
+  String get pdfDiarioTitle;
+
+  /// No description provided for @pdfTargetLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'target'**
+  String get pdfTargetLabel;
+
+  /// No description provided for @pdfPagina.
+  ///
+  /// In it, this message translates to:
+  /// **'pagina {page} di {total}'**
+  String pdfPagina(int page, int total);
+
+  /// No description provided for @pdfNessunDato.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessun dato registrato'**
+  String get pdfNessunDato;
+
+  /// No description provided for @pdfPastoFallback.
+  ///
+  /// In it, this message translates to:
+  /// **'Pasto'**
+  String get pdfPastoFallback;
+
+  /// No description provided for @pdfRiepilogo.
+  ///
+  /// In it, this message translates to:
+  /// **'RIEPILOGO'**
+  String get pdfRiepilogo;
+
+  /// No description provided for @pdfGiorniConDati.
+  ///
+  /// In it, this message translates to:
+  /// **'Giorni con dati: {withData}/{days}'**
+  String pdfGiorniConDati(int withData, int days);
+
+  /// No description provided for @pdfGiorniOnTarget.
+  ///
+  /// In it, this message translates to:
+  /// **'Giorni on-target (90–105%): {onTarget}/{total}'**
+  String pdfGiorniOnTarget(int onTarget, int total);
+
+  /// No description provided for @pdfMediaLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'Media giornaliera:'**
+  String get pdfMediaLabel;
+
+  /// No description provided for @pdfTargetPrefix.
+  ///
+  /// In it, this message translates to:
+  /// **'Target:'**
+  String get pdfTargetPrefix;
+
+  /// No description provided for @pdfPianoTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Piano Alimentare'**
+  String get pdfPianoTitle;
+
+  /// No description provided for @pdfGenerato.
+  ///
+  /// In it, this message translates to:
+  /// **'Generato il {created}'**
+  String pdfGenerato(String created);
+
+  /// No description provided for @muscleGroupAll.
+  ///
+  /// In it, this message translates to:
+  /// **'Tutti'**
+  String get muscleGroupAll;
+
+  /// No description provided for @muscleGroupChest.
+  ///
+  /// In it, this message translates to:
+  /// **'Petto'**
+  String get muscleGroupChest;
+
+  /// No description provided for @muscleGroupBack.
+  ///
+  /// In it, this message translates to:
+  /// **'Dorso'**
+  String get muscleGroupBack;
+
+  /// No description provided for @muscleGroupLegs.
+  ///
+  /// In it, this message translates to:
+  /// **'Gambe'**
+  String get muscleGroupLegs;
+
+  /// No description provided for @muscleGroupArms.
+  ///
+  /// In it, this message translates to:
+  /// **'Braccia'**
+  String get muscleGroupArms;
+
+  /// No description provided for @muscleGroupShoulders.
+  ///
+  /// In it, this message translates to:
+  /// **'Spalle'**
+  String get muscleGroupShoulders;
+
+  /// No description provided for @muscleGroupCore.
+  ///
+  /// In it, this message translates to:
+  /// **'Core'**
+  String get muscleGroupCore;
+
+  /// No description provided for @muscleGroupCardio.
+  ///
+  /// In it, this message translates to:
+  /// **'Cardio'**
+  String get muscleGroupCardio;
+
+  /// No description provided for @eserciziCatalogoTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Catalogo esercizi'**
+  String get eserciziCatalogoTitle;
+
+  /// No description provided for @eserciziCercaHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Cerca esercizio...'**
+  String get eserciziCercaHint;
+
+  /// No description provided for @eserciziNessunRisultato.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessun esercizio trovato'**
+  String get eserciziNessunRisultato;
+
+  /// No description provided for @eserciziAggiungiPersonalizzato.
+  ///
+  /// In it, this message translates to:
+  /// **'Aggiungi esercizio personalizzato'**
+  String get eserciziAggiungiPersonalizzato;
+
+  /// No description provided for @eserciziPersonalizzatoBadge.
+  ///
+  /// In it, this message translates to:
+  /// **'Il mio'**
+  String get eserciziPersonalizzatoBadge;
+
+  /// No description provided for @eserciziNuovoTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Nuovo esercizio'**
+  String get eserciziNuovoTitle;
+
+  /// No description provided for @eserciziNomeLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'Nome'**
+  String get eserciziNomeLabel;
+
+  /// No description provided for @eserciziNomeHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Es. Spinte alla macchina'**
+  String get eserciziNomeHint;
+
+  /// No description provided for @eserciziGruppoMuscolareLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'Gruppo muscolare'**
+  String get eserciziGruppoMuscolareLabel;
+
+  /// No description provided for @eserciziTipoLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'Tipo'**
+  String get eserciziTipoLabel;
+
+  /// No description provided for @eserciziTipoForza.
+  ///
+  /// In it, this message translates to:
+  /// **'Forza'**
+  String get eserciziTipoForza;
+
+  /// No description provided for @eserciziTipoCardio.
+  ///
+  /// In it, this message translates to:
+  /// **'Cardio'**
+  String get eserciziTipoCardio;
+
+  /// No description provided for @eserciziAttrezzaturaLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'Attrezzatura (opzionale)'**
+  String get eserciziAttrezzaturaLabel;
+
+  /// No description provided for @eserciziAttrezzaturaHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Es. Manubri, corpo libero...'**
+  String get eserciziAttrezzaturaHint;
+
+  /// No description provided for @eserciziSalva.
+  ///
+  /// In it, this message translates to:
+  /// **'Salva'**
+  String get eserciziSalva;
+
+  /// No description provided for @eserciziNomeObbligatorio.
+  ///
+  /// In it, this message translates to:
+  /// **'Il nome è obbligatorio'**
+  String get eserciziNomeObbligatorio;
 }
 
 class _AppLocalizationsDelegate

@@ -490,5 +490,32 @@
   "pdfGenerato": "Generato il {created}",
   "@pdfGenerato": {
     "placeholders": { "created": { "type": "String" } }
-  }
+  },
+
+  "muscleGroupAll": "Tutti",
+  "muscleGroupChest": "Petto",
+  "muscleGroupBack": "Dorso",
+  "muscleGroupLegs": "Gambe",
+  "muscleGroupArms": "Braccia",
+  "muscleGroupShoulders": "Spalle",
+  "muscleGroupCore": "Core",
+  "muscleGroupCardio": "Cardio",
+
+  "eserciziCatalogoTitle": "Catalogo esercizi",
+  "eserciziCercaHint": "Cerca esercizio...",
+  "eserciziNessunRisultato": "Nessun esercizio trovato",
+  "eserciziAggiungiPersonalizzato": "Aggiungi esercizio personalizzato",
+  "eserciziPersonalizzatoBadge": "Il mio",
+
+  "eserciziNuovoTitle": "Nuovo esercizio",
+  "eserciziNomeLabel": "Nome",
+  "eserciziNomeHint": "Es. Spinte alla macchina",
+  "eserciziGruppoMuscolareLabel": "Gruppo muscolare",
+  "eserciziTipoLabel": "Tipo",
+  "eserciziTipoForza": "Forza",
+  "eserciziTipoCardio": "Cardio",
+  "eserciziAttrezzaturaLabel": "Attrezzatura (opzionale)",
+  "eserciziAttrezzaturaHint": "Es. Manubri, corpo libero...",
+  "eserciziSalva": "Salva",
+  "eserciziNomeObbligatorio": "Il nome è obbligatorio"
 }

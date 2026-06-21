@@ -801,6 +801,23 @@ class DatabaseService {
     return _isar.exerciseDefinitions.filter().isDeletedEqualTo(false).findAll();
   }
 
+  Future<List<ExerciseDefinition>> searchExercises(String query, {String? muscleGroup}) async {
+    final all = await getAllExercises();
+    final q = query.trim().toLowerCase();
+    return all.where((e) {
+      if (muscleGroup != null && e.muscleGroup != muscleGroup) return false;
+      if (q.isEmpty) return true;
+      return e.name.toLowerCase().contains(q) ||
+          (e.nameIt?.toLowerCase().contains(q) ?? false);
+    }).toList();
+  }
+
+  Future<void> addCustomExercise(ExerciseDefinition exercise) async {
+    await _isar.writeTxn(() async {
+      await _isar.exerciseDefinitions.put(exercise);
+    });
+  }
+
   // ──────────────────────────────────────────────
   // Utility
   // ──────────────────────────────────────────────

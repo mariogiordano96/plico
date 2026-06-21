@@ -375,5 +375,32 @@
   "pdfMediaLabel": "Daily average:",
   "pdfTargetPrefix": "Target:",
   "pdfPianoTitle": "Meal Plan",
-  "pdfGenerato": "Generated on {created}"
+  "pdfGenerato": "Generated on {created}",
+
+  "muscleGroupAll": "All",
+  "muscleGroupChest": "Chest",
+  "muscleGroupBack": "Back",
+  "muscleGroupLegs": "Legs",
+  "muscleGroupArms": "Arms",
+  "muscleGroupShoulders": "Shoulders",
+  "muscleGroupCore": "Core",
+  "muscleGroupCardio": "Cardio",
+
+  "eserciziCatalogoTitle": "Exercise catalog",
+  "eserciziCercaHint": "Search exercise...",
+  "eserciziNessunRisultato": "No exercise found",
+  "eserciziAggiungiPersonalizzato": "Add custom exercise",
+  "eserciziPersonalizzatoBadge": "Mine",
+
+  "eserciziNuovoTitle": "New exercise",
+  "eserciziNomeLabel": "Name",
+  "eserciziNomeHint": "E.g. Machine chest press",
+  "eserciziGruppoMuscolareLabel": "Muscle group",
+  "eserciziTipoLabel": "Type",
+  "eserciziTipoForza": "Strength",
+  "eserciziTipoCardio": "Cardio",
+  "eserciziAttrezzaturaLabel": "Equipment (optional)",
+  "eserciziAttrezzaturaHint": "E.g. Dumbbells, bodyweight...",
+  "eserciziSalva": "Save",
+  "eserciziNomeObbligatorio": "Name is required"
 }
