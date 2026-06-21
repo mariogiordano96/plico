@@ -433,6 +433,9 @@
   "notifChannelMattinoDesc": "Riepilogo delle calorie di ieri",
   "notifChannelPesata": "Promemoria pesata",
   "notifChannelPesataDesc": "Ricordati di registrare il tuo peso",
+  "notifChannelRestTimer": "Timer di recupero",
+  "notifChannelRestTimerDesc": "Avviso a fine riposo tra le serie",
+  "notifRestTimerBody": "Riposo terminato — pronto per la prossima serie?",
   "notifPastoBody": "Hai registrato {pasto}?",
   "@notifPastoBody": {
     "placeholders": { "pasto": { "type": "String" } }
@@ -607,5 +610,31 @@
   "overloadDeload": "Stai progredendo da {weeks} settimane: valuta uno scarico a {kg} kg",
   "@overloadDeload": {
     "placeholders": { "weeks": { "type": "int" }, "kg": { "type": "String" } }
-  }
+  },
+
+  "restTimerTitle": "Recupero",
+  "restTimerSalta": "Salta",
+  "restTimerSettingsTitle": "Riposo di default tra le serie",
+
+  "sessioneGuidataProgress": "Esercizio {current}/{total}",
+  "@sessioneGuidataProgress": {
+    "placeholders": { "current": { "type": "int" }, "total": { "type": "int" } }
+  },
+  "sessioneGuidataPrecedente": "Precedente",
+  "sessioneGuidataSuccessivo": "Successivo",
+  "sessioneGuidataTermina": "Termina",
+  "sessioneGuidataConferma": "Conferma serie",
+
+  "sessioneRiepilogoTitle": "Sessione completata",
+  "sessioneRiepilogoKcal": "{kcal} kcal stimate",
+  "@sessioneRiepilogoKcal": {
+    "placeholders": { "kcal": { "type": "int" } }
+  },
+  "sessioneRiepilogoNuoviRecord": "NUOVI RECORD PERSONALI",
+  "sessioneRiepilogoNessunRecord": "Nessun nuovo record questa volta",
+  "sessioneRiepilogoRecordEsercizio": "{esercizio}: {kg} kg",
+  "@sessioneRiepilogoRecordEsercizio": {
+    "placeholders": { "esercizio": { "type": "String" }, "kg": { "type": "String" } }
+  },
+  "sessioneRiepilogoChiudi": "Fine"
 }

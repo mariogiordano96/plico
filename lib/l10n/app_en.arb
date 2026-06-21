@@ -354,6 +354,9 @@
   "notifChannelMattinoDesc": "Yesterday's calorie summary",
   "notifChannelPesata": "Weigh-in reminder",
   "notifChannelPesataDesc": "Remember to log your weight",
+  "notifChannelRestTimer": "Rest timer",
+  "notifChannelRestTimerDesc": "Alert when the rest between sets ends",
+  "notifRestTimerBody": "Rest is over — ready for the next set?",
   "notifPastoBody": "Did you log {pasto}?",
   "notifRecapNuovaStreak": "Log your meals today to start a new streak.",
   "notifRecapMantieni": "You've logged every day for {streak} days. Keep your streak going? 🔥",
@@ -470,5 +473,22 @@
   "overloadSuggeritoUp": "Suggested: increase to {kg} kg",
   "overloadSuggeritoSame": "Suggested: keep {kg} kg",
   "overloadSuggeritoDown": "Suggested: reduce to {kg} kg",
-  "overloadDeload": "You've progressed for {weeks} weeks: consider a deload at {kg} kg"
+  "overloadDeload": "You've progressed for {weeks} weeks: consider a deload at {kg} kg",
+
+  "restTimerTitle": "Rest",
+  "restTimerSalta": "Skip",
+  "restTimerSettingsTitle": "Default rest between sets",
+
+  "sessioneGuidataProgress": "Exercise {current}/{total}",
+  "sessioneGuidataPrecedente": "Previous",
+  "sessioneGuidataSuccessivo": "Next",
+  "sessioneGuidataTermina": "Finish",
+  "sessioneGuidataConferma": "Confirm set",
+
+  "sessioneRiepilogoTitle": "Session complete",
+  "sessioneRiepilogoKcal": "{kcal} kcal estimated",
+  "sessioneRiepilogoNuoviRecord": "NEW PERSONAL RECORDS",
+  "sessioneRiepilogoNessunRecord": "No new records this time",
+  "sessioneRiepilogoRecordEsercizio": "{esercizio}: {kg} kg",
+  "sessioneRiepilogoChiudi": "Done"
 }

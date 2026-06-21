@@ -2084,6 +2084,24 @@ abstract class AppLocalizations {
   /// **'Ricordati di registrare il tuo peso'**
   String get notifChannelPesataDesc;
 
+  /// No description provided for @notifChannelRestTimer.
+  ///
+  /// In it, this message translates to:
+  /// **'Timer di recupero'**
+  String get notifChannelRestTimer;
+
+  /// No description provided for @notifChannelRestTimerDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'Avviso a fine riposo tra le serie'**
+  String get notifChannelRestTimerDesc;
+
+  /// No description provided for @notifRestTimerBody.
+  ///
+  /// In it, this message translates to:
+  /// **'Riposo terminato — pronto per la prossima serie?'**
+  String get notifRestTimerBody;
+
   /// No description provided for @notifPastoBody.
   ///
   /// In it, this message translates to:
@@ -2695,6 +2713,90 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Stai progredendo da {weeks} settimane: valuta uno scarico a {kg} kg'**
   String overloadDeload(int weeks, String kg);
+
+  /// No description provided for @restTimerTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Recupero'**
+  String get restTimerTitle;
+
+  /// No description provided for @restTimerSalta.
+  ///
+  /// In it, this message translates to:
+  /// **'Salta'**
+  String get restTimerSalta;
+
+  /// No description provided for @restTimerSettingsTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Riposo di default tra le serie'**
+  String get restTimerSettingsTitle;
+
+  /// No description provided for @sessioneGuidataProgress.
+  ///
+  /// In it, this message translates to:
+  /// **'Esercizio {current}/{total}'**
+  String sessioneGuidataProgress(int current, int total);
+
+  /// No description provided for @sessioneGuidataPrecedente.
+  ///
+  /// In it, this message translates to:
+  /// **'Precedente'**
+  String get sessioneGuidataPrecedente;
+
+  /// No description provided for @sessioneGuidataSuccessivo.
+  ///
+  /// In it, this message translates to:
+  /// **'Successivo'**
+  String get sessioneGuidataSuccessivo;
+
+  /// No description provided for @sessioneGuidataTermina.
+  ///
+  /// In it, this message translates to:
+  /// **'Termina'**
+  String get sessioneGuidataTermina;
+
+  /// No description provided for @sessioneGuidataConferma.
+  ///
+  /// In it, this message translates to:
+  /// **'Conferma serie'**
+  String get sessioneGuidataConferma;
+
+  /// No description provided for @sessioneRiepilogoTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Sessione completata'**
+  String get sessioneRiepilogoTitle;
+
+  /// No description provided for @sessioneRiepilogoKcal.
+  ///
+  /// In it, this message translates to:
+  /// **'{kcal} kcal stimate'**
+  String sessioneRiepilogoKcal(int kcal);
+
+  /// No description provided for @sessioneRiepilogoNuoviRecord.
+  ///
+  /// In it, this message translates to:
+  /// **'NUOVI RECORD PERSONALI'**
+  String get sessioneRiepilogoNuoviRecord;
+
+  /// No description provided for @sessioneRiepilogoNessunRecord.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessun nuovo record questa volta'**
+  String get sessioneRiepilogoNessunRecord;
+
+  /// No description provided for @sessioneRiepilogoRecordEsercizio.
+  ///
+  /// In it, this message translates to:
+  /// **'{esercizio}: {kg} kg'**
+  String sessioneRiepilogoRecordEsercizio(String esercizio, String kg);
+
+  /// No description provided for @sessioneRiepilogoChiudi.
+  ///
+  /// In it, this message translates to:
+  /// **'Fine'**
+  String get sessioneRiepilogoChiudi;
 }
 
 class _AppLocalizationsDelegate

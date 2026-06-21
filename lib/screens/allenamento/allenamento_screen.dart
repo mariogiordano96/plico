@@ -10,6 +10,7 @@ import '../esercizi/catalogo_esercizi_screen.dart';
 import 'le_mie_schede_screen.dart';
 import 'log_cardio_dialog.dart';
 import 'log_serie_dialog.dart';
+import 'rest_timer_settings_dialog.dart';
 import 'storico_esercizio_screen.dart';
 
 class AllenamentoScreen extends StatefulWidget {
@@ -112,6 +113,11 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
         elevation: 0,
         centerTitle: true,
         actions: [
+          IconButton(
+            onPressed: () => showRestTimerSettingsDialog(context),
+            icon: Icon(Icons.timer_outlined, color: p.accent),
+            tooltip: l10n.restTimerSettingsTitle,
+          ),
           IconButton(
             onPressed: () => Navigator.push(
               context,

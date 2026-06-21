@@ -1438,16 +1438,46 @@ posizionamento/stile già visto in Progressi.
 - [x] Verificato: `flutter analyze` pulito; 11 test sulle metriche/overload/deload/PR/
       esclusione riscaldamento; test di integrazione storico→suggerimento→nuovo PR
 
-### Fase 8 — Modalità esecuzione guidata + timer di recupero
-- [ ] Campo `restSeconds` già su `WorkoutTemplateExercise`/`WorkoutExercise` (da Fase 4/6)
-- [ ] Schermata sessione attiva: navigazione esercizio per esercizio (avanti/indietro,
-      rispetta `supersetGroupId`), indicatore di avanzamento
-- [ ] Pre-compilazione serie con suggerimento progressive overload (⬆️/➡️/⬇️, da Fase 7)
-- [ ] Widget countdown di recupero con vibrazione/suono a fine riposo, avvio automatico
-      a fine esercizio/blocco superset
-- [ ] Default riposo configurabile nelle impostazioni
-- [ ] Persistenza del timer in background durante il cambio schermata
-- [ ] Riepilogo di fine sessione (kcal stimate, PR raggiunti)
+### Fase 8 — Modalità esecuzione guidata + timer di recupero ✅ completata
+- [x] Campo `restSeconds` già su `WorkoutTemplateExercise`/`WorkoutExercise` (da Fase 4/6)
+- [x] Schermata sessione attiva (`SessioneGuidataScreen`): navigazione esercizio per
+      esercizio (avanti/indietro liberi, non bloccati dalla conferma delle serie), gli
+      step rispettano `supersetGroupId` (`GuidedSessionService.groupSteps`, esercizi
+      consecutivi con lo stesso gruppo formano un solo step/superset), indicatore di
+      avanzamento "Esercizio N/M" in AppBar
+- [x] Pre-compilazione serie con suggerimento progressive overload (⬆️/➡️/⬇️/💡 scarico,
+      da Fase 7), stessa logica `WorkoutProgressService` usata nel log manuale
+- [x] `RestTimerSheet` (bottom sheet non dismissibile): countdown, vibrazione
+      (`HapticFeedback.heavyImpact`) + suono di sistema (`SystemSound.play`) a fine
+      riposo — nessuna nuova dipendenza, riusate le API native di Flutter — avvio
+      automatico dopo ogni serie confermata (`_confirmSerie`/`_confirmCardio`)
+- [x] Default riposo configurabile: `AppSettings.restTimerDefaultSeconds`, dialog
+      dedicato (`RestTimerSettingsDialog`) apribile dall'icona ⏱️ in `AllenamentoScreen`
+- [x] Persistenza del timer in background: `NotificationService.scheduleRestTimer`
+      programma una notifica locale one-shot a fine riposo (riusa
+      `flutter_local_notifications`, già usato per i promemoria pasti), cancellata se il
+      riposo viene saltato/modificato o termina mentre il sheet è ancora aperto
+- [x] `SessioneRiepilogoScreen` a fine sessione: kcal totali stimate
+      (`GuidedSessionService.totalEstimatedKcal`) e nuovi record personali
+      (`GuidedSessionService.newPersonalRecords`, esclude i cardio)
+- [x] Verificato: `flutter analyze` pulito; 7 test temporanei su `GuidedSessionService`
+      (raggruppamento step/superset, somma kcal, individuazione PR escludendo i cardio),
+      rimossi dopo la verifica per restare coerenti con le fasi precedenti
+
+> **Correzione rispetto al piano originale**: il timer di recupero parte dopo OGNI
+> serie confermata (non solo a fine esercizio/blocco), in linea con la sezione
+> "Timer di recupero tra le serie" del piano ("Dopo aver loggato una serie...").
+> Il blocco superset (timer solo a fine blocco, navigazione bloccata sul gruppo) resta
+> previsto per la Fase 12; qui i superset sono raggruppati solo come step visivi.
+>
+> **Correzione rispetto al piano originale**: `startWorkoutFromTemplate` (Fase 6)
+> persiste già il `WorkoutExercise` della sessione in corso prima che la modalità
+> guidata si apra, quindi `getHistoryForExercise` includerebbe la sessione corrente
+> stessa nello storico usato per il suggerimento di overload. `SessioneGuidataScreen`
+> esclude esplicitamente l'id della sessione corrente dallo storico recuperato
+> (`_priorHistoryByExerciseId`), che viene anche passato al riepilogo per il calcolo dei
+> PR (altrimenti ogni sessione risulterebbe banalmente un "nuovo record" rispetto a se
+> stessa).
 
 ### Fase 9 — Note di sessione e RPE
 - [ ] Campo `note` su `WorkoutLog` (da Fase 4), UI riuso pattern `body_snapshot`/diario

@@ -32,4 +32,7 @@ class AppSettings {
   int notSorMin = 1260;     // 21:00
 
   bool tourCompleted = false;
+
+  // Allenamento — Fase 8
+  int restTimerDefaultSeconds = 90;
 }

@@ -1085,6 +1085,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifChannelPesataDesc => 'Remember to log your weight';
 
   @override
+  String get notifChannelRestTimer => 'Rest timer';
+
+  @override
+  String get notifChannelRestTimerDesc =>
+      'Alert when the rest between sets ends';
+
+  @override
+  String get notifRestTimerBody => 'Rest is over — ready for the next set?';
+
+  @override
   String notifPastoBody(String pasto) {
     return 'Did you log $pasto?';
   }
@@ -1445,4 +1455,52 @@ class AppLocalizationsEn extends AppLocalizations {
   String overloadDeload(int weeks, String kg) {
     return 'You\'ve progressed for $weeks weeks: consider a deload at $kg kg';
   }
+
+  @override
+  String get restTimerTitle => 'Rest';
+
+  @override
+  String get restTimerSalta => 'Skip';
+
+  @override
+  String get restTimerSettingsTitle => 'Default rest between sets';
+
+  @override
+  String sessioneGuidataProgress(int current, int total) {
+    return 'Exercise $current/$total';
+  }
+
+  @override
+  String get sessioneGuidataPrecedente => 'Previous';
+
+  @override
+  String get sessioneGuidataSuccessivo => 'Next';
+
+  @override
+  String get sessioneGuidataTermina => 'Finish';
+
+  @override
+  String get sessioneGuidataConferma => 'Confirm set';
+
+  @override
+  String get sessioneRiepilogoTitle => 'Session complete';
+
+  @override
+  String sessioneRiepilogoKcal(int kcal) {
+    return '$kcal kcal estimated';
+  }
+
+  @override
+  String get sessioneRiepilogoNuoviRecord => 'NEW PERSONAL RECORDS';
+
+  @override
+  String get sessioneRiepilogoNessunRecord => 'No new records this time';
+
+  @override
+  String sessioneRiepilogoRecordEsercizio(String esercizio, String kg) {
+    return '$esercizio: $kg kg';
+  }
+
+  @override
+  String get sessioneRiepilogoChiudi => 'Done';
 }

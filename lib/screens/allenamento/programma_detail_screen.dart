@@ -4,6 +4,7 @@ import '../../models/workout_program.dart';
 import '../../models/workout_template.dart';
 import '../../services/database_service.dart';
 import 'crea_scheda_screen.dart';
+import 'sessione_guidata_screen.dart';
 
 class ProgrammaDetailScreen extends StatefulWidget {
   final WorkoutProgram program;
@@ -59,8 +60,17 @@ class _ProgrammaDetailScreenState extends State<ProgrammaDetailScreen> {
   }
 
   Future<void> _inizia(WorkoutTemplate giorno) async {
-    await DatabaseService.instance.startWorkoutFromTemplate(giorno, DateTime.now());
-    if (mounted) setState(() => _avviato = true);
+    final esercizi =
+        await DatabaseService.instance.startWorkoutFromTemplate(giorno, DateTime.now());
+    if (!mounted) return;
+    setState(() => _avviato = true);
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SessioneGuidataScreen(template: giorno, exercises: esercizi),
+      ),
+    );
+    _load();
   }
 
   @override

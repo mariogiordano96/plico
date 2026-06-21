@@ -6,6 +6,7 @@ import '../../models/workout_template.dart';
 import '../../services/database_service.dart';
 import 'crea_scheda_screen.dart';
 import 'programma_detail_screen.dart';
+import 'sessione_guidata_screen.dart';
 
 class LeMieSchedeScreen extends StatefulWidget {
   const LeMieSchedeScreen({super.key});
@@ -135,8 +136,15 @@ class _LeMieSchedeScreenState extends State<LeMieSchedeScreen> {
   }
 
   Future<void> _inizia(WorkoutTemplate t) async {
-    await DatabaseService.instance.startWorkoutFromTemplate(t, DateTime.now());
-    if (mounted) Navigator.pop(context);
+    final esercizi = await DatabaseService.instance.startWorkoutFromTemplate(t, DateTime.now());
+    if (!mounted) return;
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SessioneGuidataScreen(template: t, exercises: esercizi),
+      ),
+    );
+    _load();
   }
 
   @override

@@ -30,6 +30,9 @@ class NotificationService {
   static const _weighInChannelName = 'Promemoria pesata';
   static const _weighInId = 202;
   static const _weighInThresholdDays = 5;
+  static const _restTimerChannelId = 'rest_timer';
+  static const _restTimerChannelName = 'Timer di recupero';
+  static const _restTimerId = 210;
 
   Future<void> init() async {
     tzdata.initializeTimeZones();
@@ -306,6 +309,43 @@ class NotificationService {
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
     );
   }
+
+  /// Notifica locale one-shot a fine riposo, così l'utente è avvisato anche se ha
+  /// cambiato schermata o l'app è in background (analogo a un timer di cottura).
+  /// Va cancellata (`cancelRestTimer`) se l'utente salta o modifica il riposo prima
+  /// che scada da sola.
+  Future<void> scheduleRestTimer(Duration remaining) async {
+    await _plugin.cancel(id: _restTimerId);
+    if (remaining <= Duration.zero) return;
+
+    final details = NotificationDetails(
+      android: AndroidNotificationDetails(
+        _restTimerChannelId,
+        _l10n?.notifChannelRestTimer ?? _restTimerChannelName,
+        channelDescription:
+            _l10n?.notifChannelRestTimerDesc ?? 'Avviso a fine riposo tra le serie',
+        importance: Importance.high,
+        priority: Priority.high,
+        playSound: true,
+      ),
+      iOS: const DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: false,
+        presentSound: true,
+      ),
+    );
+
+    await _plugin.zonedSchedule(
+      id: _restTimerId,
+      title: 'Plico',
+      body: _l10n?.notifRestTimerBody ?? 'Riposo terminato — pronto per la prossima serie?',
+      scheduledDate: tz.TZDateTime.now(tz.local).add(remaining),
+      notificationDetails: details,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    );
+  }
+
+  Future<void> cancelRestTimer() => _plugin.cancel(id: _restTimerId);
 
   tz.TZDateTime _nextOccurrence(int hour, int minute) {
     final now = tz.TZDateTime.now(tz.local);

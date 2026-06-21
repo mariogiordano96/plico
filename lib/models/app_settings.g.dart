@@ -122,13 +122,18 @@ const AppSettingsSchema = CollectionSchema(
       name: r'pesoObiettivo',
       type: IsarType.double,
     ),
-    r'tourCompleted': PropertySchema(
+    r'restTimerDefaultSeconds': PropertySchema(
       id: 21,
+      name: r'restTimerDefaultSeconds',
+      type: IsarType.long,
+    ),
+    r'tourCompleted': PropertySchema(
+      id: 22,
       name: r'tourCompleted',
       type: IsarType.bool,
     ),
     r'workoutPresetsSeeded': PropertySchema(
-      id: 22,
+      id: 23,
       name: r'workoutPresetsSeeded',
       type: IsarType.bool,
     )
@@ -183,8 +188,9 @@ void _appSettingsSerialize(
   writer.writeBool(offsets[18], object.notificheAttive);
   writer.writeLong(offsets[19], object.obiettivo);
   writer.writeDouble(offsets[20], object.pesoObiettivo);
-  writer.writeBool(offsets[21], object.tourCompleted);
-  writer.writeBool(offsets[22], object.workoutPresetsSeeded);
+  writer.writeLong(offsets[21], object.restTimerDefaultSeconds);
+  writer.writeBool(offsets[22], object.tourCompleted);
+  writer.writeBool(offsets[23], object.workoutPresetsSeeded);
 }
 
 AppSettings _appSettingsDeserialize(
@@ -216,8 +222,9 @@ AppSettings _appSettingsDeserialize(
   object.notificheAttive = reader.readBool(offsets[18]);
   object.obiettivo = reader.readLong(offsets[19]);
   object.pesoObiettivo = reader.readDoubleOrNull(offsets[20]);
-  object.tourCompleted = reader.readBool(offsets[21]);
-  object.workoutPresetsSeeded = reader.readBool(offsets[22]);
+  object.restTimerDefaultSeconds = reader.readLong(offsets[21]);
+  object.tourCompleted = reader.readBool(offsets[22]);
+  object.workoutPresetsSeeded = reader.readBool(offsets[23]);
   return object;
 }
 
@@ -271,8 +278,10 @@ P _appSettingsDeserializeProp<P>(
     case 20:
       return (reader.readDoubleOrNull(offset)) as P;
     case 21:
-      return (reader.readBool(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 22:
+      return (reader.readBool(offset)) as P;
+    case 23:
       return (reader.readBool(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1188,6 +1197,62 @@ extension AppSettingsQueryFilter
   }
 
   QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      restTimerDefaultSecondsEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'restTimerDefaultSeconds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      restTimerDefaultSecondsGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'restTimerDefaultSeconds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      restTimerDefaultSecondsLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'restTimerDefaultSeconds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      restTimerDefaultSecondsBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'restTimerDefaultSeconds',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
       tourCompletedEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -1479,6 +1544,20 @@ extension AppSettingsQuerySortBy
       sortByPesoObiettivoDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'pesoObiettivo', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByRestTimerDefaultSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'restTimerDefaultSeconds', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByRestTimerDefaultSecondsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'restTimerDefaultSeconds', Sort.desc);
     });
   }
 
@@ -1790,6 +1869,20 @@ extension AppSettingsQuerySortThenBy
     });
   }
 
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByRestTimerDefaultSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'restTimerDefaultSeconds', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByRestTimerDefaultSecondsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'restTimerDefaultSeconds', Sort.desc);
+    });
+  }
+
   QueryBuilder<AppSettings, AppSettings, QAfterSortBy> thenByTourCompleted() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'tourCompleted', Sort.asc);
@@ -1952,6 +2045,13 @@ extension AppSettingsQueryWhereDistinct
     });
   }
 
+  QueryBuilder<AppSettings, AppSettings, QDistinct>
+      distinctByRestTimerDefaultSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'restTimerDefaultSeconds');
+    });
+  }
+
   QueryBuilder<AppSettings, AppSettings, QDistinct> distinctByTourCompleted() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'tourCompleted');
@@ -2098,6 +2198,13 @@ extension AppSettingsQueryProperty
   QueryBuilder<AppSettings, double?, QQueryOperations> pesoObiettivoProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'pesoObiettivo');
+    });
+  }
+
+  QueryBuilder<AppSettings, int, QQueryOperations>
+      restTimerDefaultSecondsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'restTimerDefaultSeconds');
     });
   }
 
