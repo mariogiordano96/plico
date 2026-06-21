@@ -120,6 +120,15 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     });
   }
 
+  /// All'interno di un blocco superset non si riposa tra un esercizio e il
+  /// successivo: il timer scatta solo dopo l'ultimo esercizio del blocco
+  /// (gli esercizi singoli, non in superset, mantengono il comportamento
+  /// originale: riposo dopo ogni serie).
+  bool _isLastInStep(WorkoutExercise e) {
+    final step = _steps[_stepIndex];
+    return step.length <= 1 || identical(step.last, e);
+  }
+
   Future<void> _confirmSerie(WorkoutExercise e, int setIndex) async {
     final reps = int.tryParse(_repsCtrls[e.id]![setIndex].text);
     final kg = double.tryParse(_kgCtrls[e.id]![setIndex].text.replaceAll(',', '.'));
@@ -133,7 +142,9 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     await DatabaseService.instance.updateWorkoutExercise(e);
     if (!mounted) return;
     setState(() {});
-    await showRestTimerSheet(context, seconds: e.restSeconds ?? _defaultRestSeconds);
+    if (_isLastInStep(e)) {
+      await showRestTimerSheet(context, seconds: e.restSeconds ?? _defaultRestSeconds);
+    }
   }
 
   Future<void> _confirmCardio(WorkoutExercise e) async {
@@ -148,7 +159,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     await DatabaseService.instance.updateWorkoutExercise(e);
     if (!mounted) return;
     setState(() {});
-    if ((e.restSeconds ?? 0) > 0) {
+    if ((e.restSeconds ?? 0) > 0 && _isLastInStep(e)) {
       await showRestTimerSheet(context, seconds: e.restSeconds!);
     }
   }
@@ -209,6 +220,22 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
         children: [
+          if (step.length > 1)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Row(
+                children: [
+                  Icon(Icons.link_rounded, color: p.accent, size: 16),
+                  const SizedBox(width: 6),
+                  Text(l10n.sessioneGuidataSuperset,
+                      style: TextStyle(
+                          color: p.accent,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1)),
+                ],
+              ),
+            ),
           for (final e in step) _ExerciseStepCard(
             exercise: e,
             suggestion: _suggestionById[e.id],

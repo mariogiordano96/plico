@@ -1557,11 +1557,43 @@ posizionamento/stile già visto in Progressi.
 > `WorkoutLog` può esistere anche con sola nota (Fase 9) senza alcun esercizio
 > loggato, il che renderebbe la streak falsabile senza allenarsi davvero.
 
-### Fase 12 — Superset / circuiti
-- [ ] Campo `supersetGroupId` già su `WorkoutTemplateExercise`/`WorkoutExercise` (da Fase 4/6)
-- [ ] UI raggruppamento esercizi in creazione scheda
-- [ ] UI blocco superset durante il log + timer di recupero solo a fine blocco
-- [ ] Aggiornare il preset Circuito Cardio/HIIT per usare un singolo superset
+### Fase 12 — Superset / circuiti ✅ completata
+- [x] Campo `supersetGroupId` già su `WorkoutTemplateExercise`/`WorkoutExercise`
+      (da Fase 4/6): confermato presente su entrambi i modelli, e già copiato
+      da `startWorkoutFromTemplate` (`database_service.dart`) dal template
+      al `WorkoutExercise` del giorno — nessuna modifica necessaria lì
+- [x] UI raggruppamento esercizi in `crea_scheda_screen.dart`: pulsante
+      "link/unlink" (`_SupersetConnector`) tra una riga esercizio e la
+      precedente per unirle/separarle in un gruppo; `_EsercizioRow` mostra
+      un'icona e un bordo evidenziato quando l'esercizio è in un gruppo.
+      I gruppi sono sempre per costruzione esercizi consecutivi (si può solo
+      unire al precedente), coerente con `GuidedSessionService.groupSteps`;
+      `_normalizeGroups` azzera i gruppi rimasti con un solo membro dopo
+      un'eliminazione
+- [x] UI blocco superset durante il log: in `sessione_guidata_screen.dart`,
+      etichetta "SUPERSET" sopra le card quando lo step corrente ha più di
+      un esercizio (i.e. blocco); stessa etichetta come indicatore visivo
+      (non interattivo) anche nella lista piatta di `allenamento_screen.dart`,
+      per coerenza quando gli esercizi del giorno provengono da una scheda
+      con superset ma sono visti fuori dalla modalità guidata
+- [x] Timer di recupero solo a fine blocco: nuovo `_isLastInStep` in
+      `sessione_guidata_screen.dart` — `_confirmSerie`/`_confirmCardio`
+      mostrano il timer di riposo solo se l'esercizio è l'ultimo dello step
+      corrente (gli esercizi singoli, non in superset, mantengono il
+      comportamento originale: riposo dopo ogni serie)
+- [x] Preset "Circuito Cardio/HIIT" aggiornato in `workout_presets.json`:
+      tutti i 5 esercizi condividono `supersetGroupId: 1`, `restSeconds: 120`
+      solo sull'ultimo (Burpee) per il riposo tra round del circuito
+- [x] Verificato: `flutter analyze` pulito (21 issue pre-esistenti, 0 nuove);
+      nessun nuovo test temporaneo — la logica nuova è UI/stato di schermata
+      (`_toggleSuperset`/`_normalizeGroups`/`_isLastInStep`), non logica pura
+      isolabile senza inizializzare il widget
+
+> **Correzione rispetto al piano originale**: i preset seedati una volta
+> (`workoutPresetsSeeded`) non vengono ri-seedati automaticamente sugli
+> installi esistenti — limite pre-esistente del meccanismo di seeding, non
+> specifico di questa fase; le installazioni nuove ottengono il preset
+> Circuito Cardio/HIIT già a superset unico.
 
 ### Fase 13 — Sostituzione esercizio al volo
 - [ ] Campo `mechanic` su `ExerciseDefinition` (da Fase 1, già nel JSON sorgente)

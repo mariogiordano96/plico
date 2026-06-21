@@ -269,12 +269,38 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
                   itemCount: esercizi.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 10),
-                  itemBuilder: (context, i) => _ExerciseCard(
-                    exercise: esercizi[i],
-                    p: p,
-                    l10n: l10n,
-                    onDelete: () => _elimina(esercizi[i]),
-                  ),
+                  itemBuilder: (context, i) {
+                    final e = esercizi[i];
+                    final isGroupStart = e.supersetGroupId != null &&
+                        (i == 0 || esercizi[i - 1].supersetGroupId != e.supersetGroupId);
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (isGroupStart)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 6),
+                            child: Row(
+                              children: [
+                                Icon(Icons.link_rounded, color: p.accent, size: 14),
+                                const SizedBox(width: 6),
+                                Text(l10n.sessioneGuidataSuperset,
+                                    style: TextStyle(
+                                        color: p.accent,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 1)),
+                              ],
+                            ),
+                          ),
+                        _ExerciseCard(
+                          exercise: e,
+                          p: p,
+                          l10n: l10n,
+                          onDelete: () => _elimina(e),
+                        ),
+                      ],
+                    );
+                  },
                 );
               },
             ),

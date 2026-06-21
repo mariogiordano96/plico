@@ -2678,6 +2678,18 @@ abstract class AppLocalizations {
   /// **'Il nome è obbligatorio'**
   String get creaSchedaNomeObbligatorio;
 
+  /// No description provided for @creaSchedaSupersetUnisci.
+  ///
+  /// In it, this message translates to:
+  /// **'Unisci in superset'**
+  String get creaSchedaSupersetUnisci;
+
+  /// No description provided for @creaSchedaSupersetUnito.
+  ///
+  /// In it, this message translates to:
+  /// **'Superset'**
+  String get creaSchedaSupersetUnito;
+
   /// No description provided for @creaProgrammaTitle.
   ///
   /// In it, this message translates to:
@@ -2845,6 +2857,12 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Conferma serie'**
   String get sessioneGuidataConferma;
+
+  /// No description provided for @sessioneGuidataSuperset.
+  ///
+  /// In it, this message translates to:
+  /// **'SUPERSET'**
+  String get sessioneGuidataSuperset;
 
   /// No description provided for @sessioneRiepilogoTitle.
   ///

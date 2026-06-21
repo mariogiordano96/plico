@@ -463,6 +463,8 @@
   "creaSchedaAggiungiEsercizio": "Add exercise",
   "creaSchedaNessunEsercizio": "Add at least one exercise",
   "creaSchedaNomeObbligatorio": "Name is required",
+  "creaSchedaSupersetUnisci": "Group as superset",
+  "creaSchedaSupersetUnito": "Superset",
 
   "creaProgrammaTitle": "New program",
   "creaProgrammaNomeLabel": "Program name",
@@ -498,6 +500,7 @@
   "sessioneGuidataSuccessivo": "Next",
   "sessioneGuidataTermina": "Finish",
   "sessioneGuidataConferma": "Confirm set",
+  "sessioneGuidataSuperset": "SUPERSET",
 
   "sessioneRiepilogoTitle": "Session complete",
   "sessioneRiepilogoKcal": "{kcal} kcal estimated",

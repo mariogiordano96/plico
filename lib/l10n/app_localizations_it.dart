@@ -1434,6 +1434,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get creaSchedaNomeObbligatorio => 'Il nome è obbligatorio';
 
   @override
+  String get creaSchedaSupersetUnisci => 'Unisci in superset';
+
+  @override
+  String get creaSchedaSupersetUnito => 'Superset';
+
+  @override
   String get creaProgrammaTitle => 'Nuovo programma';
 
   @override
@@ -1537,6 +1543,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get sessioneGuidataConferma => 'Conferma serie';
+
+  @override
+  String get sessioneGuidataSuperset => 'SUPERSET';
 
   @override
   String get sessioneRiepilogoTitle => 'Sessione completata';

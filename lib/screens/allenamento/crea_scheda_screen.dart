@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/workout_template.dart';
 import '../../models/workout_template_exercise.dart';
 import '../../services/database_service.dart';
@@ -44,6 +45,47 @@ class _CreaSchedaScreenState extends State<CreaSchedaScreen> {
     setState(() {
       final updated = [..._esercizi];
       updated.removeAt(i);
+      _normalizeGroups(updated);
+      _esercizi = updated;
+    });
+  }
+
+  /// Azzera `supersetGroupId` per i gruppi rimasti con un solo membro, che
+  /// possono formarsi dopo la rimozione di un esercizio in mezzo a un gruppo.
+  void _normalizeGroups(List<WorkoutTemplateExercise> list) {
+    final counts = <int, int>{};
+    for (final e in list) {
+      final g = e.supersetGroupId;
+      if (g != null) counts[g] = (counts[g] ?? 0) + 1;
+    }
+    for (final e in list) {
+      if (e.supersetGroupId != null && counts[e.supersetGroupId] == 1) {
+        e.supersetGroupId = null;
+      }
+    }
+  }
+
+  int _nextGroupId() {
+    final ids = _esercizi.map((e) => e.supersetGroupId).whereType<int>();
+    return ids.isEmpty ? 1 : ids.reduce((a, b) => a > b ? a : b) + 1;
+  }
+
+  /// Unisce/separa l'esercizio [i] in superset con quello precedente: i
+  /// gruppi sono sempre formati da esercizi consecutivi nell'ordine della
+  /// scheda (vedi `GuidedSessionService.groupSteps`).
+  void _toggleSuperset(int i) {
+    setState(() {
+      final updated = [..._esercizi];
+      final current = updated[i];
+      final prev = updated[i - 1];
+      if (current.supersetGroupId != null && current.supersetGroupId == prev.supersetGroupId) {
+        current.supersetGroupId = null;
+        _normalizeGroups(updated);
+      } else {
+        final groupId = prev.supersetGroupId ?? _nextGroupId();
+        prev.supersetGroupId = groupId;
+        current.supersetGroupId = groupId;
+      }
       _esercizi = updated;
     });
   }
@@ -113,8 +155,20 @@ class _CreaSchedaScreenState extends State<CreaSchedaScreen> {
             Text(_errore!, style: const TextStyle(color: Colors.red, fontSize: 12)),
           ],
           const SizedBox(height: 20),
-          for (var i = 0; i < _esercizi.length; i++)
-            _EsercizioRow(esercizio: _esercizi[i], p: p, onDelete: () => _rimuoviEsercizio(i)),
+          for (var i = 0; i < _esercizi.length; i++) ...[
+            if (i > 0) _SupersetConnector(
+              grouped: _esercizi[i].supersetGroupId != null &&
+                  _esercizi[i].supersetGroupId == _esercizi[i - 1].supersetGroupId,
+              p: p,
+              l10n: l10n,
+              onTap: () => _toggleSuperset(i),
+            ),
+            _EsercizioRow(
+              esercizio: _esercizi[i],
+              p: p,
+              onDelete: () => _rimuoviEsercizio(i),
+            ),
+          ],
           const SizedBox(height: 8),
           OutlinedButton.icon(
             onPressed: _aggiungiEsercizio,
@@ -147,6 +201,7 @@ class _EsercizioRow extends StatelessWidget {
         ? '${esercizio.targetDurationSeconds! ~/ 60} min'
         : '${esercizio.targetSets ?? '-'}×${esercizio.targetReps ?? '-'}'
             '${esercizio.targetWeightKg != null ? ' · ${esercizio.targetWeightKg}kg' : ''}';
+    final grouped = esercizio.supersetGroupId != null;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -154,10 +209,14 @@ class _EsercizioRow extends StatelessWidget {
       decoration: BoxDecoration(
         color: p.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: p.cardBorder),
+        border: Border.all(color: grouped ? p.accent.withValues(alpha: 0.5) : p.cardBorder),
       ),
       child: Row(
         children: [
+          if (grouped) ...[
+            Icon(Icons.link_rounded, color: p.accent, size: 16),
+            const SizedBox(width: 8),
+          ],
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,6 +232,35 @@ class _EsercizioRow extends StatelessWidget {
             icon: Icon(Icons.close_rounded, color: p.textMuted, size: 18),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _SupersetConnector extends StatelessWidget {
+  final bool grouped;
+  final ColorPalette p;
+  final AppLocalizations l10n;
+  final VoidCallback onTap;
+  const _SupersetConnector(
+      {required this.grouped, required this.p, required this.l10n, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: TextButton.icon(
+        onPressed: onTap,
+        icon: Icon(grouped ? Icons.link_rounded : Icons.link_off_rounded,
+            size: 16, color: grouped ? p.accent : p.textMuted),
+        label: Text(
+          grouped ? l10n.creaSchedaSupersetUnito : l10n.creaSchedaSupersetUnisci,
+          style: TextStyle(fontSize: 11, color: grouped ? p.accent : p.textMuted),
+        ),
+        style: TextButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          minimumSize: Size.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
       ),
     );
   }
