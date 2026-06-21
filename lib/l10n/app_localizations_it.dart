@@ -1249,4 +1249,53 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get eserciziNomeObbligatorio => 'Il nome è obbligatorio';
+
+  @override
+  String get tabAllenamento => 'Allenamento';
+
+  @override
+  String get allenamentoVuotoTitle => 'Nessun esercizio oggi';
+
+  @override
+  String get allenamentoVuotoSub => 'Aggiungi il primo esercizio per iniziare';
+
+  @override
+  String get allenamentoAggiungiEsercizio => 'Aggiungi esercizio';
+
+  @override
+  String allenamentoSerieCount(int n) {
+    return '$n serie';
+  }
+
+  @override
+  String allenamentoDurataMin(int min) {
+    return '$min min';
+  }
+
+  @override
+  String get allenamentoEliminaTitle => 'Eliminare l\'esercizio?';
+
+  @override
+  String get allenamentoEliminaSub =>
+      'L\'esercizio e le serie registrate verranno rimossi.';
+
+  @override
+  String serieDialogSerieLabel(int n) {
+    return 'Serie $n';
+  }
+
+  @override
+  String get serieDialogRipHint => 'rip';
+
+  @override
+  String get serieDialogKgHint => 'kg';
+
+  @override
+  String get serieDialogAggiungiSerie => 'Aggiungi serie';
+
+  @override
+  String get cardioDialogDurataLabel => 'Durata (minuti)';
+
+  @override
+  String get cardioDialogDurataHint => '30';
 }

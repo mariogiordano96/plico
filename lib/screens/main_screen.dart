@@ -3,6 +3,7 @@ import '../theme/app_theme.dart';
 import '../widgets/app_tour.dart';
 import 'home_screen.dart';
 import 'diario/diario_screen.dart';
+import 'allenamento/allenamento_screen.dart';
 import 'progressi/progressi_screen.dart';
 import 'tdee/tdee_screen.dart';
 
@@ -29,6 +30,7 @@ class _MainScreenState extends State<MainScreen> {
         children: [
           HomeScreen(onSwitchTab: _switchTab),
           const DiarioScreen(),
+          const AllenamentoScreen(),
           const ProgressiScreen(),
           const TdeeScreen(),
         ],
@@ -50,7 +52,7 @@ class _MainScreenState extends State<MainScreen> {
           unselectedFontSize: 11,
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
           elevation: 0,
-          items: const [
+          items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.home_rounded),
               label: 'Home',
@@ -58,6 +60,10 @@ class _MainScreenState extends State<MainScreen> {
             BottomNavigationBarItem(
               icon: Icon(Icons.restaurant_menu_rounded),
               label: 'Diario',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.fitness_center_rounded),
+              label: context.l10n.tabAllenamento,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.bar_chart_rounded),

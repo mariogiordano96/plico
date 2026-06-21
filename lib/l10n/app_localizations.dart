@@ -2353,6 +2353,90 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Il nome è obbligatorio'**
   String get eserciziNomeObbligatorio;
+
+  /// No description provided for @tabAllenamento.
+  ///
+  /// In it, this message translates to:
+  /// **'Allenamento'**
+  String get tabAllenamento;
+
+  /// No description provided for @allenamentoVuotoTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessun esercizio oggi'**
+  String get allenamentoVuotoTitle;
+
+  /// No description provided for @allenamentoVuotoSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Aggiungi il primo esercizio per iniziare'**
+  String get allenamentoVuotoSub;
+
+  /// No description provided for @allenamentoAggiungiEsercizio.
+  ///
+  /// In it, this message translates to:
+  /// **'Aggiungi esercizio'**
+  String get allenamentoAggiungiEsercizio;
+
+  /// No description provided for @allenamentoSerieCount.
+  ///
+  /// In it, this message translates to:
+  /// **'{n} serie'**
+  String allenamentoSerieCount(int n);
+
+  /// No description provided for @allenamentoDurataMin.
+  ///
+  /// In it, this message translates to:
+  /// **'{min} min'**
+  String allenamentoDurataMin(int min);
+
+  /// No description provided for @allenamentoEliminaTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Eliminare l\'esercizio?'**
+  String get allenamentoEliminaTitle;
+
+  /// No description provided for @allenamentoEliminaSub.
+  ///
+  /// In it, this message translates to:
+  /// **'L\'esercizio e le serie registrate verranno rimossi.'**
+  String get allenamentoEliminaSub;
+
+  /// No description provided for @serieDialogSerieLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'Serie {n}'**
+  String serieDialogSerieLabel(int n);
+
+  /// No description provided for @serieDialogRipHint.
+  ///
+  /// In it, this message translates to:
+  /// **'rip'**
+  String get serieDialogRipHint;
+
+  /// No description provided for @serieDialogKgHint.
+  ///
+  /// In it, this message translates to:
+  /// **'kg'**
+  String get serieDialogKgHint;
+
+  /// No description provided for @serieDialogAggiungiSerie.
+  ///
+  /// In it, this message translates to:
+  /// **'Aggiungi serie'**
+  String get serieDialogAggiungiSerie;
+
+  /// No description provided for @cardioDialogDurataLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'Durata (minuti)'**
+  String get cardioDialogDurataLabel;
+
+  /// No description provided for @cardioDialogDurataHint.
+  ///
+  /// In it, this message translates to:
+  /// **'30'**
+  String get cardioDialogDurataHint;
 }
 
 class _AppLocalizationsDelegate

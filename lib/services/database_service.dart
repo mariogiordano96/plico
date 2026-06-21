@@ -20,6 +20,8 @@ import '../models/meal_plan.dart';
 import '../models/achievement.dart';
 import '../models/meal_combo.dart';
 import '../models/exercise_definition.dart';
+import '../models/workout_log.dart';
+import '../models/workout_exercise.dart';
 
 class DatabaseService {
   static final DatabaseService instance = DatabaseService._();
@@ -32,6 +34,7 @@ class DatabaseService {
     AppSettingsSchema, MeasurementSnapshotSchema, FoodItemSchema,
     DailyLogSchema, UserFoodPreferencesSchema, MealPlanSchema,
     AchievementSchema, MealComboSchema, ExerciseDefinitionSchema,
+    WorkoutLogSchema, WorkoutExerciseSchema,
   ];
 
   Future<void> init() async {
@@ -815,6 +818,71 @@ class DatabaseService {
   Future<void> addCustomExercise(ExerciseDefinition exercise) async {
     await _isar.writeTxn(() async {
       await _isar.exerciseDefinitions.put(exercise);
+    });
+  }
+
+  // ──────────────────────────────────────────────
+  // WorkoutLog / WorkoutExercise
+  // ──────────────────────────────────────────────
+
+  Future<WorkoutLog?> getWorkoutLog(DateTime date) async {
+    final day = _logDate(date);
+    return _isar.workoutLogs.filter().dateEqualTo(day).findFirst();
+  }
+
+  Future<void> setWorkoutNote(DateTime date, String? note) async {
+    final day = _logDate(date);
+    await _isar.writeTxn(() async {
+      var log = await _isar.workoutLogs.filter().dateEqualTo(day).findFirst();
+      log ??= WorkoutLog()..date = day;
+      log.note = note;
+      await _isar.workoutLogs.put(log);
+    });
+  }
+
+  Future<List<WorkoutExercise>> getWorkoutExercisesForDay(DateTime date) async {
+    final day = _logDate(date);
+    return _isar.workoutExercises.filter().dateEqualTo(day).findAll();
+  }
+
+  Stream<List<WorkoutExercise>> watchWorkoutExercisesForDay(DateTime date) {
+    final day = _logDate(date);
+    return _isar.workoutExercises
+        .filter()
+        .dateEqualTo(day)
+        .watch(fireImmediately: true);
+  }
+
+  Future<void> addWorkoutExercise(DateTime date, WorkoutExercise exercise) async {
+    final day = _logDate(date);
+    exercise.date = day;
+    await _isar.writeTxn(() async {
+      var log = await _isar.workoutLogs.filter().dateEqualTo(day).findFirst();
+      log ??= WorkoutLog()..date = day;
+      await _isar.workoutLogs.put(log);
+      await _isar.workoutExercises.put(exercise);
+    });
+  }
+
+  Future<void> updateWorkoutExercise(WorkoutExercise exercise) async {
+    await _isar.writeTxn(() async {
+      await _isar.workoutExercises.put(exercise);
+    });
+  }
+
+  Future<void> deleteWorkoutExercise(Id id) async {
+    await _isar.writeTxn(() async {
+      await _isar.workoutExercises.delete(id);
+    });
+  }
+
+  Future<void> deleteWorkoutLog(DateTime date) async {
+    final day = _logDate(date);
+    await _isar.writeTxn(() async {
+      final exercises = await _isar.workoutExercises.filter().dateEqualTo(day).findAll();
+      await _isar.workoutExercises.deleteAll(exercises.map((e) => e.id).toList());
+      final log = await _isar.workoutLogs.filter().dateEqualTo(day).findFirst();
+      if (log != null) await _isar.workoutLogs.delete(log.id);
     });
   }
 

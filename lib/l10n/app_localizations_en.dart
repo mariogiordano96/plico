@@ -1243,4 +1243,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eserciziNomeObbligatorio => 'Name is required';
+
+  @override
+  String get tabAllenamento => 'Workout';
+
+  @override
+  String get allenamentoVuotoTitle => 'No exercise today';
+
+  @override
+  String get allenamentoVuotoSub => 'Add your first exercise to get started';
+
+  @override
+  String get allenamentoAggiungiEsercizio => 'Add exercise';
+
+  @override
+  String allenamentoSerieCount(int n) {
+    return '$n sets';
+  }
+
+  @override
+  String allenamentoDurataMin(int min) {
+    return '$min min';
+  }
+
+  @override
+  String get allenamentoEliminaTitle => 'Delete exercise?';
+
+  @override
+  String get allenamentoEliminaSub =>
+      'The exercise and its logged sets will be removed.';
+
+  @override
+  String serieDialogSerieLabel(int n) {
+    return 'Set $n';
+  }
+
+  @override
+  String get serieDialogRipHint => 'reps';
+
+  @override
+  String get serieDialogKgHint => 'kg';
+
+  @override
+  String get serieDialogAggiungiSerie => 'Add set';
+
+  @override
+  String get cardioDialogDurataLabel => 'Duration (minutes)';
+
+  @override
+  String get cardioDialogDurataHint => '30';
 }

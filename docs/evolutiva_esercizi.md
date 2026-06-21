@@ -129,7 +129,7 @@ Il campo `muscleGroup` viene derivato da `primaryMuscles` al momento del seed:
 | shoulders | shoulders |
 | categoria `cardio` | cardio |
 
-### `WorkoutLog` — allenamento giornaliero (Isar)
+### `WorkoutLog` — allenamento giornaliero (Isar) ✅ implementato
 
 ```dart
 @collection
@@ -140,12 +140,15 @@ class WorkoutLog {
   late DateTime date;
 
   String? note;                // nota libera sulla sessione (es. "ginocchio doloreva")
-
-  final exercises = IsarLinks<WorkoutExercise>();
 }
 ```
 
-### `WorkoutExercise` — esercizio eseguito (Isar)
+> **Correzione rispetto al piano originale**: niente `IsarLinks<WorkoutExercise>` su
+> `WorkoutLog`. Dato che `WorkoutExercise.date` è già denormalizzata, gli esercizi di un
+> giorno si interrogano direttamente (`WorkoutExercise.filter().dateEqualTo(day)`) senza
+> bisogno di un link esplicito — più semplice, nessun overhead di tabella di link.
+
+### `WorkoutExercise` — esercizio eseguito (Isar) ✅ implementato
 
 ```dart
 @collection
@@ -157,8 +160,8 @@ class WorkoutExercise {
   late String exerciseName;    // snapshot del nome al momento del log
 
   @Index(type: IndexType.value)
-  late DateTime date;          // denormalizzato da WorkoutLog.date: evita il join
-                                // per le query di storico per esercizio
+  late DateTime date;          // normalizzata a mezzanotte: query dirette per giorno
+                                // e per storico, senza join
 
   int? supersetGroupId;        // esercizi con lo stesso valore eseguiti in sequenza
                                 // senza riposo tra loro (null = esercizio singolo)
@@ -168,14 +171,14 @@ class WorkoutExercise {
   int? durationSeconds;
   int? met;                    // valore MET usato per la stima
 
-  // Per strength
-  final sets = IsarLinks<WorkoutSet>();
+  // Per strength — embedded, non IsarLinks (vedi nota sotto)
+  List<WorkoutSet> sets = [];
 
   int? estimatedKcal;          // calcolato e persistito al salvataggio
 }
 ```
 
-### `WorkoutSet` — singola serie (Isar, embedded)
+### `WorkoutSet` — singola serie (Isar, embedded) ✅ implementato
 
 ```dart
 @embedded
@@ -186,6 +189,12 @@ class WorkoutSet {
   bool isWarmup = false;        // serie di riscaldamento: esclusa da PR/volume/storico overload
 }
 ```
+
+> **Correzione rispetto al piano originale**: `WorkoutSet` è `@embedded`, e Isar non
+> permette `IsarLinks` su tipi embedded (i link richiedono `@collection` su entrambi i
+> lati). `WorkoutExercise.sets` è quindi una `List<WorkoutSet>` embedded semplice, come
+> già fa `DailyLog.entries` con `MealEntry` nel resto dell'app — coerente con la
+> convenzione esistente, e WorkoutSet non ha comunque bisogno di query indipendenti.
 
 ---
 
@@ -1304,12 +1313,23 @@ posizionamento/stile già visto in Progressi.
 > logica è verificata a livello di servizio (test diretti su `DatabaseService`); la
 > verifica interattiva della UI va fatta manualmente su device/emulatore.
 
-### Fase 4 — Log allenamento
-- [ ] Modelli Isar `WorkoutLog` (con `note`), `WorkoutExercise` (con `exerciseId`/`date`
-      indicizzati, `supersetGroupId`, `restSeconds`), `WorkoutSet` (con `rpe`) + codegen
-- [ ] `WorkoutService` con CRUD
-- [ ] Tab Allenamento con lista esercizi del giorno
-- [ ] Dialog log serie (forza) e dialog durata (cardio)
+### Fase 4 — Log allenamento ✅ completata
+- [x] Modelli Isar `WorkoutLog` (con `note`), `WorkoutExercise` (con `exerciseId`/`date`
+      indicizzati, `supersetGroupId`, `restSeconds`), `WorkoutSet` (con `rpe`, `isWarmup`)
+      + codegen — vedi correzioni `@embedded`/`IsarLinks` sopra
+- [x] CRUD direttamente in `DatabaseService` (no `WorkoutService` dedicato: il progetto
+      non ha service per-collection, tutto il CRUD vive in `DatabaseService`, stesso
+      pattern di `DailyLog`/`BodySnapshot`/ecc.)
+- [x] 5° tab "Allenamento" in `MainScreen` (tra Diario e Progressi) + `AllenamentoScreen`
+      con lista esercizi del giorno (StreamBuilder su `watchWorkoutExercisesForDay`)
+- [x] `showLogSerieDialog` (forza, serie dinamiche rip/kg) e `showLogCardioDialog`
+      (durata in minuti) — RPE non incluso nel dialog: è Fase 9
+- [x] **Fix collaterale**: `app_tour.dart` aveva indici di tab e calcolo larghezza
+      cablati su 4 tab; inserendo il 5° a metà si rompeva lo spotlight. Shiftati gli
+      indici (Progressi/TDEE ora 3/4) e il calcolo `itemW` su 5 tab totali — senza
+      aggiungere un nuovo step per "Allenamento" (contenuto del tour: Fase 20/Rifinitura)
+- [x] Verificato: `flutter analyze` pulito; test di servizio sul CRUD completo
+      (creazione/lettura/nota/eliminazione esercizio/eliminazione intero log) passa
 
 ### Fase 5 — Stima kcal + integrazione Home
 - [ ] `CalorieEstimationService` con MET per cardio + euristica strength

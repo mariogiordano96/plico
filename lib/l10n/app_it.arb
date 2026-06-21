@@ -517,5 +517,31 @@
   "eserciziAttrezzaturaLabel": "Attrezzatura (opzionale)",
   "eserciziAttrezzaturaHint": "Es. Manubri, corpo libero...",
   "eserciziSalva": "Salva",
-  "eserciziNomeObbligatorio": "Il nome è obbligatorio"
+  "eserciziNomeObbligatorio": "Il nome è obbligatorio",
+
+  "tabAllenamento": "Allenamento",
+  "allenamentoVuotoTitle": "Nessun esercizio oggi",
+  "allenamentoVuotoSub": "Aggiungi il primo esercizio per iniziare",
+  "allenamentoAggiungiEsercizio": "Aggiungi esercizio",
+  "allenamentoSerieCount": "{n} serie",
+  "@allenamentoSerieCount": {
+    "placeholders": { "n": { "type": "int" } }
+  },
+  "allenamentoDurataMin": "{min} min",
+  "@allenamentoDurataMin": {
+    "placeholders": { "min": { "type": "int" } }
+  },
+  "allenamentoEliminaTitle": "Eliminare l'esercizio?",
+  "allenamentoEliminaSub": "L'esercizio e le serie registrate verranno rimossi.",
+
+  "serieDialogSerieLabel": "Serie {n}",
+  "@serieDialogSerieLabel": {
+    "placeholders": { "n": { "type": "int" } }
+  },
+  "serieDialogRipHint": "rip",
+  "serieDialogKgHint": "kg",
+  "serieDialogAggiungiSerie": "Aggiungi serie",
+
+  "cardioDialogDurataLabel": "Durata (minuti)",
+  "cardioDialogDurataHint": "30"
 }
