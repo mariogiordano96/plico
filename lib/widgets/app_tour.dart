@@ -10,10 +10,7 @@ class _TourStep {
 }
 
 // Tab indices used for navigation — not localizable
-// Indice 2 (Allenamento) non ha ancora un suo step del tour: aggiunto in Fase di
-// Rifinitura della sezione Esercizi (docs/evolutiva_esercizi.md). Nel frattempo gli
-// step restanti puntano agli indici corretti (shiftati di +1 da Progressi in poi).
-const _kTourTabIndices = [0, 1, 3, 4];
+const _kTourTabIndices = [0, 1, 2, 3, 4];
 const _kTotalTabs = 5; // Home, Diario, Allenamento, Progressi, TDEE
 
 class AppTour extends StatefulWidget {
@@ -109,6 +106,7 @@ class _TourUI extends StatelessWidget {
     final steps = [
       _TourStep(0, l10n.tourHomeTitle, l10n.tourHomeDesc),
       _TourStep(1, l10n.tourDiarioTitle, l10n.tourDiarioDesc),
+      _TourStep(2, l10n.tourAllenamentoTitle, l10n.tourAllenamentoDesc),
       _TourStep(3, l10n.tourProgressiTitle, l10n.tourProgressiDesc),
       _TourStep(4, l10n.tourTdeeTitle, l10n.tourTdeeDesc),
     ];

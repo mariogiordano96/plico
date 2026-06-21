@@ -200,6 +200,18 @@ abstract class AppLocalizations {
   /// **'Registra ogni pasto della giornata. Tocca il \"+\" in alto per aggiungere un alimento o scannerizza un barcode.'**
   String get tourDiarioDesc;
 
+  /// Tour: titolo tab Allenamento
+  ///
+  /// In it, this message translates to:
+  /// **'Allenamento'**
+  String get tourAllenamentoTitle;
+
+  /// Tour: descrizione tab Allenamento
+  ///
+  /// In it, this message translates to:
+  /// **'Registra i tuoi allenamenti, crea schede e programmi, e monitora il volume settimanale per gruppo muscolare.'**
+  String get tourAllenamentoDesc;
+
   /// Tour: titolo tab Progressi
   ///
   /// In it, this message translates to:
@@ -1387,6 +1399,18 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'MISURAZIONI'**
   String get progressiSezMisurazioni;
+
+  /// No description provided for @progressiSezAllenamenti.
+  ///
+  /// In it, this message translates to:
+  /// **'ALLENAMENTI RECENTI'**
+  String get progressiSezAllenamenti;
+
+  /// No description provided for @progressiNessunAllenamento.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessun allenamento'**
+  String get progressiNessunAllenamento;
 
   /// No description provided for @progressiRange1A.
   ///
@@ -2677,6 +2701,12 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Bilancio netto'**
   String get homeAttivitaBilancioNetto;
+
+  /// No description provided for @homeAttivitaKcalDisclaimer.
+  ///
+  /// In it, this message translates to:
+  /// **'Stima indicativa, non un dato medico: basata sull\'ultimo peso registrato (o 75 kg di default se non disponibile).'**
+  String get homeAttivitaKcalDisclaimer;
 
   /// No description provided for @schedeTitle.
   ///

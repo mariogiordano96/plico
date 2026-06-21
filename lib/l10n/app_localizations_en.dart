@@ -62,6 +62,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Log every meal of the day. Tap \"+\" at the top to add a food or scan a barcode.';
 
   @override
+  String get tourAllenamentoTitle => 'Workout';
+
+  @override
+  String get tourAllenamentoDesc =>
+      'Log your workouts, create plans and programs, and track weekly volume per muscle group.';
+
+  @override
   String get tourProgressiTitle => 'Progress';
 
   @override
@@ -705,6 +712,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get progressiSezMisurazioni => 'MEASUREMENTS';
+
+  @override
+  String get progressiSezAllenamenti => 'RECENT WORKOUTS';
+
+  @override
+  String get progressiNessunAllenamento => 'No workout';
 
   @override
   String get progressiRange1A => '1Y';
@@ -1428,6 +1441,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeAttivitaBilancioNetto => 'Net balance';
+
+  @override
+  String get homeAttivitaKcalDisclaimer =>
+      'Indicative estimate, not a medical figure: based on your last recorded weight (or a default of 75 kg if unavailable).';
 
   @override
   String get schedeTitle => 'My templates';

@@ -971,6 +971,17 @@ class DatabaseService {
         .map((list) => list.map((e) => e.date).toSet());
   }
 
+  /// Tutti i [WorkoutExercise] registrati nel range [from]-[to] (inclusi),
+  /// osservabile. Usato dalla cronologia allenamenti recenti in Progressi.
+  Stream<List<WorkoutExercise>> watchWorkoutExercisesRange(DateTime from, DateTime to) {
+    final f = _logDate(from);
+    final t = _logDate(to);
+    return _isar.workoutExercises
+        .filter()
+        .dateBetween(f, t)
+        .watch(fireImmediately: true);
+  }
+
   /// Numero totale di sessioni allenamento mai registrate, dove una sessione
   /// è un giorno con almeno un [WorkoutExercise].
   Future<int> getTotalWorkoutSessionsCount() async {

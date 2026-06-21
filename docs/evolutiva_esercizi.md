@@ -281,8 +281,8 @@ durata_stimata_ora = (numero_serie_di_lavoro × 2.5 min) / 60
 Il peso corporeo usato è l'ultimo `BodySnapshot.pesoKg` registrato; se assente, default
 75 kg (`CalorieEstimationService.defaultBodyWeightKg`).
 
-> La stima resta puramente indicativa, su entrambe le formule. Disclaimer in UI: Fase 20
-> (Rifinitura) — non ancora mostrato.
+> La stima resta puramente indicativa, su entrambe le formule. Disclaimer in UI: aggiunto
+> in Fase 20 (Rifinitura), sotto la card "Attività" in `home_screen.dart`.
 
 ### Integrazione in Home ✅ implementata
 
@@ -1868,10 +1868,36 @@ posizionamento/stile già visto in Progressi.
 > servizio (nessuna dipendenza da Isar, a differenza dei test delle fasi precedenti),
 > rimossi dopo la verifica per restare coerenti con le fasi precedenti.
 
-### Fase 20 — Rifinitura
-- [ ] Cronologia allenamenti in Progressi (ultimi 7 giorni)
-- [ ] Aggiornare tour guidato con il nuovo tab, le schede e le nuove feature
-- [ ] Disclaimer stima kcal in UI
+### Fase 20 — Rifinitura ✅ completata
+- [x] Cronologia allenamenti in Progressi (ultimi 7 giorni)
+  - Nuovo `DatabaseService.watchWorkoutExercisesRange(from, to)`: variante osservabile di
+    `getWorkoutDaysRange` ma su `WorkoutExercise` completi (non solo le date), filtrati con
+    `dateBetween` — serve sia il conteggio esercizi che gli `estimatedKcal` per giorno, non
+    solo la presenza/assenza usata dalla streak.
+  - Nuova sezione `_CronologiaAllenamenti` in `progressi_screen.dart`: 7 righe (oggi e i 6
+    giorni precedenti, più recente in alto), ciascuna con un pallino di stato (colorato se
+    quel giorno ha almeno un `WorkoutExercise`, altrimenti `p.cardBorder`), il conteggio
+    esercizi (`l10n.schedeNEsercizi`, riusato da Fase 19) o "Nessun allenamento", e il totale
+    kcal stimate del giorno se presente.
+- [x] Aggiornare tour guidato con il nuovo tab, le schede e le nuove feature
+  - `app_tour.dart` aveva già un TODO esplicito lasciato da una fase precedente
+    (`_kTourTabIndices` saltava l'indice 2/Allenamento). Aggiunto il quarto step
+    (`tourAllenamentoTitle`/`tourAllenamentoDesc`) nella posizione corretta tra Diario e
+    Progressi, verificata via l'ordine reale dei tab in `main_screen.dart`
+    (Home/Diario/Allenamento/Progressi/TDEE).
+- [x] Disclaimer stima kcal in UI
+  - Nuova stringa `homeAttivitaKcalDisclaimer` mostrata sotto la card "Attività" in
+    `home_screen.dart` (bilancio kcal ingerite/bruciate del giorno) — il punto più
+    prominente in cui le kcal stimate da `CalorieEstimationService` vengono mostrate
+    all'utente, già individuato come riferimento esplicito nel piano (sezione "Stima
+    calorie bruciate"). Non aggiunto un disclaimer ripetuto anche per-esercizio in
+    `AllenamentoScreen` (dove il valore è già preceduto da "≈") per non appesantire la UI
+    con lo stesso testo lungo ripetuto su ogni riga.
+
+> nessun nuovo test temporaneo — la logica nuova è interamente accoppiata a Isar
+> (`watchWorkoutExercisesRange`) o UI/stato di schermata (raggruppamento per giorno e somma
+> kcal in `_CronologiaAllenamenti`, step del tour, testo del disclaimer), non estraibile in
+> una funzione pura (stesso giudizio già applicato in Fase 16).
 
 **Stima totale: ~30–37 giorni-persona stile tradizionale (con assistenza AI sulle fasi di
 codice, l'elapsed-time reale è dominato dai compiti non comprimibili: traduzioni, mapping

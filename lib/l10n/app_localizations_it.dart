@@ -62,6 +62,13 @@ class AppLocalizationsIt extends AppLocalizations {
       'Registra ogni pasto della giornata. Tocca il \"+\" in alto per aggiungere un alimento o scannerizza un barcode.';
 
   @override
+  String get tourAllenamentoTitle => 'Allenamento';
+
+  @override
+  String get tourAllenamentoDesc =>
+      'Registra i tuoi allenamenti, crea schede e programmi, e monitora il volume settimanale per gruppo muscolare.';
+
+  @override
   String get tourProgressiTitle => 'Progressi';
 
   @override
@@ -710,6 +717,12 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get progressiSezMisurazioni => 'MISURAZIONI';
+
+  @override
+  String get progressiSezAllenamenti => 'ALLENAMENTI RECENTI';
+
+  @override
+  String get progressiNessunAllenamento => 'Nessun allenamento';
 
   @override
   String get progressiRange1A => '1A';
@@ -1436,6 +1449,10 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get homeAttivitaBilancioNetto => 'Bilancio netto';
+
+  @override
+  String get homeAttivitaKcalDisclaimer =>
+      'Stima indicativa, non un dato medico: basata sull\'ultimo peso registrato (o 75 kg di default se non disponibile).';
 
   @override
   String get schedeTitle => 'Le mie schede';

@@ -467,6 +467,11 @@ class _AttivitaCardState extends State<_AttivitaCard> {
               p: p,
               bold: true,
             ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.homeAttivitaKcalDisclaimer,
+              style: TextStyle(color: p.textMuted, fontSize: 11, height: 1.3),
+            ),
           ],
         ),
       ),
