@@ -146,7 +146,9 @@ class _ProgrammaDetailScreenState extends State<ProgrammaDetailScreen> {
             ),
         ],
       ),
-      body: ListView(
+      body: SafeArea(
+        top: false,
+        child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
         children: [
           if (_avviato)
@@ -218,6 +220,7 @@ class _ProgrammaDetailScreenState extends State<ProgrammaDetailScreen> {
               ),
             ),
         ],
+        ),
       ),
     );
   }

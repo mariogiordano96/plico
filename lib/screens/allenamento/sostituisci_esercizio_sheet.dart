@@ -40,7 +40,9 @@ class _SostituisciEsercizioSheet extends StatelessWidget {
             color: p.background,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           ),
-          child: Column(
+          child: SafeArea(
+            top: false,
+            child: Column(
             children: [
               const SizedBox(height: 10),
               Container(
@@ -100,6 +102,7 @@ class _SostituisciEsercizioSheet extends StatelessWidget {
                       ),
               ),
             ],
+            ),
           ),
         );
       },

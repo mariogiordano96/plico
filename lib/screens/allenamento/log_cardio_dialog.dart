@@ -65,7 +65,9 @@ class _LogCardioDialogState extends State<_LogCardioDialog> {
   Widget build(BuildContext context) {
     final p = context.palette;
     final l10n = context.l10n;
-    return Padding(
+    return SafeArea(
+      top: false,
+      child: Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Container(
         decoration: BoxDecoration(
@@ -122,6 +124,7 @@ class _LogCardioDialogState extends State<_LogCardioDialog> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

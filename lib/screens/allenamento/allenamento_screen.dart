@@ -87,7 +87,9 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => Padding(
+      builder: (ctx) => SafeArea(
+        top: false,
+        child: Padding(
         padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
         child: Container(
           decoration: BoxDecoration(
@@ -140,6 +142,7 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
               ),
             ],
           ),
+        ),
         ),
       ),
     );

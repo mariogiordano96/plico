@@ -111,7 +111,9 @@ class _StoricoEsercizioScreenState extends State<StoricoEsercizioScreen> {
             ),
         ],
       ),
-      body: _loading
+      body: SafeArea(
+        top: false,
+        child: _loading
           ? Center(child: CircularProgressIndicator(color: p.accent))
           : _history.isEmpty
               ? Center(
@@ -133,6 +135,7 @@ class _StoricoEsercizioScreenState extends State<StoricoEsercizioScreen> {
                       ),
                   ],
                 ),
+      ),
     );
   }
 }

@@ -61,7 +61,9 @@ class _VolumeSettimanaleScreenState extends State<VolumeSettimanaleScreen> {
         elevation: 0,
         iconTheme: IconThemeData(color: p.accent),
       ),
-      body: _loading
+      body: SafeArea(
+        top: false,
+        child: _loading
           ? Center(child: CircularProgressIndicator(color: p.accent))
           : ListView(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
@@ -91,6 +93,7 @@ class _VolumeSettimanaleScreenState extends State<VolumeSettimanaleScreen> {
                 ],
               ],
             ),
+      ),
     );
   }
 }

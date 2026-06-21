@@ -93,7 +93,9 @@ class _RestTimerSheetState extends State<_RestTimerSheet> {
     final l10n = context.l10n;
     return GestureDetector(
       onTap: _done ? _close : null,
-      child: Container(
+      child: SafeArea(
+        top: false,
+        child: Container(
         decoration: BoxDecoration(
           color: p.background,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
@@ -129,6 +131,7 @@ class _RestTimerSheetState extends State<_RestTimerSheet> {
                 ],
               ),
           ],
+        ),
         ),
       ),
     );

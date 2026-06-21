@@ -80,7 +80,9 @@ class _CatalogoEserciziSheetState extends State<_CatalogoEserciziSheet> {
             color: p.background,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           ),
-          child: Column(
+          child: SafeArea(
+            top: false,
+            child: Column(
             children: [
               const SizedBox(height: 10),
               Container(
@@ -191,6 +193,7 @@ class _CatalogoEserciziSheetState extends State<_CatalogoEserciziSheet> {
                 ),
               ),
             ],
+            ),
           ),
         );
       },

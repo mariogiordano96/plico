@@ -60,7 +60,9 @@ class _AggiungiEsercizioPersonalizzatoScreenState
         elevation: 0,
         iconTheme: IconThemeData(color: p.accent),
       ),
-      body: ListView(
+      body: SafeArea(
+        top: false,
+        child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           Text(l10n.eserciziNomeLabel,
@@ -151,6 +153,7 @@ class _AggiungiEsercizioPersonalizzatoScreenState
             ),
           ),
         ],
+        ),
       ),
     );
   }

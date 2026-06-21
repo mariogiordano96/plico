@@ -54,7 +54,9 @@ class _RecordPersonaliScreenState extends State<RecordPersonaliScreen> {
         elevation: 0,
         iconTheme: IconThemeData(color: p.accent),
       ),
-      body: _loading
+      body: SafeArea(
+        top: false,
+        child: _loading
           ? Center(child: CircularProgressIndicator(color: p.accent))
           : Column(
               children: [
@@ -97,6 +99,7 @@ class _RecordPersonaliScreenState extends State<RecordPersonaliScreen> {
                 ),
               ],
             ),
+      ),
     );
   }
 }

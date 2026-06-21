@@ -130,7 +130,9 @@ class _CreaSchedaScreenState extends State<CreaSchedaScreen> {
         elevation: 0,
         iconTheme: IconThemeData(color: p.accent),
       ),
-      body: ListView(
+      body: SafeArea(
+        top: false,
+        child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
         children: [
           Text(l10n.creaSchedaNomeLabel,
@@ -177,6 +179,7 @@ class _CreaSchedaScreenState extends State<CreaSchedaScreen> {
             style: OutlinedButton.styleFrom(side: BorderSide(color: p.cardBorder)),
           ),
         ],
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _salva,

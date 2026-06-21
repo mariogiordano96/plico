@@ -231,7 +231,9 @@ class _LeMieSchedeScreenState extends State<LeMieSchedeScreen> {
           ),
         ],
       ),
-      body: ListView(
+      body: SafeArea(
+        top: false,
+        child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
         children: [
           if (presetTemplates.isNotEmpty || presetPrograms.isNotEmpty) ...[
@@ -288,6 +290,7 @@ class _LeMieSchedeScreenState extends State<LeMieSchedeScreen> {
               onTap: () => _openProgram(pr),
             ),
         ],
+        ),
       ),
     );
   }
