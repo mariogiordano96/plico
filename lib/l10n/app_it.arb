@@ -558,6 +558,15 @@
   "allenamentoModifica": "Modifica",
   "allenamentoEliminaGiornataTitle": "Eliminare la sessione?",
   "allenamentoEliminaGiornataSub": "Tutti gli esercizi e la nota di questo giorno verranno rimossi.",
+  "allenamentoObiettivoSettimanale": "{done}/{target} questa settimana",
+  "@allenamentoObiettivoSettimanale": {
+    "placeholders": { "done": { "type": "int" }, "target": { "type": "int" } }
+  },
+  "obiettivoSettimanaleTitle": "Obiettivo settimanale",
+  "obiettivoSettimanaleGiorni": "{n} giorni",
+  "@obiettivoSettimanaleGiorni": {
+    "placeholders": { "n": { "type": "int" } }
+  },
 
   "serieDialogSerieLabel": "Serie {n}",
   "@serieDialogSerieLabel": {

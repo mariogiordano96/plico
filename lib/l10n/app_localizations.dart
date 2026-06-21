@@ -2528,6 +2528,24 @@ abstract class AppLocalizations {
   /// **'Tutti gli esercizi e la nota di questo giorno verranno rimossi.'**
   String get allenamentoEliminaGiornataSub;
 
+  /// No description provided for @allenamentoObiettivoSettimanale.
+  ///
+  /// In it, this message translates to:
+  /// **'{done}/{target} questa settimana'**
+  String allenamentoObiettivoSettimanale(int done, int target);
+
+  /// No description provided for @obiettivoSettimanaleTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Obiettivo settimanale'**
+  String get obiettivoSettimanaleTitle;
+
+  /// No description provided for @obiettivoSettimanaleGiorni.
+  ///
+  /// In it, this message translates to:
+  /// **'{n} giorni'**
+  String obiettivoSettimanaleGiorni(int n);
+
   /// No description provided for @serieDialogSerieLabel.
   ///
   /// In it, this message translates to:

@@ -433,6 +433,9 @@
   "allenamentoModifica": "Edit",
   "allenamentoEliminaGiornataTitle": "Delete this session?",
   "allenamentoEliminaGiornataSub": "All exercises and the note for this day will be removed.",
+  "allenamentoObiettivoSettimanale": "{done}/{target} this week",
+  "obiettivoSettimanaleTitle": "Weekly goal",
+  "obiettivoSettimanaleGiorni": "{n} days",
 
   "serieDialogSerieLabel": "Set {n}",
   "serieDialogRipHint": "reps",

@@ -38,4 +38,9 @@ class AppSettings {
 
   // Allenamento — Fase 10
   bool notWorkoutAttiva = false;
+
+  // Allenamento — Fase 16: target settimanale (null = usa il default
+  // suggerito, calcolato dal programma attivo)
+  int? workoutTargetSettimanale;
+  bool workoutTargetAttivo = true;
 }

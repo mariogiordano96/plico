@@ -11,6 +11,7 @@ import '../esercizi/catalogo_esercizi_screen.dart';
 import 'le_mie_schede_screen.dart';
 import 'log_cardio_dialog.dart';
 import 'log_serie_dialog.dart';
+import 'obiettivo_settimanale_settings_dialog.dart';
 import 'rest_timer_settings_dialog.dart';
 import 'sostituisci_esercizio_sheet.dart';
 import 'storico_esercizio_screen.dart';
@@ -25,6 +26,9 @@ class AllenamentoScreen extends StatefulWidget {
 class _AllenamentoScreenState extends State<AllenamentoScreen> {
   DateTime _data = _dayStart(DateTime.now());
   String? _nota;
+  bool _targetAttivo = true;
+  int? _targetSettimanale;
+  int _targetDefault = 3;
 
   static DateTime _dayStart(DateTime d) => DateTime(d.year, d.month, d.day);
   bool get _isToday => _data == _dayStart(DateTime.now());
@@ -33,6 +37,23 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
   void initState() {
     super.initState();
     _loadNota();
+    _loadTargetSettings();
+  }
+
+  Future<void> _loadTargetSettings() async {
+    final settings = await DatabaseService.instance.getAppSettings();
+    final activeDays = await DatabaseService.instance.getActiveProgramDaysCount();
+    if (!mounted) return;
+    setState(() {
+      _targetAttivo = settings.workoutTargetAttivo;
+      _targetSettimanale = settings.workoutTargetSettimanale;
+      _targetDefault = activeDays ?? 3;
+    });
+  }
+
+  Future<void> _openObiettivoSettings() async {
+    await showObiettivoSettimanaleSettingsDialog(context, defaultTarget: _targetDefault);
+    await _loadTargetSettings();
   }
 
   void _changeDate(DateTime date) {
@@ -329,6 +350,11 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
             tooltip: l10n.schedeTitle,
           ),
           IconButton(
+            onPressed: _openObiettivoSettings,
+            icon: Icon(Icons.flag_outlined, color: p.accent),
+            tooltip: l10n.obiettivoSettimanaleTitle,
+          ),
+          IconButton(
             onPressed: _eliminaGiornata,
             icon: Icon(Icons.delete_sweep_rounded, color: p.accent),
             tooltip: l10n.allenamentoEliminaGiornataTitle,
@@ -343,6 +369,21 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
             onNext: _isToday ? null : () => _changeDate(_data.add(const Duration(days: 1))),
             p: p,
           ),
+          if (_targetAttivo)
+            StreamBuilder<int>(
+              stream: DatabaseService.instance.watchWorkoutsThisWeek(),
+              builder: (context, snapshot) {
+                final done = snapshot.data ?? 0;
+                final target = _targetSettimanale ?? _targetDefault;
+                return _WeeklyGoalChip(
+                  done: done,
+                  target: target,
+                  onTap: _openObiettivoSettings,
+                  p: p,
+                  l10n: l10n,
+                );
+              },
+            ),
           if (_nota != null && _nota!.isNotEmpty)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
@@ -571,6 +612,52 @@ class _ExerciseCard extends StatelessWidget {
 }
 
 enum _ExerciseCardAction { modifica, sostituisci, elimina }
+
+class _WeeklyGoalChip extends StatelessWidget {
+  final int done;
+  final int target;
+  final VoidCallback onTap;
+  final ColorPalette p;
+  final AppLocalizations l10n;
+
+  const _WeeklyGoalChip({
+    required this.done,
+    required this.target,
+    required this.onTap,
+    required this.p,
+    required this.l10n,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final complete = done >= target;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: p.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: complete ? p.accent : p.cardBorder),
+        ),
+        child: Row(
+          children: [
+            Icon(complete ? Icons.check_circle_rounded : Icons.flag_rounded,
+                color: p.accent, size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                l10n.allenamentoObiettivoSettimanale(done, target),
+                style: TextStyle(color: p.textPrimary, fontSize: 13, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class _DateNav extends StatelessWidget {
   final String label;

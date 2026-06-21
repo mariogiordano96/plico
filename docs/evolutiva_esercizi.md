@@ -1715,12 +1715,54 @@ posizionamento/stile già visto in Progressi.
 > (`_prepare`, `_skipWarmup`, `_ExerciseStepCard`), accoppiata a
 > `BuildContext`/controller di testo, non estraibile in una funzione pura.
 
-### Fase 16 — Obiettivo settimanale di allenamenti
-- [ ] Preferenza utente per il target settimanale (pattern `target_service.dart`)
-- [ ] `getWorkoutsThisWeek()` (conteggio `WorkoutLog` distinti per data, settimana locale-aware)
-- [ ] Default suggerito = numero giorni del programma attivo, modificabile
-- [ ] Indicatore di progresso nel tab Allenamento ("2/3 questa settimana")
-- [ ] Toggle per disattivarlo nelle impostazioni
+### Fase 16 — Obiettivo settimanale di allenamenti ✅ completata
+- [x] Preferenza utente per il target settimanale (pattern `target_service.dart`)
+  > **Correzione rispetto al piano originale**: `target_service.dart` (nutrizione)
+  > non è un servizio di "preferenza utente" generico — è un calcolo puro che
+  > legge input già salvati in `AppSettings` tramite getter dedicati. La
+  > preferenza vera e propria segue invece il pattern di `AppSettings` stesso:
+  > due nuovi campi, `int? workoutTargetSettimanale` (null = usa il default
+  > suggerito) e `bool workoutTargetAttivo`, letti/scritti con i metodi bulk
+  > già esistenti `getAppSettings()`/`saveAppSettings()` (lo stesso pattern di
+  > `restTimerDefaultSeconds`/`notWorkoutAttiva`), senza alcun nuovo servizio
+  > dedicato.
+- [x] `getWorkoutsThisWeek()` (conteggio `WorkoutLog` distinti per data, settimana locale-aware)
+  - Aggiunto a `DatabaseService`, riusa `getWorkoutDaysRange(monday, now)` già
+    esistente (Fase 11/streak) con lo stesso calcolo del lunedì usato da
+    `WorkoutProgressService._weekKey` (`date.subtract(Duration(days: date.weekday - 1))`).
+    Aggiunta anche la variante osservabile `watchWorkoutsThisWeek()` (filtra
+    `watchWorkoutDays()` lato client), usata dalla UI per aggiornarsi in tempo
+    reale.
+- [x] Default suggerito = numero giorni del programma attivo, modificabile
+  - Nessun concetto di "programma attivo" esisteva già: aggiunto
+    `getActiveProgramDaysCount()` che individua il programma a cui appartiene
+    la scheda con `lastUsedAt` più recente (quella che l'utente sta
+    effettivamente seguendo) e ne conta i giorni (`getProgramDays`). Fallback
+    a 3 se nessuna scheda di programma è mai stata eseguita.
+  - Il default è "modificabile" tramite uno stepper (+/- 1, range 1-7 giorni)
+    nel nuovo bottom sheet `obiettivo_settimanale_settings_dialog.dart`,
+    ricalcando esattamente il pattern di `rest_timer_settings_dialog.dart`
+    (stesso layout, stesso stile +/- ).
+- [x] Indicatore di progresso nel tab Allenamento ("2/3 questa settimana")
+  - Nuovo widget `_WeeklyGoalChip` in `allenamento_screen.dart`, mostrato
+    sotto `_DateNav` quando `workoutTargetAttivo` è true; usa
+    `StreamBuilder<int>` su `watchWorkoutsThisWeek()` e si colora con
+    `p.accent` (icona spunta) quando l'obiettivo è raggiunto. Tap sulla chip
+    apre lo stesso bottom sheet delle impostazioni.
+- [x] Toggle per disattivarlo nelle impostazioni
+  > **Nota implementativa**: l'app non ha una schermata "Impostazioni" hub
+  > generica — gli unici accessi alle preferenze esistenti (es. promemoria
+  > allenamento di Fase 10) sono icone dedicate raggiungibili dalla schermata
+  > pertinente. Per coerenza, il toggle "attiva/disattiva" vive nello stesso
+  > bottom sheet `obiettivo_settimanale_settings_dialog.dart`, raggiungibile
+  > da una nuova icona (`Icons.flag_outlined`) nell'AppBar di
+  > `AllenamentoScreen`, esattamente come l'icona del timer di recupero.
+
+> nessun nuovo test temporaneo — la logica nuova è interamente accoppiata a
+> Isar (`getWorkoutsThisWeek`, `watchWorkoutsThisWeek`,
+> `getActiveProgramDaysCount` in `database_service.dart`) o UI/stato di
+> schermata (`_WeeklyGoalChip`, il bottom sheet delle impostazioni), non
+> estraibile in una funzione pura.
 
 ### Fase 17 — Bacheca record personali
 - [ ] `getAllPersonalRecords()` (PR per ogni `exerciseId` distinto, esclude `isWarmup`)

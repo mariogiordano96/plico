@@ -141,6 +141,16 @@ const AppSettingsSchema = CollectionSchema(
       id: 24,
       name: r'workoutPresetsSeeded',
       type: IsarType.bool,
+    ),
+    r'workoutTargetAttivo': PropertySchema(
+      id: 25,
+      name: r'workoutTargetAttivo',
+      type: IsarType.bool,
+    ),
+    r'workoutTargetSettimanale': PropertySchema(
+      id: 26,
+      name: r'workoutTargetSettimanale',
+      type: IsarType.long,
     )
   },
   estimateSize: _appSettingsEstimateSize,
@@ -197,6 +207,8 @@ void _appSettingsSerialize(
   writer.writeLong(offsets[22], object.restTimerDefaultSeconds);
   writer.writeBool(offsets[23], object.tourCompleted);
   writer.writeBool(offsets[24], object.workoutPresetsSeeded);
+  writer.writeBool(offsets[25], object.workoutTargetAttivo);
+  writer.writeLong(offsets[26], object.workoutTargetSettimanale);
 }
 
 AppSettings _appSettingsDeserialize(
@@ -232,6 +244,8 @@ AppSettings _appSettingsDeserialize(
   object.restTimerDefaultSeconds = reader.readLong(offsets[22]);
   object.tourCompleted = reader.readBool(offsets[23]);
   object.workoutPresetsSeeded = reader.readBool(offsets[24]);
+  object.workoutTargetAttivo = reader.readBool(offsets[25]);
+  object.workoutTargetSettimanale = reader.readLongOrNull(offsets[26]);
   return object;
 }
 
@@ -292,6 +306,10 @@ P _appSettingsDeserializeProp<P>(
       return (reader.readBool(offset)) as P;
     case 24:
       return (reader.readBool(offset)) as P;
+    case 25:
+      return (reader.readBool(offset)) as P;
+    case 26:
+      return (reader.readLongOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -1290,6 +1308,90 @@ extension AppSettingsQueryFilter
       ));
     });
   }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      workoutTargetAttivoEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'workoutTargetAttivo',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      workoutTargetSettimanaleIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'workoutTargetSettimanale',
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      workoutTargetSettimanaleIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'workoutTargetSettimanale',
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      workoutTargetSettimanaleEqualTo(int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'workoutTargetSettimanale',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      workoutTargetSettimanaleGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'workoutTargetSettimanale',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      workoutTargetSettimanaleLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'workoutTargetSettimanale',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      workoutTargetSettimanaleBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'workoutTargetSettimanale',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
 }
 
 extension AppSettingsQueryObject
@@ -1618,6 +1720,34 @@ extension AppSettingsQuerySortBy
       sortByWorkoutPresetsSeededDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'workoutPresetsSeeded', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByWorkoutTargetAttivo() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'workoutTargetAttivo', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByWorkoutTargetAttivoDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'workoutTargetAttivo', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByWorkoutTargetSettimanale() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'workoutTargetSettimanale', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByWorkoutTargetSettimanaleDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'workoutTargetSettimanale', Sort.desc);
     });
   }
 }
@@ -1956,6 +2086,34 @@ extension AppSettingsQuerySortThenBy
       return query.addSortBy(r'workoutPresetsSeeded', Sort.desc);
     });
   }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByWorkoutTargetAttivo() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'workoutTargetAttivo', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByWorkoutTargetAttivoDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'workoutTargetAttivo', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByWorkoutTargetSettimanale() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'workoutTargetSettimanale', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByWorkoutTargetSettimanaleDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'workoutTargetSettimanale', Sort.desc);
+    });
+  }
 }
 
 extension AppSettingsQueryWhereDistinct
@@ -2118,6 +2276,20 @@ extension AppSettingsQueryWhereDistinct
       return query.addDistinctBy(r'workoutPresetsSeeded');
     });
   }
+
+  QueryBuilder<AppSettings, AppSettings, QDistinct>
+      distinctByWorkoutTargetAttivo() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'workoutTargetAttivo');
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QDistinct>
+      distinctByWorkoutTargetSettimanale() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'workoutTargetSettimanale');
+    });
+  }
 }
 
 extension AppSettingsQueryProperty
@@ -2278,6 +2450,20 @@ extension AppSettingsQueryProperty
       workoutPresetsSeededProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'workoutPresetsSeeded');
+    });
+  }
+
+  QueryBuilder<AppSettings, bool, QQueryOperations>
+      workoutTargetAttivoProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'workoutTargetAttivo');
+    });
+  }
+
+  QueryBuilder<AppSettings, int?, QQueryOperations>
+      workoutTargetSettimanaleProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'workoutTargetSettimanale');
     });
   }
 }
