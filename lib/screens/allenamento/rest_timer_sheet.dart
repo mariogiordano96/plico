@@ -27,28 +27,47 @@ class _RestTimerSheet extends StatefulWidget {
   State<_RestTimerSheet> createState() => _RestTimerSheetState();
 }
 
-class _RestTimerSheetState extends State<_RestTimerSheet> {
+class _RestTimerSheetState extends State<_RestTimerSheet> with WidgetsBindingObserver {
   late int _remaining;
+  late DateTime _endTime;
   Timer? _ticker;
+  Timer? _autoCloseTimer;
   bool _done = false;
+  bool _closed = false;
 
   @override
   void initState() {
     super.initState();
-    _remaining = widget.initialSeconds;
+    WidgetsBinding.instance.addObserver(this);
+    // Clamp difensivo: un initialSeconds corrotto o fuori range (es. dati
+    // legacy) non deve mai tradursi in un countdown assurdo a schermo.
+    _remaining = widget.initialSeconds.clamp(0, 600);
+    _endTime = DateTime.now().add(Duration(seconds: _remaining));
     NotificationService.instance.scheduleRestTimer(Duration(seconds: _remaining));
     _startTicker();
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _resync();
+  }
+
+  // Ricalcola sempre il tempo residuo dall'orologio reale (_endTime), invece
+  // di decrementare un contatore: evita drift quando l'app va in background
+  // e i tick del Timer.periodic vengono sospesi dal sistema operativo.
+  void _resync() {
+    if (_done) return;
+    final rem = _endTime.difference(DateTime.now()).inSeconds;
+    if (rem <= 0) {
+      _onDone();
+    } else {
+      setState(() => _remaining = rem);
+    }
+  }
+
   void _startTicker() {
     _ticker?.cancel();
-    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (_remaining <= 1) {
-        _onDone();
-        return;
-      }
-      setState(() => _remaining--);
-    });
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _resync());
   }
 
   void _onDone() {
@@ -60,17 +79,27 @@ class _RestTimerSheetState extends State<_RestTimerSheet> {
     HapticFeedback.heavyImpact();
     SystemSound.play(SystemSoundType.alert);
     NotificationService.instance.cancelRestTimer();
+    // Chiusura automatica dopo un istante: lascia il tempo di percepire
+    // vibrazione/suono prima di tornare all'esercizio, senza richiedere un tap.
+    _autoCloseTimer = Timer(const Duration(seconds: 1), _close);
   }
 
   void _adjust(int deltaSeconds) {
     if (_done) return;
-    setState(() => _remaining = (_remaining + deltaSeconds).clamp(0, 600));
-    NotificationService.instance.scheduleRestTimer(Duration(seconds: _remaining));
-    if (_remaining == 0) _onDone();
+    final newRemaining = (_remaining + deltaSeconds).clamp(0, 600);
+    setState(() {
+      _remaining = newRemaining;
+      _endTime = DateTime.now().add(Duration(seconds: newRemaining));
+    });
+    NotificationService.instance.scheduleRestTimer(Duration(seconds: newRemaining));
+    if (newRemaining == 0) _onDone();
   }
 
   void _close() {
+    if (_closed) return;
+    _closed = true;
     _ticker?.cancel();
+    _autoCloseTimer?.cancel();
     NotificationService.instance.cancelRestTimer();
     Navigator.pop(context);
   }
@@ -78,6 +107,8 @@ class _RestTimerSheetState extends State<_RestTimerSheet> {
   @override
   void dispose() {
     _ticker?.cancel();
+    _autoCloseTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 

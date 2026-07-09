@@ -3,16 +3,17 @@ import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/exercise_definition.dart';
 import '../../models/workout_exercise.dart';
-import '../../services/achievement_service.dart';
+import '../../models/workout_set.dart';
+import '../../models/workout_template.dart';
 import '../../services/calorie_estimation_service.dart';
 import '../../services/database_service.dart';
-import '../../services/workout_progress_service.dart';
 import '../esercizi/catalogo_esercizi_screen.dart';
 import 'le_mie_schede_screen.dart';
 import 'log_cardio_dialog.dart';
 import 'log_serie_dialog.dart';
 import 'obiettivo_settimanale_settings_dialog.dart';
 import 'rest_timer_settings_dialog.dart';
+import 'sessione_guidata_screen.dart';
 import 'sostituisci_esercizio_sheet.dart';
 import 'storico_esercizio_screen.dart';
 
@@ -153,56 +154,41 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
     }
   }
 
+  Future<void> _apriSchede() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const LeMieSchedeScreen()),
+    );
+  }
+
+  /// Log libero: crea l'esercizio scelto dal catalogo e lo fa seguire con la
+  /// stessa sessione guidata delle schede (spunta serie per serie, timer di
+  /// recupero, suggerimento di overload/riscaldamento) invece di un dialog che
+  /// chiede tutte le serie in blocco. Il "template" è puramente in-memory, solo
+  /// per il titolo della schermata: non viene mai salvato come scheda.
   Future<void> _aggiungiEsercizio() async {
     final exercise = await showCatalogoEserciziSheet(context);
     if (exercise == null || !mounted) return;
 
-    WorkoutExercise? workoutExercise;
-    List<WorkoutExercise> history = const [];
-    if (exercise.category == 'cardio') {
-      workoutExercise = await showLogCardioDialog(context, exercise);
-    } else {
-      history = await DatabaseService.instance.getHistoryForExercise(exercise.externalId);
-      final lastSession = history.isNotEmpty ? history.first : null;
-      OverloadSuggestion? suggestion;
-      if (lastSession != null) {
-        suggestion = WorkoutProgressService.needsDeload(history)
-            ? WorkoutProgressService.deloadSuggestion(lastSession)
-            : WorkoutProgressService.suggestNextSession(lastSession);
-      }
-      if (!mounted) return;
-      workoutExercise = await showLogSerieDialog(
-        context,
-        exercise,
-        lastSession: lastSession,
-        suggestion: suggestion,
-      );
-    }
+    final isCardio = exercise.category == 'cardio';
+    final workoutExercise = WorkoutExercise()
+      ..exerciseId = exercise.externalId
+      ..exerciseName = exercise.nameIt ?? exercise.name
+      ..sets = isCardio ? [] : List.generate(3, (_) => WorkoutSet());
 
-    if (workoutExercise != null) {
-      final bodySnapshot = await DatabaseService.instance.getLatestBodySnapshot();
-      final bodyWeightKg = bodySnapshot?.pesoKg;
+    await DatabaseService.instance.addWorkoutExercise(_data, workoutExercise);
+    if (!mounted) return;
 
-      if (workoutExercise.durationSeconds != null) {
-        workoutExercise.met =
-            CalorieEstimationService.metForCardioExercise(workoutExercise.exerciseId).round();
-        workoutExercise.estimatedKcal = CalorieEstimationService.estimateCardioKcal(
-          exerciseId: workoutExercise.exerciseId,
-          durationSeconds: workoutExercise.durationSeconds!,
-          bodyWeightKg: bodyWeightKg,
-        );
-      } else {
-        workoutExercise.estimatedKcal = CalorieEstimationService.estimateStrengthKcal(
-          workingSetCount: workoutExercise.sets.length,
-          bodyWeightKg: bodyWeightKg,
-        );
-      }
-
-      final isNewPr = exercise.category != 'cardio' &&
-          WorkoutProgressService.isNewPersonalRecord(workoutExercise, history);
-      await DatabaseService.instance.addWorkoutExercise(_data, workoutExercise);
-      await AchievementService.instance.checkAll(hasNewWorkoutPr: isNewPr);
-    }
+    final adHocTemplate = WorkoutTemplate()
+      ..name = workoutExercise.exerciseName
+      ..createdAt = DateTime.now();
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            SessioneGuidataScreen(template: adHocTemplate, exercises: [workoutExercise]),
+      ),
+    );
   }
 
   Future<void> _modifica(WorkoutExercise e) async {
@@ -345,10 +331,7 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
             tooltip: l10n.restTimerSettingsTitle,
           ),
           IconButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const LeMieSchedeScreen()),
-            ),
+            onPressed: _apriSchede,
             icon: Icon(Icons.list_alt_rounded, color: p.accent),
             tooltip: l10n.schedeTitle,
           ),
@@ -422,7 +405,7 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
                 }
                 final esercizi = snapshot.data!;
                 if (esercizi.isEmpty) {
-                  return _EmptyState(onAdd: _aggiungiEsercizio);
+                  return _EmptyState(onStartFromScheda: _apriSchede, onAdd: _aggiungiEsercizio);
                 }
                 return ListView.separated(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
@@ -472,17 +455,19 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
         onPressed: _aggiungiEsercizio,
         backgroundColor: p.accent,
         foregroundColor: p.background,
-        icon: const Icon(Icons.add_rounded),
+        icon: const Icon(Icons.playlist_add_rounded),
         label: Text(l10n.allenamentoAggiungiEsercizio,
             style: const TextStyle(fontWeight: FontWeight.w700)),
+        tooltip: l10n.allenamentoAggiungiEsercizioSub,
       ),
     );
   }
 }
 
 class _EmptyState extends StatelessWidget {
+  final VoidCallback onStartFromScheda;
   final VoidCallback onAdd;
-  const _EmptyState({required this.onAdd});
+  const _EmptyState({required this.onStartFromScheda, required this.onAdd});
 
   @override
   Widget build(BuildContext context) {
@@ -503,6 +488,27 @@ class _EmptyState extends StatelessWidget {
             Text(l10n.allenamentoVuotoSub,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: p.textMuted, fontSize: 13)),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: onStartFromScheda,
+                style: FilledButton.styleFrom(
+                  backgroundColor: p.accent,
+                  foregroundColor: p.background,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                icon: const Icon(Icons.list_alt_rounded),
+                label: Text(l10n.allenamentoIniziaDaScheda,
+                    style: const TextStyle(fontWeight: FontWeight.w700)),
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextButton.icon(
+              onPressed: onAdd,
+              icon: Icon(Icons.playlist_add_rounded, color: p.textMuted, size: 18),
+              label: Text(l10n.allenamentoAggiungiEsercizio, style: TextStyle(color: p.textMuted)),
+            ),
           ],
         ),
       ),

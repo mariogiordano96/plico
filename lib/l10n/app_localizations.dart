@@ -2501,14 +2501,26 @@ abstract class AppLocalizations {
   /// No description provided for @allenamentoVuotoSub.
   ///
   /// In it, this message translates to:
-  /// **'Aggiungi il primo esercizio per iniziare'**
+  /// **'Inizia da una scheda per l\'allenamento guidato, oppure registra un esercizio al volo'**
   String get allenamentoVuotoSub;
+
+  /// No description provided for @allenamentoIniziaDaScheda.
+  ///
+  /// In it, this message translates to:
+  /// **'Inizia da una scheda'**
+  String get allenamentoIniziaDaScheda;
 
   /// No description provided for @allenamentoAggiungiEsercizio.
   ///
   /// In it, this message translates to:
-  /// **'Aggiungi esercizio'**
+  /// **'Esercizio libero'**
   String get allenamentoAggiungiEsercizio;
+
+  /// No description provided for @allenamentoAggiungiEsercizioSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Segui un singolo esercizio al volo, senza crearti una scheda'**
+  String get allenamentoAggiungiEsercizioSub;
 
   /// No description provided for @allenamentoSerieCount.
   ///
@@ -2743,6 +2755,12 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Inizia'**
   String get schedeInizia;
+
+  /// No description provided for @schedeModifica.
+  ///
+  /// In it, this message translates to:
+  /// **'Modifica'**
+  String get schedeModifica;
 
   /// No description provided for @schedeProssimo.
   ///

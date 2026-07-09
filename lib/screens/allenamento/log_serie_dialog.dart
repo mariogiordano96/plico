@@ -172,7 +172,7 @@ class _LogSerieDialogState extends State<_LogSerieDialog> {
                       ],
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 70),
+                      padding: const EdgeInsets.only(top: 6),
                       child: _RpeSelector(
                         value: _rpeValues[i],
                         p: p,
@@ -282,42 +282,45 @@ class _RpeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 30,
-      child: Row(
-        children: [
-          Text(label, style: TextStyle(color: p.textMuted, fontSize: 11)),
-          const SizedBox(width: 8),
-          Expanded(
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: 10,
-              separatorBuilder: (_, _) => const SizedBox(width: 6),
-              itemBuilder: (_, idx) {
-                final n = idx + 1;
-                final selected = value == n;
-                return GestureDetector(
-                  onTap: () => onChanged(selected ? null : n),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: Text(label, style: TextStyle(color: p.textMuted, fontSize: 11)),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          // Wrap invece di uno scroll orizzontale: su schermi stretti i 10
+          // valori vanno a capo su due righe invece di restare tagliati al
+          // bordo senza alcun indizio visivo che la lista fosse scorribile.
+          child: Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (var n = 1; n <= 10; n++)
+                GestureDetector(
+                  onTap: () => onChanged(value == n ? null : n),
                   child: Container(
-                    width: 26,
+                    width: 24,
+                    height: 24,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: selected ? p.accent : p.surface,
+                      color: value == n ? p.accent : p.surface,
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: selected ? p.accent : p.cardBorder),
+                      border: Border.all(color: value == n ? p.accent : p.cardBorder),
                     ),
                     child: Text('$n',
                         style: TextStyle(
-                            color: selected ? p.background : p.textMuted,
-                            fontSize: 12,
+                            color: value == n ? p.background : p.textMuted,
+                            fontSize: 11,
                             fontWeight: FontWeight.w600)),
                   ),
-                );
-              },
-            ),
+                ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

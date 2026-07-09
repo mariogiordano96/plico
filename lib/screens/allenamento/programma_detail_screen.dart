@@ -49,6 +49,14 @@ class _ProgrammaDetailScreenState extends State<ProgrammaDetailScreen> {
     _load();
   }
 
+  Future<void> _modificaGiorno(WorkoutTemplate giorno) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => CreaSchedaScreen(existing: giorno)),
+    );
+    _load();
+  }
+
   Future<void> _eliminaGiorno(WorkoutTemplate giorno) async {
     final l10n = context.l10n;
     final ok = await DatabaseService.instance.deleteWorkoutTemplate(giorno.id);
@@ -196,6 +204,12 @@ class _ProgrammaDetailScreenState extends State<ProgrammaDetailScreen> {
                       ],
                     ),
                   ),
+                  if (isCustom)
+                    IconButton(
+                      onPressed: () => _modificaGiorno(giorno),
+                      icon: Icon(Icons.edit_outlined, color: p.textMuted, size: 20),
+                      tooltip: l10n.schedeModifica,
+                    ),
                   if (isCustom && _giorni.length > 1)
                     IconButton(
                       onPressed: () => _eliminaGiorno(giorno),

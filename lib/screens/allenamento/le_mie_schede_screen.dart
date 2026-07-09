@@ -55,6 +55,14 @@ class _LeMieSchedeScreenState extends State<LeMieSchedeScreen> {
     _load();
   }
 
+  Future<void> _modificaScheda(WorkoutTemplate t) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => CreaSchedaScreen(existing: t)),
+    );
+    _load();
+  }
+
   Future<void> _nuovoProgramma() async {
     final l10n = context.l10n;
     final p = context.palette;
@@ -276,6 +284,7 @@ class _LeMieSchedeScreenState extends State<LeMieSchedeScreen> {
               l10n: l10n,
               onTap: () => _inizia(t),
               onExportPdf: () => _exportTemplate(t),
+              onEdit: () => _modificaScheda(t),
               trailing: IconButton(
                 onPressed: () => _eliminaTemplate(t),
                 icon: Icon(Icons.delete_outline_rounded, color: p.textMuted, size: 20),
@@ -326,6 +335,7 @@ class _TemplateCard extends StatelessWidget {
   final AppLocalizations l10n;
   final VoidCallback onTap;
   final VoidCallback? onExportPdf;
+  final VoidCallback? onEdit;
   final Widget? trailing;
 
   const _TemplateCard({
@@ -334,6 +344,7 @@ class _TemplateCard extends StatelessWidget {
     required this.l10n,
     required this.onTap,
     this.onExportPdf,
+    this.onEdit,
     this.trailing,
   });
 
@@ -359,6 +370,12 @@ class _TemplateCard extends StatelessWidget {
                 onPressed: onExportPdf,
                 icon: Icon(Icons.picture_as_pdf_outlined, color: p.textMuted, size: 20),
                 tooltip: l10n.pianoEsportaPdf,
+              ),
+            if (onEdit != null)
+              IconButton(
+                onPressed: onEdit,
+                icon: Icon(Icons.edit_outlined, color: p.textMuted, size: 20),
+                tooltip: l10n.schedeModifica,
               ),
             if (trailing != null) trailing!,
             TextButton(

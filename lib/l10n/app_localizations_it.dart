@@ -1330,10 +1330,18 @@ class AppLocalizationsIt extends AppLocalizations {
   String get allenamentoVuotoTitle => 'Nessun esercizio oggi';
 
   @override
-  String get allenamentoVuotoSub => 'Aggiungi il primo esercizio per iniziare';
+  String get allenamentoVuotoSub =>
+      'Inizia da una scheda per l\'allenamento guidato, oppure registra un esercizio al volo';
 
   @override
-  String get allenamentoAggiungiEsercizio => 'Aggiungi esercizio';
+  String get allenamentoIniziaDaScheda => 'Inizia da una scheda';
+
+  @override
+  String get allenamentoAggiungiEsercizio => 'Esercizio libero';
+
+  @override
+  String get allenamentoAggiungiEsercizioSub =>
+      'Segui un singolo esercizio al volo, senza crearti una scheda';
 
   @override
   String allenamentoSerieCount(int n) {
@@ -1471,6 +1479,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get schedeInizia => 'Inizia';
+
+  @override
+  String get schedeModifica => 'Modifica';
 
   @override
   String schedeProssimo(String giorno) {

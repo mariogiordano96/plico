@@ -1323,10 +1323,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get allenamentoVuotoTitle => 'No exercise today';
 
   @override
-  String get allenamentoVuotoSub => 'Add your first exercise to get started';
+  String get allenamentoVuotoSub =>
+      'Start from a template for a guided workout, or log a one-off exercise';
 
   @override
-  String get allenamentoAggiungiEsercizio => 'Add exercise';
+  String get allenamentoIniziaDaScheda => 'Start from a template';
+
+  @override
+  String get allenamentoAggiungiEsercizio => 'Free exercise';
+
+  @override
+  String get allenamentoAggiungiEsercizioSub =>
+      'Follow a single exercise on the fly, no template needed';
 
   @override
   String allenamentoSerieCount(int n) {
@@ -1463,6 +1471,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get schedeInizia => 'Start';
+
+  @override
+  String get schedeModifica => 'Edit';
 
   @override
   String schedeProssimo(String giorno) {

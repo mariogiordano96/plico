@@ -549,8 +549,10 @@
 
   "tabAllenamento": "Allenamento",
   "allenamentoVuotoTitle": "Nessun esercizio oggi",
-  "allenamentoVuotoSub": "Aggiungi il primo esercizio per iniziare",
-  "allenamentoAggiungiEsercizio": "Aggiungi esercizio",
+  "allenamentoVuotoSub": "Inizia da una scheda per l'allenamento guidato, oppure registra un esercizio al volo",
+  "allenamentoIniziaDaScheda": "Inizia da una scheda",
+  "allenamentoAggiungiEsercizio": "Esercizio libero",
+  "allenamentoAggiungiEsercizioSub": "Segui un singolo esercizio al volo, senza crearti una scheda",
   "allenamentoSerieCount": "{n} serie",
   "@allenamentoSerieCount": {
     "placeholders": { "n": { "type": "int" } }
@@ -613,6 +615,7 @@
   "schedeNuovaScheda": "Nuova scheda",
   "schedeNuovoProgramma": "Programma",
   "schedeInizia": "Inizia",
+  "schedeModifica": "Modifica",
   "schedeProssimo": "Prossimo: {giorno}",
   "@schedeProssimo": { "placeholders": { "giorno": { "type": "String" } } },
   "schedeDuplica": "Duplica e personalizza",
