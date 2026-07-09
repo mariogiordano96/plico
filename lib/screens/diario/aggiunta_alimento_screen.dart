@@ -125,7 +125,7 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
 
   void _selectLocal(FoodItem item) {
     _showQuantitySheet(
-      nome: item.nome,
+      nome: item.localizedName(Localizations.localeOf(context).languageCode),
       brand: item.brand,
       kcalPer100g: item.kcalPer100g,
       proteinPer100g: item.proteinPer100g,
@@ -349,7 +349,8 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
                         _FoodListBox(
                           children: _localResults.map((item) {
                             return _FoodTile(
-                              nome: item.nome,
+                              nome: item.localizedName(
+                                  Localizations.localeOf(context).languageCode),
                               brand: item.brand,
                               kcal: item.kcalPer100g,
                               protein: item.proteinPer100g,

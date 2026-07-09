@@ -282,7 +282,8 @@ class _QuestionarioScreenState extends State<QuestionarioScreen> {
                                 const SizedBox(width: 4),
                               ],
                               Text(
-                                _shortName(food.nome),
+                                _shortName(food
+                                    .localizedName(Localizations.localeOf(context).languageCode)),
                                 style: TextStyle(
                                   color: liked ? p.accent : p.textSecondary,
                                   fontSize: 12,

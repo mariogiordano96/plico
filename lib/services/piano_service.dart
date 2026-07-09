@@ -253,7 +253,7 @@ class PianoService {
     return (kcal, prot, fat, carbs);
   }
 
-  static Future<MealPlan?> generaPiano() async {
+  static Future<MealPlan?> generaPiano({String languageCode = 'it'}) async {
     final targets = await computeTargets();
     if (targets == null) return null;
     final protTarget = targets.$2.toDouble();
@@ -314,6 +314,7 @@ class PianoService {
           scoreFn: scoreFn,
           maxGrams: maxGrams,
           minGrams: minGrams,
+          languageCode: languageCode,
         );
 
     void trackPrincipal(PlanSlot? s, Set<int> used) {
@@ -700,6 +701,7 @@ class PianoService {
     required double Function(FoodItem) scoreFn,
     required double maxGrams,
     required double minGrams,
+    required String languageCode,
   }) {
     if (foods.isEmpty) return null;
 
@@ -712,7 +714,7 @@ class PianoService {
       if (grams <= 0 || !grams.isFinite) return null;
       final g = _round5(grams.clamp(minGrams, maxGrams));
       return PlanFood()
-        ..nome = f.nome
+        ..nome = f.localizedName(languageCode)
         ..foodItemId = f.id
         ..quantitaG = g
         ..kcal = f.kcalPer100g * g / 100

@@ -30,4 +30,17 @@ class FoodItem {
 
   // Dati nutrizionali completi (presenti solo per alimenti CREA)
   NutrizioneCompleta? nutrizione;
+
+  /// Nome da mostrare per la lingua corrente. Gli alimenti CREA hanno solo
+  /// `nome` (italiano) e `nomeInglese` (nome del dataset originale, unica
+  /// alternativa disponibile) — non esiste una traduzione curata per le
+  /// altre lingue, quindi si ricade su `nome`. Gli alimenti custom
+  /// (`isCustom`) non hanno `nomeInglese` e restano nel nome scritto
+  /// dall'utente, coerente con `docs/internazionalizzazione.md`.
+  String localizedName(String languageCode) {
+    if (languageCode == 'en' && nomeInglese != null && nomeInglese!.isNotEmpty) {
+      return nomeInglese!;
+    }
+    return nome;
+  }
 }

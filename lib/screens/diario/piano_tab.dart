@@ -77,7 +77,8 @@ class _PianoTabState extends State<PianoTab> {
 
   Future<void> _generaPiano() async {
     setState(() => _generating = true);
-    final plan = await PianoService.generaPiano();
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final plan = await PianoService.generaPiano(languageCode: languageCode);
     if (!mounted) return;
     setState(() {
       _plan = plan;
