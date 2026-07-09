@@ -471,6 +471,39 @@ class DatabaseService {
     });
   }
 
+  /// Migrazione una-tantum: rinomina i `FoodItem` già persistiti secondo il
+  /// nome normalizzato corrente in `crea_seed.json`, matchando per `creaCode`
+  /// (stabile, a differenza del nome). Necessaria per chi aveva installato
+  /// l'app prima della normalizzazione dei nomi (docs/normalizzazione_nomi_alimenti.md):
+  /// senza questa migrazione il vecchio nome salvato in Isar non fa più match
+  /// con `PianoService.curatedNames`/`byName`, e l'alimento sparisce
+  /// silenziosamente dalle preferenze e dal piano pur restando in DB.
+  Future<void> migrateFoodNamesV2() async {
+    final settings = await _isar.appSettings.get(1);
+    if (settings?.foodNamesNormalizedV2 == true) return;
+
+    final raw = await rootBundle.loadString('assets/data/crea_seed.json');
+    final list = jsonDecode(raw) as List<dynamic>;
+    final nameByCode = <String, String>{
+      for (final e in list.cast<Map<String, dynamic>>())
+        if (e['creaCode'] != null) e['creaCode'] as String: e['nome'] as String,
+    };
+
+    await _isar.writeTxn(() async {
+      final existing = await _isar.foodItems.filter().creaCodeIsNotNull().findAll();
+      for (final food in existing) {
+        final newName = nameByCode[food.creaCode];
+        if (newName != null && newName != food.nome) {
+          food.nome = newName;
+          await _isar.foodItems.put(food);
+        }
+      }
+      final s = await _isar.appSettings.get(1) ?? AppSettings();
+      s.foodNamesNormalizedV2 = true;
+      await _isar.appSettings.put(s);
+    });
+  }
+
   FoodItem _foodFromJson(Map<String, dynamic> j) {
     final item = FoodItem()
       ..nome = j['nome'] as String
@@ -756,6 +789,7 @@ class DatabaseService {
     // Isar reads garbage bytes from old records when new int fields are added.
     // Any value outside 0..1439 (valid minutes in a day) means corrupt/missing data.
     bool invalidMin(int v) => v < 0 || v > 1439;
+    bool needsSave = false;
     if (invalidMin(s.notColMin) || invalidMin(s.notPranzoMin) || invalidMin(s.notCenaMin)) {
       s.notColMin = 450;
       s.notPranzoMin = 750;
@@ -763,6 +797,13 @@ class DatabaseService {
       s.notSpuntinoMin = 630;
       s.notPostWoMin = 1020;
       s.notSorMin = 1260;
+      needsSave = true;
+    }
+    if (s.restTimerDefaultSeconds < 15 || s.restTimerDefaultSeconds > 600) {
+      s.restTimerDefaultSeconds = 90;
+      needsSave = true;
+    }
+    if (needsSave) {
       await _isar.writeTxn(() async => _isar.appSettings.put(s));
     }
     return s;

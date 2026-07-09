@@ -13,6 +13,11 @@ class AppSettings {
   bool creaSeeded = false;
   bool exercisesSeeded = false;
   bool workoutPresetsSeeded = false;
+  // Migrazione una-tantum: rinomina gli alimenti già in DB secondo i nomi
+  // normalizzati correnti (matching per creaCode, stabile) — necessaria per
+  // chi aveva installato l'app prima della normalizzazione dei nomi, altrimenti
+  // il vecchio nome in Isar non fa più match con `PianoService.curatedNames`.
+  bool foodNamesNormalizedV2 = false;
   DateTime? goalSetDate;
   double? pesoObiettivo;
 
