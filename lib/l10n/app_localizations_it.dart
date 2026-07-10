@@ -1644,9 +1644,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get restTimerSalta => 'Salta';
 
   @override
-  String get restTimerSettingsTitle => 'Riposo di default tra le serie';
-
-  @override
   String sessioneGuidataProgress(int current, int total) {
     return 'Esercizio $current/$total';
   }

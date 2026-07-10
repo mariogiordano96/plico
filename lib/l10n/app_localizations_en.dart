@@ -1636,9 +1636,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restTimerSalta => 'Skip';
 
   @override
-  String get restTimerSettingsTitle => 'Default rest between sets';
-
-  @override
   String sessioneGuidataProgress(int current, int total) {
     return 'Exercise $current/$total';
   }

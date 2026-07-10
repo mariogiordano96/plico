@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../models/workout_exercise.dart';
@@ -42,14 +44,47 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
   final Map<int, TextEditingController> _durataCtrls = {};
   final Map<String, List<WorkoutExercise>> _priorHistoryByExerciseId = {};
 
+  // Fase 30: timer incrementale della sessione, parte subito all'apertura
+  // (anche durante il caricamento) — la durata viene salvata sul WorkoutLog
+  // del giorno sia a fine sessione (_termina) sia, come fallback, se si esce
+  // prima (dispose), per non perdere il tempo di una sessione abbandonata.
+  final Stopwatch _stopwatch = Stopwatch()..start();
+  Timer? _tickTimer;
+  bool _durationSaved = false;
+
+  String get _elapsedLabel {
+    final s = _stopwatch.elapsed.inSeconds;
+    final h = s ~/ 3600;
+    final m = (s % 3600) ~/ 60;
+    final sec = s % 60;
+    final mm = m.toString().padLeft(2, '0');
+    final ss = sec.toString().padLeft(2, '0');
+    return h > 0 ? '$h:$mm:$ss' : '$mm:$ss';
+  }
+
+  Future<void> _persistElapsedDuration() async {
+    if (_durationSaved) return;
+    _durationSaved = true;
+    _stopwatch.stop();
+    final date = widget.exercises.isNotEmpty ? widget.exercises.first.date : DateTime.now();
+    await DatabaseService.instance.addSessionDuration(date, _stopwatch.elapsed.inSeconds);
+  }
+
   @override
   void initState() {
     super.initState();
+    _tickTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) setState(() {});
+    });
     _prepare();
   }
 
   @override
   void dispose() {
+    _tickTimer?.cancel();
+    // Fire-and-forget: se l'utente esce senza premere "Termina sessione"
+    // (es. back button), salva comunque il tempo trascorso finora.
+    unawaited(_persistElapsedDuration());
     for (final c in _repsCtrls.values.expand((l) => l)) {
       c.dispose();
     }
@@ -304,6 +339,8 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
   }
 
   Future<void> _termina() async {
+    final elapsedSeconds = _stopwatch.elapsed.inSeconds;
+    await _persistElapsedDuration();
     final prs =
         GuidedSessionService.newPersonalRecords(widget.exercises, _priorHistoryByExerciseId);
     await AchievementService.instance.checkAll(hasNewWorkoutPr: prs.isNotEmpty);
@@ -314,6 +351,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
         builder: (_) => SessioneRiepilogoScreen(
           exercises: widget.exercises,
           priorHistoryByExerciseId: _priorHistoryByExerciseId,
+          durationSeconds: elapsedSeconds,
         ),
       ),
     );
@@ -327,7 +365,16 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     if (_loading) {
       return Scaffold(
         backgroundColor: p.background,
-        body: Center(child: CircularProgressIndicator(color: p.accent)),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(color: p.accent),
+              const SizedBox(height: 12),
+              Text(_elapsedLabel, style: TextStyle(color: p.textMuted)),
+            ],
+          ),
+        ),
       );
     }
 
@@ -343,6 +390,22 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
         backgroundColor: p.background,
         elevation: 0,
         iconTheme: IconThemeData(color: p.accent),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.timer_outlined, color: p.accent, size: 16),
+                  const SizedBox(width: 4),
+                  Text(_elapsedLabel,
+                      style: TextStyle(color: p.accent, fontWeight: FontWeight.w600)),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),

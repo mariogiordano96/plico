@@ -11,7 +11,6 @@ import '../esercizi/catalogo_esercizi_screen.dart';
 import 'le_mie_schede_screen.dart';
 import 'log_cardio_dialog.dart';
 import 'log_serie_dialog.dart';
-import 'rest_timer_settings_dialog.dart';
 import 'sessione_guidata_screen.dart';
 import 'sostituisci_esercizio_sheet.dart';
 import 'storico_esercizio_screen.dart';
@@ -311,11 +310,6 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
         elevation: 0,
         centerTitle: true,
         actions: [
-          IconButton(
-            onPressed: () => showRestTimerSettingsDialog(context),
-            icon: Icon(Icons.timer_outlined, color: p.accent),
-            tooltip: l10n.restTimerSettingsTitle,
-          ),
           IconButton(
             onPressed: _apriSchede,
             icon: Icon(Icons.list_alt_rounded, color: p.accent),

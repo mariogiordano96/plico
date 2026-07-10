@@ -534,7 +534,6 @@
 
   "restTimerTitle": "Rest",
   "restTimerSalta": "Skip",
-  "restTimerSettingsTitle": "Default rest between sets",
 
   "sessioneGuidataProgress": "Exercise {current}/{total}",
   "sessioneGuidataPrecedente": "Previous",

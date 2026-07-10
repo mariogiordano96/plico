@@ -2077,6 +2077,27 @@ preset, test manuale su device — vedi nota a inizio sezione)**
 
 > nessun nuovo test temporaneo — solo rimozione di codice/UI/campi non più referenziati.
 
+### Fase 30 — Timer incrementale di sessione, via l'icona impostazioni riposo ✅ completata
+- [x] Rimossa l'icona "timer" in AppBar (`AllenamentoScreen`) e il dialog collegato
+      (`rest_timer_settings_dialog.dart`, eliminato) per configurare il riposo di default tra le
+      serie — su richiesta dell'utente. Il valore resta quello di default
+      (`AppSettings.restTimerDefaultSeconds = 90`, ancora usato dalla modalità guidata per il
+      riposo tra le serie: campo non rimosso, solo non più configurabile da UI).
+- [x] Aggiunto invece un timer incrementale (cronometro) che parte non appena si apre
+      `SessioneGuidataScreen` (anche durante il caricamento, prima che `_prepare()` finisca):
+      mostrato in AppBar (o sotto lo spinner di caricamento) come mm:ss (h:mm:ss oltre l'ora).
+  - Nuovo campo `WorkoutLog.totalDurationSeconds` (cumulativo: più sessioni/rientri lo stesso
+    giorno si sommano invece di sovrascriversi) e `DatabaseService.addSessionDuration(date,
+    seconds)`, stesso pattern upsert di `setWorkoutNote`.
+  - Salvato sia a fine sessione (`_termina`, prima di navigare al riepilogo) sia, come fallback,
+    in `dispose()` se l'utente esce prima (es. back button) senza premere "Termina sessione" —
+    guardia `_durationSaved` per non contare due volte lo stesso intervallo.
+  - Durata della sessione appena conclusa mostrata anche in `SessioneRiepilogoScreen`, accanto
+    alle kcal stimate.
+
+> nessun nuovo test temporaneo — logica accoppiata a `Stopwatch`/`Timer.periodic` (stato UI) e a
+> Isar (nuovo campo additivo, nessuna migrazione necessaria).
+
 ---
 
 ## Considerazioni aperte

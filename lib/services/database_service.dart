@@ -904,6 +904,20 @@ class DatabaseService {
     });
   }
 
+  /// Somma [seconds] alla durata totale già accumulata quel giorno (Fase 30):
+  /// più sessioni guidate nello stesso giorno si sommano invece di
+  /// sovrascriversi.
+  Future<void> addSessionDuration(DateTime date, int seconds) async {
+    if (seconds <= 0) return;
+    final day = _logDate(date);
+    await _isar.writeTxn(() async {
+      var log = await _isar.workoutLogs.filter().dateEqualTo(day).findFirst();
+      log ??= WorkoutLog()..date = day;
+      log.totalDurationSeconds = (log.totalDurationSeconds ?? 0) + seconds;
+      await _isar.workoutLogs.put(log);
+    });
+  }
+
   Future<List<WorkoutExercise>> getWorkoutExercisesForDay(DateTime date) async {
     final day = _logDate(date);
     return _isar.workoutExercises.filter().dateEqualTo(day).findAll();

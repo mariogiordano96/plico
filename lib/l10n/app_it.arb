@@ -678,7 +678,6 @@
 
   "restTimerTitle": "Recupero",
   "restTimerSalta": "Salta",
-  "restTimerSettingsTitle": "Riposo di default tra le serie",
 
   "sessioneGuidataProgress": "Esercizio {current}/{total}",
   "@sessioneGuidataProgress": {

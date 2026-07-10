@@ -26,6 +26,11 @@ const WorkoutLogSchema = CollectionSchema(
       id: 1,
       name: r'note',
       type: IsarType.string,
+    ),
+    r'totalDurationSeconds': PropertySchema(
+      id: 2,
+      name: r'totalDurationSeconds',
+      type: IsarType.long,
     )
   },
   estimateSize: _workoutLogEstimateSize,
@@ -79,6 +84,7 @@ void _workoutLogSerialize(
 ) {
   writer.writeDateTime(offsets[0], object.date);
   writer.writeString(offsets[1], object.note);
+  writer.writeLong(offsets[2], object.totalDurationSeconds);
 }
 
 WorkoutLog _workoutLogDeserialize(
@@ -91,6 +97,7 @@ WorkoutLog _workoutLogDeserialize(
   object.date = reader.readDateTime(offsets[0]);
   object.id = id;
   object.note = reader.readStringOrNull(offsets[1]);
+  object.totalDurationSeconds = reader.readLongOrNull(offsets[2]);
   return object;
 }
 
@@ -105,6 +112,8 @@ P _workoutLogDeserializeProp<P>(
       return (reader.readDateTime(offset)) as P;
     case 1:
       return (reader.readStringOrNull(offset)) as P;
+    case 2:
+      return (reader.readLongOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -550,6 +559,80 @@ extension WorkoutLogQueryFilter
       ));
     });
   }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QAfterFilterCondition>
+      totalDurationSecondsIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'totalDurationSeconds',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QAfterFilterCondition>
+      totalDurationSecondsIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'totalDurationSeconds',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QAfterFilterCondition>
+      totalDurationSecondsEqualTo(int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'totalDurationSeconds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QAfterFilterCondition>
+      totalDurationSecondsGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'totalDurationSeconds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QAfterFilterCondition>
+      totalDurationSecondsLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'totalDurationSeconds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QAfterFilterCondition>
+      totalDurationSecondsBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'totalDurationSeconds',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
 }
 
 extension WorkoutLogQueryObject
@@ -581,6 +664,20 @@ extension WorkoutLogQuerySortBy
   QueryBuilder<WorkoutLog, WorkoutLog, QAfterSortBy> sortByNoteDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'note', Sort.desc);
+    });
+  }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QAfterSortBy>
+      sortByTotalDurationSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'totalDurationSeconds', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QAfterSortBy>
+      sortByTotalDurationSecondsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'totalDurationSeconds', Sort.desc);
     });
   }
 }
@@ -622,6 +719,20 @@ extension WorkoutLogQuerySortThenBy
       return query.addSortBy(r'note', Sort.desc);
     });
   }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QAfterSortBy>
+      thenByTotalDurationSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'totalDurationSeconds', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QAfterSortBy>
+      thenByTotalDurationSecondsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'totalDurationSeconds', Sort.desc);
+    });
+  }
 }
 
 extension WorkoutLogQueryWhereDistinct
@@ -636,6 +747,13 @@ extension WorkoutLogQueryWhereDistinct
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'note', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QDistinct>
+      distinctByTotalDurationSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'totalDurationSeconds');
     });
   }
 }
@@ -657,6 +775,13 @@ extension WorkoutLogQueryProperty
   QueryBuilder<WorkoutLog, String?, QQueryOperations> noteProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'note');
+    });
+  }
+
+  QueryBuilder<WorkoutLog, int?, QQueryOperations>
+      totalDurationSecondsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'totalDurationSeconds');
     });
   }
 }

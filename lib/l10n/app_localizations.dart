@@ -3026,12 +3026,6 @@ abstract class AppLocalizations {
   /// **'Salta'**
   String get restTimerSalta;
 
-  /// No description provided for @restTimerSettingsTitle.
-  ///
-  /// In it, this message translates to:
-  /// **'Riposo di default tra le serie'**
-  String get restTimerSettingsTitle;
-
   /// No description provided for @sessioneGuidataProgress.
   ///
   /// In it, this message translates to:

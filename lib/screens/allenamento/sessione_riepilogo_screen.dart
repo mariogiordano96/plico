@@ -9,12 +9,21 @@ import '../../services/workout_progress_service.dart';
 class SessioneRiepilogoScreen extends StatelessWidget {
   final List<WorkoutExercise> exercises;
   final Map<String, List<WorkoutExercise>> priorHistoryByExerciseId;
+  final int? durationSeconds;
 
   const SessioneRiepilogoScreen({
     super.key,
     required this.exercises,
     required this.priorHistoryByExerciseId,
+    this.durationSeconds,
   });
+
+  String _formatDuration(int seconds) {
+    final h = seconds ~/ 3600;
+    final m = (seconds % 3600) ~/ 60;
+    if (h > 0) return '${h}h ${m.toString().padLeft(2, '0')}min';
+    return '${m}min';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,24 +44,56 @@ class SessioneRiepilogoScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
         children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: p.surface,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: p.cardBorder),
-            ),
-            child: Column(
-              children: [
-                const Text('🔥', style: TextStyle(fontSize: 32)),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.sessioneRiepilogoKcal(kcal),
-                  style: TextStyle(
-                      color: p.textPrimary, fontSize: 20, fontWeight: FontWeight.w700),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: p.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: p.cardBorder),
+                  ),
+                  child: Column(
+                    children: [
+                      const Text('🔥', style: TextStyle(fontSize: 32)),
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.sessioneRiepilogoKcal(kcal),
+                        style: TextStyle(
+                            color: p.textPrimary, fontSize: 16, fontWeight: FontWeight.w700),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (durationSeconds != null && durationSeconds! > 0) ...[
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: p.surface,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: p.cardBorder),
+                    ),
+                    child: Column(
+                      children: [
+                        const Text('⏱️', style: TextStyle(fontSize: 32)),
+                        const SizedBox(height: 8),
+                        Text(
+                          _formatDuration(durationSeconds!),
+                          style: TextStyle(
+                              color: p.textPrimary, fontSize: 16, fontWeight: FontWeight.w700),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
-            ),
+            ],
           ),
           const SizedBox(height: 20),
           Text(l10n.sessioneRiepilogoNuoviRecord,

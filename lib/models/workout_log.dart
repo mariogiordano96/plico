@@ -15,4 +15,8 @@ class WorkoutLog {
   late DateTime date;
 
   String? note; // Fase 9: nota libera sulla sessione
+
+  // Fase 30: somma dei secondi trascorsi in modalità guidata questo giorno
+  // (cumulativa: più sessioni/rientri nello stesso giorno si sommano).
+  int? totalDurationSeconds;
 }
