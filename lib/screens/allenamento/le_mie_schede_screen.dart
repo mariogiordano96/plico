@@ -272,9 +272,11 @@ class _LeMieSchedeScreenState extends State<LeMieSchedeScreen> {
     final l10n = context.l10n;
 
     final presetTemplates = _templates.where((t) => t.isPreset).toList();
-    final myTemplates = _templates.where((t) => !t.isPreset).toList();
+    final myTemplates = _templates.where((t) => !t.isPreset).toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     final presetPrograms = _programs.where((pr) => pr.isPreset).toList();
-    final myPrograms = _programs.where((pr) => !pr.isPreset).toList();
+    final myPrograms = _programs.where((pr) => !pr.isPreset).toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
     return Scaffold(
       backgroundColor: p.background,
@@ -297,6 +299,32 @@ class _LeMieSchedeScreenState extends State<LeMieSchedeScreen> {
         child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
         children: [
+          if (myTemplates.isNotEmpty || myPrograms.isNotEmpty) ...[
+            _SectionLabel(l10n.schedeSezioneMie, p),
+            const SizedBox(height: 8),
+            for (final t in myTemplates)
+              _TemplateCard(
+                template: t,
+                p: p,
+                l10n: l10n,
+                onTap: () => _inizia(t),
+                onExportPdf: () => _exportTemplate(t),
+                onEdit: () => _modificaScheda(t),
+                trailing: IconButton(
+                  onPressed: () => _eliminaTemplate(t),
+                  icon: Icon(Icons.delete_outline_rounded, color: p.textMuted, size: 20),
+                ),
+              ),
+            for (final pr in myPrograms)
+              _ProgramCard(
+                program: pr,
+                nextDay: _nextDayByProgram[pr.id],
+                p: p,
+                l10n: l10n,
+                onTap: () => _openProgram(pr),
+              ),
+            const SizedBox(height: 20),
+          ],
           if (presetTemplates.isNotEmpty || presetPrograms.isNotEmpty) ...[
             _SectionLabel(l10n.schedeSezionePreimpostate, p),
             const SizedBox(height: 8),
@@ -326,31 +354,7 @@ class _LeMieSchedeScreenState extends State<LeMieSchedeScreen> {
                   tooltip: l10n.schedeDuplica,
                 ),
               ),
-            const SizedBox(height: 20),
           ],
-          _SectionLabel(l10n.schedeSezioneMie, p),
-          const SizedBox(height: 8),
-          for (final t in myTemplates)
-            _TemplateCard(
-              template: t,
-              p: p,
-              l10n: l10n,
-              onTap: () => _inizia(t),
-              onExportPdf: () => _exportTemplate(t),
-              onEdit: () => _modificaScheda(t),
-              trailing: IconButton(
-                onPressed: () => _eliminaTemplate(t),
-                icon: Icon(Icons.delete_outline_rounded, color: p.textMuted, size: 20),
-              ),
-            ),
-          for (final pr in myPrograms)
-            _ProgramCard(
-              program: pr,
-              nextDay: _nextDayByProgram[pr.id],
-              p: p,
-              l10n: l10n,
-              onTap: () => _openProgram(pr),
-            ),
         ],
         ),
       ),
