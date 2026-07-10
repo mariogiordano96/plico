@@ -177,6 +177,13 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
   bool _isExerciseDone(WorkoutExercise e) =>
       e.sets.isEmpty ? e.cardioConfirmed : e.sets.every((s) => s.confirmed);
 
+  bool get _isLastStep => _stepIndex >= _steps.length - 1;
+
+  /// Vero solo quando tutti gli esercizi di tutta la scheda (non solo dello
+  /// step corrente) sono stati confermati — condizione per mostrare
+  /// "Termina sessione" come azione attiva sull'ultimo step.
+  bool get _allExercisesDone => widget.exercises.every(_isExerciseDone);
+
   /// Avanza automaticamente allo step successivo quando tutti gli esercizi
   /// dello step corrente sono stati confermati. Sull'ultimo step non fa
   /// nulla: la fine sessione resta un'azione esplicita (pulsante "Termina
@@ -371,16 +378,22 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: FilledButton(
-                  onPressed: _next,
-                  style: FilledButton.styleFrom(backgroundColor: p.accent),
-                  child: Text(
-                    _stepIndex < _steps.length - 1
-                        ? l10n.sessioneGuidataSuccessivo
-                        : l10n.sessioneGuidataTermina,
-                    style: const TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                ),
+                child: _isLastStep && !_allExercisesDone
+                    ? FilledButton(
+                        onPressed: null,
+                        style: FilledButton.styleFrom(
+                            backgroundColor: p.cardBorder, disabledBackgroundColor: p.cardBorder),
+                        child: Text(l10n.sessioneGuidataCompletaTutto,
+                            style: TextStyle(color: p.textMuted, fontWeight: FontWeight.w700)),
+                      )
+                    : FilledButton(
+                        onPressed: _next,
+                        style: FilledButton.styleFrom(backgroundColor: p.accent),
+                        child: Text(
+                          _isLastStep ? l10n.sessioneGuidataTermina : l10n.sessioneGuidataSuccessivo,
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                      ),
               ),
             ],
           ),

@@ -2020,6 +2020,19 @@ preset, test manuale su device — vedi nota a inizio sezione)**
 > nessun nuovo test temporaneo — logica di navigazione step legata allo stato UI (`_steps`/
 > `_stepIndex`), stesso giudizio delle fasi precedenti sulla modalità guidata.
 
+### Fase 26 — "Termina sessione" attivo solo a scheda interamente completata ✅ completata
+- [x] Sull'ultimo step il pulsante mostrava "Termina sessione" (Fase 25) anche se quello step
+      (o uno step precedente raggiunto saltando avanti manualmente) non era ancora completo —
+      corretto su richiesta dell'utente: deve comparire come azione attiva solo quando **tutti**
+      gli esercizi di tutta la scheda risultano confermati, non solo quelli dello step corrente.
+- [x] Nuovi getter `_isLastStep`/`_allExercisesDone` (quest'ultimo su `widget.exercises`, non solo
+      sullo step corrente — copre anche il caso in cui l'utente ha saltato avanti manualmente
+      lasciando uno step precedente incompleto). Sull'ultimo step, se `!_allExercisesDone` il
+      pulsante è disabilitato con label diversa ("Completa tutti gli esercizi" /
+      "Complete all exercises") invece di "Termina sessione".
+
+> nessun nuovo test temporaneo — stesso giudizio della Fase 25.
+
 ---
 
 ## Considerazioni aperte

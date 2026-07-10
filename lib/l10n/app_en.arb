@@ -544,6 +544,7 @@
   "sessioneGuidataPrecedente": "Previous",
   "sessioneGuidataSuccessivo": "Next",
   "sessioneGuidataTermina": "Finish session",
+  "sessioneGuidataCompletaTutto": "Complete all exercises",
   "sessioneGuidataConferma": "Confirm set",
   "sessioneGuidataSuperset": "SUPERSET",
   "sessioneGuidataRiscaldamento": "WARM-UP",

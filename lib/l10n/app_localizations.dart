@@ -3074,6 +3074,12 @@ abstract class AppLocalizations {
   /// **'Termina sessione'**
   String get sessioneGuidataTermina;
 
+  /// No description provided for @sessioneGuidataCompletaTutto.
+  ///
+  /// In it, this message translates to:
+  /// **'Completa tutti gli esercizi'**
+  String get sessioneGuidataCompletaTutto;
+
   /// No description provided for @sessioneGuidataConferma.
   ///
   /// In it, this message translates to:

@@ -1666,6 +1666,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sessioneGuidataTermina => 'Finish session';
 
   @override
+  String get sessioneGuidataCompletaTutto => 'Complete all exercises';
+
+  @override
   String get sessioneGuidataConferma => 'Confirm set';
 
   @override
