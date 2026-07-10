@@ -2098,6 +2098,25 @@ preset, test manuale su device — vedi nota a inizio sezione)**
 > nessun nuovo test temporaneo — logica accoppiata a `Stopwatch`/`Timer.periodic` (stato UI) e a
 > Isar (nuovo campo additivo, nessuna migrazione necessaria).
 
+### Fase 31 — Calendario allenamenti ✅ completata
+- [x] Nuova icona in AppBar (`AllenamentoScreen`, `Icons.calendar_month_rounded`) che apre
+      `CalendarioAllenamentiScreen`: vista mensile custom (nessun package calendario in
+      `pubspec.yaml`, grid 7 colonne fatta a mano, coerente con lo stile del resto della sezione)
+      con i giorni in cui è stato registrato un allenamento marcati ed etichettati col nome della
+      prima scheda/programma fatto quel giorno (`WorkoutExercise.sourceTemplateName`, Fase 21) —
+      "+N" se nello stesso giorno ci sono più schede diverse, "Libero" se solo esercizi liberi.
+- [x] Nuovo `DatabaseService.getWorkoutLabelsForRange` (stesso pattern filter/dateBetween di
+      `getWorkoutDaysRange`): mappa giorno → nomi distinti delle schede fatte quel giorno.
+- [x] Tap su un giorno marcato → `Navigator.pop(context, day)`; `AllenamentoScreen._apriCalendario`
+      passa il giorno scelto a `_changeDate` (già esistente), spostando il tab Allenamento su
+      quella data. Giorni senza allenamento non sono tappabili.
+- [x] Navigazione mese precedente/successivo (ricarica dati ad ogni cambio), etichette dei giorni
+      della settimana localizzate correttamente per lingua (`DateFormat.E` su una settimana di
+      riferimento nota, lun-dom).
+
+> nessun nuovo test temporaneo — nuova query semplice (stesso pattern di `getWorkoutDaysRange`,
+> già non testato) e UI di navigazione/calendario.
+
 ---
 
 ## Considerazioni aperte

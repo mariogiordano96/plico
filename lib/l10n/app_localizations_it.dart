@@ -1479,6 +1479,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get schedeTitle => 'Le mie schede';
 
   @override
+  String get calendarioTitle => 'Calendario allenamenti';
+
+  @override
+  String get calendarioEsercizioLibero => 'Libero';
+
+  @override
   String get schedeCreaTooltip => 'Crea';
 
   @override

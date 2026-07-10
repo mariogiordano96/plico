@@ -2750,6 +2750,18 @@ abstract class AppLocalizations {
   /// **'Le mie schede'**
   String get schedeTitle;
 
+  /// No description provided for @calendarioTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Calendario allenamenti'**
+  String get calendarioTitle;
+
+  /// No description provided for @calendarioEsercizioLibero.
+  ///
+  /// In it, this message translates to:
+  /// **'Libero'**
+  String get calendarioEsercizioLibero;
+
   /// No description provided for @schedeCreaTooltip.
   ///
   /// In it, this message translates to:

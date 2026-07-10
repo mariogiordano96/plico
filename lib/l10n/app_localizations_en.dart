@@ -1471,6 +1471,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get schedeTitle => 'My templates';
 
   @override
+  String get calendarioTitle => 'Workout calendar';
+
+  @override
+  String get calendarioEsercizioLibero => 'Free';
+
+  @override
   String get schedeCreaTooltip => 'Create';
 
   @override

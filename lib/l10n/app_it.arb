@@ -611,6 +611,8 @@
   "homeAttivitaKcalDisclaimer": "Stima indicativa, non un dato medico: basata sull'ultimo peso registrato (o 75 kg di default se non disponibile).",
 
   "schedeTitle": "Le mie schede",
+  "calendarioTitle": "Calendario allenamenti",
+  "calendarioEsercizioLibero": "Libero",
   "schedeCreaTooltip": "Crea",
   "schedeSezionePreimpostate": "Preimpostate",
   "schedeSezioneMie": "Le mie schede",

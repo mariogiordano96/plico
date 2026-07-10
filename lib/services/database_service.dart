@@ -1017,6 +1017,23 @@ class DatabaseService {
     return exercises.map((e) => e.date).toSet();
   }
 
+  /// Per ogni giorno del range con almeno un [WorkoutExercise], i nomi
+  /// distinti delle schede fatte quel giorno (`sourceTemplateName`, ordine di
+  /// prima comparsa) — lista vuota se il giorno ha solo esercizi liberi.
+  /// Usato dal calendario allenamenti (Fase 31).
+  Future<Map<DateTime, List<String>>> getWorkoutLabelsForRange(DateTime from, DateTime to) async {
+    final f = _logDate(from);
+    final t = _logDate(to);
+    final exercises = await _isar.workoutExercises.filter().dateBetween(f, t).findAll();
+    final byDay = <DateTime, List<String>>{};
+    for (final e in exercises) {
+      final labels = byDay.putIfAbsent(e.date, () => []);
+      final name = e.sourceTemplateName;
+      if (name != null && !labels.contains(name)) labels.add(name);
+    }
+    return byDay;
+  }
+
   /// Come [getWorkoutDaysRange], ma osservabile: emette ogni volta che cambia
   /// un [WorkoutExercise] qualsiasi.
   Stream<Set<DateTime>> watchWorkoutDays() {

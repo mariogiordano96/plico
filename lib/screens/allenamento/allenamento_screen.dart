@@ -8,6 +8,7 @@ import '../../models/workout_template.dart';
 import '../../services/calorie_estimation_service.dart';
 import '../../services/database_service.dart';
 import '../esercizi/catalogo_esercizi_screen.dart';
+import 'calendario_allenamenti_screen.dart';
 import 'le_mie_schede_screen.dart';
 import 'log_cardio_dialog.dart';
 import 'log_serie_dialog.dart';
@@ -137,6 +138,14 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
       context,
       MaterialPageRoute(builder: (_) => const LeMieSchedeScreen()),
     );
+  }
+
+  Future<void> _apriCalendario() async {
+    final scelto = await Navigator.push<DateTime>(
+      context,
+      MaterialPageRoute(builder: (_) => const CalendarioAllenamentiScreen()),
+    );
+    if (scelto != null) _changeDate(scelto);
   }
 
   /// Aggiunge al log del giorno l'esercizio scelto dal catalogo, con target di
@@ -310,6 +319,11 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
         elevation: 0,
         centerTitle: true,
         actions: [
+          IconButton(
+            onPressed: _apriCalendario,
+            icon: Icon(Icons.calendar_month_rounded, color: p.accent),
+            tooltip: l10n.calendarioTitle,
+          ),
           IconButton(
             onPressed: _apriSchede,
             icon: Icon(Icons.list_alt_rounded, color: p.accent),
