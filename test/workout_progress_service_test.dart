@@ -1,0 +1,259 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:plico/models/workout_exercise.dart';
+import 'package:plico/models/workout_set.dart';
+import 'package:plico/services/workout_progress_service.dart';
+
+WorkoutExercise _exercise({
+  String id = 'ex',
+  DateTime? date,
+  List<WorkoutSet>? sets,
+}) {
+  return WorkoutExercise()
+    ..exerciseId = id
+    ..exerciseName = id
+    ..date = date ?? DateTime(2026, 1, 1)
+    ..sets = sets ?? [];
+}
+
+WorkoutSet _set({int? reps, double? weightKg, int? rpe, bool isWarmup = false}) {
+  return WorkoutSet()
+    ..reps = reps
+    ..weightKg = weightKg
+    ..rpe = rpe
+    ..isWarmup = isWarmup;
+}
+
+void main() {
+  group('suggestWarmupSets', () {
+    test('sotto la soglia di default (20kg) non suggerisce riscaldamento', () {
+      expect(WorkoutProgressService.suggestWarmupSets(19), isEmpty);
+    });
+
+    test('esattamente alla soglia suggerisce il riscaldamento (confronto stretto)', () {
+      expect(WorkoutProgressService.suggestWarmupSets(20), isNotEmpty);
+    });
+
+    test('sopra la soglia genera 3 serie con rampa 50/70/90% e rip decrescenti', () {
+      final warmup = WorkoutProgressService.suggestWarmupSets(100);
+      expect(warmup, hasLength(3));
+      expect(warmup.map((s) => s.weightKg), [50, 70, 90]);
+      expect(warmup.map((s) => s.reps), [8, 5, 3]);
+      expect(warmup.every((s) => s.isWarmup), isTrue);
+    });
+
+    test('rispetta una soglia personalizzata', () {
+      expect(WorkoutProgressService.suggestWarmupSets(10, skipThresholdKg: 5), isNotEmpty);
+      expect(WorkoutProgressService.suggestWarmupSets(3, skipThresholdKg: 5), isEmpty);
+    });
+  });
+
+  group('neglectedMuscleGroups', () {
+    test('nessun gruppo con volume positivo → nessun trascurato', () {
+      expect(WorkoutProgressService.neglectedMuscleGroups({'chest': 0, 'back': 0}), isEmpty);
+    });
+
+    test('un gruppo molto sotto la media degli altri viene segnalato', () {
+      final result = WorkoutProgressService.neglectedMuscleGroups(
+        {'chest': 100, 'back': 100, 'legs': 5},
+      );
+      expect(result, ['legs']);
+    });
+
+    test('gruppi vicini alla media non sono trascurati', () {
+      final result = WorkoutProgressService.neglectedMuscleGroups(
+        {'chest': 100, 'back': 90},
+      );
+      expect(result, isEmpty);
+    });
+  });
+
+  group('sessionVolume', () {
+    test('somma reps × peso escludendo le serie di riscaldamento', () {
+      final e = _exercise(sets: [
+        _set(reps: 10, weightKg: 50),
+        _set(reps: 8, weightKg: 50),
+        _set(reps: 20, weightKg: 999, isWarmup: true),
+      ]);
+      expect(WorkoutProgressService.sessionVolume(e), 900);
+    });
+  });
+
+  group('sessionMaxWeight', () {
+    test('null se non ci sono serie con peso', () {
+      final e = _exercise(sets: [_set(reps: 10)]);
+      expect(WorkoutProgressService.sessionMaxWeight(e), isNull);
+    });
+
+    test('il massimo tra le serie di lavoro, esclude il riscaldamento', () {
+      final e = _exercise(sets: [
+        _set(reps: 10, weightKg: 60),
+        _set(reps: 8, weightKg: 80),
+        _set(reps: 20, weightKg: 999, isWarmup: true),
+      ]);
+      expect(WorkoutProgressService.sessionMaxWeight(e), 80);
+    });
+  });
+
+  group('averageRpe', () {
+    test('null se nessuna serie ha un rpe', () {
+      final e = _exercise(sets: [_set(reps: 10, weightKg: 50)]);
+      expect(WorkoutProgressService.averageRpe(e), isNull);
+    });
+
+    test('media degli rpe impostati', () {
+      final e = _exercise(sets: [
+        _set(reps: 10, weightKg: 50, rpe: 7),
+        _set(reps: 10, weightKg: 50, rpe: 9),
+      ]);
+      expect(WorkoutProgressService.averageRpe(e), 8);
+    });
+  });
+
+  group('estimatedOneRepMax', () {
+    test('null se nessuna serie ha reps e peso validi', () {
+      final e = _exercise(sets: [_set(reps: 10)]);
+      expect(WorkoutProgressService.estimatedOneRepMax(e), isNull);
+    });
+
+    test('formula di Epley sulla serie migliore', () {
+      final e = _exercise(sets: [
+        _set(reps: 5, weightKg: 100), // 100 * (1 + 5/30) = 116.67
+        _set(reps: 10, weightKg: 80), // 80 * (1 + 10/30) = 106.67
+      ]);
+      expect(WorkoutProgressService.estimatedOneRepMax(e), closeTo(116.67, 0.01));
+    });
+  });
+
+  group('isNewPersonalRecord', () {
+    test('false se il candidato non ha un peso massimo', () {
+      final candidate = _exercise(sets: [_set(reps: 10)]);
+      expect(WorkoutProgressService.isNewPersonalRecord(candidate, []), isFalse);
+    });
+
+    test('true senza storico precedente (se ha un peso)', () {
+      final candidate = _exercise(sets: [_set(reps: 5, weightKg: 100)]);
+      expect(WorkoutProgressService.isNewPersonalRecord(candidate, []), isTrue);
+    });
+
+    test('true se supera il massimo di tutto lo storico', () {
+      final candidate = _exercise(sets: [_set(reps: 5, weightKg: 110)]);
+      final prior1 = _exercise(sets: [_set(reps: 5, weightKg: 100)]);
+      final prior2 = _exercise(sets: [_set(reps: 5, weightKg: 105)]);
+      expect(
+          WorkoutProgressService.isNewPersonalRecord(candidate, [prior1, prior2]), isTrue);
+    });
+
+    test('false se pari o sotto il massimo storico', () {
+      final candidate = _exercise(sets: [_set(reps: 5, weightKg: 100)]);
+      final prior = _exercise(sets: [_set(reps: 5, weightKg: 100)]);
+      expect(WorkoutProgressService.isNewPersonalRecord(candidate, [prior]), isFalse);
+    });
+  });
+
+  group('suggestNextSession', () {
+    test('nessuna serie di lavoro → maintain senza valori suggeriti', () {
+      final last = _exercise(sets: []);
+      final s = WorkoutProgressService.suggestNextSession(last);
+      expect(s.direction, OverloadDirection.maintain);
+      expect(s.suggestedWeightKg, isNull);
+      expect(s.suggestedReps, isNull);
+    });
+
+    test('2+ serie sotto il target di rip → decrease (-7.5% arrotondato)', () {
+      final last = _exercise(sets: [
+        _set(reps: 10, weightKg: 100),
+        _set(reps: 8, weightKg: 100),
+        _set(reps: 7, weightKg: 100),
+      ]);
+      final s = WorkoutProgressService.suggestNextSession(last);
+      expect(s.direction, OverloadDirection.decrease);
+      expect(s.suggestedWeightKg, 92.5);
+      expect(s.suggestedReps, 10);
+    });
+
+    test('esattamente 1 serie sotto il target → maintain sullo stesso peso', () {
+      final last = _exercise(sets: [
+        _set(reps: 10, weightKg: 100),
+        _set(reps: 10, weightKg: 100),
+        _set(reps: 8, weightKg: 100),
+      ]);
+      final s = WorkoutProgressService.suggestNextSession(last);
+      expect(s.direction, OverloadDirection.maintain);
+      expect(s.suggestedWeightKg, 100);
+      expect(s.suggestedReps, 10);
+    });
+
+    test('nessuna serie sotto target ma RPE medio alto (≥8.5) → maintain', () {
+      final last = _exercise(sets: [
+        _set(reps: 10, weightKg: 100, rpe: 9),
+        _set(reps: 10, weightKg: 100, rpe: 9),
+      ]);
+      final s = WorkoutProgressService.suggestNextSession(last);
+      expect(s.direction, OverloadDirection.maintain);
+      expect(s.suggestedWeightKg, 100);
+    });
+
+    test('target rispettato e RPE basso/assente → increase (+2.5kg)', () {
+      final last = _exercise(sets: [
+        _set(reps: 10, weightKg: 100),
+        _set(reps: 10, weightKg: 100),
+      ]);
+      final s = WorkoutProgressService.suggestNextSession(last);
+      expect(s.direction, OverloadDirection.increase);
+      expect(s.suggestedWeightKg, 102.5);
+      expect(s.suggestedReps, 10);
+    });
+  });
+
+  group('needsDeload', () {
+    test('meno del numero minimo di settimane di storico → false', () {
+      final history = [
+        _exercise(date: DateTime(2026, 1, 1), sets: [_set(reps: 5, weightKg: 100)]),
+        _exercise(date: DateTime(2026, 1, 8), sets: [_set(reps: 5, weightKg: 100)]),
+      ];
+      expect(WorkoutProgressService.needsDeload(history), isFalse);
+    });
+
+    test('carico massimo settimanale mai diminuito nelle ultime N settimane → true', () {
+      final history = [
+        _exercise(date: DateTime(2026, 1, 1), sets: [_set(reps: 5, weightKg: 100)]),
+        _exercise(date: DateTime(2026, 1, 8), sets: [_set(reps: 5, weightKg: 100)]),
+        _exercise(date: DateTime(2026, 1, 15), sets: [_set(reps: 5, weightKg: 105)]),
+        _exercise(date: DateTime(2026, 1, 22), sets: [_set(reps: 5, weightKg: 110)]),
+      ];
+      expect(WorkoutProgressService.needsDeload(history), isTrue);
+    });
+
+    test('un calo di carico settimanale interrompe il segnale di scarico', () {
+      final history = [
+        _exercise(date: DateTime(2026, 1, 1), sets: [_set(reps: 5, weightKg: 100)]),
+        _exercise(date: DateTime(2026, 1, 8), sets: [_set(reps: 5, weightKg: 110)]),
+        _exercise(date: DateTime(2026, 1, 15), sets: [_set(reps: 5, weightKg: 90)]),
+        _exercise(date: DateTime(2026, 1, 22), sets: [_set(reps: 5, weightKg: 100)]),
+      ];
+      expect(WorkoutProgressService.needsDeload(history), isFalse);
+    });
+  });
+
+  group('deloadSuggestion', () {
+    test('-40% sul carico massimo, arrotondato, reps della prima serie', () {
+      final last = _exercise(sets: [
+        _set(reps: 8, weightKg: 100),
+        _set(reps: 8, weightKg: 90),
+      ]);
+      final s = WorkoutProgressService.deloadSuggestion(last);
+      expect(s.direction, OverloadDirection.decrease);
+      expect(s.isDeload, isTrue);
+      expect(s.suggestedWeightKg, 60);
+      expect(s.suggestedReps, 8);
+    });
+
+    test('nessuna serie di lavoro → nessun valore suggerito ma isDeload true', () {
+      final last = _exercise(sets: []);
+      final s = WorkoutProgressService.deloadSuggestion(last);
+      expect(s.suggestedWeightKg, isNull);
+      expect(s.suggestedReps, isNull);
+      expect(s.isDeload, isTrue);
+    });
+  });
+}
