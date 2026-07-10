@@ -305,9 +305,10 @@ class _ProgrammaDetailScreenState extends State<ProgrammaDetailScreen> {
                       onPressed: () => _eliminaGiorno(giorno),
                       icon: Icon(Icons.delete_outline_rounded, color: p.textMuted, size: 20),
                     ),
-                  TextButton(
+                  IconButton(
                     onPressed: () => _inizia(giorno),
-                    child: Text(l10n.schedeInizia, style: TextStyle(color: p.accent)),
+                    icon: Icon(Icons.play_circle_fill_rounded, color: p.accent, size: 28),
+                    tooltip: l10n.schedeInizia,
                   ),
                 ],
               ),

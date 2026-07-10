@@ -431,9 +431,10 @@ class _TemplateCard extends StatelessWidget {
                 tooltip: l10n.schedeModifica,
               ),
             if (trailing != null) trailing!,
-            TextButton(
+            IconButton(
               onPressed: onTap,
-              child: Text(l10n.schedeInizia, style: TextStyle(color: p.accent)),
+              icon: Icon(Icons.play_circle_fill_rounded, color: p.accent, size: 28),
+              tooltip: l10n.schedeInizia,
             ),
           ],
         ),
