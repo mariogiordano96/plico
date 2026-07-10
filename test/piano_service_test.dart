@@ -57,16 +57,21 @@ Future<void> _seedDb({
   await db.seedTestFoods(_testFoods);
 }
 
-// Alimenti di test con valori nutrizionali realistici (per 100g)
+// Alimenti di test con valori nutrizionali realistici (per 100g).
+// Nomi allineati a PianoService.curatedNames/curated*Colazione dopo la
+// normalizzazione dei nomi CREA (docs/normalizzazione_nomi_alimenti.md) — i
+// vecchi nomi verbosi (es. "Pollo, petto, crudo") non combaciano più con le
+// liste curate ("Petto di pollo"), causando un pool quasi vuoto e piani
+// generati con kcal/macro molto sotto target.
 const _testFoods = [
   // Proteine animali
-  _TF('Pollo, petto, crudo',          kcal: 110, prot: 23.0, fat:  1.2, carbs:  0.0, cat: 'Carni fresche'),
-  _TF('Tacchino, fesa, crudo',        kcal: 107, prot: 21.9, fat:  1.2, carbs:  0.0, cat: 'Carni fresche'),
-  _TF('Tonno in salamoia, sgocciolato', kcal: 103, prot: 23.5, fat: 1.0, carbs: 0.0, cat: 'Prodotti della pesca'),
-  _TF('Uova di gallina, intero',       kcal: 128, prot: 12.4, fat:  8.7, carbs:  0.7, cat: 'Uova'),
+  _TF('Petto di pollo',               kcal: 110, prot: 23.0, fat:  1.2, carbs:  0.0, cat: 'Carni fresche'),
+  _TF('Fesa di tacchino',             kcal: 107, prot: 21.9, fat:  1.2, carbs:  0.0, cat: 'Carni fresche'),
+  _TF('Tonno al naturale',            kcal: 103, prot: 23.5, fat: 1.0, carbs: 0.0, cat: 'Prodotti della pesca'),
+  _TF('Uovo intero',                  kcal: 128, prot: 12.4, fat:  8.7, carbs:  0.7, cat: 'Uova'),
   // Proteine vegetali
   _TF('Lenticchie, secche',           kcal: 291, prot: 22.7, fat:  1.3, carbs: 46.1, cat: 'Legumi'),
-  _TF('Tofu, sodo',                   kcal:  76, prot:  8.0, fat:  4.8, carbs:  1.9, cat: 'Legumi'),
+  _TF('Tofu',                         kcal:  76, prot:  8.0, fat:  4.8, carbs:  1.9, cat: 'Legumi'),
   // Latticini
   _TF('Yogurt greco, 0% lipidi',       kcal:  57, prot: 10.0, fat:  0.4, carbs:  4.0, cat: 'Latte e yogurt'),
   _TF('Fiocchi di latte',              kcal:  98, prot: 11.0, fat:  4.3, carbs:  3.3, cat: 'Formaggi e latticini'),
@@ -75,35 +80,36 @@ const _testFoods = [
   _TF('Latte di vacca, pastorizzato, scremato', kcal: 36, prot: 3.6, fat: 0.1, carbs: 5.0, cat: 'Latte e yogurt'),
   _TF('Fiocchi di formaggio magro',   kcal:  80, prot: 10.0, fat:  1.5, carbs:  5.0, cat: 'Formaggi e latticini'),
   // Cereali
-  _TF('Pasta di semola',              kcal: 353, prot: 11.0, fat:  1.8, carbs: 72.0, cat: 'Cereali e derivati'),
-  _TF('Riso Basmati, crudo',          kcal: 361, prot:  7.5, fat:  0.9, carbs: 78.0, cat: 'Cereali e derivati'),
+  _TF('Pasta',                         kcal: 353, prot: 11.0, fat:  1.8, carbs: 72.0, cat: 'Cereali e derivati'),
+  _TF('Riso Basmati',                  kcal: 361, prot:  7.5, fat:  0.9, carbs: 78.0, cat: 'Cereali e derivati'),
   _TF("Fiocchi d'avena",              kcal: 375, prot: 13.0, fat:  7.0, carbs: 61.0, cat: 'Cereali e derivati'),
   _TF('Gallette di riso',             kcal: 381, prot:  8.0, fat:  3.5, carbs: 78.0, cat: 'Cereali e derivati'),
   _TF('Pane di tipo integrale',       kcal: 224, prot:  7.5, fat:  1.3, carbs: 43.0, cat: 'Cereali e derivati'),
+  _TF('Pane integrale',               kcal: 224, prot:  7.5, fat:  1.3, carbs: 43.0, cat: 'Cereali e derivati'),
   _TF('Muesli',                       kcal: 368, prot:  9.9, fat:  7.6, carbs: 64.0, cat: 'Cereali e derivati'),
   _TF('Fette biscottate, integrali',  kcal: 380, prot: 10.0, fat:  5.0, carbs: 72.0, cat: 'Cereali e derivati'),
   _TF('Crackers, integrali',          kcal: 380, prot: 10.0, fat:  8.0, carbs: 64.0, cat: 'Cereali e derivati'),
   // Verdure
-  _TF('Spinaci, crudi',               kcal:  23, prot:  2.9, fat:  0.4, carbs:  2.9, cat: 'Verdure e ortaggi'),
-  _TF('Zucchine, crude',              kcal:  17, prot:  1.3, fat:  0.2, carbs:  2.6, cat: 'Verdure e ortaggi'),
-  _TF('Broccolo a testa, crudo',      kcal:  34, prot:  2.9, fat:  0.4, carbs:  5.0, cat: 'Verdure e ortaggi'),
-  _TF('Pomodori, da insalata, freschi', kcal: 18, prot: 0.9, fat: 0.2, carbs: 3.5, cat: 'Verdure e ortaggi'),
+  _TF('Spinaci',                      kcal:  23, prot:  2.9, fat:  0.4, carbs:  2.9, cat: 'Verdure e ortaggi'),
+  _TF('Zucchine',                     kcal:  17, prot:  1.3, fat:  0.2, carbs:  2.6, cat: 'Verdure e ortaggi'),
+  _TF('Broccoli',                     kcal:  34, prot:  2.9, fat:  0.4, carbs:  5.0, cat: 'Verdure e ortaggi'),
+  _TF('Pomodori da insalata',          kcal: 18, prot: 0.9, fat: 0.2, carbs: 3.5, cat: 'Verdure e ortaggi'),
   // Grassi
-  _TF('Olio di oliva extra vergine',  kcal: 899, prot:  0.0, fat: 99.9, carbs:  0.0, cat: null),
-  _TF('Mandorle dolci, secche',       kcal: 603, prot: 22.0, fat: 53.0, carbs: 19.0, cat: 'Frutta secca a guscio e semi oleaginosi'),
-  _TF('Noci, secche',                 kcal: 689, prot: 15.2, fat: 65.2, carbs:  7.0, cat: 'Frutta secca a guscio e semi oleaginosi'),
-  _TF('Nocciole, secche',             kcal: 655, prot: 15.0, fat: 60.8, carbs: 10.6, cat: 'Frutta secca a guscio e semi oleaginosi'),
-  _TF("Burro d'arachidi",             kcal: 589, prot: 25.0, fat: 50.0, carbs: 16.0, cat: 'Frutta secca a guscio e semi oleaginosi'),
-  _TF('Avocado, fresco',              kcal: 160, prot:  2.0, fat: 15.0, carbs:  1.8, cat: null),
+  _TF("Olio extravergine d'oliva",    kcal: 899, prot:  0.0, fat: 99.9, carbs:  0.0, cat: null),
+  _TF('Mandorle',                     kcal: 603, prot: 22.0, fat: 53.0, carbs: 19.0, cat: 'Frutta secca a guscio e semi oleaginosi'),
+  _TF('Noci',                         kcal: 689, prot: 15.2, fat: 65.2, carbs:  7.0, cat: 'Frutta secca a guscio e semi oleaginosi'),
+  _TF('Nocciole',                     kcal: 655, prot: 15.0, fat: 60.8, carbs: 10.6, cat: 'Frutta secca a guscio e semi oleaginosi'),
+  _TF('Burro di arachidi',            kcal: 589, prot: 25.0, fat: 50.0, carbs: 16.0, cat: 'Frutta secca a guscio e semi oleaginosi'),
+  _TF('Avocado',                      kcal: 160, prot:  2.0, fat: 15.0, carbs:  1.8, cat: null),
   // Frutta (per slot frutta e colazione)
-  _TF('Mele, fresche, golden',        kcal:  57, prot:  0.3, fat:  0.1, carbs: 14.9, cat: 'Frutta'),
-  _TF('Banane, fresche',              kcal:  89, prot:  1.1, fat:  0.3, carbs: 22.8, cat: 'Frutta'),
-  _TF('Pere, fresche, Abate Fetel',   kcal:  55, prot:  0.4, fat:  0.3, carbs: 13.8, cat: 'Frutta'),
-  _TF('Fragole, fresche',             kcal:  30, prot:  0.7, fat:  0.4, carbs:  6.5, cat: 'Frutta'),
-  _TF('Kiwi, freschi',               kcal:  55, prot:  1.1, fat:  0.6, carbs: 12.0, cat: 'Frutta'),
+  _TF('Mela',                         kcal:  57, prot:  0.3, fat:  0.1, carbs: 14.9, cat: 'Frutta'),
+  _TF('Banana',                       kcal:  89, prot:  1.1, fat:  0.3, carbs: 22.8, cat: 'Frutta'),
+  _TF('Pera',                         kcal:  55, prot:  0.4, fat:  0.3, carbs: 13.8, cat: 'Frutta'),
+  _TF('Fragole',                      kcal:  30, prot:  0.7, fat:  0.4, carbs:  6.5, cat: 'Frutta'),
+  _TF('Kiwi',                        kcal:  55, prot:  1.1, fat:  0.6, carbs: 12.0, cat: 'Frutta'),
   // Proteine salata colazione
   _TF('Bresaola della Valtellina IGP', kcal: 151, prot: 31.4, fat: 2.7, carbs: 0.0, cat: 'Carni trasformate e conservate'),
-  _TF('Prosciutto cotto, sgrassato',   kcal: 136, prot: 20.2, fat: 5.8, carbs: 1.0, cat: 'Carni trasformate e conservate'),
+  _TF('Prosciutto cotto magro',        kcal: 136, prot: 20.2, fat: 5.8, carbs: 1.0, cat: 'Carni trasformate e conservate'),
   _TF('Salmone, affumicato',           kcal: 142, prot: 20.0, fat: 7.0, carbs: 0.0, cat: 'Prodotti della pesca'),
 ];
 

@@ -29,10 +29,15 @@ stesso pattern di `piano_service_test.dart`)
 
 ## Blocco 3 — Bug pre-esistente scoperto durante il Blocco 1
 
-- [ ] Investigare e correggere i 5 test falliti in `piano_service_test.dart`
-      (`generaPiano integration`): kcal del piano molto lontane dal target
-      (es. atteso ~2711, ottenuto 1228) — sospetta regressione dalla normalizzazione/
-      localizzazione dei nomi alimenti (commit `e44e1d1`/`bfeed58`)
+- [x] Investigato e corretto: **non era un bug dell'app**, ma un fixture di test
+      obsoleto. `PianoService.curatedNames` (e le altre liste curate) erano già stati
+      aggiornati ai nomi normalizzati (`docs/normalizzazione_nomi_alimenti.md`, es.
+      "Petto di pollo" al posto di "Pollo, petto, crudo"), ma `_testFoods` in
+      `piano_service_test.dart` usava ancora i vecchi nomi CREA verbosi — quasi nessun
+      alimento del test combaciava più con le liste curate (specialmente proteine
+      animali e grassi, pool quasi vuoti), da cui il crollo di kcal/proteine/grassi nel
+      piano generato. Aggiornati i nomi in `_testFoods` per allinearli a
+      `curatedNames`/`curated*Colazione`; tutti e 5 i test ora passano.
 
 ## Blocco 4 — Platform/IO (bassa priorità, valutare caso per caso)
 
