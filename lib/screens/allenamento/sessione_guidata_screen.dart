@@ -68,6 +68,12 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     final bodySnapshot = await db.getLatestBodySnapshot();
 
     for (final e in widget.exercises) {
+      // Gli esercizi passati qui possono arrivare da Isar (log già popolato,
+      // "Avvia allenamento") invece che da un oggetto appena creato in memoria
+      // (vecchio flusso "Inizia" da scheda): le liste embedded lette da Isar
+      // sono a lunghezza fissa, insertAll/add sotto altrimenti lanciano
+      // "Cannot add to a fixed-length list".
+      e.sets = List.of(e.sets, growable: true);
       final isCardio = e.sets.isEmpty;
       if (isCardio) {
         _durataCtrls[e.id] = TextEditingController(
