@@ -476,36 +476,30 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
                 ),
                 const SizedBox(width: 12),
               ],
-              FloatingActionButton.extended(
+              FloatingActionButton(
                 heroTag: 'allenamentoNota',
                 onPressed: _editNota,
                 backgroundColor: p.surface,
                 foregroundColor: p.accent,
                 elevation: 0,
-                tooltip: l10n.allenamentoNotaTitle,
-                icon: Icon(
+                tooltip: _nota != null && _nota!.isNotEmpty
+                    ? l10n.allenamentoModificaNotaButton
+                    : l10n.allenamentoAggiungiNotaButton,
+                child: Icon(
                   _nota != null && _nota!.isNotEmpty
                       ? Icons.edit_note_rounded
                       : Icons.note_add_outlined,
                 ),
-                label: Text(
-                  _nota != null && _nota!.isNotEmpty
-                      ? l10n.allenamentoModificaNotaButton
-                      : l10n.allenamentoAggiungiNotaButton,
-                  style: const TextStyle(fontWeight: FontWeight.w700),
-                ),
               ),
               const SizedBox(width: 12),
-              FloatingActionButton.extended(
+              FloatingActionButton(
                 heroTag: 'allenamentoAggiungiEsercizio',
                 onPressed: _aggiungiEsercizio,
                 backgroundColor: p.surface,
                 foregroundColor: p.accent,
                 elevation: 0,
-                icon: const Icon(Icons.playlist_add_rounded),
-                label: Text(l10n.allenamentoAggiungiEsercizio,
-                    style: const TextStyle(fontWeight: FontWeight.w700)),
                 tooltip: l10n.allenamentoAggiungiEsercizioSub,
+                child: const Icon(Icons.playlist_add_rounded),
               ),
             ],
           ),
