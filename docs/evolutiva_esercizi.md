@@ -2033,6 +2033,17 @@ preset, test manuale su device — vedi nota a inizio sezione)**
 
 > nessun nuovo test temporaneo — stesso giudizio della Fase 25.
 
+### Fase 27 — Niente timer di recupero se la conferma chiude la sessione ✅ completata
+- [x] Confermando l'ultima serie/il cardio dell'ultimo esercizio dell'ultimo step partiva comunque
+      il timer di recupero, anche se non c'era più nulla per cui riposare (la scheda era finita) —
+      corretto su richiesta dell'utente.
+- [x] Nuovo getter `_sessionComplete` (`_isLastStep && _allExercisesDone`, valutato dopo il
+      `setState` della conferma appena fatta): `_confirmSerie`/`_confirmCardio` non mostrano più
+      `showRestTimerSheet` quando la conferma appena effettuata chiude l'intera sessione. Il
+      timer resta invariato tra una serie/step e l'altro in tutti gli altri casi.
+
+> nessun nuovo test temporaneo — stesso giudizio delle fasi 25/26.
+
 ---
 
 ## Considerazioni aperte

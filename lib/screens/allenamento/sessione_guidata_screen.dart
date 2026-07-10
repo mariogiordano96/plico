@@ -184,6 +184,11 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
   /// "Termina sessione" come azione attiva sull'ultimo step.
   bool get _allExercisesDone => widget.exercises.every(_isExerciseDone);
 
+  /// Vero quando la conferma appena fatta chiude l'intera sessione (ultimo
+  /// step, tutto confermato): non ha senso far partire il timer di recupero
+  /// se non c'è più nessun esercizio/serie successivo per cui riposare.
+  bool get _sessionComplete => _isLastStep && _allExercisesDone;
+
   /// Avanza automaticamente allo step successivo quando tutti gli esercizi
   /// dello step corrente sono stati confermati. Sull'ultimo step non fa
   /// nulla: la fine sessione resta un'azione esplicita (pulsante "Termina
@@ -210,7 +215,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     await DatabaseService.instance.updateWorkoutExercise(e);
     if (!mounted) return;
     setState(() {});
-    if (_isLastInStep(e)) {
+    if (_isLastInStep(e) && !_sessionComplete) {
       await showRestTimerSheet(context, seconds: e.restSeconds ?? _defaultRestSeconds);
     }
     _maybeAdvanceStep();
@@ -229,7 +234,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     await DatabaseService.instance.updateWorkoutExercise(e);
     if (!mounted) return;
     setState(() {});
-    if ((e.restSeconds ?? 0) > 0 && _isLastInStep(e)) {
+    if ((e.restSeconds ?? 0) > 0 && _isLastInStep(e) && !_sessionComplete) {
       await showRestTimerSheet(context, seconds: e.restSeconds!);
     }
     _maybeAdvanceStep();
