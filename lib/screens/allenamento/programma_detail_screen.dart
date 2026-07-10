@@ -40,13 +40,120 @@ class _ProgrammaDetailScreenState extends State<ProgrammaDetailScreen> {
   }
 
   Future<void> _aggiungiGiorno() async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => CreaSchedaScreen(programId: widget.program.id, order: _giorni.length),
+    final scelta = await _scegliOrigineGiorno();
+    if (scelta == null || !mounted) return;
+    if (scelta == _OrigineGiorno.nuova) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => CreaSchedaScreen(programId: widget.program.id, order: _giorni.length),
+        ),
+      );
+    } else {
+      await _scegliSchedaEsistente();
+    }
+    _load();
+  }
+
+  Future<_OrigineGiorno?> _scegliOrigineGiorno() async {
+    final p = context.palette;
+    final l10n = context.l10n;
+    return showModalBottomSheet<_OrigineGiorno>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => SafeArea(
+        top: false,
+        child: Container(
+          decoration: BoxDecoration(
+            color: p.background,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.programmaDetailAggiungiGiorno,
+                  style: TextStyle(color: p.accent, fontSize: 17, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 16),
+              _OpzioneMenu(
+                icon: Icons.add_rounded,
+                label: l10n.creaSchedaTitleNuova,
+                p: p,
+                onTap: () => Navigator.pop(ctx, _OrigineGiorno.nuova),
+              ),
+              const SizedBox(height: 8),
+              _OpzioneMenu(
+                icon: Icons.content_copy_rounded,
+                label: l10n.programmaDetailSchedaEsistente,
+                p: p,
+                onTap: () => Navigator.pop(ctx, _OrigineGiorno.esistente),
+              ),
+            ],
+          ),
+        ),
       ),
     );
-    _load();
+  }
+
+  Future<void> _scegliSchedaEsistente() async {
+    final l10n = context.l10n;
+    final p = context.palette;
+    final standalone = await DatabaseService.instance.getStandaloneTemplates();
+    if (!mounted) return;
+    if (standalone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.programmaDetailNessunaSchedaDisponibile)),
+      );
+      return;
+    }
+    final scelta = await showModalBottomSheet<WorkoutTemplate>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => SafeArea(
+        top: false,
+        child: Container(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.7),
+          decoration: BoxDecoration(
+            color: p.background,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.programmaDetailSchedaEsistente,
+                  style: TextStyle(color: p.accent, fontSize: 17, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 16),
+              Flexible(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: standalone.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 8),
+                  itemBuilder: (context, i) {
+                    final t = standalone[i];
+                    return ListTile(
+                      tileColor: p.surface,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      title: Text(t.name,
+                          style: TextStyle(color: p.textPrimary, fontWeight: FontWeight.w600)),
+                      subtitle: Text(l10n.schedeNEsercizi(t.exercises.length),
+                          style: TextStyle(color: p.textMuted, fontSize: 12)),
+                      onTap: () => Navigator.pop(ctx, t),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (scelta == null || !mounted) return;
+    await DatabaseService.instance
+        .duplicateTemplate(scelta, programId: widget.program.id, order: _giorni.length);
   }
 
   Future<void> _modificaGiorno(WorkoutTemplate giorno) async {
@@ -234,6 +341,46 @@ class _ProgrammaDetailScreenState extends State<ProgrammaDetailScreen> {
               ),
             ),
         ],
+        ),
+      ),
+    );
+  }
+}
+
+enum _OrigineGiorno { nuova, esistente }
+
+class _OpzioneMenu extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final ColorPalette p;
+  final VoidCallback onTap;
+
+  const _OpzioneMenu({
+    required this.icon,
+    required this.label,
+    required this.p,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: p.surface,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          child: Row(
+            children: [
+              Icon(icon, color: p.accent, size: 20),
+              const SizedBox(width: 12),
+              Text(label,
+                  style: TextStyle(
+                      color: p.textPrimary, fontWeight: FontWeight.w600, fontSize: 14)),
+            ],
+          ),
         ),
       ),
     );

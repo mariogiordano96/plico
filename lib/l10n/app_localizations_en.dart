@@ -1468,6 +1468,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get schedeTitle => 'My templates';
 
   @override
+  String get schedeCreaTooltip => 'Create';
+
+  @override
   String get schedeSezionePreimpostate => 'Presets';
 
   @override
@@ -1475,9 +1478,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get schedeNuovaScheda => 'New template';
-
-  @override
-  String get schedeNuovoProgramma => 'Program';
 
   @override
   String get schedeInizia => 'Start';
@@ -1554,6 +1554,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get programmaDetailNessunGiorno => 'No days yet';
+
+  @override
+  String get programmaDetailSchedaEsistente => 'Existing template';
+
+  @override
+  String get programmaDetailNessunaSchedaDisponibile =>
+      'No standalone template available. Create one from \"My templates\".';
 
   @override
   String targetDialogTitle(String nome) {

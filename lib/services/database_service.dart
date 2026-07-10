@@ -1230,13 +1230,14 @@ class DatabaseService {
     });
   }
 
-  Future<WorkoutTemplate> duplicateTemplate(WorkoutTemplate original, {int? programId}) async {
+  Future<WorkoutTemplate> duplicateTemplate(WorkoutTemplate original,
+      {int? programId, int? order}) async {
     final copy = WorkoutTemplate()
       ..name = original.name
       ..createdAt = DateTime.now()
       ..isPreset = false
       ..programId = programId
-      ..order = original.order
+      ..order = order ?? original.order
       ..exercises = original.exercises
           .map((e) => WorkoutTemplateExercise()
             ..exerciseId = e.exerciseId

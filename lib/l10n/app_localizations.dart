@@ -2738,6 +2738,12 @@ abstract class AppLocalizations {
   /// **'Le mie schede'**
   String get schedeTitle;
 
+  /// No description provided for @schedeCreaTooltip.
+  ///
+  /// In it, this message translates to:
+  /// **'Crea'**
+  String get schedeCreaTooltip;
+
   /// No description provided for @schedeSezionePreimpostate.
   ///
   /// In it, this message translates to:
@@ -2755,12 +2761,6 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Nuova scheda'**
   String get schedeNuovaScheda;
-
-  /// No description provided for @schedeNuovoProgramma.
-  ///
-  /// In it, this message translates to:
-  /// **'Programma'**
-  String get schedeNuovoProgramma;
 
   /// No description provided for @schedeInizia.
   ///
@@ -2899,6 +2899,18 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Nessun giorno ancora'**
   String get programmaDetailNessunGiorno;
+
+  /// No description provided for @programmaDetailSchedaEsistente.
+  ///
+  /// In it, this message translates to:
+  /// **'Scheda esistente'**
+  String get programmaDetailSchedaEsistente;
+
+  /// No description provided for @programmaDetailNessunaSchedaDisponibile.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessuna scheda autonoma disponibile. Creane una da \"Le mie schede\".'**
+  String get programmaDetailNessunaSchedaDisponibile;
 
   /// No description provided for @targetDialogTitle.
   ///

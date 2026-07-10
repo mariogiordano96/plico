@@ -616,10 +616,10 @@
   "homeAttivitaKcalDisclaimer": "Stima indicativa, non un dato medico: basata sull'ultimo peso registrato (o 75 kg di default se non disponibile).",
 
   "schedeTitle": "Le mie schede",
+  "schedeCreaTooltip": "Crea",
   "schedeSezionePreimpostate": "Preimpostate",
   "schedeSezioneMie": "Le mie schede",
   "schedeNuovaScheda": "Nuova scheda",
-  "schedeNuovoProgramma": "Programma",
   "schedeInizia": "Inizia",
   "schedeModifica": "Modifica",
   "schedeProssimo": "Prossimo: {giorno}",
@@ -649,6 +649,8 @@
 
   "programmaDetailAggiungiGiorno": "Aggiungi giorno",
   "programmaDetailNessunGiorno": "Nessun giorno ancora",
+  "programmaDetailSchedaEsistente": "Scheda esistente",
+  "programmaDetailNessunaSchedaDisponibile": "Nessuna scheda autonoma disponibile. Creane una da \"Le mie schede\".",
 
   "targetDialogTitle": "Target — {nome}",
   "@targetDialogTitle": { "placeholders": { "nome": { "type": "String" } } },

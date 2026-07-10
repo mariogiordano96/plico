@@ -480,10 +480,10 @@
   "homeAttivitaKcalDisclaimer": "Indicative estimate, not a medical figure: based on your last recorded weight (or a default of 75 kg if unavailable).",
 
   "schedeTitle": "My templates",
+  "schedeCreaTooltip": "Create",
   "schedeSezionePreimpostate": "Presets",
   "schedeSezioneMie": "My templates",
   "schedeNuovaScheda": "New template",
-  "schedeNuovoProgramma": "Program",
   "schedeInizia": "Start",
   "schedeModifica": "Edit",
   "schedeProssimo": "Next: {giorno}",
@@ -510,6 +510,8 @@
 
   "programmaDetailAggiungiGiorno": "Add day",
   "programmaDetailNessunGiorno": "No days yet",
+  "programmaDetailSchedaEsistente": "Existing template",
+  "programmaDetailNessunaSchedaDisponibile": "No standalone template available. Create one from \"My templates\".",
 
   "targetDialogTitle": "Target — {nome}",
   "targetDialogSerie": "Sets",

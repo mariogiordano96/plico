@@ -6,6 +6,7 @@ import '../../models/workout_program.dart';
 import '../../models/workout_template.dart';
 import '../../services/database_service.dart';
 import '../../services/pdf_export_service.dart';
+import '../esercizi/aggiungi_esercizio_personalizzato_screen.dart';
 import 'crea_scheda_screen.dart';
 import 'programma_detail_screen.dart';
 import 'sessione_guidata_screen.dart';
@@ -106,6 +107,67 @@ class _LeMieSchedeScreenState extends State<LeMieSchedeScreen> {
       MaterialPageRoute(builder: (_) => ProgrammaDetailScreen(program: program)),
     );
     _load();
+  }
+
+  Future<void> _apriMenuCreazione() async {
+    final p = context.palette;
+    final l10n = context.l10n;
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => SafeArea(
+        top: false,
+        child: Container(
+          decoration: BoxDecoration(
+            color: p.background,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _OpzioneMenu(
+                icon: Icons.list_alt_rounded,
+                label: l10n.schedeNuovaScheda,
+                p: p,
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _nuovaScheda();
+                },
+              ),
+              const SizedBox(height: 8),
+              _OpzioneMenu(
+                icon: Icons.calendar_view_week_rounded,
+                label: l10n.creaProgrammaTitle,
+                p: p,
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _nuovoProgramma();
+                },
+              ),
+              const SizedBox(height: 8),
+              _OpzioneMenu(
+                icon: Icons.fitness_center_rounded,
+                label: l10n.eserciziNuovoTitle,
+                p: p,
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _nuovoEsercizioPersonalizzato();
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _nuovoEsercizioPersonalizzato() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const AggiungiEsercizioPersonalizzatoScreen()),
+    );
   }
 
   Future<void> _duplicaTemplate(WorkoutTemplate t) async {
@@ -228,14 +290,9 @@ class _LeMieSchedeScreenState extends State<LeMieSchedeScreen> {
         iconTheme: IconThemeData(color: p.accent),
         actions: [
           IconButton(
-            onPressed: _nuovaScheda,
+            onPressed: _apriMenuCreazione,
             icon: Icon(Icons.add_rounded, color: p.accent),
-            tooltip: l10n.schedeNuovaScheda,
-          ),
-          IconButton(
-            onPressed: _nuovoProgramma,
-            icon: Icon(Icons.calendar_view_week_rounded, color: p.accent),
-            tooltip: l10n.schedeNuovoProgramma,
+            tooltip: l10n.schedeCreaTooltip,
           ),
         ],
       ),
@@ -425,6 +482,44 @@ class _ProgramCard extends StatelessWidget {
                 style: TextStyle(color: p.textMuted, fontSize: 12))
             : null,
         trailing: trailing,
+      ),
+    );
+  }
+}
+
+class _OpzioneMenu extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final ColorPalette p;
+  final VoidCallback onTap;
+
+  const _OpzioneMenu({
+    required this.icon,
+    required this.label,
+    required this.p,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: p.surface,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          child: Row(
+            children: [
+              Icon(icon, color: p.accent, size: 20),
+              const SizedBox(width: 12),
+              Text(label,
+                  style: TextStyle(
+                      color: p.textPrimary, fontWeight: FontWeight.w600, fontSize: 14)),
+            ],
+          ),
+        ),
       ),
     );
   }

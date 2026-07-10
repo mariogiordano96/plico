@@ -1476,6 +1476,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get schedeTitle => 'Le mie schede';
 
   @override
+  String get schedeCreaTooltip => 'Crea';
+
+  @override
   String get schedeSezionePreimpostate => 'Preimpostate';
 
   @override
@@ -1483,9 +1486,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get schedeNuovaScheda => 'Nuova scheda';
-
-  @override
-  String get schedeNuovoProgramma => 'Programma';
 
   @override
   String get schedeInizia => 'Inizia';
@@ -1562,6 +1562,13 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get programmaDetailNessunGiorno => 'Nessun giorno ancora';
+
+  @override
+  String get programmaDetailSchedaEsistente => 'Scheda esistente';
+
+  @override
+  String get programmaDetailNessunaSchedaDisponibile =>
+      'Nessuna scheda autonoma disponibile. Creane una da \"Le mie schede\".';
 
   @override
   String targetDialogTitle(String nome) {

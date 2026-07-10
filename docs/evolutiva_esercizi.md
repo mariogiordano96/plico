@@ -1928,6 +1928,29 @@ preset, test manuale su device — vedi nota a inizio sezione)**
 > nessun nuovo test temporaneo — logica interamente accoppiata a Isar (nuovi campi) o a
 > UI/raggruppamento in lista, stesso giudizio delle fasi precedenti (16, 20).
 
+### Fase 22 — Riuso schede esistenti nei programmi + punto di creazione unico ✅ completata
+- [x] Prima di questa fase, "Aggiungi giorno" in un programma creava sempre una scheda vuota da
+      zero: nessun modo di riusare una scheda standalone già creata. Inoltre i punti di creazione
+      (Nuova scheda, Nuovo programma, Nuovo esercizio personalizzato) erano sparsi su più
+      schermate con peso visivo diverso — segnalato dall'utente come UX da snellire.
+- [x] `DatabaseService.duplicateTemplate` esteso con `{int? order}` (default `original.order` se
+      omesso, retrocompatibile con l'uso esistente in `duplicateProgram`).
+- [x] `ProgrammaDetailScreen._aggiungiGiorno` ora apre un bottom sheet con 2 opzioni: "Nuova
+      scheda" (comportamento invariato) o "Scheda esistente" (picker sulle schede standalone,
+      `getStandaloneTemplates()`; alla selezione, `duplicateTemplate(scelta, programId:, order:
+      _giorni.length)` — è una **copia** degli esercizi, non un link condiviso, stessa semantica
+      già usata da `duplicateProgram`, coerente con l'assenza di IsarLinks nel progetto). La
+      scheda standalone originale resta invariata. Se non ci sono schede standalone, uno
+      snackbar lo segnala invece di aprire un picker vuoto.
+- [x] `LeMieSchedeScreen`: i due `IconButton` in AppBar (Nuova scheda / Programma) sostituiti da
+      un unico "+" che apre un bottom sheet a 3 opzioni (Nuova scheda, Nuovo programma, Nuovo
+      esercizio personalizzato — quest'ultimo riusa `AggiungiEsercizioPersonalizzatoScreen` già
+      esistente, prima raggiungibile solo annidata nel catalogo esercizi). Rimossa la stringa
+      `schedeNuovoProgramma`, non più referenziata da nessuna schermata dopo l'unificazione.
+
+> nessun nuovo test temporaneo — cambi di navigazione/UI e un parametro opzionale su un metodo
+> già coperto solo indirettamente (nessun test esistente su `duplicateTemplate`).
+
 ---
 
 ## Considerazioni aperte
