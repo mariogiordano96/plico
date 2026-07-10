@@ -489,21 +489,21 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
               tooltip: l10n.allenamentoAvviaButtonSub,
             ),
             const SizedBox(height: 12),
-          ] else if (_isToday && esercizi.isNotEmpty && esercizi.every(_isDone)) ...[
-            FloatingActionButton.extended(
-              heroTag: 'allenamentoElimina',
-              onPressed: _eliminaGiornata,
-              backgroundColor: p.error,
-              foregroundColor: p.background,
-              icon: const Icon(Icons.delete_sweep_rounded),
-              label: Text(l10n.allenamentoEliminaGiornataTitle,
-                  style: const TextStyle(fontWeight: FontWeight.w700)),
-            ),
-            const SizedBox(height: 12),
           ],
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (_isToday && esercizi.isNotEmpty && esercizi.every(_isDone)) ...[
+                FloatingActionButton(
+                  heroTag: 'allenamentoElimina',
+                  onPressed: _eliminaGiornata,
+                  backgroundColor: p.error,
+                  foregroundColor: p.background,
+                  tooltip: l10n.allenamentoEliminaGiornataTitle,
+                  child: const Icon(Icons.delete_sweep_rounded),
+                ),
+                const SizedBox(width: 12),
+              ],
               FloatingActionButton.extended(
                 heroTag: 'allenamentoNota',
                 onPressed: _editNota,
