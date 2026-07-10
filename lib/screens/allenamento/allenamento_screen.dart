@@ -347,11 +347,12 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
             icon: Icon(Icons.flag_outlined, color: p.accent),
             tooltip: l10n.obiettivoSettimanaleTitle,
           ),
-          IconButton(
-            onPressed: _eliminaGiornata,
-            icon: Icon(Icons.delete_sweep_rounded, color: p.accent),
-            tooltip: l10n.allenamentoEliminaGiornataTitle,
-          ),
+          if (_isToday)
+            IconButton(
+              onPressed: _eliminaGiornata,
+              icon: Icon(Icons.delete_sweep_rounded, color: p.accent),
+              tooltip: l10n.allenamentoEliminaGiornataTitle,
+            ),
         ],
       ),
       body: Column(
