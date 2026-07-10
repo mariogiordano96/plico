@@ -445,9 +445,10 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
           ),
         ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           if (esercizi.isNotEmpty && !esercizi.every(_isDone)) ...[
             FloatingActionButton.extended(
@@ -460,10 +461,11 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
                   style: const TextStyle(fontWeight: FontWeight.w700)),
               tooltip: l10n.allenamentoAvviaButtonSub,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
           ],
           Row(
             mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (esercizi.isNotEmpty) ...[
                 FloatingActionButton(
@@ -474,7 +476,7 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
                   tooltip: l10n.allenamentoEliminaGiornataTitle,
                   child: const Icon(Icons.delete_sweep_rounded),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 20),
               ],
               FloatingActionButton(
                 heroTag: 'allenamentoNota',
@@ -491,7 +493,7 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
                       : Icons.note_add_outlined,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 20),
               FloatingActionButton(
                 heroTag: 'allenamentoAggiungiEsercizio',
                 onPressed: _aggiungiEsercizio,
