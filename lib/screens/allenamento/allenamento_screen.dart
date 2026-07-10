@@ -347,12 +347,6 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
             icon: Icon(Icons.flag_outlined, color: p.accent),
             tooltip: l10n.obiettivoSettimanaleTitle,
           ),
-          if (_isToday)
-            IconButton(
-              onPressed: _eliminaGiornata,
-              icon: Icon(Icons.delete_sweep_rounded, color: p.accent),
-              tooltip: l10n.allenamentoEliminaGiornataTitle,
-            ),
         ],
       ),
       body: Column(
@@ -493,6 +487,17 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
               label: Text(l10n.allenamentoAvviaButton,
                   style: const TextStyle(fontWeight: FontWeight.w700)),
               tooltip: l10n.allenamentoAvviaButtonSub,
+            ),
+            const SizedBox(height: 12),
+          ] else if (_isToday && esercizi.isNotEmpty && esercizi.every(_isDone)) ...[
+            FloatingActionButton.extended(
+              heroTag: 'allenamentoElimina',
+              onPressed: _eliminaGiornata,
+              backgroundColor: p.error,
+              foregroundColor: p.background,
+              icon: const Icon(Icons.delete_sweep_rounded),
+              label: Text(l10n.allenamentoEliminaGiornataTitle,
+                  style: const TextStyle(fontWeight: FontWeight.w700)),
             ),
             const SizedBox(height: 12),
           ],
