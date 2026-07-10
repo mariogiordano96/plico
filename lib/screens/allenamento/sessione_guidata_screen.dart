@@ -459,8 +459,12 @@ class _ExerciseStepCard extends StatelessWidget {
                 const SizedBox(width: 10),
                 IconButton(
                   onPressed: onConfirmCardio,
-                  icon: Icon(Icons.check_circle_rounded,
-                      color: exercise.durationSeconds != null ? p.accent : p.textMuted),
+                  icon: Icon(
+                    exercise.durationSeconds != null
+                        ? Icons.check_circle_rounded
+                        : Icons.check_circle_outline_rounded,
+                    color: exercise.durationSeconds != null ? p.accent : p.textMuted,
+                  ),
                   tooltip: l10n.sessioneGuidataConferma,
                 ),
               ],
@@ -586,7 +590,10 @@ class _SetRow extends StatelessWidget {
           Expanded(child: _NumberField(controller: kg, hint: l10n.serieDialogKgHint, p: p)),
           IconButton(
             onPressed: onConfirm,
-            icon: Icon(Icons.check_circle_rounded, color: done ? p.accent : p.textMuted),
+            icon: Icon(
+              done ? Icons.check_circle_rounded : Icons.check_circle_outline_rounded,
+              color: done ? p.accent : p.textMuted,
+            ),
             tooltip: l10n.sessioneGuidataConferma,
           ),
         ],
