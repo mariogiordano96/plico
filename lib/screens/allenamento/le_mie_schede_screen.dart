@@ -9,7 +9,6 @@ import '../../services/pdf_export_service.dart';
 import '../esercizi/aggiungi_esercizio_personalizzato_screen.dart';
 import 'crea_scheda_screen.dart';
 import 'programma_detail_screen.dart';
-import 'sessione_guidata_screen.dart';
 
 class LeMieSchedeScreen extends StatefulWidget {
   const LeMieSchedeScreen({super.key});
@@ -207,16 +206,13 @@ class _LeMieSchedeScreenState extends State<LeMieSchedeScreen> {
     }
   }
 
+  /// Popola solo il log di oggi con gli esercizi della scheda (target/serie da
+  /// compilare) e torna al tab Allenamento: l'avvio della modalità guidata è
+  /// un'azione separata, dal pulsante "Avvia allenamento" nel log.
   Future<void> _inizia(WorkoutTemplate t) async {
-    final esercizi = await DatabaseService.instance.startWorkoutFromTemplate(t, DateTime.now());
+    await DatabaseService.instance.startWorkoutFromTemplate(t, DateTime.now());
     if (!mounted) return;
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => SessioneGuidataScreen(template: t, exercises: esercizi),
-      ),
-    );
-    _load();
+    Navigator.popUntil(context, (route) => route.isFirst);
   }
 
   PdfStrings _pdfStrings(AppLocalizations l10n) {

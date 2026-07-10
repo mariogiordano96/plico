@@ -161,11 +161,10 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
     );
   }
 
-  /// Log libero: crea l'esercizio scelto dal catalogo e lo fa seguire con la
-  /// stessa sessione guidata delle schede (spunta serie per serie, timer di
-  /// recupero, suggerimento di overload/riscaldamento) invece di un dialog che
-  /// chiede tutte le serie in blocco. Il "template" è puramente in-memory, solo
-  /// per il titolo della schermata: non viene mai salvato come scheda.
+  /// Aggiunge al log del giorno l'esercizio scelto dal catalogo, con target di
+  /// default (3 serie vuote) da compilare più tardi in modalità guidata
+  /// (`_avviaAllenamento`) — creazione e avvio sono due passi separati, vedi
+  /// `_avviaAllenamento`.
   Future<void> _aggiungiEsercizio() async {
     final exercise = await showCatalogoEserciziSheet(context);
     if (exercise == null || !mounted) return;
@@ -177,16 +176,20 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
       ..sets = isCardio ? [] : List.generate(3, (_) => WorkoutSet());
 
     await DatabaseService.instance.addWorkoutExercise(_data, workoutExercise);
-    if (!mounted) return;
+  }
 
+  /// Avvia la modalità guidata su tutti gli esercizi già presenti nel log del
+  /// giorno (aggiunti liberamente o popolati da una scheda/programma con
+  /// "Inizia") — l'unico punto in cui parte la sessione interattiva.
+  Future<void> _avviaAllenamento(List<WorkoutExercise> esercizi) async {
+    final l10n = context.l10n;
     final adHocTemplate = WorkoutTemplate()
-      ..name = workoutExercise.exerciseName
+      ..name = l10n.allenamentoSessioneOggiTitle
       ..createdAt = DateTime.now();
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) =>
-            SessioneGuidataScreen(template: adHocTemplate, exercises: [workoutExercise]),
+        builder: (_) => SessioneGuidataScreen(template: adHocTemplate, exercises: esercizi),
       ),
     );
   }
@@ -306,6 +309,17 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
     final p = context.palette;
     final l10n = context.l10n;
 
+    return StreamBuilder<List<WorkoutExercise>>(
+      stream: DatabaseService.instance.watchWorkoutExercisesForDay(_data),
+      builder: (context, snapshot) {
+        final esercizi = snapshot.data ?? [];
+        return _buildScaffold(context, p, l10n, snapshot.hasData, esercizi);
+      },
+    );
+  }
+
+  Widget _buildScaffold(BuildContext context, ColorPalette p, AppLocalizations l10n,
+      bool hasData, List<WorkoutExercise> esercizi) {
     return Scaffold(
       backgroundColor: p.background,
       appBar: AppBar(
@@ -387,120 +401,132 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
               ),
             ),
           Expanded(
-            child: StreamBuilder<List<WorkoutExercise>>(
-              stream: DatabaseService.instance.watchWorkoutExercisesForDay(_data),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return Center(child: CircularProgressIndicator(color: p.accent));
-                }
-                final esercizi = snapshot.data!;
-                if (esercizi.isEmpty) {
-                  return _EmptyState(onStartFromScheda: _apriSchede, onAdd: _aggiungiEsercizio);
-                }
-                return ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-                  itemCount: esercizi.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 10),
-                  itemBuilder: (context, i) {
-                    final e = esercizi[i];
-                    final isGroupStart = e.supersetGroupId != null &&
-                        (i == 0 || esercizi[i - 1].supersetGroupId != e.supersetGroupId);
-                    final isSourceStart = e.sourceTemplateId != null &&
-                        (i == 0 ||
-                            esercizi[i - 1].sourceTemplateId != e.sourceTemplateId ||
-                            esercizi[i - 1].sourceProgramId != e.sourceProgramId);
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (isSourceStart)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 6),
-                            child: Row(
-                              children: [
-                                Icon(Icons.list_alt_rounded, color: p.textMuted, size: 14),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Text(
-                                    e.sourceProgramName != null
-                                        ? l10n.allenamentoFonteSchedaProgramma(
-                                            e.sourceTemplateName!, e.sourceProgramName!)
-                                        : l10n.allenamentoFonteScheda(e.sourceTemplateName!),
-                                    style: TextStyle(
-                                        color: p.textMuted,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                        letterSpacing: 0.5),
-                                    overflow: TextOverflow.ellipsis,
+            child: !hasData
+                ? Center(child: CircularProgressIndicator(color: p.accent))
+                : esercizi.isEmpty
+                    ? _EmptyState(onStartFromScheda: _apriSchede, onAdd: _aggiungiEsercizio)
+                    : ListView.separated(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                        itemCount: esercizi.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: 10),
+                        itemBuilder: (context, i) {
+                          final e = esercizi[i];
+                          final isGroupStart = e.supersetGroupId != null &&
+                              (i == 0 || esercizi[i - 1].supersetGroupId != e.supersetGroupId);
+                          final isSourceStart = e.sourceTemplateId != null &&
+                              (i == 0 ||
+                                  esercizi[i - 1].sourceTemplateId != e.sourceTemplateId ||
+                                  esercizi[i - 1].sourceProgramId != e.sourceProgramId);
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (isSourceStart)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 6),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.list_alt_rounded, color: p.textMuted, size: 14),
+                                      const SizedBox(width: 6),
+                                      Expanded(
+                                        child: Text(
+                                          e.sourceProgramName != null
+                                              ? l10n.allenamentoFonteSchedaProgramma(
+                                                  e.sourceTemplateName!, e.sourceProgramName!)
+                                              : l10n.allenamentoFonteScheda(e.sourceTemplateName!),
+                                          style: TextStyle(
+                                              color: p.textMuted,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
+                                              letterSpacing: 0.5),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        if (isGroupStart)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 6),
-                            child: Row(
-                              children: [
-                                Icon(Icons.link_rounded, color: p.accent, size: 14),
-                                const SizedBox(width: 6),
-                                Text(l10n.sessioneGuidataSuperset,
-                                    style: TextStyle(
-                                        color: p.accent,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w700,
-                                        letterSpacing: 1)),
-                              ],
-                            ),
-                          ),
-                        _ExerciseCard(
-                          exercise: e,
-                          p: p,
-                          l10n: l10n,
-                          onDelete: () => _elimina(e),
-                          onSostituisci: () => _sostituisci(e),
-                          onModifica: () => _modifica(e),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-            ),
+                              if (isGroupStart)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 6),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.link_rounded, color: p.accent, size: 14),
+                                      const SizedBox(width: 6),
+                                      Text(l10n.sessioneGuidataSuperset,
+                                          style: TextStyle(
+                                              color: p.accent,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w700,
+                                              letterSpacing: 1)),
+                                    ],
+                                  ),
+                                ),
+                              _ExerciseCard(
+                                exercise: e,
+                                p: p,
+                                l10n: l10n,
+                                onDelete: () => _elimina(e),
+                                onSostituisci: () => _sostituisci(e),
+                                onModifica: () => _modifica(e),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
           ),
         ],
       ),
-      floatingActionButton: Row(
+      floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          FloatingActionButton.extended(
-            heroTag: 'allenamentoNota',
-            onPressed: _editNota,
-            backgroundColor: p.surface,
-            foregroundColor: p.accent,
-            elevation: 0,
-            tooltip: l10n.allenamentoNotaTitle,
-            icon: Icon(
-              _nota != null && _nota!.isNotEmpty
-                  ? Icons.edit_note_rounded
-                  : Icons.note_add_outlined,
+          if (esercizi.isNotEmpty) ...[
+            FloatingActionButton.extended(
+              heroTag: 'allenamentoAvvia',
+              onPressed: () => _avviaAllenamento(esercizi),
+              backgroundColor: p.accent,
+              foregroundColor: p.background,
+              icon: const Icon(Icons.play_arrow_rounded),
+              label: Text(l10n.allenamentoAvviaButton,
+                  style: const TextStyle(fontWeight: FontWeight.w700)),
+              tooltip: l10n.allenamentoAvviaButtonSub,
             ),
-            label: Text(
-              _nota != null && _nota!.isNotEmpty
-                  ? l10n.allenamentoModificaNotaButton
-                  : l10n.allenamentoAggiungiNotaButton,
-              style: const TextStyle(fontWeight: FontWeight.w700),
-            ),
-          ),
-          const SizedBox(width: 12),
-          FloatingActionButton.extended(
-            heroTag: 'allenamentoAggiungiEsercizio',
-            onPressed: _aggiungiEsercizio,
-            backgroundColor: p.accent,
-            foregroundColor: p.background,
-            icon: const Icon(Icons.playlist_add_rounded),
-            label: Text(l10n.allenamentoAggiungiEsercizio,
-                style: const TextStyle(fontWeight: FontWeight.w700)),
-            tooltip: l10n.allenamentoAggiungiEsercizioSub,
+            const SizedBox(height: 12),
+          ],
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FloatingActionButton.extended(
+                heroTag: 'allenamentoNota',
+                onPressed: _editNota,
+                backgroundColor: p.surface,
+                foregroundColor: p.accent,
+                elevation: 0,
+                tooltip: l10n.allenamentoNotaTitle,
+                icon: Icon(
+                  _nota != null && _nota!.isNotEmpty
+                      ? Icons.edit_note_rounded
+                      : Icons.note_add_outlined,
+                ),
+                label: Text(
+                  _nota != null && _nota!.isNotEmpty
+                      ? l10n.allenamentoModificaNotaButton
+                      : l10n.allenamentoAggiungiNotaButton,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+              ),
+              const SizedBox(width: 12),
+              FloatingActionButton.extended(
+                heroTag: 'allenamentoAggiungiEsercizio',
+                onPressed: _aggiungiEsercizio,
+                backgroundColor: p.surface,
+                foregroundColor: p.accent,
+                elevation: 0,
+                icon: const Icon(Icons.playlist_add_rounded),
+                label: Text(l10n.allenamentoAggiungiEsercizio,
+                    style: const TextStyle(fontWeight: FontWeight.w700)),
+                tooltip: l10n.allenamentoAggiungiEsercizioSub,
+              ),
+            ],
           ),
         ],
       ),

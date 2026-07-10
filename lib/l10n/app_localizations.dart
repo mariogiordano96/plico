@@ -2582,6 +2582,24 @@ abstract class AppLocalizations {
   /// **'Modifica nota'**
   String get allenamentoModificaNotaButton;
 
+  /// No description provided for @allenamentoAvviaButton.
+  ///
+  /// In it, this message translates to:
+  /// **'Avvia allenamento'**
+  String get allenamentoAvviaButton;
+
+  /// No description provided for @allenamentoAvviaButtonSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Avvia la sessione guidata per gli esercizi di oggi'**
+  String get allenamentoAvviaButtonSub;
+
+  /// No description provided for @allenamentoSessioneOggiTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Allenamento di oggi'**
+  String get allenamentoSessioneOggiTitle;
+
   /// No description provided for @allenamentoSostituisci.
   ///
   /// In it, this message translates to:

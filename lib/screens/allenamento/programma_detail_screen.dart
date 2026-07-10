@@ -6,7 +6,6 @@ import '../../models/workout_template.dart';
 import '../../services/database_service.dart';
 import '../../services/pdf_export_service.dart';
 import 'crea_scheda_screen.dart';
-import 'sessione_guidata_screen.dart';
 
 class ProgrammaDetailScreen extends StatefulWidget {
   final WorkoutProgram program;
@@ -19,7 +18,6 @@ class ProgrammaDetailScreen extends StatefulWidget {
 class _ProgrammaDetailScreenState extends State<ProgrammaDetailScreen> {
   List<WorkoutTemplate> _giorni = [];
   WorkoutTemplate? _suggerito;
-  bool _avviato = false;
 
   @override
   void initState() {
@@ -224,18 +222,13 @@ class _ProgrammaDetailScreenState extends State<ProgrammaDetailScreen> {
     }
   }
 
+  /// Popola solo il log di oggi con gli esercizi del giorno scelto e torna al
+  /// tab Allenamento: l'avvio della modalità guidata è un'azione separata, dal
+  /// pulsante "Avvia allenamento" nel log.
   Future<void> _inizia(WorkoutTemplate giorno) async {
-    final esercizi =
-        await DatabaseService.instance.startWorkoutFromTemplate(giorno, DateTime.now());
+    await DatabaseService.instance.startWorkoutFromTemplate(giorno, DateTime.now());
     if (!mounted) return;
-    setState(() => _avviato = true);
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => SessioneGuidataScreen(template: giorno, exercises: esercizi),
-      ),
-    );
-    _load();
+    Navigator.popUntil(context, (route) => route.isFirst);
   }
 
   @override
@@ -266,16 +259,6 @@ class _ProgrammaDetailScreenState extends State<ProgrammaDetailScreen> {
         child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
         children: [
-          if (_avviato)
-            Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: p.accent.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text('✓', style: TextStyle(color: p.accent)),
-            ),
           if (_giorni.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 40),

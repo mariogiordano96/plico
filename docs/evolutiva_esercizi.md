@@ -1951,6 +1951,34 @@ preset, test manuale su device — vedi nota a inizio sezione)**
 > nessun nuovo test temporaneo — cambi di navigazione/UI e un parametro opzionale su un metodo
 > già coperto solo indirettamente (nessun test esistente su `duplicateTemplate`).
 
+### Fase 23 — Disaccoppiare creazione/pianificazione da avvio della modalità guidata ✅ completata
+- [x] Prima di questa fase, sia il "+" per l'esercizio libero (`AllenamentoScreen`) sia "Inizia"
+      su una scheda/programma aprivano subito `SessioneGuidataScreen`, fondendo in un solo tocco
+      "pianifica cosa fare oggi" ed "esegui in modalità interattiva" — segnalato dall'utente come
+      comportamento da separare: i "+" (scheda/programma/esercizio) devono solo creare/pianificare
+      in termini di serie/ripetizioni/carichi, l'avvio della sessione interattiva deve essere
+      un'azione esplicita nella schermata di log.
+- [x] `AllenamentoScreen._aggiungiEsercizio` ora si limita ad aggiungere l'esercizio al log del
+      giorno (target di default, 3 serie vuote); non apre più la modalità guidata.
+- [x] `LeMieSchedeScreen._inizia`/`ProgrammaDetailScreen._inizia` ora chiamano solo
+      `startWorkoutFromTemplate` (popolano il log di oggi) e tornano al tab Allenamento
+      (`Navigator.popUntil(..., isFirst)`), senza aprire la modalità guidata. Rimosso il campo
+      `_avviato`/l'indicatore "✓" in `ProgrammaDetailScreen`, non più raggiungibile.
+- [x] Nuovo pulsante primario "Avvia allenamento" (FAB esteso, accent) in `AllenamentoScreen`,
+      visibile solo quando il log del giorno non è vuoto: apre `SessioneGuidataScreen` su **tutti**
+      gli esercizi del giorno (inclusi quelli già confermati in precedenza, rivedibili/modificabili
+      in guidata), indipendentemente dal fatto che provengano da una scheda o siano stati aggiunti
+      liberamente. Titolo sessione generico ("Allenamento di oggi", `WorkoutTemplate` in-memory,
+      mai salvato) dato che può aggregare esercizi di provenienza mista.
+  - `AllenamentoScreen.build` ristrutturato: lo `StreamBuilder` su
+    `watchWorkoutExercisesForDay` ora avvolge l'intero `Scaffold` (non solo la lista), così sia il
+    corpo che il FAB "Avvia allenamento" condividono la stessa lista aggiornata.
+  - I pulsanti secondari (nota, "+Esercizio libero") spostati sotto, in stile compatto
+    (`p.surface`, elevazione 0), il colore accent ora è riservato al solo "Avvia allenamento".
+
+> nessun nuovo test temporaneo — cambi interamente di navigazione/UI (nessuna nuova logica di
+> dominio: `startWorkoutFromTemplate`/`addWorkoutExercise` erano già coperti solo indirettamente).
+
 ---
 
 ## Considerazioni aperte

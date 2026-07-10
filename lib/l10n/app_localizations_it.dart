@@ -1384,6 +1384,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get allenamentoModificaNotaButton => 'Modifica nota';
 
   @override
+  String get allenamentoAvviaButton => 'Avvia allenamento';
+
+  @override
+  String get allenamentoAvviaButtonSub =>
+      'Avvia la sessione guidata per gli esercizi di oggi';
+
+  @override
+  String get allenamentoSessioneOggiTitle => 'Allenamento di oggi';
+
+  @override
   String get allenamentoSostituisci => 'Sostituisci';
 
   @override
