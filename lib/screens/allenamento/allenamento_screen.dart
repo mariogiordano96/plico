@@ -316,16 +316,6 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: _editNota,
-            icon: Icon(
-              _nota != null && _nota!.isNotEmpty
-                  ? Icons.edit_note_rounded
-                  : Icons.note_add_outlined,
-              color: p.accent,
-            ),
-            tooltip: l10n.allenamentoNotaTitle,
-          ),
-          IconButton(
             onPressed: () => showRestTimerSettingsDialog(context),
             icon: Icon(Icons.timer_outlined, color: p.accent),
             tooltip: l10n.restTimerSettingsTitle,
@@ -479,14 +469,34 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _aggiungiEsercizio,
-        backgroundColor: p.accent,
-        foregroundColor: p.background,
-        icon: const Icon(Icons.playlist_add_rounded),
-        label: Text(l10n.allenamentoAggiungiEsercizio,
-            style: const TextStyle(fontWeight: FontWeight.w700)),
-        tooltip: l10n.allenamentoAggiungiEsercizioSub,
+      floatingActionButton: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton(
+            heroTag: 'allenamentoNota',
+            onPressed: _editNota,
+            backgroundColor: p.surface,
+            foregroundColor: p.accent,
+            elevation: 0,
+            tooltip: l10n.allenamentoNotaTitle,
+            child: Icon(
+              _nota != null && _nota!.isNotEmpty
+                  ? Icons.edit_note_rounded
+                  : Icons.note_add_outlined,
+            ),
+          ),
+          const SizedBox(width: 12),
+          FloatingActionButton.extended(
+            heroTag: 'allenamentoAggiungiEsercizio',
+            onPressed: _aggiungiEsercizio,
+            backgroundColor: p.accent,
+            foregroundColor: p.background,
+            icon: const Icon(Icons.playlist_add_rounded),
+            label: Text(l10n.allenamentoAggiungiEsercizio,
+                style: const TextStyle(fontWeight: FontWeight.w700)),
+            tooltip: l10n.allenamentoAggiungiEsercizioSub,
+          ),
+        ],
       ),
     );
   }
