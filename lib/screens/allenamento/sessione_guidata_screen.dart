@@ -88,13 +88,18 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
       final history =
           (await db.getHistoryForExercise(e.exerciseId)).where((h) => h.id != e.id).toList();
       _priorHistoryByExerciseId[e.exerciseId] = history;
+      // Se la prima serie è già confermata (esercizio rivisto con "Avvia
+      // allenamento" dopo essere stato davvero completato), non sovrascriverla
+      // con un suggerimento/target: mostrerebbe uno spunta piena ma con un
+      // valore diverso da quello confermato dall'utente.
+      final firstConfirmed = e.sets.isNotEmpty && e.sets.first.confirmed;
       if (history.isNotEmpty) {
         final lastSession = history.first;
         final suggestion = WorkoutProgressService.needsDeload(history)
             ? WorkoutProgressService.deloadSuggestion(lastSession)
             : WorkoutProgressService.suggestNextSession(lastSession);
         _suggestionById[e.id] = suggestion;
-        if (e.sets.isNotEmpty) {
+        if (e.sets.isNotEmpty && !firstConfirmed) {
           if (suggestion.suggestedReps != null) e.sets.first.reps = suggestion.suggestedReps;
           if (suggestion.suggestedWeightKg != null) {
             e.sets.first.weightKg = suggestion.suggestedWeightKg;
@@ -103,7 +108,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
       }
 
       final targetWeightKg = e.sets.isNotEmpty ? e.sets.first.weightKg : null;
-      if (targetWeightKg != null && !e.sets.any((s) => s.isWarmup)) {
+      if (targetWeightKg != null && !firstConfirmed && !e.sets.any((s) => s.isWarmup)) {
         final warmup = WorkoutProgressService.suggestWarmupSets(targetWeightKg);
         if (warmup.isNotEmpty) e.sets.insertAll(0, warmup);
       }
@@ -174,7 +179,8 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     final kg = double.tryParse(_kgCtrls[e.id]![setIndex].text.replaceAll(',', '.'));
     e.sets[setIndex]
       ..reps = reps
-      ..weightKg = kg;
+      ..weightKg = kg
+      ..confirmed = true;
     e.estimatedKcal = CalorieEstimationService.estimateStrengthKcal(
       workingSetCount: e.sets.where((s) => !s.isWarmup).length,
       bodyWeightKg: _bodyWeightKg,
@@ -191,6 +197,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     final minuti = int.tryParse(_durataCtrls[e.id]!.text);
     if (minuti == null || minuti <= 0) return;
     e.durationSeconds = minuti * 60;
+    e.cardioConfirmed = true;
     e.estimatedKcal = CalorieEstimationService.estimateCardioKcal(
       exerciseId: e.exerciseId,
       durationSeconds: e.durationSeconds!,
@@ -466,10 +473,10 @@ class _ExerciseStepCard extends StatelessWidget {
                 IconButton(
                   onPressed: onConfirmCardio,
                   icon: Icon(
-                    exercise.durationSeconds != null
+                    exercise.cardioConfirmed
                         ? Icons.check_circle_rounded
                         : Icons.check_circle_outline_rounded,
-                    color: exercise.durationSeconds != null ? p.accent : p.textMuted,
+                    color: exercise.cardioConfirmed ? p.accent : p.textMuted,
                   ),
                   tooltip: l10n.sessioneGuidataConferma,
                 ),
@@ -500,7 +507,7 @@ class _ExerciseStepCard extends StatelessWidget {
                   label: l10n.sessioneGuidataRiscaldamentoSerieLabel(w + 1),
                   reps: repsCtrls![_warmupIndices[w]],
                   kg: kgCtrls![_warmupIndices[w]],
-                  done: exercise.sets[_warmupIndices[w]].reps != null,
+                  done: exercise.sets[_warmupIndices[w]].confirmed,
                   onConfirm: () => onConfirmSerie(_warmupIndices[w]),
                   p: p,
                 ),
@@ -513,7 +520,7 @@ class _ExerciseStepCard extends StatelessWidget {
                 label: l10n.serieDialogSerieLabel(i + 1),
                 reps: repsCtrls![_workIndices[i]],
                 kg: kgCtrls![_workIndices[i]],
-                done: exercise.sets[_workIndices[i]].reps != null,
+                done: exercise.sets[_workIndices[i]].confirmed,
                 onConfirm: () => onConfirmSerie(_workIndices[i]),
                 p: p,
               ),

@@ -13,23 +13,28 @@ const WorkoutSetSchema = Schema(
   name: r'WorkoutSet',
   id: -5974587475565306185,
   properties: {
-    r'isWarmup': PropertySchema(
+    r'confirmed': PropertySchema(
       id: 0,
+      name: r'confirmed',
+      type: IsarType.bool,
+    ),
+    r'isWarmup': PropertySchema(
+      id: 1,
       name: r'isWarmup',
       type: IsarType.bool,
     ),
     r'reps': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'reps',
       type: IsarType.long,
     ),
     r'rpe': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'rpe',
       type: IsarType.long,
     ),
     r'weightKg': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'weightKg',
       type: IsarType.double,
     )
@@ -55,10 +60,11 @@ void _workoutSetSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeBool(offsets[0], object.isWarmup);
-  writer.writeLong(offsets[1], object.reps);
-  writer.writeLong(offsets[2], object.rpe);
-  writer.writeDouble(offsets[3], object.weightKg);
+  writer.writeBool(offsets[0], object.confirmed);
+  writer.writeBool(offsets[1], object.isWarmup);
+  writer.writeLong(offsets[2], object.reps);
+  writer.writeLong(offsets[3], object.rpe);
+  writer.writeDouble(offsets[4], object.weightKg);
 }
 
 WorkoutSet _workoutSetDeserialize(
@@ -68,10 +74,11 @@ WorkoutSet _workoutSetDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = WorkoutSet();
-  object.isWarmup = reader.readBool(offsets[0]);
-  object.reps = reader.readLongOrNull(offsets[1]);
-  object.rpe = reader.readLongOrNull(offsets[2]);
-  object.weightKg = reader.readDoubleOrNull(offsets[3]);
+  object.confirmed = reader.readBool(offsets[0]);
+  object.isWarmup = reader.readBool(offsets[1]);
+  object.reps = reader.readLongOrNull(offsets[2]);
+  object.rpe = reader.readLongOrNull(offsets[3]);
+  object.weightKg = reader.readDoubleOrNull(offsets[4]);
   return object;
 }
 
@@ -85,10 +92,12 @@ P _workoutSetDeserializeProp<P>(
     case 0:
       return (reader.readBool(offset)) as P;
     case 1:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 2:
       return (reader.readLongOrNull(offset)) as P;
     case 3:
+      return (reader.readLongOrNull(offset)) as P;
+    case 4:
       return (reader.readDoubleOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -97,6 +106,16 @@ P _workoutSetDeserializeProp<P>(
 
 extension WorkoutSetQueryFilter
     on QueryBuilder<WorkoutSet, WorkoutSet, QFilterCondition> {
+  QueryBuilder<WorkoutSet, WorkoutSet, QAfterFilterCondition> confirmedEqualTo(
+      bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'confirmed',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<WorkoutSet, WorkoutSet, QAfterFilterCondition> isWarmupEqualTo(
       bool value) {
     return QueryBuilder.apply(this, (query) {

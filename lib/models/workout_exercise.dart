@@ -20,6 +20,10 @@ class WorkoutExercise {
   // Per cardio
   int? durationSeconds;
   int? met; // valore MET usato per la stima (Fase 5)
+  // Fase 23: true solo quando l'utente conferma esplicitamente in modalità
+  // guidata — durationSeconds può già essere valorizzato prima (target della
+  // scheda) senza che l'esercizio sia stato davvero eseguito.
+  bool cardioConfirmed = false;
 
   // Per strength — embedded, non IsarLinks: WorkoutSet non ha bisogno di query indipendenti
   List<WorkoutSet> sets = [];

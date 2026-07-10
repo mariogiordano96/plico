@@ -17,69 +17,74 @@ const WorkoutExerciseSchema = CollectionSchema(
   name: r'WorkoutExercise',
   id: 9115529306380274138,
   properties: {
-    r'date': PropertySchema(
+    r'cardioConfirmed': PropertySchema(
       id: 0,
+      name: r'cardioConfirmed',
+      type: IsarType.bool,
+    ),
+    r'date': PropertySchema(
+      id: 1,
       name: r'date',
       type: IsarType.dateTime,
     ),
     r'durationSeconds': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'durationSeconds',
       type: IsarType.long,
     ),
     r'estimatedKcal': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'estimatedKcal',
       type: IsarType.long,
     ),
     r'exerciseId': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'exerciseId',
       type: IsarType.string,
     ),
     r'exerciseName': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'exerciseName',
       type: IsarType.string,
     ),
     r'met': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'met',
       type: IsarType.long,
     ),
     r'restSeconds': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'restSeconds',
       type: IsarType.long,
     ),
     r'sets': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'sets',
       type: IsarType.objectList,
       target: r'WorkoutSet',
     ),
     r'sourceProgramId': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'sourceProgramId',
       type: IsarType.long,
     ),
     r'sourceProgramName': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'sourceProgramName',
       type: IsarType.string,
     ),
     r'sourceTemplateId': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'sourceTemplateId',
       type: IsarType.long,
     ),
     r'sourceTemplateName': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'sourceTemplateName',
       type: IsarType.string,
     ),
     r'supersetGroupId': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'supersetGroupId',
       type: IsarType.long,
     )
@@ -162,24 +167,25 @@ void _workoutExerciseSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeDateTime(offsets[0], object.date);
-  writer.writeLong(offsets[1], object.durationSeconds);
-  writer.writeLong(offsets[2], object.estimatedKcal);
-  writer.writeString(offsets[3], object.exerciseId);
-  writer.writeString(offsets[4], object.exerciseName);
-  writer.writeLong(offsets[5], object.met);
-  writer.writeLong(offsets[6], object.restSeconds);
+  writer.writeBool(offsets[0], object.cardioConfirmed);
+  writer.writeDateTime(offsets[1], object.date);
+  writer.writeLong(offsets[2], object.durationSeconds);
+  writer.writeLong(offsets[3], object.estimatedKcal);
+  writer.writeString(offsets[4], object.exerciseId);
+  writer.writeString(offsets[5], object.exerciseName);
+  writer.writeLong(offsets[6], object.met);
+  writer.writeLong(offsets[7], object.restSeconds);
   writer.writeObjectList<WorkoutSet>(
-    offsets[7],
+    offsets[8],
     allOffsets,
     WorkoutSetSchema.serialize,
     object.sets,
   );
-  writer.writeLong(offsets[8], object.sourceProgramId);
-  writer.writeString(offsets[9], object.sourceProgramName);
-  writer.writeLong(offsets[10], object.sourceTemplateId);
-  writer.writeString(offsets[11], object.sourceTemplateName);
-  writer.writeLong(offsets[12], object.supersetGroupId);
+  writer.writeLong(offsets[9], object.sourceProgramId);
+  writer.writeString(offsets[10], object.sourceProgramName);
+  writer.writeLong(offsets[11], object.sourceTemplateId);
+  writer.writeString(offsets[12], object.sourceTemplateName);
+  writer.writeLong(offsets[13], object.supersetGroupId);
 }
 
 WorkoutExercise _workoutExerciseDeserialize(
@@ -189,26 +195,27 @@ WorkoutExercise _workoutExerciseDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = WorkoutExercise();
-  object.date = reader.readDateTime(offsets[0]);
-  object.durationSeconds = reader.readLongOrNull(offsets[1]);
-  object.estimatedKcal = reader.readLongOrNull(offsets[2]);
-  object.exerciseId = reader.readString(offsets[3]);
-  object.exerciseName = reader.readString(offsets[4]);
+  object.cardioConfirmed = reader.readBool(offsets[0]);
+  object.date = reader.readDateTime(offsets[1]);
+  object.durationSeconds = reader.readLongOrNull(offsets[2]);
+  object.estimatedKcal = reader.readLongOrNull(offsets[3]);
+  object.exerciseId = reader.readString(offsets[4]);
+  object.exerciseName = reader.readString(offsets[5]);
   object.id = id;
-  object.met = reader.readLongOrNull(offsets[5]);
-  object.restSeconds = reader.readLongOrNull(offsets[6]);
+  object.met = reader.readLongOrNull(offsets[6]);
+  object.restSeconds = reader.readLongOrNull(offsets[7]);
   object.sets = reader.readObjectList<WorkoutSet>(
-        offsets[7],
+        offsets[8],
         WorkoutSetSchema.deserialize,
         allOffsets,
         WorkoutSet(),
       ) ??
       [];
-  object.sourceProgramId = reader.readLongOrNull(offsets[8]);
-  object.sourceProgramName = reader.readStringOrNull(offsets[9]);
-  object.sourceTemplateId = reader.readLongOrNull(offsets[10]);
-  object.sourceTemplateName = reader.readStringOrNull(offsets[11]);
-  object.supersetGroupId = reader.readLongOrNull(offsets[12]);
+  object.sourceProgramId = reader.readLongOrNull(offsets[9]);
+  object.sourceProgramName = reader.readStringOrNull(offsets[10]);
+  object.sourceTemplateId = reader.readLongOrNull(offsets[11]);
+  object.sourceTemplateName = reader.readStringOrNull(offsets[12]);
+  object.supersetGroupId = reader.readLongOrNull(offsets[13]);
   return object;
 }
 
@@ -220,20 +227,22 @@ P _workoutExerciseDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 1:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readDateTime(offset)) as P;
     case 2:
       return (reader.readLongOrNull(offset)) as P;
     case 3:
-      return (reader.readString(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 4:
       return (reader.readString(offset)) as P;
     case 5:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 6:
       return (reader.readLongOrNull(offset)) as P;
     case 7:
+      return (reader.readLongOrNull(offset)) as P;
+    case 8:
       return (reader.readObjectList<WorkoutSet>(
             offset,
             WorkoutSetSchema.deserialize,
@@ -241,15 +250,15 @@ P _workoutExerciseDeserializeProp<P>(
             WorkoutSet(),
           ) ??
           []) as P;
-    case 8:
-      return (reader.readLongOrNull(offset)) as P;
     case 9:
-      return (reader.readStringOrNull(offset)) as P;
-    case 10:
       return (reader.readLongOrNull(offset)) as P;
-    case 11:
+    case 10:
       return (reader.readStringOrNull(offset)) as P;
+    case 11:
+      return (reader.readLongOrNull(offset)) as P;
     case 12:
+      return (reader.readStringOrNull(offset)) as P;
+    case 13:
       return (reader.readLongOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -600,6 +609,16 @@ extension WorkoutExerciseQueryWhere
 
 extension WorkoutExerciseQueryFilter
     on QueryBuilder<WorkoutExercise, WorkoutExercise, QFilterCondition> {
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      cardioConfirmedEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'cardioConfirmed',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
       dateEqualTo(DateTime value) {
     return QueryBuilder.apply(this, (query) {
@@ -1915,6 +1934,20 @@ extension WorkoutExerciseQueryLinks
 
 extension WorkoutExerciseQuerySortBy
     on QueryBuilder<WorkoutExercise, WorkoutExercise, QSortBy> {
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      sortByCardioConfirmed() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'cardioConfirmed', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      sortByCardioConfirmedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'cardioConfirmed', Sort.desc);
+    });
+  }
+
   QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy> sortByDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'date', Sort.asc);
@@ -2083,6 +2116,20 @@ extension WorkoutExerciseQuerySortBy
 
 extension WorkoutExerciseQuerySortThenBy
     on QueryBuilder<WorkoutExercise, WorkoutExercise, QSortThenBy> {
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      thenByCardioConfirmed() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'cardioConfirmed', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      thenByCardioConfirmedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'cardioConfirmed', Sort.desc);
+    });
+  }
+
   QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy> thenByDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'date', Sort.asc);
@@ -2263,6 +2310,13 @@ extension WorkoutExerciseQuerySortThenBy
 
 extension WorkoutExerciseQueryWhereDistinct
     on QueryBuilder<WorkoutExercise, WorkoutExercise, QDistinct> {
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QDistinct>
+      distinctByCardioConfirmed() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'cardioConfirmed');
+    });
+  }
+
   QueryBuilder<WorkoutExercise, WorkoutExercise, QDistinct> distinctByDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'date');
@@ -2353,6 +2407,13 @@ extension WorkoutExerciseQueryProperty
   QueryBuilder<WorkoutExercise, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, bool, QQueryOperations>
+      cardioConfirmedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'cardioConfirmed');
     });
   }
 

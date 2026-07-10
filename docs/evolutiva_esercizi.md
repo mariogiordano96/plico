@@ -1979,6 +1979,28 @@ preset, test manuale su device — vedi nota a inizio sezione)**
 > nessun nuovo test temporaneo — cambi interamente di navigazione/UI (nessuna nuova logica di
 > dominio: `startWorkoutFromTemplate`/`addWorkoutExercise` erano già coperti solo indirettamente).
 
+### Fase 24 — Fix: serie/esercizi risultavano già confermati in modalità guidata ✅ completata
+- [x] Due bug scoperti avviando "Avvia allenamento" (Fase 23) su esercizi già persistiti:
+  - Crash `Unsupported operation: Cannot add to a fixed-length list` — le liste embedded
+    (`WorkoutExercise.sets`) lette da Isar sono a lunghezza fissa; `insertAll` (riscaldamento) e
+    `add` (nuova serie) andavano in eccezione non gestita non appena gli esercizi arrivavano dal
+    log già popolato invece che da un oggetto appena creato in memoria (vecchio flusso "Inizia"
+    diretto, mai esposto al bug). Fix: `e.sets = List.of(e.sets, growable: true)` a inizio
+    `_prepare`.
+  - Spunte già "flaggate" all'apertura della modalità guidata: `done` era calcolato da
+    `reps != null`/`durationSeconds != null`, ma quei campi vengono pre-valorizzati con i target
+    della scheda (`startWorkoutFromTemplate`) o col suggerimento di progressive overload,
+    **prima** che l'utente confermi davvero la serie — quindi con target definiti la spunta
+    risultava piena da subito. Fix: nuovo campo persistito `WorkoutSet.confirmed` /
+    `WorkoutExercise.cardioConfirmed`, `true` solo quando l'utente preme la spunta
+    (`_confirmSerie`/`_confirmCardio`); `_SetRow.done` e l'icona cardio ora leggono questo campo
+    invece dei valori. Il suggerimento di progressive overload e l'inserimento del riscaldamento
+    ora non sovrascrivono più la prima serie se già `confirmed` (caso: si rivede in guidata un
+    esercizio già completato in una sessione precedente lo stesso giorno).
+
+> nessun nuovo test temporaneo — fix rilevati da crash reali (log runtime), coperti da verifica
+> manuale end-to-end (stesso giudizio delle fasi precedenti sulla modalità guidata).
+
 ---
 
 ## Considerazioni aperte
