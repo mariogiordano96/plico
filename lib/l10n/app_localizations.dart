@@ -3071,7 +3071,7 @@ abstract class AppLocalizations {
   /// No description provided for @sessioneGuidataTermina.
   ///
   /// In it, this message translates to:
-  /// **'Termina'**
+  /// **'Termina sessione'**
   String get sessioneGuidataTermina;
 
   /// No description provided for @sessioneGuidataConferma.

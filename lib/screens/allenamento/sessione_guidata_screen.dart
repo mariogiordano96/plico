@@ -174,6 +174,21 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     return step.length <= 1 || identical(step.last, e);
   }
 
+  bool _isExerciseDone(WorkoutExercise e) =>
+      e.sets.isEmpty ? e.cardioConfirmed : e.sets.every((s) => s.confirmed);
+
+  /// Avanza automaticamente allo step successivo quando tutti gli esercizi
+  /// dello step corrente sono stati confermati. Sull'ultimo step non fa
+  /// nulla: la fine sessione resta un'azione esplicita (pulsante "Termina
+  /// sessione", già mostrato da `_next`/`build` quando non ci sono più step).
+  void _maybeAdvanceStep() {
+    if (!mounted) return;
+    if (_stepIndex >= _steps.length - 1) return;
+    if (_steps[_stepIndex].every(_isExerciseDone)) {
+      setState(() => _stepIndex++);
+    }
+  }
+
   Future<void> _confirmSerie(WorkoutExercise e, int setIndex) async {
     final reps = int.tryParse(_repsCtrls[e.id]![setIndex].text);
     final kg = double.tryParse(_kgCtrls[e.id]![setIndex].text.replaceAll(',', '.'));
@@ -191,6 +206,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     if (_isLastInStep(e)) {
       await showRestTimerSheet(context, seconds: e.restSeconds ?? _defaultRestSeconds);
     }
+    _maybeAdvanceStep();
   }
 
   Future<void> _confirmCardio(WorkoutExercise e) async {
@@ -209,6 +225,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     if ((e.restSeconds ?? 0) > 0 && _isLastInStep(e)) {
       await showRestTimerSheet(context, seconds: e.restSeconds!);
     }
+    _maybeAdvanceStep();
   }
 
   Future<void> _sostituisci(WorkoutExercise e) async {

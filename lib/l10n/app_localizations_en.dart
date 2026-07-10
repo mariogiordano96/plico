@@ -1663,7 +1663,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sessioneGuidataSuccessivo => 'Next';
 
   @override
-  String get sessioneGuidataTermina => 'Finish';
+  String get sessioneGuidataTermina => 'Finish session';
 
   @override
   String get sessioneGuidataConferma => 'Confirm set';

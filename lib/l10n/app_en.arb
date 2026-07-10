@@ -543,7 +543,7 @@
   "sessioneGuidataProgress": "Exercise {current}/{total}",
   "sessioneGuidataPrecedente": "Previous",
   "sessioneGuidataSuccessivo": "Next",
-  "sessioneGuidataTermina": "Finish",
+  "sessioneGuidataTermina": "Finish session",
   "sessioneGuidataConferma": "Confirm set",
   "sessioneGuidataSuperset": "SUPERSET",
   "sessioneGuidataRiscaldamento": "WARM-UP",

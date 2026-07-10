@@ -2001,6 +2001,25 @@ preset, test manuale su device — vedi nota a inizio sezione)**
 > nessun nuovo test temporaneo — fix rilevati da crash reali (log runtime), coperti da verifica
 > manuale end-to-end (stesso giudizio delle fasi precedenti sulla modalità guidata).
 
+### Fase 25 — Avanzamento automatico di step in modalità guidata ✅ completata
+- [x] In precedenza il passaggio allo step successivo era sempre manuale (pulsante
+      "Successivo"/"Termina" in fondo), anche a step completamente confermato — segnalato
+      dall'utente: quando tutti gli esercizi di uno step sono flaggati si deve passare da soli al
+      successivo, e sull'ultimo deve comparire un pulsante esplicito per terminare la sessione.
+- [x] Nuovo `_isExerciseDone` (cardio → `cardioConfirmed`, forza → tutte le serie `confirmed`) e
+      `_maybeAdvanceStep`, chiamato a fine `_confirmSerie`/`_confirmCardio` (dopo l'eventuale
+      timer di recupero): se tutti gli esercizi dello step corrente sono `_isExerciseDone`, avanza
+      automaticamente (`_stepIndex++`). Sull'ultimo step non fa nulla: terminare resta un'azione
+      esplicita, il pulsante in fondo (già presente) mostra "Termina sessione" quando non ci sono
+      più step — stringa `sessioneGuidataTermina` resa più esplicita ("Termina" → "Termina
+      sessione" / "Finish" → "Finish session").
+- [x] Il pulsante manuale "Successivo"/"Termina sessione" resta comunque sempre disponibile
+      (nessun blocco): permette di saltare avanti volontariamente anche a step incompleto, es. se
+      l'utente decide di abbreviare un esercizio.
+
+> nessun nuovo test temporaneo — logica di navigazione step legata allo stato UI (`_steps`/
+> `_stepIndex`), stesso giudizio delle fasi precedenti sulla modalità guidata.
+
 ---
 
 ## Considerazioni aperte

@@ -1671,7 +1671,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get sessioneGuidataSuccessivo => 'Successivo';
 
   @override
-  String get sessioneGuidataTermina => 'Termina';
+  String get sessioneGuidataTermina => 'Termina sessione';
 
   @override
   String get sessioneGuidataConferma => 'Conferma serie';
