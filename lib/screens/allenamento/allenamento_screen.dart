@@ -404,7 +404,12 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
                 : esercizi.isEmpty
                     ? _EmptyState(onStartFromScheda: _apriSchede, onAdd: _aggiungiEsercizio)
                     : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                        // Spazio extra in fondo quando è presente anche il
+                        // pulsante "Avvia allenamento"/elimina sopra la riga
+                        // nota/esercizio libero, altrimenti l'ultima card
+                        // finisce sotto il FAB.
+                        padding: EdgeInsets.fromLTRB(
+                            16, 16, 16, esercizi.isNotEmpty && !esercizi.every(_isDone) ? 170 : 100),
                         itemCount: esercizi.length,
                         separatorBuilder: (_, _) => const SizedBox(height: 10),
                         itemBuilder: (context, i) {
