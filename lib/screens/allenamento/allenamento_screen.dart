@@ -446,66 +446,119 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          if (esercizi.isNotEmpty && !esercizi.every(_isDone)) ...[
-            FloatingActionButton.extended(
-              heroTag: 'allenamentoAvvia',
-              onPressed: () => _avviaAllenamento(esercizi),
-              backgroundColor: p.accent,
-              foregroundColor: p.background,
-              icon: const Icon(Icons.play_arrow_rounded),
-              label: Text(l10n.allenamentoAvviaButton,
-                  style: const TextStyle(fontWeight: FontWeight.w700)),
-              tooltip: l10n.allenamentoAvviaButtonSub,
-            ),
-            const SizedBox(height: 14),
-          ],
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (esercizi.isNotEmpty) ...[
-                FloatingActionButton(
-                  heroTag: 'allenamentoElimina',
-                  onPressed: _eliminaGiornata,
-                  backgroundColor: p.error,
+      floatingActionButton: SizedBox(
+        width: MediaQuery.of(context).size.width - 32,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (esercizi.isNotEmpty && !esercizi.every(_isDone)) ...[
+              SizedBox(
+                width: double.infinity,
+                child: FloatingActionButton.extended(
+                  heroTag: 'allenamentoAvvia',
+                  onPressed: () => _avviaAllenamento(esercizi),
+                  backgroundColor: p.accent,
                   foregroundColor: p.background,
-                  tooltip: l10n.allenamentoEliminaGiornataTitle,
-                  child: const Icon(Icons.delete_sweep_rounded),
-                ),
-                const SizedBox(width: 20),
-              ],
-              FloatingActionButton(
-                heroTag: 'allenamentoNota',
-                onPressed: _editNota,
-                backgroundColor: p.surface,
-                foregroundColor: p.accent,
-                elevation: 0,
-                tooltip: _nota != null && _nota!.isNotEmpty
-                    ? l10n.allenamentoModificaNotaButton
-                    : l10n.allenamentoAggiungiNotaButton,
-                child: Icon(
-                  _nota != null && _nota!.isNotEmpty
-                      ? Icons.edit_note_rounded
-                      : Icons.note_add_outlined,
+                  icon: const Icon(Icons.play_arrow_rounded),
+                  label: Text(l10n.allenamentoAvviaButton,
+                      style: const TextStyle(fontWeight: FontWeight.w700)),
+                  tooltip: l10n.allenamentoAvviaButtonSub,
                 ),
               ),
-              const SizedBox(width: 20),
-              FloatingActionButton(
-                heroTag: 'allenamentoAggiungiEsercizio',
-                onPressed: _aggiungiEsercizio,
-                backgroundColor: p.surface,
-                foregroundColor: p.accent,
-                elevation: 0,
-                tooltip: l10n.allenamentoAggiungiEsercizioSub,
-                child: const Icon(Icons.playlist_add_rounded),
+              const SizedBox(height: 14),
+            ],
+            Row(
+              children: [
+                if (esercizi.isNotEmpty) ...[
+                  Expanded(
+                    child: _FlexActionButton(
+                      icon: Icons.delete_sweep_rounded,
+                      label: l10n.allenamentoEliminaGiornataTitle,
+                      onPressed: _eliminaGiornata,
+                      background: p.error,
+                      foreground: p.background,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                ],
+                Expanded(
+                  child: _FlexActionButton(
+                    icon: _nota != null && _nota!.isNotEmpty
+                        ? Icons.edit_note_rounded
+                        : Icons.note_add_outlined,
+                    label: _nota != null && _nota!.isNotEmpty
+                        ? l10n.allenamentoModificaNotaButton
+                        : l10n.allenamentoAggiungiNotaButton,
+                    onPressed: _editNota,
+                    background: p.surface,
+                    foreground: p.accent,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _FlexActionButton(
+                    icon: Icons.playlist_add_rounded,
+                    label: l10n.allenamentoAggiungiEsercizio,
+                    onPressed: _aggiungiEsercizio,
+                    background: p.surface,
+                    foreground: p.accent,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Pulsante FAB-style dentro un `Expanded`: l'etichetta si tronca con
+/// ellipsis invece di andare in overflow, così più bottoni in riga si
+/// autoadattano sempre su una sola riga qualunque sia la larghezza dello
+/// schermo (invece di forzare icone senza testo).
+class _FlexActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+  final Color background;
+  final Color foreground;
+
+  const _FlexActionButton({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+    required this.background,
+    required this.foreground,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: background,
+      elevation: 2,
+      borderRadius: BorderRadius.circular(28),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(28),
+        onTap: onPressed,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: foreground, size: 20),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: foreground, fontWeight: FontWeight.w700),
+                ),
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
