@@ -25,4 +25,13 @@ class WorkoutExercise {
   List<WorkoutSet> sets = [];
 
   int? estimatedKcal; // calcolato e persistito al salvataggio (Fase 5)
+
+  // Fase 21: tracciabilità della scheda/programma di provenienza, valorizzati solo
+  // quando l'esercizio nasce da startWorkoutFromTemplate (null per il log libero).
+  // Snapshot (non solo l'id) così il riferimento resta leggibile anche se la scheda
+  // o il programma vengono rinominati o eliminati in seguito.
+  int? sourceTemplateId;
+  String? sourceTemplateName;
+  int? sourceProgramId;
+  String? sourceProgramName;
 }

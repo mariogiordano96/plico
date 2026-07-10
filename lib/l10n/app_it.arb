@@ -553,6 +553,12 @@
   "allenamentoIniziaDaScheda": "Inizia da una scheda",
   "allenamentoAggiungiEsercizio": "Esercizio libero",
   "allenamentoAggiungiEsercizioSub": "Segui un singolo esercizio al volo, senza crearti una scheda",
+  "allenamentoFonteScheda": "{scheda}",
+  "@allenamentoFonteScheda": { "placeholders": { "scheda": { "type": "String" } } },
+  "allenamentoFonteSchedaProgramma": "{scheda} · {programma}",
+  "@allenamentoFonteSchedaProgramma": {
+    "placeholders": { "scheda": { "type": "String" }, "programma": { "type": "String" } }
+  },
   "allenamentoSerieCount": "{n} serie",
   "@allenamentoSerieCount": {
     "placeholders": { "n": { "type": "int" } }

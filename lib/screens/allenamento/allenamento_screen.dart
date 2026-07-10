@@ -415,9 +415,37 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
                     final e = esercizi[i];
                     final isGroupStart = e.supersetGroupId != null &&
                         (i == 0 || esercizi[i - 1].supersetGroupId != e.supersetGroupId);
+                    final isSourceStart = e.sourceTemplateId != null &&
+                        (i == 0 ||
+                            esercizi[i - 1].sourceTemplateId != e.sourceTemplateId ||
+                            esercizi[i - 1].sourceProgramId != e.sourceProgramId);
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        if (isSourceStart)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 6),
+                            child: Row(
+                              children: [
+                                Icon(Icons.list_alt_rounded, color: p.textMuted, size: 14),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    e.sourceProgramName != null
+                                        ? l10n.allenamentoFonteSchedaProgramma(
+                                            e.sourceTemplateName!, e.sourceProgramName!)
+                                        : l10n.allenamentoFonteScheda(e.sourceTemplateName!),
+                                    style: TextStyle(
+                                        color: p.textMuted,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 0.5),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         if (isGroupStart)
                           Padding(
                             padding: const EdgeInsets.only(bottom: 6),

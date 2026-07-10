@@ -1905,6 +1905,31 @@ preset, test manuale su device — vedi nota a inizio sezione)**
 
 ---
 
+### Fase 21 — Tracciabilità scheda/programma nel log ✅ completata
+- [x] Il legame Programma → Scheda → Esercizi esisteva già nel modello (`WorkoutTemplate.programId`,
+      `WorkoutTemplateExercise` embedded), ma si perdeva non appena una scheda veniva **eseguita**:
+      `startWorkoutFromTemplate` copiava gli esercizi come `WorkoutExercise` semplici nel log del
+      giorno, indistinguibili da quelli aggiunti liberamente — segnalato dall'utente come UI
+      "confusionaria" nel tab Allenamento.
+- [x] Aggiunti 4 campi nullable a `WorkoutExercise` (denormalizzati/snapshot, stesso pattern di
+      `WorkoutTemplateExercise.exerciseName`): `sourceTemplateId`, `sourceTemplateName`,
+      `sourceProgramId`, `sourceProgramName` — restano leggibili anche se la scheda/il programma
+      di origine vengono rinominati o eliminati in seguito. Campi additivi nullable: nessuna
+      migrazione Isar necessaria.
+- [x] `startWorkoutFromTemplate` (`database_service.dart`) li valorizza da `template.id`/
+      `template.name` e, se `template.programId != null`, da `_isar.workoutPrograms.get(...)`. Il
+      log libero (`AllenamentoScreen._aggiungiEsercizio`) non li tocca: restano `null`.
+- [x] In `AllenamentoScreen`, header di gruppo (stesso pattern già usato per il superset) sopra i
+      blocchi contigui di esercizi che condividono la stessa scheda/programma:
+      "{scheda}" o "{scheda} · {programma}". Nessun header per gli esercizi senza source (log
+      libero), per non introdurre rumore visivo a chi non usa le schede. Vale anche nello storico,
+      dato che la stessa schermata gestisce la navigazione per data.
+
+> nessun nuovo test temporaneo — logica interamente accoppiata a Isar (nuovi campi) o a
+> UI/raggruppamento in lista, stesso giudizio delle fasi precedenti (16, 20).
+
+---
+
 ## Considerazioni aperte
 
 - **Peso utente per MET** — la formula MET richiede il peso dell'utente. Se non inserito,

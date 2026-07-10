@@ -432,6 +432,12 @@
   "allenamentoIniziaDaScheda": "Start from a template",
   "allenamentoAggiungiEsercizio": "Free exercise",
   "allenamentoAggiungiEsercizioSub": "Follow a single exercise on the fly, no template needed",
+  "allenamentoFonteScheda": "{scheda}",
+  "@allenamentoFonteScheda": { "placeholders": { "scheda": { "type": "String" } } },
+  "allenamentoFonteSchedaProgramma": "{scheda} · {programma}",
+  "@allenamentoFonteSchedaProgramma": {
+    "placeholders": { "scheda": { "type": "String" }, "programma": { "type": "String" } }
+  },
   "allenamentoSerieCount": "{n} sets",
   "allenamentoDurataMin": "{min} min",
   "allenamentoEliminaTitle": "Delete exercise?",

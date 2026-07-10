@@ -2522,6 +2522,18 @@ abstract class AppLocalizations {
   /// **'Segui un singolo esercizio al volo, senza crearti una scheda'**
   String get allenamentoAggiungiEsercizioSub;
 
+  /// No description provided for @allenamentoFonteScheda.
+  ///
+  /// In it, this message translates to:
+  /// **'{scheda}'**
+  String allenamentoFonteScheda(String scheda);
+
+  /// No description provided for @allenamentoFonteSchedaProgramma.
+  ///
+  /// In it, this message translates to:
+  /// **'{scheda} · {programma}'**
+  String allenamentoFonteSchedaProgramma(String scheda, String programma);
+
   /// No description provided for @allenamentoSerieCount.
   ///
   /// In it, this message translates to:

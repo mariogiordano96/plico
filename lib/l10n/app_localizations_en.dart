@@ -1337,6 +1337,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Follow a single exercise on the fly, no template needed';
 
   @override
+  String allenamentoFonteScheda(String scheda) {
+    return '$scheda';
+  }
+
+  @override
+  String allenamentoFonteSchedaProgramma(String scheda, String programma) {
+    return '$scheda · $programma';
+  }
+
+  @override
   String allenamentoSerieCount(int n) {
     return '$n sets';
   }

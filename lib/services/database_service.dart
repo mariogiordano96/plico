@@ -1271,6 +1271,8 @@ class DatabaseService {
   Future<List<WorkoutExercise>> startWorkoutFromTemplate(
       WorkoutTemplate template, DateTime date) async {
     final day = _logDate(date);
+    final program =
+        template.programId != null ? await _isar.workoutPrograms.get(template.programId!) : null;
     final created = <WorkoutExercise>[];
     for (final te in template.exercises) {
       final isCardio = te.targetDurationSeconds != null;
@@ -1281,6 +1283,10 @@ class DatabaseService {
         ..supersetGroupId = te.supersetGroupId
         ..restSeconds = te.restSeconds
         ..durationSeconds = te.targetDurationSeconds
+        ..sourceTemplateId = template.id
+        ..sourceTemplateName = template.name
+        ..sourceProgramId = program?.id
+        ..sourceProgramName = program?.name
         ..sets = isCardio
             ? []
             : List.generate(

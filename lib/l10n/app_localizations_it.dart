@@ -1344,6 +1344,16 @@ class AppLocalizationsIt extends AppLocalizations {
       'Segui un singolo esercizio al volo, senza crearti una scheda';
 
   @override
+  String allenamentoFonteScheda(String scheda) {
+    return '$scheda';
+  }
+
+  @override
+  String allenamentoFonteSchedaProgramma(String scheda, String programma) {
+    return '$scheda · $programma';
+  }
+
+  @override
   String allenamentoSerieCount(int n) {
     return '$n serie';
   }
