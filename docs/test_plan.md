@@ -9,13 +9,9 @@ quando il test è scritto **e passa**. Aggiornare questo file ad ogni blocco com
 - [x] `CalorieEstimationService` — `test/calorie_estimation_service_test.dart`
 - [x] `GuidedSessionService` — `test/guided_session_service_test.dart`
 - [x] `WorkoutProgressService` — `test/workout_progress_service_test.dart`
-- [ ] `ExerciseAlternativesService.rank` — ranking sostituzione esercizio (stesso
-      `muscleGroup`, punteggio per `mechanic`/`equipment` in comune)
-- [ ] `PlicometryCalculator` — 5 metodi (Durnin-Womersley, Jackson-Pollock 3/7, Faulkner,
-      US Navy) + `categoria()` per uomo/donna
-- [ ] `PianoService.excludedByRestrizioni` — filtro alimenti per restrizioni (unica funzione
-      pura non ancora coperta; `calcolaTdee`/macro math già testati in
-      `piano_service_test.dart`)
+- [x] `ExerciseAlternativesService.rank` — `test/exercise_alternatives_service_test.dart`
+- [x] `PlicometryCalculator` — `test/plicometry_calculator_test.dart`
+- [x] `PianoService.excludedByRestrizioni` — `test/piano_service_restrizioni_test.dart`
 
 ## Blocco 2 — Servizi con dipendenza Isar (richiedono `DatabaseService.initForTest`,
 stesso pattern di `piano_service_test.dart`)
