@@ -16,23 +16,16 @@ quando il test è scritto **e passa**. Aggiornare questo file ad ogni blocco com
 ## Blocco 2 — Servizi con dipendenza Isar (richiedono `DatabaseService.initForTest`,
 stesso pattern di `piano_service_test.dart`)
 
-- [ ] `DatabaseService` — metodi core allenamento: `startWorkoutFromTemplate`,
-      `addWorkoutExercise`, `addSessionDuration` (cumulativo), `getWorkoutLabelsForRange`,
-      `duplicateTemplate`/`duplicateProgram`, `deleteWorkoutLog`, `getNextDayForProgram`
-- [ ] `TargetService.computeDailyTargets` — null se profilo/peso mancanti, calcolo
-      kcal/macro altrimenti
-- [ ] `MealTimingService.suggestedTime` — null sotto la soglia campioni, media orari
-      altrimenti
-- [ ] `TdeeCalibrationService.suggestion` — null nei vari casi di guardia (pochi snapshot,
-      pochi giorni loggati, differenza sotto soglia), suggerimento altrimenti
-- [ ] `InsightsService.generate` — overshoot insight (giorno della settimana ricorrente) e
-      protein insight (proteine sotto target)
-- [ ] `StreakService` — `currentStreak`/`currentWorkoutStreak` (giorni consecutivi da oggi
-      o ieri a ritroso)
-- [ ] `AchievementService` — `checkAll` e le singole soglie (`_checkFirstKgLost`,
-      `_checkStreak7`, `_checkDays30Logged`, `_checkWeekOnTarget`, `_checkFirstWorkout`,
-      `_checkWorkoutStreak7`, `_checkWorkoutSessions`) indirettamente tramite gli
-      achievement sbloccati
+- [x] `DatabaseService` — `test/database_service_workout_test.dart` (`startWorkoutFromTemplate`,
+      `addWorkoutExercise`, `addSessionDuration` cumulativo, `getWorkoutLabelsForRange`,
+      `duplicateTemplate`/`duplicateProgram`, `deleteWorkoutLog`, `getNextDayForProgram`)
+- [x] `TargetService.computeDailyTargets` — `test/target_service_test.dart`
+- [x] `MealTimingService.suggestedTime` — `test/meal_timing_service_test.dart`
+- [x] `TdeeCalibrationService.suggestion` — `test/tdee_calibration_service_test.dart`
+- [x] `InsightsService.generate` — `test/insights_service_test.dart`
+- [x] `StreakService` — `test/streak_service_test.dart`
+- [x] `AchievementService` — `test/achievement_service_test.dart` (`checkAll` e le singole
+      soglie, indirettamente tramite gli achievement sbloccati)
 
 ## Blocco 3 — Bug pre-esistente scoperto durante il Blocco 1
 
