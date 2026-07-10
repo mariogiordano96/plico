@@ -465,7 +465,7 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (_isToday && esercizi.isNotEmpty) ...[
+              if (esercizi.isNotEmpty) ...[
                 FloatingActionButton(
                   heroTag: 'allenamentoElimina',
                   onPressed: _eliminaGiornata,

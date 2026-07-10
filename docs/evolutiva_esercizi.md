@@ -2134,6 +2134,13 @@ preset, test manuale su device — vedi nota a inizio sezione)**
 > nessun nuovo test temporaneo — un cambio di condizione UI e la propagazione di un parametro già
 > esistente (`startWorkoutFromTemplate` prendeva già una data, solo il chiamante era sbagliato).
 
+### Fase 33 — Elimina giornata abilitato anche su date passate ✅ completata
+- [x] Il FAB elimina era limitato al solo giorno corrente (`_isToday`); su richiesta dell'utente
+      rimossa la condizione: ora compare per qualunque giorno con log, passato o presente,
+      sempre dietro la stessa modale di conferma già esistente (`_eliminaGiornata`, invariata).
+
+> nessun nuovo test temporaneo — rimozione di una singola condizione booleana in un `if` di UI.
+
 ---
 
 ## Considerazioni aperte
