@@ -472,17 +472,23 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
       floatingActionButton: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          FloatingActionButton(
+          FloatingActionButton.extended(
             heroTag: 'allenamentoNota',
             onPressed: _editNota,
             backgroundColor: p.surface,
             foregroundColor: p.accent,
             elevation: 0,
             tooltip: l10n.allenamentoNotaTitle,
-            child: Icon(
+            icon: Icon(
               _nota != null && _nota!.isNotEmpty
                   ? Icons.edit_note_rounded
                   : Icons.note_add_outlined,
+            ),
+            label: Text(
+              _nota != null && _nota!.isNotEmpty
+                  ? l10n.allenamentoModificaNotaButton
+                  : l10n.allenamentoAggiungiNotaButton,
+              style: const TextStyle(fontWeight: FontWeight.w700),
             ),
           ),
           const SizedBox(width: 12),

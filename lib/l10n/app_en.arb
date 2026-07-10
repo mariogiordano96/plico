@@ -444,6 +444,8 @@
   "allenamentoEliminaSub": "The exercise and its logged sets will be removed.",
   "allenamentoNotaTitle": "Session note",
   "allenamentoNotaHint": "How did it go? Feelings, energy, soreness...",
+  "allenamentoAggiungiNotaButton": "Add note",
+  "allenamentoModificaNotaButton": "Edit note",
   "allenamentoSostituisci": "Substitute",
   "allenamentoSostituisciTitle": "Substitute exercise",
   "allenamentoSostituisciVuoto": "No alternatives available",

@@ -2570,6 +2570,18 @@ abstract class AppLocalizations {
   /// **'Come è andata? Sensazioni, energia, dolori...'**
   String get allenamentoNotaHint;
 
+  /// No description provided for @allenamentoAggiungiNotaButton.
+  ///
+  /// In it, this message translates to:
+  /// **'Aggiungi nota'**
+  String get allenamentoAggiungiNotaButton;
+
+  /// No description provided for @allenamentoModificaNotaButton.
+  ///
+  /// In it, this message translates to:
+  /// **'Modifica nota'**
+  String get allenamentoModificaNotaButton;
+
   /// No description provided for @allenamentoSostituisci.
   ///
   /// In it, this message translates to:

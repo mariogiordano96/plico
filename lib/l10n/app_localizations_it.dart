@@ -1378,6 +1378,12 @@ class AppLocalizationsIt extends AppLocalizations {
       'Come è andata? Sensazioni, energia, dolori...';
 
   @override
+  String get allenamentoAggiungiNotaButton => 'Aggiungi nota';
+
+  @override
+  String get allenamentoModificaNotaButton => 'Modifica nota';
+
+  @override
   String get allenamentoSostituisci => 'Sostituisci';
 
   @override
