@@ -2063,6 +2063,20 @@ preset, test manuale su device — vedi nota a inizio sezione)**
 
 > nessun nuovo test temporaneo — stesso giudizio delle fasi precedenti sulla modalità guidata.
 
+### Fase 29 — Rimossa la feature "Obiettivo settimanale" (Fase 16) ✅ completata
+- [x] Su richiesta dell'utente ("non mi serve"), rimossa interamente la feature introdotta in
+      Fase 16: bandierina in AppBar, chip "X/Y allenamenti questa settimana" sotto la data,
+      `ObiettivoSettimanaleSettingsDialog` (file eliminato), campi `AppSettings
+      .workoutTargetSettimanale`/`workoutTargetAttivo` (rigenerato codegen Isar — rimozione
+      additiva, nessuna migrazione necessaria), e i metodi ormai non più referenziati
+      `DatabaseService.watchWorkoutsThisWeek`/`getWorkoutsThisWeek`/`getActiveProgramDaysCount`
+      (verificato con grep che non fossero usati altrove, es. streak/achievement — restano invece
+      `getWorkoutDaysRange`/`watchWorkoutDays`, condivisi con `streak_service.dart`).
+- [x] La sezione "Fase 16" più sopra resta come registro storico di cosa era stato costruito e
+      perché; questa voce documenta la rimozione successiva.
+
+> nessun nuovo test temporaneo — solo rimozione di codice/UI/campi non più referenziati.
+
 ---
 
 ## Considerazioni aperte

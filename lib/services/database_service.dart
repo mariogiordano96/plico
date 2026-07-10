@@ -1037,37 +1037,6 @@ class DatabaseService {
 
   /// Giorni con almeno un allenamento nella settimana corrente (lunedì-oggi,
   /// stessa convenzione locale-aware di `WorkoutProgressService._weekKey`).
-  Future<int> getWorkoutsThisWeek() async {
-    final now = DateTime.now();
-    final monday = _logDate(now.subtract(Duration(days: now.weekday - 1)));
-    final days = await getWorkoutDaysRange(monday, now);
-    return days.length;
-  }
-
-  /// Come [getWorkoutsThisWeek], ma osservabile.
-  Stream<int> watchWorkoutsThisWeek() {
-    return watchWorkoutDays().map((allDays) {
-      final now = DateTime.now();
-      final monday = _logDate(now.subtract(Duration(days: now.weekday - 1)));
-      return allDays.where((d) => !d.isBefore(monday)).length;
-    });
-  }
-
-  /// Numero di giorni del "programma attivo": il programma a cui appartiene
-  /// la scheda con `lastUsedAt` più recente (quello che l'utente sta
-  /// effettivamente seguendo). Null se nessuna scheda di un programma è mai
-  /// stata eseguita.
-  Future<int?> getActiveProgramDaysCount() async {
-    final mostRecent = await _isar.workoutTemplates
-        .filter()
-        .programIdIsNotNull()
-        .lastUsedAtIsNotNull()
-        .sortByLastUsedAtDesc()
-        .findFirst();
-    if (mostRecent?.programId == null) return null;
-    final days = await getProgramDays(mostRecent!.programId!);
-    return days.isEmpty ? null : days.length;
-  }
 
   /// Volume totale (Σ rip × peso, escluse le serie di riscaldamento) della
   /// settimana che inizia in [weekStart], aggregato per

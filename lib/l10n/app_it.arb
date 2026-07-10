@@ -582,16 +582,6 @@
   "allenamentoModifica": "Modifica",
   "allenamentoEliminaGiornataTitle": "Eliminare la sessione?",
   "allenamentoEliminaGiornataSub": "Tutti gli esercizi e la nota di questo giorno verranno rimossi.",
-  "allenamentoObiettivoSettimanale": "{done}/{target} questa settimana",
-  "@allenamentoObiettivoSettimanale": {
-    "placeholders": { "done": { "type": "int" }, "target": { "type": "int" } }
-  },
-  "obiettivoSettimanaleTitle": "Obiettivo settimanale",
-  "obiettivoSettimanaleGiorni": "{n} giorni",
-  "@obiettivoSettimanaleGiorni": {
-    "placeholders": { "n": { "type": "int" } }
-  },
-
   "recordPersonaliTitle": "I tuoi record",
   "recordPersonaliVuoto": "Nessun record ancora. Registra un allenamento per iniziare!",
   "recordPersonaliKg": "{peso} kg",

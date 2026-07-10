@@ -1406,19 +1406,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'All exercises and the note for this day will be removed.';
 
   @override
-  String allenamentoObiettivoSettimanale(int done, int target) {
-    return '$done/$target this week';
-  }
-
-  @override
-  String get obiettivoSettimanaleTitle => 'Weekly goal';
-
-  @override
-  String obiettivoSettimanaleGiorni(int n) {
-    return '$n days';
-  }
-
-  @override
   String get recordPersonaliTitle => 'Your records';
 
   @override
