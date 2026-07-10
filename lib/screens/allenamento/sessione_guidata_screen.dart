@@ -122,10 +122,20 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     }
 
     if (!mounted) return;
+    final steps = GuidedSessionService.groupSteps(widget.exercises);
+    // Riaprendo una sessione parzialmente (o del tutto) già confermata —
+    // "Avvia allenamento" può ripartire da esercizi già fatti in una sessione
+    // precedente lo stesso giorno — si parte dal primo step non ancora
+    // completo invece che sempre dal primo: altrimenti si dovrebbe scorrere
+    // a mano gli step già fatti, e ritoccare una spunta già confermata
+    // farebbe ripartire il timer di recupero senza motivo (vedi
+    // `_sessionComplete`, valido solo sull'ultimo step "vero").
+    final firstPending = steps.indexWhere((step) => !step.every(_isExerciseDone));
     setState(() {
       _defaultRestSeconds = settings.restTimerDefaultSeconds;
       _bodyWeightKg = bodySnapshot?.pesoKg;
-      _steps = GuidedSessionService.groupSteps(widget.exercises);
+      _steps = steps;
+      _stepIndex = firstPending == -1 ? (steps.isEmpty ? 0 : steps.length - 1) : firstPending;
       _loading = false;
     });
   }

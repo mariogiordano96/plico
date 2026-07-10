@@ -178,6 +178,9 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
     await DatabaseService.instance.addWorkoutExercise(_data, workoutExercise);
   }
 
+  bool _isDone(WorkoutExercise e) =>
+      e.sets.isEmpty ? e.cardioConfirmed : e.sets.every((s) => s.confirmed);
+
   /// Avvia la modalità guidata su tutti gli esercizi già presenti nel log del
   /// giorno (aggiunti liberamente o popolati da una scheda/programma con
   /// "Inizia") — l'unico punto in cui parte la sessione interattiva.
@@ -479,7 +482,7 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          if (esercizi.isNotEmpty) ...[
+          if (esercizi.isNotEmpty && !esercizi.every(_isDone)) ...[
             FloatingActionButton.extended(
               heroTag: 'allenamentoAvvia',
               onPressed: () => _avviaAllenamento(esercizi),

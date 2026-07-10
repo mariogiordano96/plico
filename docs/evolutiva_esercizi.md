@@ -2044,6 +2044,25 @@ preset, test manuale su device — vedi nota a inizio sezione)**
 
 > nessun nuovo test temporaneo — stesso giudizio delle fasi 25/26.
 
+### Fase 28 — "Avvia allenamento" non deve ripartire su un giorno già completo ✅ completata
+- [x] Il FAB "Avvia allenamento" (`AllenamentoScreen`) restava visibile anche quando tutti gli
+      esercizi del giorno erano già confermati, permettendo di rientrare in modalità guidata su
+      una sessione già chiusa — segnalato dall'utente insieme a un sintomo correlato: rientrando
+      su esercizi già confermati, ritoccare una spunta già piena non sembrava "depennabile" e
+      faceva comunque ripartire il timer di recupero.
+- [x] `AllenamentoScreen`: nuovo `_isDone` (stesso calcolo di `_isExerciseDone` in
+      `sessione_guidata_screen.dart`, cardio → `cardioConfirmed`, forza → tutte le serie
+      `confirmed`); il FAB ora è nascosto quando `esercizi.every(_isDone)`, non solo quando la
+      lista è vuota.
+- [x] `sessione_guidata_screen.dart._prepare`: causa del sintomo "timer parte comunque" —
+      riaprendo una sessione parzialmente già fatta si ripartiva sempre dallo step 0, quindi
+      `_isLastStep` risultava falso anche se in realtà restava solo l'ultimo esercizio da fare,
+      e `_sessionComplete` (Fase 27) non sopprimeva il timer. Ora `_stepIndex` iniziale è il primo
+      step con almeno un esercizio non ancora completato (`steps.indexWhere(...)`), non più
+      sempre `0` — si riparte da dove ci si era fermati, coerente con `_sessionComplete`.
+
+> nessun nuovo test temporaneo — stesso giudizio delle fasi precedenti sulla modalità guidata.
+
 ---
 
 ## Considerazioni aperte
