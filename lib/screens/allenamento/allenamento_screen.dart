@@ -136,7 +136,7 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
   Future<void> _apriSchede() async {
     await Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const LeMieSchedeScreen()),
+      MaterialPageRoute(builder: (_) => LeMieSchedeScreen(targetDate: _data)),
     );
   }
 
@@ -465,7 +465,7 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (_isToday && esercizi.isNotEmpty && esercizi.every(_isDone)) ...[
+              if (_isToday && esercizi.isNotEmpty) ...[
                 FloatingActionButton(
                   heroTag: 'allenamentoElimina',
                   onPressed: _eliminaGiornata,

@@ -11,7 +11,12 @@ import 'crea_scheda_screen.dart';
 import 'programma_detail_screen.dart';
 
 class LeMieSchedeScreen extends StatefulWidget {
-  const LeMieSchedeScreen({super.key});
+  /// Giorno su cui popolare il log quando si preme "Inizia" — il giorno
+  /// selezionato nel tab Allenamento al momento dell'apertura, non
+  /// necessariamente oggi (si può navigare qui da un giorno passato).
+  final DateTime targetDate;
+
+  const LeMieSchedeScreen({super.key, required this.targetDate});
 
   @override
   State<LeMieSchedeScreen> createState() => _LeMieSchedeScreenState();
@@ -103,7 +108,9 @@ class _LeMieSchedeScreenState extends State<LeMieSchedeScreen> {
     if (!mounted) return;
     await Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => ProgrammaDetailScreen(program: program)),
+      MaterialPageRoute(
+          builder: (_) =>
+              ProgrammaDetailScreen(program: program, targetDate: widget.targetDate)),
     );
     _load();
   }
@@ -206,11 +213,12 @@ class _LeMieSchedeScreenState extends State<LeMieSchedeScreen> {
     }
   }
 
-  /// Popola solo il log di oggi con gli esercizi della scheda (target/serie da
+  /// Popola solo il log del giorno selezionato (Allenamento tab: non
+  /// necessariamente oggi) con gli esercizi della scheda (target/serie da
   /// compilare) e torna al tab Allenamento: l'avvio della modalità guidata è
   /// un'azione separata, dal pulsante "Avvia allenamento" nel log.
   Future<void> _inizia(WorkoutTemplate t) async {
-    await DatabaseService.instance.startWorkoutFromTemplate(t, DateTime.now());
+    await DatabaseService.instance.startWorkoutFromTemplate(t, widget.targetDate);
     if (!mounted) return;
     Navigator.popUntil(context, (route) => route.isFirst);
   }
@@ -364,7 +372,8 @@ class _LeMieSchedeScreenState extends State<LeMieSchedeScreen> {
   Future<void> _openProgram(WorkoutProgram p) async {
     await Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => ProgrammaDetailScreen(program: p)),
+      MaterialPageRoute(
+          builder: (_) => ProgrammaDetailScreen(program: p, targetDate: widget.targetDate)),
     );
     _load();
   }

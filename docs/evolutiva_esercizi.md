@@ -2117,6 +2117,23 @@ preset, test manuale su device — vedi nota a inizio sezione)**
 > nessun nuovo test temporaneo — nuova query semplice (stesso pattern di `getWorkoutDaysRange`,
 > già non testato) e UI di navigazione/calendario.
 
+### Fase 32 — Due fix: elimina giornata anche a metà, "Inizia" sul giorno sbagliato ✅ completata
+- [x] Il FAB elimina compariva solo a giornata interamente completata
+      (`esercizi.every(_isDone)`); l'utente vuole poterla cancellare anche a metà, con solo la
+      condizione "ci sono log oggi". Tolta la condizione `every(_isDone)`: ora basta
+      `_isToday && esercizi.isNotEmpty` — coesiste con "Avvia allenamento" quando la sessione non
+      è ancora completa.
+- [x] Bug: navigando su un giorno passato (`_DateNav`) e premendo "Inizia" da una scheda/programma,
+      `LeMieSchedeScreen`/`ProgrammaDetailScreen` chiamavano sempre `startWorkoutFromTemplate(t,
+      DateTime.now())` — popolava sempre il log di **oggi**, ignorando il giorno selezionato nel
+      tab Allenamento. Aggiunto `targetDate` (obbligatorio) a entrambe le schermate, propagato da
+      `AllenamentoScreen._apriSchede` (`_data`, il giorno correntemente visualizzato) attraverso
+      tutta la catena di navigazione (`LeMieSchedeScreen` → `ProgrammaDetailScreen`); entrambi gli
+      `_inizia` ora usano `widget.targetDate` invece di `DateTime.now()`.
+
+> nessun nuovo test temporaneo — un cambio di condizione UI e la propagazione di un parametro già
+> esistente (`startWorkoutFromTemplate` prendeva già una data, solo il chiamante era sbagliato).
+
 ---
 
 ## Considerazioni aperte

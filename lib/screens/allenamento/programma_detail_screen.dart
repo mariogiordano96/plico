@@ -9,7 +9,10 @@ import 'crea_scheda_screen.dart';
 
 class ProgrammaDetailScreen extends StatefulWidget {
   final WorkoutProgram program;
-  const ProgrammaDetailScreen({super.key, required this.program});
+  /// Giorno su cui popolare il log quando si preme "Inizia" — vedi
+  /// `LeMieSchedeScreen.targetDate`.
+  final DateTime targetDate;
+  const ProgrammaDetailScreen({super.key, required this.program, required this.targetDate});
 
   @override
   State<ProgrammaDetailScreen> createState() => _ProgrammaDetailScreenState();
@@ -222,11 +225,12 @@ class _ProgrammaDetailScreenState extends State<ProgrammaDetailScreen> {
     }
   }
 
-  /// Popola solo il log di oggi con gli esercizi del giorno scelto e torna al
-  /// tab Allenamento: l'avvio della modalità guidata è un'azione separata, dal
+  /// Popola solo il log del giorno selezionato (non necessariamente oggi, vedi
+  /// `widget.targetDate`) con gli esercizi del giorno scelto e torna al tab
+  /// Allenamento: l'avvio della modalità guidata è un'azione separata, dal
   /// pulsante "Avvia allenamento" nel log.
   Future<void> _inizia(WorkoutTemplate giorno) async {
-    await DatabaseService.instance.startWorkoutFromTemplate(giorno, DateTime.now());
+    await DatabaseService.instance.startWorkoutFromTemplate(giorno, widget.targetDate);
     if (!mounted) return;
     Navigator.popUntil(context, (route) => route.isFirst);
   }
