@@ -3242,6 +3242,114 @@ abstract class AppLocalizations {
   /// **'Dati importati con successo'**
   String get backupImportaSuccesso;
 
+  /// No description provided for @backupWifiTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'Trasferimento diretto'**
+  String get backupWifiTitolo;
+
+  /// No description provided for @backupWifiDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'Trasferisci il backup direttamente a un altro telefono sulla stessa rete Wi-Fi, senza passare da file o cloud.'**
+  String get backupWifiDesc;
+
+  /// No description provided for @backupWifiInviaButton.
+  ///
+  /// In it, this message translates to:
+  /// **'Invia a un altro dispositivo'**
+  String get backupWifiInviaButton;
+
+  /// No description provided for @backupWifiRiceviButton.
+  ///
+  /// In it, this message translates to:
+  /// **'Ricevi da un altro dispositivo'**
+  String get backupWifiRiceviButton;
+
+  /// No description provided for @wifiSendTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'Invia via Wi-Fi'**
+  String get wifiSendTitolo;
+
+  /// No description provided for @wifiSendDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'Assicurati che l\'altro telefono sia sulla stessa rete Wi-Fi, poi apri Plico → Impostazioni → Backup dati → Ricevi da un altro dispositivo e inquadra questo codice.'**
+  String get wifiSendDesc;
+
+  /// No description provided for @wifiSendInAttesa.
+  ///
+  /// In it, this message translates to:
+  /// **'In attesa di connessione...'**
+  String get wifiSendInAttesa;
+
+  /// No description provided for @wifiSendTrasferito.
+  ///
+  /// In it, this message translates to:
+  /// **'Trasferito!'**
+  String get wifiSendTrasferito;
+
+  /// No description provided for @wifiSendTimeout.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessuna connessione ricevuta. Verifica che entrambi i telefoni siano sulla stessa rete Wi-Fi e riprova.'**
+  String get wifiSendTimeout;
+
+  /// No description provided for @wifiSendErroreRete.
+  ///
+  /// In it, this message translates to:
+  /// **'Impossibile avviare il trasferimento: verifica di essere connesso a una rete Wi-Fi.'**
+  String get wifiSendErroreRete;
+
+  /// No description provided for @wifiSendRiprova.
+  ///
+  /// In it, this message translates to:
+  /// **'Riprova'**
+  String get wifiSendRiprova;
+
+  /// No description provided for @wifiSendChiudi.
+  ///
+  /// In it, this message translates to:
+  /// **'Chiudi'**
+  String get wifiSendChiudi;
+
+  /// No description provided for @wifiReceiveTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'Ricevi via Wi-Fi'**
+  String get wifiReceiveTitolo;
+
+  /// No description provided for @wifiReceiveHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Inquadra il QR mostrato sull\'altro telefono'**
+  String get wifiReceiveHint;
+
+  /// No description provided for @wifiReceiveScaricamento.
+  ///
+  /// In it, this message translates to:
+  /// **'Scaricamento in corso...'**
+  String get wifiReceiveScaricamento;
+
+  /// No description provided for @wifiReceiveErroreQr.
+  ///
+  /// In it, this message translates to:
+  /// **'QR non valido. Riprova.'**
+  String get wifiReceiveErroreQr;
+
+  /// No description provided for @wifiReceiveErroreDownload.
+  ///
+  /// In it, this message translates to:
+  /// **'Impossibile scaricare il backup. Verifica che entrambi i telefoni siano sulla stessa rete Wi-Fi e riprova.'**
+  String get wifiReceiveErroreDownload;
+
+  /// No description provided for @welcomeImportaWifiButton.
+  ///
+  /// In it, this message translates to:
+  /// **'Ricevi da un altro dispositivo (Wi-Fi)'**
+  String get welcomeImportaWifiButton;
+
   /// No description provided for @welcomeTitolo.
   ///
   /// In it, this message translates to:

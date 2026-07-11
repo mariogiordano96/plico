@@ -7,16 +7,13 @@ import 'package:share_plus/share_plus.dart';
 import '../../services/database_service.dart';
 import '../../theme/app_theme.dart';
 import '../main_screen.dart';
+import 'wifi_receive_screen.dart';
+import 'wifi_send_screen.dart';
 
-/// Seleziona un file di backup, lo valida, chiede conferma esplicita
-/// (l'import sovrascrive tutti i dati presenti) e lo importa. A successo
-/// ricostruisce la navigazione da zero verso [MainScreen]: l'istanza Isar
-/// viene chiusa e riaperta durante l'import, quindi qualunque `watch()` già
-/// sottoscritto in schermate montate smetterebbe di aggiornarsi. Ritorna
-/// true solo se l'import è stato completato.
+/// Seleziona un file di backup dal file system e lo importa (vedi
+/// [confirmAndImportBackup]). Ritorna true solo se l'import è stato
+/// completato.
 Future<bool> runImportBackupFlow(BuildContext context) async {
-  final l10n = context.l10n;
-
   // L'estensione "isar" è registrata come tipo di file custom in
   // ios/Runner/Info.plist (UTExportedTypeDeclarations): senza quella
   // dichiarazione iOS non saprebbe risolverla a un tipo noto e file_picker
@@ -28,7 +25,20 @@ Future<bool> runImportBackupFlow(BuildContext context) async {
   );
   final path = picked?.files.single.path;
   if (path == null) return false;
-  final file = File(path);
+  if (!context.mounted) return false;
+  return confirmAndImportBackup(context, File(path));
+}
+
+/// Valida [file] come backup, chiede conferma esplicita (l'import
+/// sovrascrive tutti i dati presenti) e lo importa. A successo ricostruisce
+/// la navigazione da zero verso [MainScreen]: l'istanza Isar viene chiusa e
+/// riaperta durante l'import, quindi qualunque `watch()` già sottoscritto
+/// in schermate montate smetterebbe di aggiornarsi. Ritorna true solo se
+/// l'import è stato completato. Punto condiviso da [runImportBackupFlow]
+/// (file scelto dal file system) e dal trasferimento via Wi-Fi locale
+/// (file scaricato da un altro device).
+Future<bool> confirmAndImportBackup(BuildContext context, File file) async {
+  final l10n = context.l10n;
 
   final valid = await DatabaseService.instance.validateBackupFile(file);
   if (!valid) {
@@ -130,6 +140,27 @@ class _BackupScreenState extends State<BackupScreen> {
     }
   }
 
+  Future<void> _sendViaWifi() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const WifiSendScreen()),
+    );
+  }
+
+  Future<void> _receiveViaWifi() async {
+    final file = await Navigator.push<File>(
+      context,
+      MaterialPageRoute(builder: (_) => const WifiReceiveScreen()),
+    );
+    if (file == null || !mounted) return;
+    final ok = await confirmAndImportBackup(context, file);
+    if (ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.backupImportaSuccesso)),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
@@ -168,6 +199,46 @@ class _BackupScreenState extends State<BackupScreen> {
               onTap: _import,
               destructive: true,
               p: p,
+            ),
+            const SizedBox(height: 24),
+            Text(l10n.backupWifiTitolo,
+                style: TextStyle(
+                    color: p.textMuted,
+                    fontSize: 11,
+                    letterSpacing: 2,
+                    fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            Text(l10n.backupWifiDesc,
+                style: TextStyle(color: p.textMuted, fontSize: 13, height: 1.4)),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: _sendViaWifi,
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: p.cardBorder),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: Text(l10n.backupWifiInviaButton,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: p.accent, fontWeight: FontWeight.w700)),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: _receiveViaWifi,
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: p.cardBorder),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: Text(l10n.backupWifiRiceviButton,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: p.accent, fontWeight: FontWeight.w700)),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

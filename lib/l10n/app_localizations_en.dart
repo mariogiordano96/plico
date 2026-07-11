@@ -1760,6 +1760,66 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backupImportaSuccesso => 'Data imported successfully';
 
   @override
+  String get backupWifiTitolo => 'Direct transfer';
+
+  @override
+  String get backupWifiDesc =>
+      'Transfer the backup directly to another phone on the same Wi-Fi network, no files or cloud needed.';
+
+  @override
+  String get backupWifiInviaButton => 'Send to another device';
+
+  @override
+  String get backupWifiRiceviButton => 'Receive from another device';
+
+  @override
+  String get wifiSendTitolo => 'Send via Wi-Fi';
+
+  @override
+  String get wifiSendDesc =>
+      'Make sure the other phone is on the same Wi-Fi network, then open Plico → Settings → Data backup → Receive from another device and scan this code.';
+
+  @override
+  String get wifiSendInAttesa => 'Waiting for connection...';
+
+  @override
+  String get wifiSendTrasferito => 'Transferred!';
+
+  @override
+  String get wifiSendTimeout =>
+      'No connection received. Check that both phones are on the same Wi-Fi network and try again.';
+
+  @override
+  String get wifiSendErroreRete =>
+      'Couldn\'t start the transfer: check that you\'re connected to a Wi-Fi network.';
+
+  @override
+  String get wifiSendRiprova => 'Retry';
+
+  @override
+  String get wifiSendChiudi => 'Close';
+
+  @override
+  String get wifiReceiveTitolo => 'Receive via Wi-Fi';
+
+  @override
+  String get wifiReceiveHint =>
+      'Point the camera at the QR code shown on the other phone';
+
+  @override
+  String get wifiReceiveScaricamento => 'Downloading...';
+
+  @override
+  String get wifiReceiveErroreQr => 'Invalid QR code. Try again.';
+
+  @override
+  String get wifiReceiveErroreDownload =>
+      'Couldn\'t download the backup. Check that both phones are on the same Wi-Fi network and try again.';
+
+  @override
+  String get welcomeImportaWifiButton => 'Receive from another device (Wi-Fi)';
+
+  @override
   String get welcomeTitolo => 'Welcome to Plico';
 
   @override

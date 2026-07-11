@@ -56,6 +56,9 @@ dependencies:
   # come tutti gli altri plugin nativi già in uso) lascia quelle classi non
   # compilate. La 8.3.7 è puro Java, nessun problema di questo tipo.
   file_picker: 8.3.7
+  shelf: ^1.4.2
+  qr_flutter: ^4.1.0
+  network_info_plus: ^7.0.0
 
 dev_dependencies:
   flutter_test:

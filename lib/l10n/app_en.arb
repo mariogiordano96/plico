@@ -574,6 +574,27 @@
   "backupImportaFileNonValido": "The selected file is not a valid Plico backup.",
   "backupImportaErrore": "Couldn't import the backup: {err}",
   "backupImportaSuccesso": "Data imported successfully",
+  "backupWifiTitolo": "Direct transfer",
+  "backupWifiDesc": "Transfer the backup directly to another phone on the same Wi-Fi network, no files or cloud needed.",
+  "backupWifiInviaButton": "Send to another device",
+  "backupWifiRiceviButton": "Receive from another device",
+
+  "wifiSendTitolo": "Send via Wi-Fi",
+  "wifiSendDesc": "Make sure the other phone is on the same Wi-Fi network, then open Plico → Settings → Data backup → Receive from another device and scan this code.",
+  "wifiSendInAttesa": "Waiting for connection...",
+  "wifiSendTrasferito": "Transferred!",
+  "wifiSendTimeout": "No connection received. Check that both phones are on the same Wi-Fi network and try again.",
+  "wifiSendErroreRete": "Couldn't start the transfer: check that you're connected to a Wi-Fi network.",
+  "wifiSendRiprova": "Retry",
+  "wifiSendChiudi": "Close",
+
+  "wifiReceiveTitolo": "Receive via Wi-Fi",
+  "wifiReceiveHint": "Point the camera at the QR code shown on the other phone",
+  "wifiReceiveScaricamento": "Downloading...",
+  "wifiReceiveErroreQr": "Invalid QR code. Try again.",
+  "wifiReceiveErroreDownload": "Couldn't download the backup. Check that both phones are on the same Wi-Fi network and try again.",
+
+  "welcomeImportaWifiButton": "Receive from another device (Wi-Fi)",
 
   "welcomeTitolo": "Welcome to Plico",
   "welcomeSottotitolo": "Before you start, let us know if you've already used Plico on another phone.",

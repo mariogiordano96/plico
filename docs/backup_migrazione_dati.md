@@ -185,3 +185,64 @@ piccoli o di un import "parziale/merge" invece che sostitutivo.
       idempotenti post-import, non da un controllo di versione dichiarato)
 - [ ] Aggiornare `docs/database.md`/`docs/retention.md` con la nuova
       funzionalità
+
+### Fase 4 — Trasferimento diretto via Wi-Fi locale ✅ completata
+
+**Idea**: alternativa al passaggio manuale (export → condividi file →
+importa) per chi ha i due telefoni a disposizione insieme (es. cambio
+device). Spunto iniziale: "Bluetooth, come Quick Share". Il Bluetooth
+diretto non è praticabile cross-platform — iOS non espone API di
+Bluetooth Classic a app di terze parti (solo BLE via CoreBluetooth,
+pensato per pochi byte, non per un file di alcuni MB), e Quick Share
+funziona su iPhone solo grazie a un'integrazione dedicata di Google, non
+disponibile a sviluppatori terzi. L'alternativa che raggiunge lo stesso
+obiettivo pratico, cross-platform, è un trasferimento diretto sulla
+**stessa rete Wi-Fi locale** (stile LocalSend): un device apre un piccolo
+server HTTP locale e mostra un QR con indirizzo/porta/token, l'altro lo
+scansiona e scarica il file via HTTP, senza passare da cloud o file
+manuali.
+
+- [x] `lib/services/sync_transfer_service.dart` — `BackupSendServer`
+      (server `shelf` one-shot: bind `InternetAddress.anyIPv4`, porta 0
+      assegnata dal SO, un solo token casuale valido per una sola
+      richiesta, timeout 3 minuti se nessuno si connette) e
+      `fetchBackupOverWifi` (client HTTP lato ricevente)
+- [x] IP locale via `network_info_plus` (`NetworkInfo().getWifiIP()`) —
+      verificato: applica il Kotlin Gradle Plugin incondizionatamente
+      (come `flutter_local_notifications`), non con il check
+      AGP9-condizionale che aveva rotto `file_picker`, quindi nessun
+      problema con `android.builtInKotlin=false` già in uso
+- [x] QR renderizzato con `qr_flutter` (pacchetto Dart puro, nessun codice
+      nativo)
+- [x] `lib/screens/impostazioni/backup_screen.dart`: estratta
+      `confirmAndImportBackup` (valida → conferma distruttiva → importa →
+      riallinea → naviga) come coda condivisa tra `runImportBackupFlow`
+      (file picker) e il nuovo path Wi-Fi
+- [x] `lib/screens/impostazioni/wifi_send_screen.dart` — avvia il server,
+      mostra il QR, stato attesa/trasferito/timeout/errore
+- [x] `lib/screens/impostazioni/wifi_receive_screen.dart` — scanner QR
+      minimale e self-contained (non riusa `BarcodeScannerScreen`, già
+      accoppiata alla ricerca Open Food Facts), fetch HTTP, pop con il
+      file scaricato
+- [x] Punti di ingresso: nuova sezione "Trasferimento diretto" in
+      `BackupScreen` (Invia/Ricevi) e bottone aggiuntivo nello step import
+      di `WelcomeScreen` (primo avvio)
+- [x] Permessi: `NSLocalNetworkUsageDescription` in `Info.plist` (iOS 14+,
+      richiesto per qualunque socket di rete locale); `INTERNET`,
+      `ACCESS_WIFI_STATE`, `ACCESS_NETWORK_STATE` nel manifest Android
+      principale — **corregge anche un bug preesistente**: il manifest di
+      release non aveva `INTERNET` (solo debug/profile), quindi la ricerca
+      Open Food Facts falliva probabilmente già in silenzio nelle build di
+      produzione
+
+**Limiti noti** (non risolvibili lato app):
+- Richiede la stessa rete Wi-Fi (no dati mobili); su reti con
+  "isolamento client" (comune su Wi-Fi ospiti/pubblici) il trasferimento
+  diretto tra device non funziona — l'unico segnale che l'app può dare è
+  il timeout con messaggio esplicito.
+- Nessuna scoperta automatica del device (niente mDNS/Bonjour): il QR
+  stesso è il meccanismo di pairing, scelta deliberata per restare
+  semplice senza permessi/dipendenze aggiuntive.
+- [ ] Test manuale end-to-end su due device reali sulla stessa rete
+      Wi-Fi (Invia su uno, Ricevi sull'altro): da fare dall'utente, non
+      eseguibile in questo ambiente.

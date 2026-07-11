@@ -732,6 +732,27 @@
   "backupImportaErrore": "Impossibile importare il backup: {err}",
   "@backupImportaErrore": { "placeholders": { "err": { "type": "String" } } },
   "backupImportaSuccesso": "Dati importati con successo",
+  "backupWifiTitolo": "Trasferimento diretto",
+  "backupWifiDesc": "Trasferisci il backup direttamente a un altro telefono sulla stessa rete Wi-Fi, senza passare da file o cloud.",
+  "backupWifiInviaButton": "Invia a un altro dispositivo",
+  "backupWifiRiceviButton": "Ricevi da un altro dispositivo",
+
+  "wifiSendTitolo": "Invia via Wi-Fi",
+  "wifiSendDesc": "Assicurati che l'altro telefono sia sulla stessa rete Wi-Fi, poi apri Plico → Impostazioni → Backup dati → Ricevi da un altro dispositivo e inquadra questo codice.",
+  "wifiSendInAttesa": "In attesa di connessione...",
+  "wifiSendTrasferito": "Trasferito!",
+  "wifiSendTimeout": "Nessuna connessione ricevuta. Verifica che entrambi i telefoni siano sulla stessa rete Wi-Fi e riprova.",
+  "wifiSendErroreRete": "Impossibile avviare il trasferimento: verifica di essere connesso a una rete Wi-Fi.",
+  "wifiSendRiprova": "Riprova",
+  "wifiSendChiudi": "Chiudi",
+
+  "wifiReceiveTitolo": "Ricevi via Wi-Fi",
+  "wifiReceiveHint": "Inquadra il QR mostrato sull'altro telefono",
+  "wifiReceiveScaricamento": "Scaricamento in corso...",
+  "wifiReceiveErroreQr": "QR non valido. Riprova.",
+  "wifiReceiveErroreDownload": "Impossibile scaricare il backup. Verifica che entrambi i telefoni siano sulla stessa rete Wi-Fi e riprova.",
+
+  "welcomeImportaWifiButton": "Ricevi da un altro dispositivo (Wi-Fi)",
 
   "welcomeTitolo": "Benvenuto su Plico",
   "welcomeSottotitolo": "Prima di iniziare, dicci se hai già usato Plico su un altro telefono.",

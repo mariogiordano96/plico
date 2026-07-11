@@ -3,6 +3,13 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <!-- Ricerca Open Food Facts e trasferimento backup via Wi-Fi locale.
+         Mancava solo nel manifest di produzione (presente in debug/profile),
+         quindi la ricerca online falliva già silenziosamente nelle build
+         release. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <application
         android:label="plico"
         android:name="${applicationName}"

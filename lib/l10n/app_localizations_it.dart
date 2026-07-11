@@ -1770,6 +1770,66 @@ class AppLocalizationsIt extends AppLocalizations {
   String get backupImportaSuccesso => 'Dati importati con successo';
 
   @override
+  String get backupWifiTitolo => 'Trasferimento diretto';
+
+  @override
+  String get backupWifiDesc =>
+      'Trasferisci il backup direttamente a un altro telefono sulla stessa rete Wi-Fi, senza passare da file o cloud.';
+
+  @override
+  String get backupWifiInviaButton => 'Invia a un altro dispositivo';
+
+  @override
+  String get backupWifiRiceviButton => 'Ricevi da un altro dispositivo';
+
+  @override
+  String get wifiSendTitolo => 'Invia via Wi-Fi';
+
+  @override
+  String get wifiSendDesc =>
+      'Assicurati che l\'altro telefono sia sulla stessa rete Wi-Fi, poi apri Plico → Impostazioni → Backup dati → Ricevi da un altro dispositivo e inquadra questo codice.';
+
+  @override
+  String get wifiSendInAttesa => 'In attesa di connessione...';
+
+  @override
+  String get wifiSendTrasferito => 'Trasferito!';
+
+  @override
+  String get wifiSendTimeout =>
+      'Nessuna connessione ricevuta. Verifica che entrambi i telefoni siano sulla stessa rete Wi-Fi e riprova.';
+
+  @override
+  String get wifiSendErroreRete =>
+      'Impossibile avviare il trasferimento: verifica di essere connesso a una rete Wi-Fi.';
+
+  @override
+  String get wifiSendRiprova => 'Riprova';
+
+  @override
+  String get wifiSendChiudi => 'Chiudi';
+
+  @override
+  String get wifiReceiveTitolo => 'Ricevi via Wi-Fi';
+
+  @override
+  String get wifiReceiveHint => 'Inquadra il QR mostrato sull\'altro telefono';
+
+  @override
+  String get wifiReceiveScaricamento => 'Scaricamento in corso...';
+
+  @override
+  String get wifiReceiveErroreQr => 'QR non valido. Riprova.';
+
+  @override
+  String get wifiReceiveErroreDownload =>
+      'Impossibile scaricare il backup. Verifica che entrambi i telefoni siano sulla stessa rete Wi-Fi e riprova.';
+
+  @override
+  String get welcomeImportaWifiButton =>
+      'Ricevi da un altro dispositivo (Wi-Fi)';
+
+  @override
   String get welcomeTitolo => 'Benvenuto su Plico';
 
   @override

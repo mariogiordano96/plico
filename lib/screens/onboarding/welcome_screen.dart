@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../../theme/app_theme.dart';
 import '../impostazioni/backup_screen.dart';
+import '../impostazioni/wifi_receive_screen.dart';
 import 'onboarding_screen.dart';
 
 /// Primo schermo mostrato quando non esiste ancora un profilo utente
@@ -23,6 +26,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Future<void> _startImport() async {
     setState(() => _importing = true);
     await runImportBackupFlow(context);
+    if (mounted) setState(() => _importing = false);
+  }
+
+  Future<void> _startWifiImport() async {
+    final file = await Navigator.push<File>(
+      context,
+      MaterialPageRoute(builder: (_) => const WifiReceiveScreen()),
+    );
+    if (file == null || !mounted) return;
+    setState(() => _importing = true);
+    await confirmAndImportBackup(context, file);
     if (mounted) setState(() => _importing = false);
   }
 
@@ -114,6 +128,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 )
               : Text(l10n.welcomeImportaSelezionaButton,
                   style: const TextStyle(fontWeight: FontWeight.w700)),
+        ),
+        const SizedBox(height: 12),
+        OutlinedButton(
+          onPressed: _importing ? null : _startWifiImport,
+          style: OutlinedButton.styleFrom(
+              side: BorderSide(color: p.cardBorder),
+              padding: const EdgeInsets.symmetric(vertical: 14)),
+          child: Text(l10n.welcomeImportaWifiButton,
+              style: TextStyle(color: p.accent, fontWeight: FontWeight.w700)),
         ),
         const Spacer(),
       ],
