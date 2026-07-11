@@ -821,19 +821,37 @@ class DatabaseService {
 
   Future<void> seedExercises() async {
     final settings = await _isar.appSettings.get(1);
-    if (settings?.exercisesSeeded == true) return;
+    if (settings?.exercisesSeeded != true) {
+      final raw = await rootBundle.loadString('assets/data/exercises_seed.json');
+      final list = jsonDecode(raw) as List<dynamic>;
 
-    final raw = await rootBundle.loadString('assets/data/exercises_seed.json');
-    final list = jsonDecode(raw) as List<dynamic>;
+      final exercises = list.map((e) => _exerciseFromJson(e as Map<String, dynamic>)).toList();
 
-    final exercises = list.map((e) => _exerciseFromJson(e as Map<String, dynamic>)).toList();
+      await _isar.writeTxn(() async {
+        await _isar.exerciseDefinitions.putAll(exercises);
+        final s = await _isar.appSettings.get(1) ?? AppSettings();
+        s.exercisesSeeded = true;
+        await _isar.appSettings.put(s);
+      });
+    }
+    await _fixMiscategorizedExercises();
+  }
 
-    await _isar.writeTxn(() async {
-      await _isar.exerciseDefinitions.putAll(exercises);
-      final s = await _isar.appSettings.get(1) ?? AppSettings();
-      s.exercisesSeeded = true;
-      await _isar.appSettings.put(s);
-    });
+  /// Corregge in-place la categoria di voci del catalogo preinstallato già
+  /// seedate su installazioni esistenti (`seedExercises` seeda una sola
+  /// volta, quindi una correzione nel JSON da sola non arriva a chi ha già
+  /// installato l'app). Idempotente e a costo trascurabile: dopo il primo
+  /// fix diventa una sola lettura indicizzata a ogni avvio. Non tocca gli
+  /// esercizi personalizzati dell'utente.
+  Future<void> _fixMiscategorizedExercises() async {
+    final burpee =
+        await _isar.exerciseDefinitions.filter().externalIdEqualTo('Burpee').findFirst();
+    if (burpee != null && !burpee.isCustom && burpee.category == 'cardio') {
+      burpee
+        ..muscleGroup = 'core'
+        ..category = 'plyometrics';
+      await _isar.writeTxn(() => _isar.exerciseDefinitions.put(burpee));
+    }
   }
 
   ExerciseDefinition _exerciseFromJson(Map<String, dynamic> j) {
