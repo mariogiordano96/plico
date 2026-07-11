@@ -736,9 +736,9 @@ class PianoService {
             .toList()
         : sorted.skip(1).toList();
 
-    // Tutti i cibi liked come alternative (senza cap), poi 3 non-liked per varietà
+    // Tutti i cibi liked come alternative (senza cap), poi 6 non-liked per varietà
     final likedAlts = altPool.where((f) => likedIds.contains(f.id)).toList();
-    final nonLikedAlts = altPool.where((f) => !likedIds.contains(f.id)).take(3).toList();
+    final nonLikedAlts = altPool.where((f) => !likedIds.contains(f.id)).take(6).toList();
 
     final alts = <PlanFood>[];
     for (final f in [...likedAlts, ...nonLikedAlts]) {
