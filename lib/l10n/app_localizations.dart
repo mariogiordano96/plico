@@ -1382,12 +1382,6 @@ abstract class AppLocalizations {
   /// **'PESO'**
   String get progressiSezPeso;
 
-  /// No description provided for @progressiSezDiario.
-  ///
-  /// In it, this message translates to:
-  /// **'DIARIO'**
-  String get progressiSezDiario;
-
   /// No description provided for @progressiSezComposizione.
   ///
   /// In it, this message translates to:
@@ -1405,6 +1399,12 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'ALLENAMENTI RECENTI'**
   String get progressiSezAllenamenti;
+
+  /// No description provided for @progressiSezAllenamentiPdf.
+  ///
+  /// In it, this message translates to:
+  /// **'ALLENAMENTI'**
+  String get progressiSezAllenamentiPdf;
 
   /// No description provided for @progressiNessunAllenamento.
   ///
@@ -1472,23 +1472,11 @@ abstract class AppLocalizations {
   /// **'Ultimo'**
   String get progressiStatUltimo;
 
-  /// No description provided for @progressiStatMedia.
-  ///
-  /// In it, this message translates to:
-  /// **'Media'**
-  String get progressiStatMedia;
-
   /// No description provided for @progressiStatVariazione.
   ///
   /// In it, this message translates to:
   /// **'Variazione'**
   String get progressiStatVariazione;
-
-  /// No description provided for @progressiStatGiorni.
-  ///
-  /// In it, this message translates to:
-  /// **'Giorni'**
-  String get progressiStatGiorni;
 
   /// No description provided for @progressiStatRilevazioni.
   ///
@@ -1501,42 +1489,6 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Generazione PDF...'**
   String get progressiGenerazionePdf;
-
-  /// No description provided for @progressiEsportaDiario.
-  ///
-  /// In it, this message translates to:
-  /// **'Esporta Diario'**
-  String get progressiEsportaDiario;
-
-  /// No description provided for @progressiEsportaSub.
-  ///
-  /// In it, this message translates to:
-  /// **'Seleziona il periodo da esportare in PDF'**
-  String get progressiEsportaSub;
-
-  /// No description provided for @progressiUltimaSettimana.
-  ///
-  /// In it, this message translates to:
-  /// **'Ultima settimana'**
-  String get progressiUltimaSettimana;
-
-  /// No description provided for @progressiUltimoMese.
-  ///
-  /// In it, this message translates to:
-  /// **'Ultimo mese'**
-  String get progressiUltimoMese;
-
-  /// No description provided for @progressi7Giorni.
-  ///
-  /// In it, this message translates to:
-  /// **'7 giorni'**
-  String get progressi7Giorni;
-
-  /// No description provided for @progressi30Giorni.
-  ///
-  /// In it, this message translates to:
-  /// **'30 giorni'**
-  String get progressi30Giorni;
 
   /// No description provided for @progressiErrEsportazione.
   ///

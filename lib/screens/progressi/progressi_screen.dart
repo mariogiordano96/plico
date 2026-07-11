@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'dart:math';
 import '../../theme/app_theme.dart';
 import '../../models/body_snapshot.dart';
-import '../../models/daily_log.dart';
 import '../../models/plicometry_session.dart';
 import '../../models/measurement_snapshot.dart';
 import '../../models/workout_exercise.dart';
@@ -46,23 +45,6 @@ extension _CompMetricExt on _CompMetric {
   }
 }
 
-enum _DiarioMetric { kcal, proteine, grassi, carbs }
-
-extension _DiarioMetricExt on _DiarioMetric {
-  String get unit {
-    return this == _DiarioMetric.kcal ? 'kcal' : 'g';
-  }
-
-  double extract(DailyLog log) {
-    switch (this) {
-      case _DiarioMetric.kcal:     return log.kcalTotali;
-      case _DiarioMetric.proteine: return log.proteinTotali;
-      case _DiarioMetric.grassi:   return log.fatTotali;
-      case _DiarioMetric.carbs:    return log.carbsTotali;
-    }
-  }
-}
-
 String _rangeLabel(_Range r, BuildContext context) => switch (r) {
   _Range.month1 => '1M',
   _Range.month3 => '3M',
@@ -75,13 +57,6 @@ String _compMetricLabel(_CompMetric m, BuildContext context) => switch (m) {
   _CompMetric.bf     => 'BF%',
   _CompMetric.grassa => context.l10n.progressiMassaGrassa,
   _CompMetric.magra  => context.l10n.progressiMassaMagra,
-};
-
-String _diarioMetricLabel(_DiarioMetric m, BuildContext context) => switch (m) {
-  _DiarioMetric.kcal     => 'Kcal',
-  _DiarioMetric.proteine => context.l10n.progressiProteine,
-  _DiarioMetric.grassi   => context.l10n.progressiGrassi,
-  _DiarioMetric.carbs    => context.l10n.progressiCarboidrati,
 };
 
 Map<String, String> _getMisureLabels(BuildContext context) => {
@@ -134,74 +109,44 @@ class ProgressiScreen extends StatefulWidget {
 
 class _ProgressiScreenState extends State<ProgressiScreen> {
   _Range _range = _Range.month1;
-  _DiarioMetric _diarioMetric = _DiarioMetric.kcal;
   _CompMetric _compMetric = _CompMetric.bf;
   String _misuraKey = 'vitaCm';
 
-  Future<void> _showExportBottomSheet() async {
-    final p = context.palette;
-    final days = await showModalBottomSheet<int>(
-      context: context,
-      backgroundColor: p.surface,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (ctx) {
-        final pp = ctx.palette;
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: pp.cardBorder,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(ctx.l10n.progressiEsportaDiario,
-                  style: TextStyle(
-                      color: pp.textPrimary,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700)),
-              const SizedBox(height: 4),
-              Text(ctx.l10n.progressiEsportaSub,
-                  style: TextStyle(color: pp.textMuted, fontSize: 13)),
-              const SizedBox(height: 16),
-              _ExportOptionTile(
-                label: ctx.l10n.progressiUltimaSettimana,
-                subtitle: ctx.l10n.progressi7Giorni,
-                p: pp,
-                onTap: () => Navigator.pop(ctx, 7),
-              ),
-              const SizedBox(height: 8),
-              _ExportOptionTile(
-                label: ctx.l10n.progressiUltimoMese,
-                subtitle: ctx.l10n.progressi30Giorni,
-                p: pp,
-                onTap: () => Navigator.pop(ctx, 30),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-    if (days == null || !mounted) return;
-    await _exportPdf(days);
-  }
-
-  Future<void> _exportPdf(int days) async {
-    final now = DateTime.now();
-    final to = DateTime(now.year, now.month, now.day);
-    final from = to.subtract(Duration(days: days - 1));
-
+  /// Esporta in PDF esattamente le sezioni mostrate a schermo (peso,
+  /// composizione, misurazioni, log allenamenti), filtrate sullo stesso
+  /// range già selezionato in cima alla pagina — nessuna scelta ulteriore
+  /// da fare, coerente con "esporta quello che vedo".
+  Future<void> _exportPdf() async {
+    final db = DatabaseService.instance;
+    final from = _range.startDate;
+    final to = DateTime.now();
     final locale = Localizations.localeOf(context).toString();
     final l10n = context.l10n;
+
+    final allBody = await db.getBodySnapshots();
+    final body = from != null
+        ? allBody.where((s) => !s.data.isBefore(from)).toList()
+        : allBody;
+
+    final allComposizione = await db.getPlicometrySessions();
+    final composizione = from != null
+        ? allComposizione.where((s) => !s.data.isBefore(from)).toList()
+        : allComposizione;
+
+    final allMisurazioni = await db.getMeasurementSnapshots();
+    final misurazioni = from != null
+        ? allMisurazioni.where((s) => !s.data.isBefore(from)).toList()
+        : allMisurazioni;
+
+    final workoutExercises = from != null
+        ? await db.getWorkoutExercisesRange(from, to)
+        : await db.getAllWorkoutExercises();
+
+    final dateFmt = DateFormat.yMd(locale);
+    final periodLabel = from != null
+        ? '${dateFmt.format(from)} – ${dateFmt.format(to)}'
+        : l10n.progressiRangeTutto;
+
     final strings = PdfStrings(
       diarioTitle: l10n.pdfDiarioTitle,
       targetLabel: l10n.pdfTargetLabel,
@@ -231,6 +176,14 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
       nessunaSessione: l10n.storicoNessunaSessione,
       prBadge: l10n.storicoPrBadge,
       durataMin: l10n.allenamentoDurataMin,
+      progressiPdfTitle: l10n.progressiTitolo,
+      progressiSezPeso: l10n.progressiSezPeso,
+      progressiSezComposizione: l10n.progressiSezComposizione,
+      progressiSezMisurazioni: l10n.progressiSezMisurazioni,
+      progressiSezAllenamentiPdf: l10n.progressiSezAllenamentiPdf,
+      progressiMassaGrassa: l10n.progressiMassaGrassa,
+      progressiMassaMagra: l10n.progressiMassaMagra,
+      progressiNessunDato: l10n.progressiNessunDato,
     );
 
     if (!mounted) return;
@@ -241,16 +194,23 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
     );
 
     try {
-      final bytes = await PdfExportService.generateDiario(
-          from: from, to: to, strings: strings, locale: locale);
+      final bytes = await PdfExportService.generateProgressi(
+        periodLabel: periodLabel,
+        bodySnapshots: body,
+        plicometrySessions: composizione,
+        measurementSnapshots: misurazioni,
+        workoutExercises: workoutExercises,
+        misuraLabels: _getMisureLabels(context),
+        strings: strings,
+        locale: locale,
+      );
       if (!mounted) return;
       Navigator.pop(context);
 
-      final fs = '${from.year}${from.month.toString().padLeft(2, '0')}${from.day.toString().padLeft(2, '0')}';
       final ts = '${to.year}${to.month.toString().padLeft(2, '0')}${to.day.toString().padLeft(2, '0')}';
       await Printing.sharePdf(
         bytes: bytes,
-        filename: 'plico_diario_${fs}_$ts.pdf',
+        filename: 'plico_progressi_$ts.pdf',
       );
     } catch (e) {
       if (!mounted) return;
@@ -282,7 +242,7 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
           IconButton(
             icon: Icon(Icons.download_rounded, color: p.accent),
             tooltip: context.l10n.progressiTooltipEsporta,
-            onPressed: _showExportBottomSheet,
+            onPressed: _exportPdf,
           ),
           IconButton(
             icon: Icon(Icons.straighten_rounded, color: p.accent),
@@ -336,33 +296,7 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
             _PesoChart(startDate: start, p: p),
             const SizedBox(height: 28),
 
-            // ── Grafico 2: Diario kcal/macro ─────────────
-            _SectionLabel(context.l10n.progressiSezDiario, p),
-            const SizedBox(height: 10),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: _DiarioMetric.values.map((m) => Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: _RangeChip(
-                    label: _diarioMetricLabel(m, context),
-                    selected: _diarioMetric == m,
-                    onTap: () => setState(() => _diarioMetric = m),
-                    p: p,
-                  ),
-                )).toList(),
-              ),
-            ),
-            const SizedBox(height: 14),
-            _DiarioChart(
-              key: ValueKey('${_diarioMetric.name}-${_range.name}'),
-              metric: _diarioMetric,
-              startDate: start,
-              p: p,
-            ),
-            const SizedBox(height: 28),
-
-            // ── Grafico 3: Composizione ───────────────────
+            // ── Grafico 2: Composizione ───────────────────
             _SectionLabel(context.l10n.progressiSezComposizione, p),
             const SizedBox(height: 10),
             SingleChildScrollView(
@@ -387,7 +321,7 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
             ),
             const SizedBox(height: 28),
 
-            // ── Grafico 3: Misurazioni ────────────────────
+            // ── Grafico 3: Misurazioni ───────────────────
             _SectionLabel(context.l10n.progressiSezMisurazioni, p),
             const SizedBox(height: 10),
             SingleChildScrollView(
@@ -644,41 +578,6 @@ class _CronologiaRow extends StatelessWidget {
   }
 }
 
-// ── Diario Chart ──────────────────────────────────────────────
-
-class _DiarioChart extends StatelessWidget {
-  final _DiarioMetric metric;
-  final DateTime? startDate;
-  final ColorPalette p;
-  const _DiarioChart({super.key, required this.metric, required this.startDate, required this.p});
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<List<DailyLog>>(
-      stream: DatabaseService.instance.watchDailyLogs(),
-      builder: (context, snap) {
-        var logs = [...(snap.data ?? [])]
-          ..sort((a, b) => a.data.compareTo(b.data));
-
-        if (startDate != null) {
-          logs = logs.where((l) => !l.data.isBefore(startDate!)).toList();
-        }
-        logs = logs.where((l) => l.entries.isNotEmpty).toList();
-
-        final points = logs.map((l) => _Point(l.data, metric.extract(l))).toList();
-        return _ChartBox(
-          points: points,
-          unit: metric.unit,
-          color: const Color(0xFFE8945A),
-          p: p,
-          decimals: metric == _DiarioMetric.kcal ? 0 : 1,
-          showAvg: true,
-        );
-      },
-    );
-  }
-}
-
 // ── Chart Box ─────────────────────────────────────────────────
 
 class _ChartBox extends StatelessWidget {
@@ -686,8 +585,6 @@ class _ChartBox extends StatelessWidget {
   final String unit;
   final Color color;
   final ColorPalette p;
-  final int decimals;
-  final bool showAvg;
   final List<double>? trendValues;
 
   const _ChartBox({
@@ -695,8 +592,6 @@ class _ChartBox extends StatelessWidget {
     required this.unit,
     required this.color,
     required this.p,
-    this.decimals = 1,
-    this.showAvg = false,
     this.trendValues,
   });
 
@@ -704,7 +599,7 @@ class _ChartBox extends StatelessWidget {
   Widget build(BuildContext context) {
     final locale = Localizations.localeOf(context).toString();
     String fmtDate(DateTime d) => DateFormat.Md(locale).format(d);
-    final nf = NumberFormat.decimalPatternDigits(locale: locale, decimalDigits: decimals);
+    final nf = NumberFormat.decimalPatternDigits(locale: locale, decimalDigits: 1);
     String fmt(double v) => nf.format(v);
 
     if (points.isEmpty) {
@@ -754,7 +649,6 @@ class _ChartBox extends StatelessWidget {
     final last = points.last.value;
     final prev = points.length > 1 ? points[points.length - 2].value : null;
     final delta = prev != null ? last - prev : null;
-    final avg = points.fold(0.0, (s, pt) => s + pt.value) / points.length;
 
     return Container(
       decoration: BoxDecoration(
@@ -893,15 +787,7 @@ class _ChartBox extends StatelessWidget {
                     value: '${fmt(last)} $unit',
                     color: color,
                     p: p),
-                if (showAvg) ...[
-                  Container(width: 1, height: 28, color: p.cardBorder),
-                  _Stat(
-                    label: context.l10n.progressiStatMedia,
-                    value: '${fmt(avg)} $unit',
-                    color: p.textSecondary,
-                    p: p,
-                  ),
-                ] else if (delta != null) ...[
+                if (delta != null) ...[
                   Container(width: 1, height: 28, color: p.cardBorder),
                   _Stat(
                     label: context.l10n.progressiStatVariazione,
@@ -912,7 +798,7 @@ class _ChartBox extends StatelessWidget {
                 ],
                 Container(width: 1, height: 28, color: p.cardBorder),
                 _Stat(
-                    label: showAvg ? context.l10n.progressiStatGiorni : context.l10n.progressiStatRilevazioni,
+                    label: context.l10n.progressiStatRilevazioni,
                     value: '${points.length}',
                     color: p.textSecondary,
                     p: p),
@@ -1010,55 +896,6 @@ class _Stat extends StatelessWidget {
 }
 
 // ── Export helpers ─────────────────────────────────────────────
-
-class _ExportOptionTile extends StatelessWidget {
-  final String label, subtitle;
-  final ColorPalette p;
-  final VoidCallback onTap;
-
-  const _ExportOptionTile({
-    required this.label,
-    required this.subtitle,
-    required this.p,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: p.background,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: p.cardBorder),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.picture_as_pdf_rounded, color: p.accent, size: 22),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label,
-                    style: TextStyle(
-                        color: p.textPrimary,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600)),
-                Text(subtitle,
-                    style: TextStyle(color: p.textMuted, fontSize: 12)),
-              ],
-            ),
-            const Spacer(),
-            Icon(Icons.arrow_forward_ios_rounded,
-                color: p.textMuted, size: 15),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _PdfLoadingDialog extends StatelessWidget {
   const _PdfLoadingDialog();

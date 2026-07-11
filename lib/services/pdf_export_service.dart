@@ -10,6 +10,8 @@ import '../models/meal_entry.dart';
 import '../models/meal_plan.dart';
 import '../models/user_profile.dart';
 import '../models/body_snapshot.dart';
+import '../models/plicometry_session.dart';
+import '../models/measurement_snapshot.dart';
 import '../models/workout_template.dart';
 import '../models/workout_template_exercise.dart';
 import '../models/workout_program.dart';
@@ -48,6 +50,16 @@ class PdfStrings {
   final String prBadge;
   final String Function(int min) durataMin;
 
+  // Export "Progressi" (peso/composizione/misurazioni/allenamenti)
+  final String progressiPdfTitle;
+  final String progressiSezPeso;
+  final String progressiSezComposizione;
+  final String progressiSezMisurazioni;
+  final String progressiSezAllenamentiPdf;
+  final String progressiMassaGrassa;
+  final String progressiMassaMagra;
+  final String progressiNessunDato;
+
   const PdfStrings({
     required this.diarioTitle,
     required this.targetLabel,
@@ -71,6 +83,14 @@ class PdfStrings {
     required this.nessunaSessione,
     required this.prBadge,
     required this.durataMin,
+    this.progressiPdfTitle = 'Progressi',
+    this.progressiSezPeso = 'PESO',
+    this.progressiSezComposizione = 'COMPOSIZIONE CORPOREA',
+    this.progressiSezMisurazioni = 'MISURAZIONI',
+    this.progressiSezAllenamentiPdf = 'ALLENAMENTI',
+    this.progressiMassaGrassa = 'Massa Grassa',
+    this.progressiMassaMagra = 'Massa Magra',
+    this.progressiNessunDato = 'Nessun dato nel periodo selezionato',
   });
 }
 
@@ -903,6 +923,210 @@ class PdfExportService {
         ],
       ),
     );
+  }
+
+  // ── Export "Progressi" (peso/composizione/misurazioni/allenamenti) ────
+
+  /// Esporta i dati delle sezioni mostrate in [ProgressiScreen] per il
+  /// periodo già filtrato a schermo: peso, composizione corporea,
+  /// misurazioni e il log degli allenamenti registrati. Le liste vanno già
+  /// filtrate/ordinate dal chiamante (stesso range della UI).
+  static Future<Uint8List> generateProgressi({
+    required String periodLabel,
+    required List<BodySnapshot> bodySnapshots,
+    required List<PlicometrySession> plicometrySessions,
+    required List<MeasurementSnapshot> measurementSnapshots,
+    required List<WorkoutExercise> workoutExercises,
+    required Map<String, String> misuraLabels,
+    required PdfStrings strings,
+    required String locale,
+  }) async {
+    final font = await PdfGoogleFonts.notoSansRegular();
+    final bold = await PdfGoogleFonts.notoSansBold();
+    final dateFmt = DateFormat.yMd(locale);
+
+    final peso = [...bodySnapshots]..sort((a, b) => a.data.compareTo(b.data));
+    final composizione = [...plicometrySessions]..sort((a, b) => a.data.compareTo(b.data));
+    final misurazioni = [...measurementSnapshots]..sort((a, b) => a.data.compareTo(b.data));
+
+    final byDay = <DateTime, List<WorkoutExercise>>{};
+    for (final e in workoutExercises) {
+      byDay.putIfAbsent(e.date, () => []).add(e);
+    }
+    final workoutDays = byDay.keys.toList()..sort();
+
+    final doc = pw.Document(compress: true);
+    doc.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+        header: (_) => _buildDocHeader(
+          docTitle: strings.progressiPdfTitle,
+          subtitle: periodLabel,
+          detail: null,
+          font: font,
+          bold: bold,
+        ),
+        footer: (ctx) => _buildFooter(ctx, font, strings),
+        build: (_) => [
+          pw.SizedBox(height: 12),
+          _buildProgressiSection(
+            title: strings.progressiSezPeso,
+            rows: peso.isEmpty
+                ? null
+                : peso.map((s) => _buildDateValueRow(
+                    dateFmt.format(s.data), '${s.pesoKg.toStringAsFixed(1)} kg', font)),
+            emptyLabel: strings.progressiNessunDato,
+            font: font,
+            bold: bold,
+          ),
+          _buildProgressiSection(
+            title: strings.progressiSezComposizione,
+            rows: composizione.isEmpty
+                ? null
+                : composizione.map((s) => _buildDateValueRow(
+                    dateFmt.format(s.data),
+                    'BF% ${s.risultati.bodyFatPercent.toStringAsFixed(1)} · '
+                        '${strings.progressiMassaGrassa} ${s.risultati.massaGrassaKg.toStringAsFixed(1)}kg · '
+                        '${strings.progressiMassaMagra} ${s.risultati.massaMagraKg.toStringAsFixed(1)}kg',
+                    font)),
+            emptyLabel: strings.progressiNessunDato,
+            font: font,
+            bold: bold,
+          ),
+          _buildProgressiSection(
+            title: strings.progressiSezMisurazioni,
+            rows: misurazioni.isEmpty
+                ? null
+                : misurazioni.map((s) => _buildDateValueRow(
+                    dateFmt.format(s.data), _misurazioneDetail(s, misuraLabels), font)),
+            emptyLabel: strings.progressiNessunDato,
+            font: font,
+            bold: bold,
+          ),
+          _buildProgressiSection(
+            title: strings.progressiSezAllenamentiPdf,
+            rows: workoutDays.isEmpty
+                ? null
+                : workoutDays.map((d) =>
+                    _buildWorkoutDayBlock(d, byDay[d]!, dateFmt, font, bold, strings)),
+            emptyLabel: strings.nessunaSessione,
+            font: font,
+            bold: bold,
+          ),
+        ],
+      ),
+    );
+    return doc.save();
+  }
+
+  static pw.Widget _buildProgressiSection({
+    required String title,
+    required Iterable<pw.Widget>? rows,
+    required String emptyLabel,
+    required pw.Font font,
+    required pw.Font bold,
+  }) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.only(bottom: 14),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(title,
+              style: pw.TextStyle(
+                  font: bold, fontSize: 10, color: PdfColors.grey700, letterSpacing: 1.2)),
+          pw.SizedBox(height: 4),
+          if (rows == null)
+            pw.Text(emptyLabel,
+                style: pw.TextStyle(
+                    font: font,
+                    fontSize: 9,
+                    fontStyle: pw.FontStyle.italic,
+                    color: PdfColors.grey500))
+          else
+            ...rows,
+        ],
+      ),
+    );
+  }
+
+  static pw.Widget _buildDateValueRow(String date, String value, pw.Font font) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.symmetric(vertical: 2),
+      child: pw.Row(
+        children: [
+          pw.SizedBox(
+            width: 64,
+            child: pw.Text(date,
+                style: pw.TextStyle(font: font, fontSize: 8.5, color: PdfColors.grey600)),
+          ),
+          pw.Expanded(
+            child: pw.Text(value,
+                style: pw.TextStyle(font: font, fontSize: 9, color: PdfColors.grey900)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static String _misurazioneDetail(MeasurementSnapshot s, Map<String, String> labels) {
+    final parts = <String>[];
+    for (final entry in labels.entries) {
+      final v = _misurazioneValue(s, entry.key);
+      if (v == null) continue;
+      final unit = entry.key.endsWith('Mm') ? 'mm' : 'cm';
+      parts.add('${entry.value} ${v.toStringAsFixed(1)}$unit');
+    }
+    return parts.isEmpty ? '-' : parts.join(' · ');
+  }
+
+  static double? _misurazioneValue(MeasurementSnapshot s, String key) {
+    switch (key) {
+      case 'vitaCm':           return s.vitaCm;
+      case 'fianchiCm':        return s.fianchiCm;
+      case 'braccioCm':        return s.braccioCm;
+      case 'colloCm':          return s.colloCm;
+      case 'cosciaCm':         return s.cosciaCm;
+      case 'polpaccioCm':      return s.polpaccioCm;
+      case 'toraceCm':         return s.toraceCm;
+      case 'spalleCm':         return s.spalleCm;
+      case 'tricipiteMm':      return s.tricipiteMm;
+      case 'bicipiteMm':       return s.bicipiteMm;
+      case 'sottoscapolareMm': return s.sottoscapolareMm;
+      case 'sovrailiachMm':    return s.sovrailiachMm;
+      case 'addomineMm':       return s.addomineMm;
+      case 'cosciaMm':         return s.cosciaMm;
+      default:                 return null;
+    }
+  }
+
+  static pw.Widget _buildWorkoutDayBlock(DateTime day, List<WorkoutExercise> exercises,
+      DateFormat dateFmt, pw.Font font, pw.Font bold, PdfStrings strings) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.only(bottom: 5),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(dateFmt.format(day),
+              style: pw.TextStyle(font: bold, fontSize: 9, color: PdfColors.grey800)),
+          for (final e in exercises)
+            pw.Padding(
+              padding: const pw.EdgeInsets.only(left: 8, top: 1),
+              child: pw.Text(
+                '${e.exerciseName}: ${_workoutExerciseDetail(e, strings)}',
+                style: pw.TextStyle(font: font, fontSize: 8.5, color: PdfColors.grey700),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  static String _workoutExerciseDetail(WorkoutExercise e, PdfStrings strings) {
+    if (e.isCardio) {
+      return e.durationSeconds != null ? strings.durataMin(e.durationSeconds! ~/ 60) : '-';
+    }
+    return e.sets.map((s) => '${s.reps ?? '-'}×${s.weightKg ?? '-'}kg').join(', ');
   }
 
   // ── Header generico documento (scheda/programma/storico) ───────

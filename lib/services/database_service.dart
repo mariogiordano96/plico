@@ -1072,6 +1072,20 @@ class DatabaseService {
         .watch(fireImmediately: true);
   }
 
+  /// Come [watchWorkoutExercisesRange], one-shot. Usato dall'export PDF di
+  /// Progressi.
+  Future<List<WorkoutExercise>> getWorkoutExercisesRange(DateTime from, DateTime to) async {
+    final f = _logDate(from);
+    final t = _logDate(to);
+    return _isar.workoutExercises.filter().dateBetween(f, t).findAll();
+  }
+
+  /// Tutti i [WorkoutExercise] mai registrati. Usato dall'export PDF di
+  /// Progressi quando il range selezionato è "tutto" (nessun filtro data).
+  Future<List<WorkoutExercise>> getAllWorkoutExercises() async {
+    return _isar.workoutExercises.where().findAll();
+  }
+
   /// Numero totale di sessioni allenamento mai registrate, dove una sessione
   /// è un giorno con almeno un [WorkoutExercise].
   Future<int> getTotalWorkoutSessionsCount() async {

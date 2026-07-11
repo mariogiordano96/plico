@@ -705,9 +705,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get progressiSezPeso => 'WEIGHT';
 
   @override
-  String get progressiSezDiario => 'DIARY';
-
-  @override
   String get progressiSezComposizione => 'BODY COMPOSITION';
 
   @override
@@ -715,6 +712,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get progressiSezAllenamenti => 'RECENT WORKOUTS';
+
+  @override
+  String get progressiSezAllenamentiPdf => 'WORKOUTS';
 
   @override
   String get progressiNessunAllenamento => 'No workout';
@@ -752,37 +752,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get progressiStatUltimo => 'Last';
 
   @override
-  String get progressiStatMedia => 'Avg';
-
-  @override
   String get progressiStatVariazione => 'Change';
-
-  @override
-  String get progressiStatGiorni => 'Days';
 
   @override
   String get progressiStatRilevazioni => 'Readings';
 
   @override
   String get progressiGenerazionePdf => 'Generating PDF...';
-
-  @override
-  String get progressiEsportaDiario => 'Export Diary';
-
-  @override
-  String get progressiEsportaSub => 'Select the period to export as PDF';
-
-  @override
-  String get progressiUltimaSettimana => 'Last week';
-
-  @override
-  String get progressiUltimoMese => 'Last month';
-
-  @override
-  String get progressi7Giorni => '7 days';
-
-  @override
-  String get progressi30Giorni => '30 days';
 
   @override
   String progressiErrEsportazione(String err) {
