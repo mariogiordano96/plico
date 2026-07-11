@@ -177,9 +177,8 @@ piccoli o di un import "parziale/merge" invece che sostitutivo.
 
 ### Fase 3 — Verifica
 - [x] `flutter analyze` pulito, `flutter test` (148 test) verde
-- [ ] Test manuale end-to-end su device reali (export da un device, import
-      su un secondo device — idealmente di piattaforma diversa): da fare
-      dall'utente, non eseguibile in questo ambiente
+- [x] Test manuale end-to-end su device reali (export da Android, import su
+      iPhone): confermato funzionante dall'utente
 - [ ] Marker di versione/compatibilità esplicito nel file di backup (oggi la
       compatibilità è garantita solo dalla riesecuzione delle migrazioni
       idempotenti post-import, non da un controllo di versione dichiarato)
@@ -243,6 +242,6 @@ manuali.
 - Nessuna scoperta automatica del device (niente mDNS/Bonjour): il QR
   stesso è il meccanismo di pairing, scelta deliberata per restare
   semplice senza permessi/dipendenze aggiuntive.
-- [ ] Test manuale end-to-end su due device reali sulla stessa rete
-      Wi-Fi (Invia su uno, Ricevi sull'altro): da fare dall'utente, non
-      eseguibile in questo ambiente.
+- [x] Test manuale end-to-end su due device reali sulla stessa rete
+      Wi-Fi (Invia su uno, Ricevi sull'altro): confermato funzionante
+      dall'utente.
