@@ -1693,4 +1693,101 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sessioneRiepilogoChiudi => 'Done';
+
+  @override
+  String get impostazioniTitolo => 'Settings';
+
+  @override
+  String get impostazioniNotifiche => 'Notifications';
+
+  @override
+  String get impostazioniNotificheSub => 'Meal and workout reminders';
+
+  @override
+  String get impostazioniBackup => 'Data backup';
+
+  @override
+  String get impostazioniBackupSub => 'Export or import your data';
+
+  @override
+  String get backupTitolo => 'Data backup';
+
+  @override
+  String get backupEsportaTitolo => 'Export backup';
+
+  @override
+  String get backupEsportaDesc =>
+      'Creates a file with all your data (diary, workouts, weigh-ins, measurements, meal plan and preferences). Save it wherever you like (Drive, iCloud, email...) to move it to a new phone.';
+
+  @override
+  String get backupEsportaButton => 'Export backup';
+
+  @override
+  String backupEsportaErrore(String err) {
+    return 'Couldn\'t create the backup: $err';
+  }
+
+  @override
+  String get backupImportaTitolo => 'Import backup';
+
+  @override
+  String get backupImportaDesc =>
+      'Select a backup file exported from Plico on another device. Warning: this overwrites all data currently in this app.';
+
+  @override
+  String get backupImportaButton => 'Import backup';
+
+  @override
+  String get backupImportaConfermaTitolo => 'Overwrite current data?';
+
+  @override
+  String get backupImportaConfermaBody =>
+      'This will replace all data in this app with the data from the selected file. This cannot be undone.';
+
+  @override
+  String get backupImportaConfermaConferma => 'Overwrite';
+
+  @override
+  String get backupImportaFileNonValido =>
+      'The selected file is not a valid Plico backup.';
+
+  @override
+  String backupImportaErrore(String err) {
+    return 'Couldn\'t import the backup: $err';
+  }
+
+  @override
+  String get backupImportaSuccesso => 'Data imported successfully';
+
+  @override
+  String get welcomeTitolo => 'Welcome to Plico';
+
+  @override
+  String get welcomeSottotitolo =>
+      'Before you start, let us know if you\'ve already used Plico on another phone.';
+
+  @override
+  String get welcomeNuovoButton => 'Start fresh';
+
+  @override
+  String get welcomeNuovoSub => 'First time using Plico';
+
+  @override
+  String get welcomeImportaButton => 'I\'ve used Plico before';
+
+  @override
+  String get welcomeImportaSub => 'Import data from another device';
+
+  @override
+  String get welcomeImportaStepTitolo => 'Import your data';
+
+  @override
+  String get welcomeImportaStepDesc =>
+      'On your old phone: open Plico → Settings → Data backup → Export backup, then transfer the file to this phone (email, Drive, iCloud, AirDrop...). Once it\'s ready, select it below.';
+
+  @override
+  String get welcomeImportaSelezionaButton => 'Select backup file';
+
+  @override
+  String get welcomeIndietro => 'Back';
 }

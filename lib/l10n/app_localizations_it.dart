@@ -1703,4 +1703,101 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get sessioneRiepilogoChiudi => 'Fine';
+
+  @override
+  String get impostazioniTitolo => 'Impostazioni';
+
+  @override
+  String get impostazioniNotifiche => 'Notifiche';
+
+  @override
+  String get impostazioniNotificheSub => 'Promemoria pasti e allenamento';
+
+  @override
+  String get impostazioniBackup => 'Backup dati';
+
+  @override
+  String get impostazioniBackupSub => 'Esporta o importa i tuoi dati';
+
+  @override
+  String get backupTitolo => 'Backup dati';
+
+  @override
+  String get backupEsportaTitolo => 'Esporta backup';
+
+  @override
+  String get backupEsportaDesc =>
+      'Crea un file con tutti i tuoi dati (diario, allenamenti, pesate, misurazioni, piano e preferenze). Salvalo dove preferisci (Drive, iCloud, email...) per trasferirlo su un nuovo telefono.';
+
+  @override
+  String get backupEsportaButton => 'Esporta backup';
+
+  @override
+  String backupEsportaErrore(String err) {
+    return 'Impossibile creare il backup: $err';
+  }
+
+  @override
+  String get backupImportaTitolo => 'Importa backup';
+
+  @override
+  String get backupImportaDesc =>
+      'Seleziona un file di backup esportato da Plico su un altro dispositivo. Attenzione: sovrascrive tutti i dati attualmente presenti in questa app.';
+
+  @override
+  String get backupImportaButton => 'Importa backup';
+
+  @override
+  String get backupImportaConfermaTitolo => 'Sovrascrivere i dati attuali?';
+
+  @override
+  String get backupImportaConfermaBody =>
+      'Questa operazione sostituirà tutti i dati presenti in questa app con quelli del file selezionato. Non può essere annullata.';
+
+  @override
+  String get backupImportaConfermaConferma => 'Sovrascrivi';
+
+  @override
+  String get backupImportaFileNonValido =>
+      'Il file selezionato non è un backup Plico valido.';
+
+  @override
+  String backupImportaErrore(String err) {
+    return 'Impossibile importare il backup: $err';
+  }
+
+  @override
+  String get backupImportaSuccesso => 'Dati importati con successo';
+
+  @override
+  String get welcomeTitolo => 'Benvenuto su Plico';
+
+  @override
+  String get welcomeSottotitolo =>
+      'Prima di iniziare, dicci se hai già usato Plico su un altro telefono.';
+
+  @override
+  String get welcomeNuovoButton => 'Inizia da zero';
+
+  @override
+  String get welcomeNuovoSub => 'Prima volta che usi Plico';
+
+  @override
+  String get welcomeImportaButton => 'Ho già usato Plico';
+
+  @override
+  String get welcomeImportaSub => 'Importa i dati da un altro dispositivo';
+
+  @override
+  String get welcomeImportaStepTitolo => 'Importa i tuoi dati';
+
+  @override
+  String get welcomeImportaStepDesc =>
+      'Sul vecchio telefono: apri Plico → Impostazioni → Backup dati → Esporta backup, poi trasferisci il file su questo telefono (email, Drive, iCloud, AirDrop...). Quando è pronto, selezionalo qui sotto.';
+
+  @override
+  String get welcomeImportaSelezionaButton => 'Seleziona file di backup';
+
+  @override
+  String get welcomeIndietro => 'Indietro';
 }

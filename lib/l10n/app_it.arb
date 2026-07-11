@@ -708,5 +708,39 @@
   "@sessioneRiepilogoRecordEsercizio": {
     "placeholders": { "esercizio": { "type": "String" }, "kg": { "type": "String" } }
   },
-  "sessioneRiepilogoChiudi": "Fine"
+  "sessioneRiepilogoChiudi": "Fine",
+
+  "impostazioniTitolo": "Impostazioni",
+  "impostazioniNotifiche": "Notifiche",
+  "impostazioniNotificheSub": "Promemoria pasti e allenamento",
+  "impostazioniBackup": "Backup dati",
+  "impostazioniBackupSub": "Esporta o importa i tuoi dati",
+
+  "backupTitolo": "Backup dati",
+  "backupEsportaTitolo": "Esporta backup",
+  "backupEsportaDesc": "Crea un file con tutti i tuoi dati (diario, allenamenti, pesate, misurazioni, piano e preferenze). Salvalo dove preferisci (Drive, iCloud, email...) per trasferirlo su un nuovo telefono.",
+  "backupEsportaButton": "Esporta backup",
+  "backupEsportaErrore": "Impossibile creare il backup: {err}",
+  "@backupEsportaErrore": { "placeholders": { "err": { "type": "String" } } },
+  "backupImportaTitolo": "Importa backup",
+  "backupImportaDesc": "Seleziona un file di backup esportato da Plico su un altro dispositivo. Attenzione: sovrascrive tutti i dati attualmente presenti in questa app.",
+  "backupImportaButton": "Importa backup",
+  "backupImportaConfermaTitolo": "Sovrascrivere i dati attuali?",
+  "backupImportaConfermaBody": "Questa operazione sostituirà tutti i dati presenti in questa app con quelli del file selezionato. Non può essere annullata.",
+  "backupImportaConfermaConferma": "Sovrascrivi",
+  "backupImportaFileNonValido": "Il file selezionato non è un backup Plico valido.",
+  "backupImportaErrore": "Impossibile importare il backup: {err}",
+  "@backupImportaErrore": { "placeholders": { "err": { "type": "String" } } },
+  "backupImportaSuccesso": "Dati importati con successo",
+
+  "welcomeTitolo": "Benvenuto su Plico",
+  "welcomeSottotitolo": "Prima di iniziare, dicci se hai già usato Plico su un altro telefono.",
+  "welcomeNuovoButton": "Inizia da zero",
+  "welcomeNuovoSub": "Prima volta che usi Plico",
+  "welcomeImportaButton": "Ho già usato Plico",
+  "welcomeImportaSub": "Importa i dati da un altro dispositivo",
+  "welcomeImportaStepTitolo": "Importa i tuoi dati",
+  "welcomeImportaStepDesc": "Sul vecchio telefono: apri Plico → Impostazioni → Backup dati → Esporta backup, poi trasferisci il file su questo telefono (email, Drive, iCloud, AirDrop...). Quando è pronto, selezionalo qui sotto.",
+  "welcomeImportaSelezionaButton": "Seleziona file di backup",
+  "welcomeIndietro": "Indietro"
 }

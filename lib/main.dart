@@ -6,7 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:home_widget/home_widget.dart';
 import 'theme/app_theme.dart';
 import 'screens/main_screen.dart';
-import 'screens/onboarding/onboarding_screen.dart';
+import 'screens/onboarding/welcome_screen.dart';
 import 'screens/diario/aggiunta_alimento_screen.dart';
 import 'services/achievement_service.dart';
 import 'services/database_service.dart';
@@ -144,7 +144,7 @@ class _PlicoAppState extends State<PlicoApp> with WidgetsBindingObserver {
                   ),
                 );
               }
-              return snapshot.data! ? const MainScreen() : const OnboardingScreen();
+              return snapshot.data! ? const MainScreen() : const WelcomeScreen();
             },
           ),
         );

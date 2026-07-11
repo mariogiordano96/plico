@@ -552,5 +552,37 @@
   "sessioneRiepilogoNuoviRecord": "NEW PERSONAL RECORDS",
   "sessioneRiepilogoNessunRecord": "No new records this time",
   "sessioneRiepilogoRecordEsercizio": "{esercizio}: {kg} kg",
-  "sessioneRiepilogoChiudi": "Done"
+  "sessioneRiepilogoChiudi": "Done",
+
+  "impostazioniTitolo": "Settings",
+  "impostazioniNotifiche": "Notifications",
+  "impostazioniNotificheSub": "Meal and workout reminders",
+  "impostazioniBackup": "Data backup",
+  "impostazioniBackupSub": "Export or import your data",
+
+  "backupTitolo": "Data backup",
+  "backupEsportaTitolo": "Export backup",
+  "backupEsportaDesc": "Creates a file with all your data (diary, workouts, weigh-ins, measurements, meal plan and preferences). Save it wherever you like (Drive, iCloud, email...) to move it to a new phone.",
+  "backupEsportaButton": "Export backup",
+  "backupEsportaErrore": "Couldn't create the backup: {err}",
+  "backupImportaTitolo": "Import backup",
+  "backupImportaDesc": "Select a backup file exported from Plico on another device. Warning: this overwrites all data currently in this app.",
+  "backupImportaButton": "Import backup",
+  "backupImportaConfermaTitolo": "Overwrite current data?",
+  "backupImportaConfermaBody": "This will replace all data in this app with the data from the selected file. This cannot be undone.",
+  "backupImportaConfermaConferma": "Overwrite",
+  "backupImportaFileNonValido": "The selected file is not a valid Plico backup.",
+  "backupImportaErrore": "Couldn't import the backup: {err}",
+  "backupImportaSuccesso": "Data imported successfully",
+
+  "welcomeTitolo": "Welcome to Plico",
+  "welcomeSottotitolo": "Before you start, let us know if you've already used Plico on another phone.",
+  "welcomeNuovoButton": "Start fresh",
+  "welcomeNuovoSub": "First time using Plico",
+  "welcomeImportaButton": "I've used Plico before",
+  "welcomeImportaSub": "Import data from another device",
+  "welcomeImportaStepTitolo": "Import your data",
+  "welcomeImportaStepDesc": "On your old phone: open Plico → Settings → Data backup → Export backup, then transfer the file to this phone (email, Drive, iCloud, AirDrop...). Once it's ready, select it below.",
+  "welcomeImportaSelezionaButton": "Select backup file",
+  "welcomeIndietro": "Back"
 }

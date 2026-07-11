@@ -3127,6 +3127,180 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Fine'**
   String get sessioneRiepilogoChiudi;
+
+  /// No description provided for @impostazioniTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'Impostazioni'**
+  String get impostazioniTitolo;
+
+  /// No description provided for @impostazioniNotifiche.
+  ///
+  /// In it, this message translates to:
+  /// **'Notifiche'**
+  String get impostazioniNotifiche;
+
+  /// No description provided for @impostazioniNotificheSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Promemoria pasti e allenamento'**
+  String get impostazioniNotificheSub;
+
+  /// No description provided for @impostazioniBackup.
+  ///
+  /// In it, this message translates to:
+  /// **'Backup dati'**
+  String get impostazioniBackup;
+
+  /// No description provided for @impostazioniBackupSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Esporta o importa i tuoi dati'**
+  String get impostazioniBackupSub;
+
+  /// No description provided for @backupTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'Backup dati'**
+  String get backupTitolo;
+
+  /// No description provided for @backupEsportaTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'Esporta backup'**
+  String get backupEsportaTitolo;
+
+  /// No description provided for @backupEsportaDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'Crea un file con tutti i tuoi dati (diario, allenamenti, pesate, misurazioni, piano e preferenze). Salvalo dove preferisci (Drive, iCloud, email...) per trasferirlo su un nuovo telefono.'**
+  String get backupEsportaDesc;
+
+  /// No description provided for @backupEsportaButton.
+  ///
+  /// In it, this message translates to:
+  /// **'Esporta backup'**
+  String get backupEsportaButton;
+
+  /// No description provided for @backupEsportaErrore.
+  ///
+  /// In it, this message translates to:
+  /// **'Impossibile creare il backup: {err}'**
+  String backupEsportaErrore(String err);
+
+  /// No description provided for @backupImportaTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'Importa backup'**
+  String get backupImportaTitolo;
+
+  /// No description provided for @backupImportaDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'Seleziona un file di backup esportato da Plico su un altro dispositivo. Attenzione: sovrascrive tutti i dati attualmente presenti in questa app.'**
+  String get backupImportaDesc;
+
+  /// No description provided for @backupImportaButton.
+  ///
+  /// In it, this message translates to:
+  /// **'Importa backup'**
+  String get backupImportaButton;
+
+  /// No description provided for @backupImportaConfermaTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'Sovrascrivere i dati attuali?'**
+  String get backupImportaConfermaTitolo;
+
+  /// No description provided for @backupImportaConfermaBody.
+  ///
+  /// In it, this message translates to:
+  /// **'Questa operazione sostituirà tutti i dati presenti in questa app con quelli del file selezionato. Non può essere annullata.'**
+  String get backupImportaConfermaBody;
+
+  /// No description provided for @backupImportaConfermaConferma.
+  ///
+  /// In it, this message translates to:
+  /// **'Sovrascrivi'**
+  String get backupImportaConfermaConferma;
+
+  /// No description provided for @backupImportaFileNonValido.
+  ///
+  /// In it, this message translates to:
+  /// **'Il file selezionato non è un backup Plico valido.'**
+  String get backupImportaFileNonValido;
+
+  /// No description provided for @backupImportaErrore.
+  ///
+  /// In it, this message translates to:
+  /// **'Impossibile importare il backup: {err}'**
+  String backupImportaErrore(String err);
+
+  /// No description provided for @backupImportaSuccesso.
+  ///
+  /// In it, this message translates to:
+  /// **'Dati importati con successo'**
+  String get backupImportaSuccesso;
+
+  /// No description provided for @welcomeTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'Benvenuto su Plico'**
+  String get welcomeTitolo;
+
+  /// No description provided for @welcomeSottotitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'Prima di iniziare, dicci se hai già usato Plico su un altro telefono.'**
+  String get welcomeSottotitolo;
+
+  /// No description provided for @welcomeNuovoButton.
+  ///
+  /// In it, this message translates to:
+  /// **'Inizia da zero'**
+  String get welcomeNuovoButton;
+
+  /// No description provided for @welcomeNuovoSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Prima volta che usi Plico'**
+  String get welcomeNuovoSub;
+
+  /// No description provided for @welcomeImportaButton.
+  ///
+  /// In it, this message translates to:
+  /// **'Ho già usato Plico'**
+  String get welcomeImportaButton;
+
+  /// No description provided for @welcomeImportaSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Importa i dati da un altro dispositivo'**
+  String get welcomeImportaSub;
+
+  /// No description provided for @welcomeImportaStepTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'Importa i tuoi dati'**
+  String get welcomeImportaStepTitolo;
+
+  /// No description provided for @welcomeImportaStepDesc.
+  ///
+  /// In it, this message translates to:
+  /// **'Sul vecchio telefono: apri Plico → Impostazioni → Backup dati → Esporta backup, poi trasferisci il file su questo telefono (email, Drive, iCloud, AirDrop...). Quando è pronto, selezionalo qui sotto.'**
+  String get welcomeImportaStepDesc;
+
+  /// No description provided for @welcomeImportaSelezionaButton.
+  ///
+  /// In it, this message translates to:
+  /// **'Seleziona file di backup'**
+  String get welcomeImportaSelezionaButton;
+
+  /// No description provided for @welcomeIndietro.
+  ///
+  /// In it, this message translates to:
+  /// **'Indietro'**
+  String get welcomeIndietro;
 }
 
 class _AppLocalizationsDelegate

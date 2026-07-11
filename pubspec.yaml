@@ -49,6 +49,13 @@ dependencies:
   home_widget: ^0.7.0
   intl: ^0.20.2
   url_launcher: ^6.3.1
+  share_plus: ^10.0.0
+  # Pinned: le versioni successive (>=8.3.7, fino alla 11.x più recente)
+  # aggiungono sorgenti Kotlin con un check "se AGP>=9 salta il proprio
+  # Kotlin Gradle Plugin" che in questo progetto (AGP 9, builtInKotlin=false
+  # come tutti gli altri plugin nativi già in uso) lascia quelle classi non
+  # compilate. La 8.3.7 è puro Java, nessun problema di questo tipo.
+  file_picker: 8.3.7
 
 dev_dependencies:
   flutter_test:

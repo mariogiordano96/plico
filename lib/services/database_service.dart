@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -1334,6 +1336,75 @@ class DatabaseService {
     template.lastUsedAt = day;
     await saveWorkoutTemplate(template);
     return created;
+  }
+
+  // ──────────────────────────────────────────────
+  // Backup / migrazione dati
+  // ──────────────────────────────────────────────
+
+  /// Copia compattata e coerente del database corrente, pronta da
+  /// condividere. Isar raccomanda `copyToFile` per i backup (vedi doc del
+  /// metodo nel package).
+  Future<File> exportBackup() async {
+    final tempDir = await getTemporaryDirectory();
+    final ts = DateFormat('yyyyMMdd_HHmm').format(DateTime.now());
+    final target = File('${tempDir.path}/plico_backup_$ts.isar');
+    await _isar.copyToFile(target.path);
+    return target;
+  }
+
+  /// Verifica che [file] sia un backup Isar valido con lo schema atteso,
+  /// senza toccare il database reale: lo apre in un'istanza temporanea
+  /// isolata (nome e percorso diversi da quello reale) e la richiude
+  /// subito dopo.
+  Future<bool> validateBackupFile(File file) async {
+    final tempDir = await getTemporaryDirectory();
+    final probeDir = Directory(
+        '${tempDir.path}/backup_probe_${DateTime.now().microsecondsSinceEpoch}');
+    await probeDir.create(recursive: true);
+    try {
+      final probeFile = File('${probeDir.path}/probe.isar');
+      await file.copy(probeFile.path);
+      final probe = await Isar.open(
+        _schemas,
+        directory: probeDir.path,
+        name: 'probe_${DateTime.now().microsecondsSinceEpoch}',
+      );
+      await probe.close();
+      return true;
+    } catch (_) {
+      return false;
+    } finally {
+      if (await probeDir.exists()) await probeDir.delete(recursive: true);
+    }
+  }
+
+  /// Sostituisce il database reale con [file], che va validato PRIMA con
+  /// [validateBackupFile]. Chiude l'istanza corrente, tiene una copia di
+  /// sicurezza del file attuale finché la sostituzione non è confermata,
+  /// poi riapre. Dopo un import riuscito il chiamante deve ricostruire la
+  /// navigazione da zero: qualunque `watch()` già sottoscritto punta
+  /// all'istanza appena chiusa e non si aggiornerà più.
+  Future<void> importBackup(File file) async {
+    final dirPath = (await getApplicationDocumentsDirectory()).path;
+    final realFile = File('$dirPath/default.isar');
+    final safetyCopy = File('$dirPath/default.isar.bak');
+
+    await _isar.close();
+    if (await realFile.exists()) {
+      await realFile.copy(safetyCopy.path);
+    }
+    try {
+      await file.copy(realFile.path);
+      _isar = await Isar.open(_schemas, directory: dirPath);
+      if (await safetyCopy.exists()) await safetyCopy.delete();
+    } catch (_) {
+      if (await safetyCopy.exists()) {
+        await safetyCopy.copy(realFile.path);
+      }
+      _isar = await Isar.open(_schemas, directory: dirPath);
+      rethrow;
+    }
   }
 
   // ──────────────────────────────────────────────

@@ -15,7 +15,7 @@ import '../services/database_service.dart';
 import '../services/streak_service.dart';
 import '../services/insights_service.dart';
 import '../main.dart';
-import 'impostazioni/notifiche_screen.dart';
+import 'impostazioni/impostazioni_screen.dart';
 import 'pesate/pesate_screen.dart';
 import 'plicometry/method_selection_screen.dart';
 import 'tdee/tdee_screen.dart' show calcolaTdee;
@@ -41,10 +41,10 @@ class HomeScreen extends StatelessWidget {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications_outlined, color: p.accent),
+            icon: Icon(Icons.settings_outlined, color: p.accent),
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const NotificheScreen()),
+              MaterialPageRoute(builder: (_) => const ImpostazioniScreen()),
             ),
           ),
           ValueListenableBuilder<ThemeMode>(
