@@ -17,6 +17,11 @@ import '../main_screen.dart';
 Future<bool> runImportBackupFlow(BuildContext context) async {
   final l10n = context.l10n;
 
+  // L'estensione "isar" è registrata come tipo di file custom in
+  // ios/Runner/Info.plist (UTExportedTypeDeclarations): senza quella
+  // dichiarazione iOS non saprebbe risolverla a un tipo noto e file_picker
+  // scarterebbe il filtro (vedi FileUtils.m, "dynamic UTI"), lasciando il
+  // file non selezionabile.
   final picked = await FilePicker.platform.pickFiles(
     type: FileType.custom,
     allowedExtensions: ['isar'],
