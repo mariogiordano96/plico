@@ -2630,6 +2630,36 @@ abstract class AppLocalizations {
   /// **'Impossibile aprire YouTube'**
   String get allenamentoYoutubeErrore;
 
+  /// No description provided for @allenamentoDurataDaImpostare.
+  ///
+  /// In it, this message translates to:
+  /// **'Durata da impostare'**
+  String get allenamentoDurataDaImpostare;
+
+  /// No description provided for @targetDialogTipoSerie.
+  ///
+  /// In it, this message translates to:
+  /// **'Serie e ripetizioni'**
+  String get targetDialogTipoSerie;
+
+  /// No description provided for @targetDialogTipoTempo.
+  ///
+  /// In it, this message translates to:
+  /// **'A tempo'**
+  String get targetDialogTipoTempo;
+
+  /// No description provided for @logDialogTracciaATempo.
+  ///
+  /// In it, this message translates to:
+  /// **'Traccia a tempo, invece'**
+  String get logDialogTracciaATempo;
+
+  /// No description provided for @logDialogTracciaASerie.
+  ///
+  /// In it, this message translates to:
+  /// **'Traccia con serie e ripetizioni, invece'**
+  String get logDialogTracciaASerie;
+
   /// No description provided for @allenamentoModifica.
   ///
   /// In it, this message translates to:

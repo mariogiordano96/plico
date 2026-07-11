@@ -30,6 +30,12 @@ class WorkoutExercise {
 
   int? estimatedKcal; // calcolato e persistito al salvataggio (Fase 5)
 
+  /// Sempre affidabile fin dalla creazione (sia `_aggiungiEsercizio` sia
+  /// `startWorkoutFromTemplate` impostano `sets=[]` solo per cardio), a
+  /// differenza di `durationSeconds`, che può restare null anche per un
+  /// esercizio cardio non ancora compilato dall'utente.
+  bool get isCardio => sets.isEmpty;
+
   // Fase 21: tracciabilità della scheda/programma di provenienza, valorizzati solo
   // quando l'esercizio nasce da startWorkoutFromTemplate (null per il log libero).
   // Snapshot (non solo l'id) così il riferimento resta leggibile anche se la scheda

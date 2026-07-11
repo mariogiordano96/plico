@@ -794,7 +794,7 @@ class PdfExportService {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: esercizi.map((e) {
-        final target = e.targetDurationSeconds != null
+        final target = e.isCardio
             ? strings.durataMin(e.targetDurationSeconds! ~/ 60)
             : '${e.targetSets ?? '-'}×${e.targetReps ?? '-'}'
                 '${e.targetWeightKg != null ? ' · ${e.targetWeightKg}kg' : ''}';
@@ -877,9 +877,11 @@ class PdfExportService {
     required pw.Font bold,
     required PdfStrings strings,
   }) {
-    final isCardio = session.durationSeconds != null;
+    final isCardio = session.isCardio;
     final detail = isCardio
-        ? strings.durataMin(session.durationSeconds! ~/ 60)
+        ? (session.durationSeconds != null
+            ? strings.durataMin(session.durationSeconds! ~/ 60)
+            : '-')
         : session.sets.map((s) => '${s.reps ?? '-'}×${s.weightKg ?? '-'}kg').join(', ');
 
     return pw.Padding(

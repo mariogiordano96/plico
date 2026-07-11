@@ -1276,7 +1276,7 @@ class DatabaseService {
         template.programId != null ? await _isar.workoutPrograms.get(template.programId!) : null;
     final created = <WorkoutExercise>[];
     for (final te in template.exercises) {
-      final isCardio = te.targetDurationSeconds != null;
+      final isCardio = te.isCardio;
       final we = WorkoutExercise()
         ..exerciseId = te.exerciseId
         ..exerciseName = te.exerciseName

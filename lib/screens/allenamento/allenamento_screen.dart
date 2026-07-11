@@ -15,6 +15,7 @@ import 'log_serie_dialog.dart';
 import 'sessione_guidata_screen.dart';
 import 'sostituisci_esercizio_sheet.dart';
 import 'storico_esercizio_screen.dart';
+import 'tracking_mode_switch.dart';
 
 class AllenamentoScreen extends StatefulWidget {
   const AllenamentoScreen({super.key});
@@ -166,7 +167,7 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
   }
 
   bool _isDone(WorkoutExercise e) =>
-      e.sets.isEmpty ? e.cardioConfirmed : e.sets.every((s) => s.confirmed);
+      e.isCardio ? e.cardioConfirmed : e.sets.every((s) => s.confirmed);
 
   /// Avvia la modalità guidata su tutti gli esercizi già presenti nel log del
   /// giorno (aggiunti liberamente o popolati da una scheda/programma con
@@ -185,20 +186,38 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
   }
 
   Future<void> _modifica(WorkoutExercise e) async {
-    final stub = ExerciseDefinition()
-      ..externalId = e.exerciseId
-      ..name = e.exerciseName
-      ..muscleGroup = ''
-      ..category = e.durationSeconds != null ? 'cardio' : 'strength';
+    var isCardio = e.isCardio;
+    Object? result;
+    while (true) {
+      final stub = ExerciseDefinition()
+        ..externalId = e.exerciseId
+        ..name = e.exerciseName
+        ..muscleGroup = ''
+        ..category = isCardio ? 'cardio' : 'strength';
 
-    final updated = e.durationSeconds != null
-        ? await showLogCardioDialog(context, stub, initial: e)
-        : await showLogSerieDialog(context, stub, initial: e);
-    if (updated == null || !mounted) return;
+      result = isCardio
+          ? await showLogCardioDialog(context, stub, initial: e)
+          : await showLogSerieDialog(context, stub, initial: e);
+      if (!mounted) return;
+      if (!identical(result, switchTrackingModeSignal)) break;
+
+      // L'utente ha chiesto di cambiare modalità di tracciamento: azzera il
+      // campo dell'altra modalità e riapre il dialog corretto (vedi
+      // WorkoutExercise.isCardio, derivato da sets.isEmpty).
+      isCardio = !isCardio;
+      if (isCardio) {
+        e.sets = [];
+      } else {
+        e.durationSeconds = null;
+        e.sets = [WorkoutSet()];
+      }
+    }
+    if (result == null) return;
+    final updated = result as WorkoutExercise;
 
     final bodySnapshot = await DatabaseService.instance.getLatestBodySnapshot();
     final bodyWeightKg = bodySnapshot?.pesoKg;
-    if (updated.durationSeconds != null) {
+    if (updated.isCardio) {
       updated.met = CalorieEstimationService.metForCardioExercise(updated.exerciseId).round();
       updated.estimatedKcal = CalorieEstimationService.estimateCardioKcal(
         exerciseId: updated.exerciseId,
@@ -278,13 +297,18 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
 
     final bodySnapshot = await DatabaseService.instance.getLatestBodySnapshot();
     final bodyWeightKg = bodySnapshot?.pesoKg;
-    if (e.durationSeconds != null) {
-      e.met = CalorieEstimationService.metForCardioExercise(e.exerciseId).round();
-      e.estimatedKcal = CalorieEstimationService.estimateCardioKcal(
-        exerciseId: e.exerciseId,
-        durationSeconds: e.durationSeconds!,
-        bodyWeightKg: bodyWeightKg,
-      );
+    if (e.isCardio) {
+      // durationSeconds può essere ancora null se l'esercizio è stato
+      // aggiunto rapidamente e non ancora compilato: niente da stimare finché
+      // non c'è un valore.
+      if (e.durationSeconds != null) {
+        e.met = CalorieEstimationService.metForCardioExercise(e.exerciseId).round();
+        e.estimatedKcal = CalorieEstimationService.estimateCardioKcal(
+          exerciseId: e.exerciseId,
+          durationSeconds: e.durationSeconds!,
+          bodyWeightKg: bodyWeightKg,
+        );
+      }
     } else {
       e.estimatedKcal = CalorieEstimationService.estimateStrengthKcal(
         workingSetCount: e.sets.length,
@@ -635,9 +659,11 @@ class _ExerciseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isCardio = exercise.durationSeconds != null;
+    final isCardio = exercise.isCardio;
     final sottotitolo = isCardio
-        ? l10n.allenamentoDurataMin(exercise.durationSeconds! ~/ 60)
+        ? (exercise.durationSeconds != null
+            ? l10n.allenamentoDurataMin(exercise.durationSeconds! ~/ 60)
+            : l10n.allenamentoDurataDaImpostare)
         : exercise.sets
             .map((s) => '${s.reps ?? '-'}×${s.weightKg != null ? '${s.weightKg}kg' : '-'}')
             .join(', ');

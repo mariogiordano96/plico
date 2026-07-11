@@ -92,7 +92,7 @@ class _StoricoEsercizioScreenState extends State<StoricoEsercizioScreen> {
   Widget build(BuildContext context) {
     final p = context.palette;
     final l10n = context.l10n;
-    final isCardio = _history.isNotEmpty && _history.first.durationSeconds != null;
+    final isCardio = _history.isNotEmpty && _history.first.isCardio;
 
     return Scaffold(
       backgroundColor: p.background,
@@ -222,9 +222,11 @@ class _SessionRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final locale = Localizations.localeOf(context).toString();
     final dataLabel = DateFormat('d MMM', locale).format(session.date);
-    final isCardio = session.durationSeconds != null;
+    final isCardio = session.isCardio;
     final detail = isCardio
-        ? l10n.allenamentoDurataMin(session.durationSeconds! ~/ 60)
+        ? (session.durationSeconds != null
+            ? l10n.allenamentoDurataMin(session.durationSeconds! ~/ 60)
+            : l10n.allenamentoDurataDaImpostare)
         : session.sets.map((s) => '${s.reps ?? '-'}×${s.weightKg ?? '-'}kg').join(', ');
     final avgRpe = isCardio ? null : WorkoutProgressService.averageRpe(session);
 

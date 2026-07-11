@@ -2,18 +2,21 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../models/exercise_definition.dart';
 import '../../models/workout_exercise.dart';
+import 'tracking_mode_switch.dart';
 
 /// Mostra il dialog di log durata per un esercizio cardio.
 /// Se [initial] è fornito (Fase 14, modifica di un esercizio già loggato), il
 /// dialog pre-compila la durata esistente e ritorna la stessa istanza
 /// aggiornata (stesso `Id`) invece di crearne una nuova.
-/// Ritorna il WorkoutExercise compilato, o null se annullato.
-Future<WorkoutExercise?> showLogCardioDialog(
+/// Ritorna il WorkoutExercise compilato, `switchTrackingModeSignal` se
+/// l'utente ha chiesto di passare al log a serie/ripetizioni, o null se
+/// annullato.
+Future<Object?> showLogCardioDialog(
   BuildContext context,
   ExerciseDefinition exercise, {
   WorkoutExercise? initial,
 }) {
-  return showModalBottomSheet<WorkoutExercise>(
+  return showModalBottomSheet<Object>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
@@ -58,6 +61,10 @@ class _LogCardioDialogState extends State<_LogCardioDialog> {
           ..exerciseName = widget.exercise.nameIt ?? widget.exercise.name
           ..date = DateTime.now());
     result.durationSeconds = minuti * 60;
+    // Un esercizio non deve mai avere sia sets che durationSeconds
+    // valorizzati: se `initial` arrivava da un cambio di modalità o da uno
+    // stato inconsistente pregresso, questo salvataggio lo corregge.
+    result.sets = [];
     Navigator.pop(context, result);
   }
 
@@ -79,9 +86,20 @@ class _LogCardioDialogState extends State<_LogCardioDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              widget.exercise.nameIt ?? widget.exercise.name,
-              style: TextStyle(color: p.accent, fontSize: 17, fontWeight: FontWeight.w700),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    widget.exercise.nameIt ?? widget.exercise.name,
+                    style: TextStyle(color: p.accent, fontSize: 17, fontWeight: FontWeight.w700),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, switchTrackingModeSignal),
+                  child: Text(l10n.logDialogTracciaASerie,
+                      style: TextStyle(color: p.textMuted, fontSize: 12)),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
             Text(l10n.cardioDialogDurataLabel,

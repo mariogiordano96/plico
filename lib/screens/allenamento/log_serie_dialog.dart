@@ -4,6 +4,7 @@ import '../../models/exercise_definition.dart';
 import '../../models/workout_exercise.dart';
 import '../../models/workout_set.dart';
 import '../../services/workout_progress_service.dart';
+import 'tracking_mode_switch.dart';
 
 /// Mostra il dialog di log serie per un esercizio di forza. Se [lastSession] è
 /// disponibile, mostra il suggerimento di progressive overload (o di scarico, se
@@ -11,15 +12,16 @@ import '../../services/workout_progress_service.dart';
 /// Se [initial] è fornito (Fase 14, modifica di un esercizio già loggato), il
 /// dialog pre-compila le serie esistenti e ritorna la stessa istanza aggiornata
 /// (stesso `Id`) invece di crearne una nuova.
-/// Ritorna il WorkoutExercise compilato, o null se annullato.
-Future<WorkoutExercise?> showLogSerieDialog(
+/// Ritorna il WorkoutExercise compilato, `switchTrackingModeSignal` se l'utente
+/// ha chiesto di passare al log a tempo, o null se annullato.
+Future<Object?> showLogSerieDialog(
   BuildContext context,
   ExerciseDefinition exercise, {
   WorkoutExercise? lastSession,
   OverloadSuggestion? suggestion,
   WorkoutExercise? initial,
 }) {
-  return showModalBottomSheet<WorkoutExercise>(
+  return showModalBottomSheet<Object>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
@@ -119,6 +121,10 @@ class _LogSerieDialogState extends State<_LogSerieDialog> {
           ..exerciseName = widget.exercise.nameIt ?? widget.exercise.name
           ..date = DateTime.now());
     result.sets = sets;
+    // Un esercizio non deve mai avere sia sets che durationSeconds
+    // valorizzati: se `initial` arrivava da un cambio di modalità o da uno
+    // stato inconsistente pregresso, questo salvataggio lo corregge.
+    result.durationSeconds = null;
     Navigator.pop(context, result);
   }
 
@@ -140,9 +146,20 @@ class _LogSerieDialogState extends State<_LogSerieDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              widget.exercise.nameIt ?? widget.exercise.name,
-              style: TextStyle(color: p.accent, fontSize: 17, fontWeight: FontWeight.w700),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    widget.exercise.nameIt ?? widget.exercise.name,
+                    style: TextStyle(color: p.accent, fontSize: 17, fontWeight: FontWeight.w700),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, switchTrackingModeSignal),
+                  child: Text(l10n.logDialogTracciaATempo,
+                      style: TextStyle(color: p.textMuted, fontSize: 12)),
+                ),
+              ],
             ),
             if (widget.lastSession != null || widget.suggestion != null) ...[
               const SizedBox(height: 10),

@@ -1402,6 +1402,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get allenamentoYoutubeErrore => 'Couldn\'t open YouTube';
 
   @override
+  String get allenamentoDurataDaImpostare => 'Duration not set';
+
+  @override
+  String get targetDialogTipoSerie => 'Sets and reps';
+
+  @override
+  String get targetDialogTipoTempo => 'Timed';
+
+  @override
+  String get logDialogTracciaATempo => 'Track by time instead';
+
+  @override
+  String get logDialogTracciaASerie => 'Track with sets and reps instead';
+
+  @override
   String get allenamentoModifica => 'Edit';
 
   @override

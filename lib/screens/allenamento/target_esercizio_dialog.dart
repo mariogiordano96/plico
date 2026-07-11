@@ -31,7 +31,10 @@ class _TargetEsercizioDialogState extends State<_TargetEsercizioDialog> {
   final _kgCtrl = TextEditingController();
   final _durataCtrl = TextEditingController(text: '30');
 
-  bool get _isCardio => widget.exercise.category == 'cardio';
+  // Preselezionato dalla categoria del catalogo ma sempre modificabile: il
+  // modello dati supporta target a tempo per qualunque esercizio (vedi i
+  // preset con Plank/Mountain Climbers), non solo quelli taggati cardio.
+  late bool _isCardio = widget.exercise.category == 'cardio';
 
   @override
   void dispose() {
@@ -82,6 +85,15 @@ class _TargetEsercizioDialogState extends State<_TargetEsercizioDialog> {
             Text(
               l10n.targetDialogTitle(widget.exercise.nameIt ?? widget.exercise.name),
               style: TextStyle(color: p.accent, fontSize: 16, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 16),
+            SegmentedButton<bool>(
+              segments: [
+                ButtonSegment(value: false, label: Text(l10n.targetDialogTipoSerie)),
+                ButtonSegment(value: true, label: Text(l10n.targetDialogTipoTempo)),
+              ],
+              selected: {_isCardio},
+              onSelectionChanged: (s) => setState(() => _isCardio = s.first),
             ),
             const SizedBox(height: 16),
             if (_isCardio)

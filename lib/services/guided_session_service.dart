@@ -35,7 +35,7 @@ class GuidedSessionService {
     Map<String, List<WorkoutExercise>> priorHistoryByExerciseId,
   ) {
     return session.where((e) {
-      if (e.durationSeconds != null) return false;
+      if (e.isCardio) return false;
       final prior = priorHistoryByExerciseId[e.exerciseId] ?? const [];
       return WorkoutProgressService.isNewPersonalRecord(e, prior);
     }).toList();

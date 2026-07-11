@@ -200,7 +200,7 @@ class _EsercizioRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final target = esercizio.targetDurationSeconds != null
+    final target = esercizio.isCardio
         ? '${esercizio.targetDurationSeconds! ~/ 60} min'
         : '${esercizio.targetSets ?? '-'}×${esercizio.targetReps ?? '-'}'
             '${esercizio.targetWeightKg != null ? ' · ${esercizio.targetWeightKg}kg' : ''}';

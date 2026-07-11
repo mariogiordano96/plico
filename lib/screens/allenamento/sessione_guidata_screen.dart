@@ -114,7 +114,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
       // sono a lunghezza fissa, insertAll/add sotto altrimenti lanciano
       // "Cannot add to a fixed-length list".
       e.sets = List.of(e.sets, growable: true);
-      final isCardio = e.sets.isEmpty;
+      final isCardio = e.isCardio;
       if (isCardio) {
         _durataCtrls[e.id] = TextEditingController(
           text: e.durationSeconds != null ? (e.durationSeconds! ~/ 60).toString() : '',
@@ -225,7 +225,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
   }
 
   bool _isExerciseDone(WorkoutExercise e) =>
-      e.sets.isEmpty ? e.cardioConfirmed : e.sets.every((s) => s.confirmed);
+      e.isCardio ? e.cardioConfirmed : e.sets.every((s) => s.confirmed);
 
   bool get _isLastStep => _stepIndex >= _steps.length - 1;
 
@@ -297,13 +297,17 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     e.exerciseId = alt.externalId;
     e.exerciseName = alt.nameIt ?? alt.name;
 
-    if (e.durationSeconds != null) {
-      e.met = CalorieEstimationService.metForCardioExercise(e.exerciseId).round();
-      e.estimatedKcal = CalorieEstimationService.estimateCardioKcal(
-        exerciseId: e.exerciseId,
-        durationSeconds: e.durationSeconds!,
-        bodyWeightKg: _bodyWeightKg,
-      );
+    if (e.isCardio) {
+      // durationSeconds può essere ancora null se non è mai stato compilato:
+      // niente da stimare finché non c'è un valore.
+      if (e.durationSeconds != null) {
+        e.met = CalorieEstimationService.metForCardioExercise(e.exerciseId).round();
+        e.estimatedKcal = CalorieEstimationService.estimateCardioKcal(
+          exerciseId: e.exerciseId,
+          durationSeconds: e.durationSeconds!,
+          bodyWeightKg: _bodyWeightKg,
+        );
+      }
       await DatabaseService.instance.updateWorkoutExercise(e);
       if (!mounted) return;
       setState(() {});

@@ -14,4 +14,6 @@ class WorkoutTemplateExercise {
 
   int? supersetGroupId; // Fase 12: esercizi eseguiti senza riposo tra loro
   int? restSeconds; // Fase 8: riposo target dopo l'ultima serie/il completamento
+
+  bool get isCardio => targetDurationSeconds != null;
 }
