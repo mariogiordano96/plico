@@ -2618,6 +2618,18 @@ abstract class AppLocalizations {
   /// **'Nessuna alternativa disponibile'**
   String get allenamentoSostituisciVuoto;
 
+  /// No description provided for @allenamentoCercaSuYoutube.
+  ///
+  /// In it, this message translates to:
+  /// **'Cerca l\'esecuzione su YouTube'**
+  String get allenamentoCercaSuYoutube;
+
+  /// No description provided for @allenamentoYoutubeErrore.
+  ///
+  /// In it, this message translates to:
+  /// **'Impossibile aprire YouTube'**
+  String get allenamentoYoutubeErrore;
+
   /// No description provided for @allenamentoModifica.
   ///
   /// In it, this message translates to:

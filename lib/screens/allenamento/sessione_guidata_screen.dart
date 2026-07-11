@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../theme/app_theme.dart';
 import '../../models/workout_exercise.dart';
 import '../../models/workout_set.dart';
@@ -516,6 +517,32 @@ class _ExerciseStepCard extends StatelessWidget {
 
   bool get _isCardio => durataCtrl != null;
 
+  // Ricerca YouTube dell'esecuzione dell'esercizio, localizzata: hl/gl
+  // orientano i risultati verso YouTube Italia o l'equivalente inglese in
+  // base alla lingua dell'app, senza dipendere da una regione fissa.
+  Future<void> _openYoutubeSearch(BuildContext context) async {
+    final isItalian = Localizations.localeOf(context).languageCode == 'it';
+    final query = isItalian
+        ? '${exercise.exerciseName} esecuzione corretta'
+        : '${exercise.exerciseName} exercise tutorial';
+    final uri = Uri.https('www.youtube.com', '/results', {
+      'search_query': query,
+      'hl': isItalian ? 'it' : 'en',
+      'gl': isItalian ? 'IT' : 'US',
+    });
+    bool ok;
+    try {
+      ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      ok = false;
+    }
+    if (!ok && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.allenamentoYoutubeErrore)),
+      );
+    }
+  }
+
   List<int> get _warmupIndices => [
         for (var i = 0; i < exercise.sets.length; i++)
           if (exercise.sets[i].isWarmup) i
@@ -545,6 +572,12 @@ class _ExerciseStepCard extends StatelessWidget {
                 child: Text(exercise.exerciseName,
                     style: TextStyle(
                         color: p.textPrimary, fontSize: 17, fontWeight: FontWeight.w700)),
+              ),
+              IconButton(
+                onPressed: () => _openYoutubeSearch(context),
+                icon: Icon(Icons.smart_display_rounded, color: p.textMuted),
+                tooltip: l10n.allenamentoCercaSuYoutube,
+                visualDensity: VisualDensity.compact,
               ),
               IconButton(
                 onPressed: onSostituisci,

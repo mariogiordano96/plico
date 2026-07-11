@@ -1396,6 +1396,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get allenamentoSostituisciVuoto => 'No alternatives available';
 
   @override
+  String get allenamentoCercaSuYoutube => 'Search execution on YouTube';
+
+  @override
+  String get allenamentoYoutubeErrore => 'Couldn\'t open YouTube';
+
+  @override
   String get allenamentoModifica => 'Edit';
 
   @override

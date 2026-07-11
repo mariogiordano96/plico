@@ -452,6 +452,8 @@
   "allenamentoSostituisci": "Substitute",
   "allenamentoSostituisciTitle": "Substitute exercise",
   "allenamentoSostituisciVuoto": "No alternatives available",
+  "allenamentoCercaSuYoutube": "Search execution on YouTube",
+  "allenamentoYoutubeErrore": "Couldn't open YouTube",
   "allenamentoModifica": "Edit",
   "allenamentoEliminaGiornataTitle": "Delete this session?",
   "allenamentoEliminaGiornataSub": "All exercises and the note for this day will be removed.",
