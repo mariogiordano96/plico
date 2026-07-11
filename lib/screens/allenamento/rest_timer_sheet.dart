@@ -34,6 +34,7 @@ class _RestTimerSheetState extends State<_RestTimerSheet> with WidgetsBindingObs
   Timer? _autoCloseTimer;
   bool _done = false;
   bool _closed = false;
+  AppLifecycleState _lifecycle = AppLifecycleState.resumed;
 
   @override
   void initState() {
@@ -49,6 +50,7 @@ class _RestTimerSheetState extends State<_RestTimerSheet> with WidgetsBindingObs
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    _lifecycle = state;
     if (state == AppLifecycleState.resumed) _resync();
   }
 
@@ -59,7 +61,12 @@ class _RestTimerSheetState extends State<_RestTimerSheet> with WidgetsBindingObs
     if (_done) return;
     final rem = _endTime.difference(DateTime.now()).inSeconds;
     if (rem <= 0) {
-      _onDone();
+      // Se l'app è in background, il processo può restare vivo abbastanza
+      // da far scattare comunque questo tick: non chiamare _onDone() qui,
+      // altrimenti cancelRestTimer() cancella la notifica di sistema prima
+      // che possa suonare, mentre aptica/suono di questo metodo non sono
+      // udibili fuori dal foreground. Si aggiorna solo al resume.
+      if (_lifecycle == AppLifecycleState.resumed) _onDone();
     } else {
       setState(() => _remaining = rem);
     }

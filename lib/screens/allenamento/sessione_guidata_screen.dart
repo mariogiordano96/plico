@@ -9,6 +9,7 @@ import '../../services/achievement_service.dart';
 import '../../services/calorie_estimation_service.dart';
 import '../../services/database_service.dart';
 import '../../services/guided_session_service.dart';
+import '../../services/notification_service.dart';
 import '../../services/workout_progress_service.dart';
 import 'rest_timer_sheet.dart';
 import 'sessione_riepilogo_screen.dart';
@@ -77,6 +78,9 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
       if (mounted) setState(() {});
     });
     _prepare();
+    // Il timer di recupero deve poter suonare anche in background, a
+    // prescindere dal toggle "Promemoria pasti" nelle impostazioni.
+    unawaited(NotificationService.instance.ensureRestTimerPermission());
   }
 
   @override

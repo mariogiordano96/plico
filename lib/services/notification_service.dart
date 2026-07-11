@@ -351,6 +351,27 @@ class NotificationService {
 
   Future<void> cancelRestTimer() => _plugin.cancel(id: _restTimerId);
 
+  /// Richiede il permesso di notifica se non è già stato concesso, a
+  /// prescindere dal toggle "Promemoria pasti" nelle impostazioni: il timer
+  /// di recupero ne ha bisogno per suonare anche quando l'app è in
+  /// background, anche se l'utente non ha mai attivato i promemoria pasti.
+  Future<void> ensureRestTimerPermission() async {
+    final android = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    if (android != null) {
+      if (!(await android.areNotificationsEnabled() ?? false)) {
+        await android.requestNotificationsPermission();
+      }
+      if (!(await android.canScheduleExactNotifications() ?? false)) {
+        await android.requestExactAlarmsPermission();
+      }
+      return;
+    }
+    final ios = _plugin.resolvePlatformSpecificImplementation<
+        IOSFlutterLocalNotificationsPlugin>();
+    await ios?.requestPermissions(alert: true, badge: false, sound: true);
+  }
+
   /// Promemoria se sono passati almeno [_workoutReminderThresholdDays] giorni
   /// dall'ultimo allenamento registrato, analogo a [refreshWeighInReminder].
   Future<void> refreshWorkoutReminder() async {
