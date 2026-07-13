@@ -51,7 +51,7 @@ class BackupSendServer {
     required void Function() onTimeout,
     Duration timeout = const Duration(minutes: 3),
   }) async {
-    final ip = await NetworkInfo().getWifiIP();
+    final ip = await _resolveWifiIP();
     if (ip == null) return null;
 
     final token = _generateToken();
@@ -80,6 +80,21 @@ class BackupSendServer {
     });
 
     return SyncPairing(ip: ip, port: _server!.port, token: token);
+  }
+
+  /// getWifiIP() legge lo stato dell'interfaccia en0 nell'istante esatto
+  /// della chiamata (getifaddrs nativo): subito dopo un risveglio/riassocia-
+  /// zione Wi-Fi può ritornare null per una frazione di secondo prima che
+  /// l'IP venga assegnato, anche a rete già connessa. Un paio di retry
+  /// ravvicinati evitano di mostrare l'errore "non connesso al Wi-Fi" per
+  /// quella finestra transitoria, senza che l'utente debba ripremere lui.
+  Future<String?> _resolveWifiIP() async {
+    for (var attempt = 0; attempt < 4; attempt++) {
+      final ip = await NetworkInfo().getWifiIP();
+      if (ip != null) return ip;
+      await Future.delayed(const Duration(milliseconds: 400));
+    }
+    return null;
   }
 
   Future<void> stop() async {

@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -1347,8 +1346,14 @@ class DatabaseService {
   /// metodo nel package).
   Future<File> exportBackup() async {
     final tempDir = await getTemporaryDirectory();
-    final ts = DateFormat('yyyyMMdd_HHmm').format(DateTime.now());
+    final ts = DateTime.now().microsecondsSinceEpoch;
     final target = File('${tempDir.path}/plico_backup_$ts.isar');
+    // mdbx_env_copy (usato da copyToFile) fallisce con FileExists se il
+    // target è già presente: su iOS NSTemporaryDirectory() può conservare
+    // file di export precedenti tra un tentativo e l'altro.
+    if (await target.exists()) {
+      await target.delete();
+    }
     await _isar.copyToFile(target.path);
     return target;
   }
