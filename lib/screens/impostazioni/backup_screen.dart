@@ -117,7 +117,12 @@ class _BackupScreenState extends State<BackupScreen> {
     setState(() => _exporting = true);
     try {
       final file = await DatabaseService.instance.exportBackup();
-      await Share.shareXFiles([XFile(file.path)]);
+      if (!mounted) return;
+      final box = context.findRenderObject() as RenderBox?;
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        sharePositionOrigin: box != null ? box.localToGlobal(Offset.zero) & box.size : null,
+      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
