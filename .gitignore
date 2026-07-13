@@ -6,6 +6,9 @@ android/key.properties
 *.jks
 *.keystore
 
+# iOS signing — generato a runtime dal workflow release-ios.yml, mai committato
+ios/ExportOptions.plist
+
 # Miscellaneous
 *.class
 *.log
