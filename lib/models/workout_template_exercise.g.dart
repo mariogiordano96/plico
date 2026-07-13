@@ -23,33 +23,38 @@ const WorkoutTemplateExerciseSchema = Schema(
       name: r'exerciseName',
       type: IsarType.string,
     ),
-    r'restSeconds': PropertySchema(
+    r'isCardio': PropertySchema(
       id: 2,
+      name: r'isCardio',
+      type: IsarType.bool,
+    ),
+    r'restSeconds': PropertySchema(
+      id: 3,
       name: r'restSeconds',
       type: IsarType.long,
     ),
     r'supersetGroupId': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'supersetGroupId',
       type: IsarType.long,
     ),
     r'targetDurationSeconds': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'targetDurationSeconds',
       type: IsarType.long,
     ),
     r'targetReps': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'targetReps',
       type: IsarType.long,
     ),
     r'targetSets': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'targetSets',
       type: IsarType.long,
     ),
     r'targetWeightKg': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'targetWeightKg',
       type: IsarType.double,
     )
@@ -79,12 +84,13 @@ void _workoutTemplateExerciseSerialize(
 ) {
   writer.writeString(offsets[0], object.exerciseId);
   writer.writeString(offsets[1], object.exerciseName);
-  writer.writeLong(offsets[2], object.restSeconds);
-  writer.writeLong(offsets[3], object.supersetGroupId);
-  writer.writeLong(offsets[4], object.targetDurationSeconds);
-  writer.writeLong(offsets[5], object.targetReps);
-  writer.writeLong(offsets[6], object.targetSets);
-  writer.writeDouble(offsets[7], object.targetWeightKg);
+  writer.writeBool(offsets[2], object.isCardio);
+  writer.writeLong(offsets[3], object.restSeconds);
+  writer.writeLong(offsets[4], object.supersetGroupId);
+  writer.writeLong(offsets[5], object.targetDurationSeconds);
+  writer.writeLong(offsets[6], object.targetReps);
+  writer.writeLong(offsets[7], object.targetSets);
+  writer.writeDouble(offsets[8], object.targetWeightKg);
 }
 
 WorkoutTemplateExercise _workoutTemplateExerciseDeserialize(
@@ -96,12 +102,12 @@ WorkoutTemplateExercise _workoutTemplateExerciseDeserialize(
   final object = WorkoutTemplateExercise();
   object.exerciseId = reader.readString(offsets[0]);
   object.exerciseName = reader.readString(offsets[1]);
-  object.restSeconds = reader.readLongOrNull(offsets[2]);
-  object.supersetGroupId = reader.readLongOrNull(offsets[3]);
-  object.targetDurationSeconds = reader.readLongOrNull(offsets[4]);
-  object.targetReps = reader.readLongOrNull(offsets[5]);
-  object.targetSets = reader.readLongOrNull(offsets[6]);
-  object.targetWeightKg = reader.readDoubleOrNull(offsets[7]);
+  object.restSeconds = reader.readLongOrNull(offsets[3]);
+  object.supersetGroupId = reader.readLongOrNull(offsets[4]);
+  object.targetDurationSeconds = reader.readLongOrNull(offsets[5]);
+  object.targetReps = reader.readLongOrNull(offsets[6]);
+  object.targetSets = reader.readLongOrNull(offsets[7]);
+  object.targetWeightKg = reader.readDoubleOrNull(offsets[8]);
   return object;
 }
 
@@ -117,7 +123,7 @@ P _workoutTemplateExerciseDeserializeProp<P>(
     case 1:
       return (reader.readString(offset)) as P;
     case 2:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 3:
       return (reader.readLongOrNull(offset)) as P;
     case 4:
@@ -127,6 +133,8 @@ P _workoutTemplateExerciseDeserializeProp<P>(
     case 6:
       return (reader.readLongOrNull(offset)) as P;
     case 7:
+      return (reader.readLongOrNull(offset)) as P;
+    case 8:
       return (reader.readDoubleOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -407,6 +415,16 @@ extension WorkoutTemplateExerciseQueryFilter on QueryBuilder<
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'exerciseName',
         value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutTemplateExercise, WorkoutTemplateExercise,
+      QAfterFilterCondition> isCardioEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isCardio',
+        value: value,
       ));
     });
   }

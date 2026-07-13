@@ -19,4 +19,12 @@ class WorkoutLog {
   // Fase 30: somma dei secondi trascorsi in modalità guidata questo giorno
   // (cumulativa: più sessioni/rientri nello stesso giorno si sommano).
   int? totalDurationSeconds;
+
+  // Checkpoint periodico del timer di una sessione guidata ancora in corso
+  // (non ancora terminata con "Termina sessione"): permette di riprendere il
+  // conteggio da dove interrotto se l'app viene chiusa a metà (es. kill del
+  // processo, dove dispose() potrebbe non fare in tempo a salvare). Azzerato
+  // non appena la sessione viene chiusa correttamente e il tempo confluisce
+  // in totalDurationSeconds.
+  int? pendingSessionSeconds;
 }

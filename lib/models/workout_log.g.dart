@@ -27,8 +27,13 @@ const WorkoutLogSchema = CollectionSchema(
       name: r'note',
       type: IsarType.string,
     ),
-    r'totalDurationSeconds': PropertySchema(
+    r'pendingSessionSeconds': PropertySchema(
       id: 2,
+      name: r'pendingSessionSeconds',
+      type: IsarType.long,
+    ),
+    r'totalDurationSeconds': PropertySchema(
+      id: 3,
       name: r'totalDurationSeconds',
       type: IsarType.long,
     )
@@ -84,7 +89,8 @@ void _workoutLogSerialize(
 ) {
   writer.writeDateTime(offsets[0], object.date);
   writer.writeString(offsets[1], object.note);
-  writer.writeLong(offsets[2], object.totalDurationSeconds);
+  writer.writeLong(offsets[2], object.pendingSessionSeconds);
+  writer.writeLong(offsets[3], object.totalDurationSeconds);
 }
 
 WorkoutLog _workoutLogDeserialize(
@@ -97,7 +103,8 @@ WorkoutLog _workoutLogDeserialize(
   object.date = reader.readDateTime(offsets[0]);
   object.id = id;
   object.note = reader.readStringOrNull(offsets[1]);
-  object.totalDurationSeconds = reader.readLongOrNull(offsets[2]);
+  object.pendingSessionSeconds = reader.readLongOrNull(offsets[2]);
+  object.totalDurationSeconds = reader.readLongOrNull(offsets[3]);
   return object;
 }
 
@@ -113,6 +120,8 @@ P _workoutLogDeserializeProp<P>(
     case 1:
       return (reader.readStringOrNull(offset)) as P;
     case 2:
+      return (reader.readLongOrNull(offset)) as P;
+    case 3:
       return (reader.readLongOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -561,6 +570,80 @@ extension WorkoutLogQueryFilter
   }
 
   QueryBuilder<WorkoutLog, WorkoutLog, QAfterFilterCondition>
+      pendingSessionSecondsIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'pendingSessionSeconds',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QAfterFilterCondition>
+      pendingSessionSecondsIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'pendingSessionSeconds',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QAfterFilterCondition>
+      pendingSessionSecondsEqualTo(int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'pendingSessionSeconds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QAfterFilterCondition>
+      pendingSessionSecondsGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'pendingSessionSeconds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QAfterFilterCondition>
+      pendingSessionSecondsLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'pendingSessionSeconds',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QAfterFilterCondition>
+      pendingSessionSecondsBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'pendingSessionSeconds',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QAfterFilterCondition>
       totalDurationSecondsIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -668,6 +751,20 @@ extension WorkoutLogQuerySortBy
   }
 
   QueryBuilder<WorkoutLog, WorkoutLog, QAfterSortBy>
+      sortByPendingSessionSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pendingSessionSeconds', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QAfterSortBy>
+      sortByPendingSessionSecondsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pendingSessionSeconds', Sort.desc);
+    });
+  }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QAfterSortBy>
       sortByTotalDurationSeconds() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'totalDurationSeconds', Sort.asc);
@@ -721,6 +818,20 @@ extension WorkoutLogQuerySortThenBy
   }
 
   QueryBuilder<WorkoutLog, WorkoutLog, QAfterSortBy>
+      thenByPendingSessionSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pendingSessionSeconds', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QAfterSortBy>
+      thenByPendingSessionSecondsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pendingSessionSeconds', Sort.desc);
+    });
+  }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QAfterSortBy>
       thenByTotalDurationSeconds() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'totalDurationSeconds', Sort.asc);
@@ -751,6 +862,13 @@ extension WorkoutLogQueryWhereDistinct
   }
 
   QueryBuilder<WorkoutLog, WorkoutLog, QDistinct>
+      distinctByPendingSessionSeconds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'pendingSessionSeconds');
+    });
+  }
+
+  QueryBuilder<WorkoutLog, WorkoutLog, QDistinct>
       distinctByTotalDurationSeconds() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'totalDurationSeconds');
@@ -775,6 +893,13 @@ extension WorkoutLogQueryProperty
   QueryBuilder<WorkoutLog, String?, QQueryOperations> noteProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'note');
+    });
+  }
+
+  QueryBuilder<WorkoutLog, int?, QQueryOperations>
+      pendingSessionSecondsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'pendingSessionSeconds');
     });
   }
 

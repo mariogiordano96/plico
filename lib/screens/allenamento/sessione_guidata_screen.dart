@@ -53,9 +53,21 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
   final Stopwatch _stopwatch = Stopwatch()..start();
   Timer? _tickTimer;
   bool _durationSaved = false;
+  int _tickCount = 0;
+
+  // Tempo già trascorso in un tentativo precedente di questa stessa sessione,
+  // interrotto (es. app chiusa) prima di "Termina sessione": letto da
+  // `pendingSessionSeconds` in `_prepare` e usato come base per non far
+  // ripartire il timer da zero al resume.
+  int _baseElapsedSeconds = 0;
+
+  DateTime get _sessionDate =>
+      widget.exercises.isNotEmpty ? widget.exercises.first.date : DateTime.now();
+
+  int get _totalElapsedSeconds => _baseElapsedSeconds + _stopwatch.elapsed.inSeconds;
 
   String get _elapsedLabel {
-    final s = _stopwatch.elapsed.inSeconds;
+    final s = _totalElapsedSeconds;
     final h = s ~/ 3600;
     final m = (s % 3600) ~/ 60;
     final sec = s % 60;
@@ -64,19 +76,32 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     return h > 0 ? '$h:$mm:$ss' : '$mm:$ss';
   }
 
+  /// Salva un checkpoint intermedio del tempo trascorso (ogni 10s di tick,
+  /// vedi `initState`), così se l'app viene chiusa senza passare da
+  /// "Termina sessione" il resume riparte da qui invece che da zero.
+  Future<void> _checkpointElapsed() async {
+    if (_durationSaved) return;
+    await DatabaseService.instance.saveSessionCheckpoint(_sessionDate, _totalElapsedSeconds);
+  }
+
   Future<void> _persistElapsedDuration() async {
     if (_durationSaved) return;
     _durationSaved = true;
     _stopwatch.stop();
-    final date = widget.exercises.isNotEmpty ? widget.exercises.first.date : DateTime.now();
-    await DatabaseService.instance.addSessionDuration(date, _stopwatch.elapsed.inSeconds);
+    await DatabaseService.instance.addSessionDuration(_sessionDate, _totalElapsedSeconds);
   }
 
   @override
   void initState() {
     super.initState();
     _tickTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) setState(() {});
+      if (!mounted) return;
+      setState(() {});
+      _tickCount++;
+      if (_tickCount >= 10) {
+        _tickCount = 0;
+        unawaited(_checkpointElapsed());
+      }
     });
     _prepare();
     // Il timer di recupero deve poter suonare anche in background, a
@@ -104,6 +129,12 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
 
   Future<void> _prepare() async {
     final db = DatabaseService.instance;
+    // Se una sessione precedente lo stesso giorno è stata interrotta prima di
+    // "Termina sessione" (es. app chiusa per sbaglio), riparte da qui invece
+    // che da zero. Fatto prima possibile, prima degli altri await più lenti,
+    // per minimizzare il tempo in cui il timer mostra ancora 0:00.
+    final pending = await db.getPendingSessionSeconds(_sessionDate);
+    if (mounted) setState(() => _baseElapsedSeconds = pending);
     final settings = await db.getAppSettings();
     final bodySnapshot = await db.getLatestBodySnapshot();
 
@@ -263,6 +294,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
       bodyWeightKg: _bodyWeightKg,
     );
     await DatabaseService.instance.updateWorkoutExercise(e);
+    unawaited(_checkpointElapsed());
     if (!mounted) return;
     setState(() {});
     if (_isLastInStep(e) && !_sessionComplete) {
@@ -282,6 +314,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
       bodyWeightKg: _bodyWeightKg,
     );
     await DatabaseService.instance.updateWorkoutExercise(e);
+    unawaited(_checkpointElapsed());
     if (!mounted) return;
     setState(() {});
     if ((e.restSeconds ?? 0) > 0 && _isLastInStep(e) && !_sessionComplete) {
@@ -348,7 +381,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
   }
 
   Future<void> _termina() async {
-    final elapsedSeconds = _stopwatch.elapsed.inSeconds;
+    final elapsedSeconds = _totalElapsedSeconds;
     await _persistElapsedDuration();
     final prs =
         GuidedSessionService.newPersonalRecords(widget.exercises, _priorHistoryByExerciseId);

@@ -933,6 +933,32 @@ class DatabaseService {
       var log = await _isar.workoutLogs.filter().dateEqualTo(day).findFirst();
       log ??= WorkoutLog()..date = day;
       log.totalDurationSeconds = (log.totalDurationSeconds ?? 0) + seconds;
+      // La sessione è chiusa: il checkpoint intermedio non serve più, altrimenti
+      // verrebbe riletto come base al prossimo "Avvia allenamento" dello stesso
+      // giorno e il tempo finirebbe conteggiato due volte.
+      log.pendingSessionSeconds = null;
+      await _isar.workoutLogs.put(log);
+    });
+  }
+
+  /// Legge il checkpoint di una sessione guidata interrotta a metà (app
+  /// chiusa senza passare da "Termina sessione"), per farla ripartire dal
+  /// tempo trascorso invece che da zero.
+  Future<int> getPendingSessionSeconds(DateTime date) async {
+    final day = _logDate(date);
+    final log = await _isar.workoutLogs.filter().dateEqualTo(day).findFirst();
+    return log?.pendingSessionSeconds ?? 0;
+  }
+
+  /// Salva periodicamente il tempo trascorso nella sessione guidata ancora in
+  /// corso, per poterlo recuperare se l'app viene chiusa prima di "Termina
+  /// sessione" (vedi [getPendingSessionSeconds]).
+  Future<void> saveSessionCheckpoint(DateTime date, int seconds) async {
+    final day = _logDate(date);
+    await _isar.writeTxn(() async {
+      var log = await _isar.workoutLogs.filter().dateEqualTo(day).findFirst();
+      log ??= WorkoutLog()..date = day;
+      log.pendingSessionSeconds = seconds;
       await _isar.workoutLogs.put(log);
     });
   }

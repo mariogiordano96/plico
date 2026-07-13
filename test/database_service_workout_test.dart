@@ -162,6 +162,34 @@ void main() {
       await db.addSessionDuration(day, 0);
       expect(await db.getWorkoutLog(day), isNull);
     });
+
+    test('azzera il checkpoint pendente quando la sessione viene chiusa', () async {
+      final db = DatabaseService.instance;
+      final day = DateTime(2026, 4, 3);
+      await db.saveSessionCheckpoint(day, 90);
+      expect(await db.getPendingSessionSeconds(day), 90);
+
+      await db.addSessionDuration(day, 90);
+      expect(await db.getPendingSessionSeconds(day), 0);
+      final log = await db.getWorkoutLog(day);
+      expect(log!.totalDurationSeconds, 90);
+    });
+  });
+
+  group('saveSessionCheckpoint / getPendingSessionSeconds', () {
+    test('il checkpoint più recente sovrascrive quello precedente (non si somma)', () async {
+      final db = DatabaseService.instance;
+      final day = DateTime(2026, 4, 4);
+      await db.saveSessionCheckpoint(day, 30);
+      await db.saveSessionCheckpoint(day, 45);
+      expect(await db.getPendingSessionSeconds(day), 45);
+    });
+
+    test('nessun checkpoint salvato restituisce zero', () async {
+      final db = DatabaseService.instance;
+      final day = DateTime(2026, 4, 5);
+      expect(await db.getPendingSessionSeconds(day), 0);
+    });
   });
 
   group('getWorkoutLabelsForRange', () {
