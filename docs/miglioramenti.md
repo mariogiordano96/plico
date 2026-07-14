@@ -42,7 +42,11 @@ Genera una lista della spesa aggregando tutti gli alimenti del piano con le quan
 
 
 ### Integrazione Apple Health / Google Fit
-Lettura dell'attività fisica per aggiustare il TDEE dinamicamente. Richiede platform channel nativo.
+Import di sessioni di allenamento (cardio e pesi) e dati corpo (peso, massa grassa) dagli
+hub di sistema (Apple Health / Health Connect — Google Fit dismesso a fine 2026). Analisi
+completa in `integrazione_smartwatch.md`. TDEE dinamico basato su passi/attività
+quotidiana valutato e scartato: nessun nutrizionista aggiusta il TDEE a questo livello di
+granularità, non aggiunge valore reale.
 
 ### ~~Export dati~~
 ~~PDF del diario settimanale (7 giorni) o mensile (30 giorni), con dettaglio pasti e riepilogo macro. Condivisione via share sheet nativo.~~
