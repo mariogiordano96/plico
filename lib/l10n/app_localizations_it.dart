@@ -710,6 +710,29 @@ class AppLocalizationsIt extends AppLocalizations {
   String get progressiSezPeso => 'PESO';
 
   @override
+  String get progressiSezSalute => 'SALUTE';
+
+  @override
+  String get progressiSaluteSonno => 'Sonno';
+
+  @override
+  String get progressiSaluteFcRiposo => 'FC a riposo';
+
+  @override
+  String get progressiSaluteHrv => 'HRV';
+
+  @override
+  String get progressiSalutePassi => 'Passi';
+
+  @override
+  String get progressiSaluteKcalTotali => 'Kcal totali';
+
+  @override
+  String progressiSaluteMinutiSettimana(int minuti) {
+    return '$minuti min questa settimana';
+  }
+
+  @override
   String get progressiSezComposizione => 'COMPOSIZIONE CORPOREA';
 
   @override

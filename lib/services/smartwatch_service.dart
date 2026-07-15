@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:health/health.dart';
 
 /// Esito della richiesta di autorizzazione, oltre al semplice bool: distingue
@@ -39,11 +41,31 @@ class SmartwatchService {
   final Health _health = Health();
   bool _configured = false;
 
-  static const _types = [
-    HealthDataType.WORKOUT,
-    HealthDataType.HEART_RATE,
-    HealthDataType.ACTIVE_ENERGY_BURNED,
-  ];
+  /// HRV: HealthKit espone SDNN, Health Connect solo RMSSD (vedi
+  /// docs/integrazione_smartwatch.md sezione 5.3).
+  static HealthDataType get hrvType =>
+      Platform.isIOS ? HealthDataType.HEART_RATE_VARIABILITY_SDNN : HealthDataType.HEART_RATE_VARIABILITY_RMSSD;
+
+  /// Sonno: SLEEP_ASLEEP su iOS è il tempo di sonno effettivo; Health Connect
+  /// non lo distingue dal tempo a letto, il dato più vicino è la sessione
+  /// intera (`SleepSessionRecord`).
+  static HealthDataType get sleepType =>
+      Platform.isIOS ? HealthDataType.SLEEP_ASLEEP : HealthDataType.SLEEP_SESSION;
+
+  /// Un'unica richiesta di autorizzazione copre sia l'import allenamenti sia
+  /// la dashboard Wellness di sola lettura (Fase 6): un solo "Collega Salute"
+  /// invece di due permessi separati per lo stesso hub.
+  static List<HealthDataType> get _types => [
+        HealthDataType.WORKOUT,
+        HealthDataType.HEART_RATE,
+        HealthDataType.ACTIVE_ENERGY_BURNED,
+        HealthDataType.RESTING_HEART_RATE,
+        HealthDataType.STEPS,
+        HealthDataType.TOTAL_CALORIES_BURNED,
+        HealthDataType.BASAL_ENERGY_BURNED,
+        hrvType,
+        sleepType,
+      ];
 
   Future<void> _ensureConfigured() async {
     if (_configured) return;

@@ -705,6 +705,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get progressiSezPeso => 'WEIGHT';
 
   @override
+  String get progressiSezSalute => 'HEALTH';
+
+  @override
+  String get progressiSaluteSonno => 'Sleep';
+
+  @override
+  String get progressiSaluteFcRiposo => 'Resting HR';
+
+  @override
+  String get progressiSaluteHrv => 'HRV';
+
+  @override
+  String get progressiSalutePassi => 'Steps';
+
+  @override
+  String get progressiSaluteKcalTotali => 'Total kcal';
+
+  @override
+  String progressiSaluteMinutiSettimana(int minuti) {
+    return '$minuti min this week';
+  }
+
+  @override
   String get progressiSezComposizione => 'BODY COMPOSITION';
 
   @override

@@ -292,12 +292,27 @@ non necessaria per gli obiettivi delle sezioni 5.1-5.2.
 - [x] Disclaimer privacy esplicito (dialog di conferma) prima della prima richiesta di
       autorizzazione, distinto dal prompt di sistema HealthKit/Health Connect che segue
 
-### Fase 6 — *(estensione successiva)* Dashboard Wellness
-- [ ] Nuova sezione "Salute" di sola lettura (es. in Progressi, sotto il grafico peso)
-- [ ] Lettura sonno, FC a riposo, HRV, VO2max, passi, kcal totali, minuti attività
-      settimanali (sezione 5.3) — nessun nuovo calcolo, solo display con trend (`fl_chart`)
-- [ ] Idratazione esclusa da questa fase: richiede prima un tracker in-app dedicato con
-      scrittura verso l'hub (sezione 5.4), non solo lettura
+### Fase 6 — *(estensione successiva)* Dashboard Wellness ✅
+- [x] Nuova sezione "Salute" di sola lettura in Progressi, sotto il grafico peso —
+      `_WellnessSection` in `progressi_screen.dart`, visibile solo se Salute è collegato
+      (nessun prompt per chi non ha uno smartwatch)
+- [x] Lettura sonno, FC a riposo, HRV, passi, kcal totali (chip selezione + `_ChartBox`,
+      stesso grafico riusato dal Peso) e minuti attività settimanali (barra progresso
+      su 150 min, linea guida OMS) — nessun nuovo calcolo, solo display,
+      `SmartwatchWellnessService` in aggiunta a `SmartwatchService` esistente
+- [x] Permessi estesi in un'unica richiesta di autorizzazione (`SmartwatchService._types`):
+      un solo "Collega Salute" copre sia l'import allenamenti sia questa dashboard
+- [x] Idratazione esclusa da questa fase come da piano (richiede un tracker in-app dedicato,
+      sezione 5.4)
+- **VO2max escluso, non per scelta ma per limite del package**: il package `health`
+  (v13.3.1) non espone alcun `HealthDataType` per VO2max su nessuna delle due piattaforme —
+  nessuna alternativa comparabile individuata senza aggiungere una seconda libreria per un
+  solo dato, considerato non necessario
+- **Sonno — semplificazione nota**: iOS legge `SLEEP_ASLEEP` (tempo di sonno effettivo),
+  Android legge `SLEEP_SESSION` (intera sessione, letto/sveglia inclusi) perché Health
+  Connect non espone un tipo "asleep" aggregato in questo package — le ore mostrate su
+  Android possono quindi risultare leggermente più alte che su iOS, stesso caveat generale
+  di asimmetria tra le due piattaforme già presente altrove nel documento (sezione 9)
 
 ---
 

@@ -7,9 +7,11 @@ import '../../theme/app_theme.dart';
 import '../../models/body_snapshot.dart';
 import '../../models/plicometry_session.dart';
 import '../../models/measurement_snapshot.dart';
+import '../../models/app_settings.dart';
 import '../../models/workout_exercise.dart';
 import '../../services/database_service.dart';
 import '../../services/pdf_export_service.dart';
+import '../../services/smartwatch_wellness_service.dart';
 import '../storico/storico_misurazioni_screen.dart';
 import 'record_personali_screen.dart';
 import 'volume_settimanale_screen.dart';
@@ -38,6 +40,52 @@ extension _RangeExt on _Range {
 }
 
 enum _CompMetric { bf, grassa, magra }
+
+enum _WellnessMetric { sonno, fcRiposo, hrv, passi, kcalTotali }
+
+extension _WellnessMetricExt on _WellnessMetric {
+  String label(BuildContext context) {
+    final l10n = context.l10n;
+    switch (this) {
+      case _WellnessMetric.sonno: return l10n.progressiSaluteSonno;
+      case _WellnessMetric.fcRiposo: return l10n.progressiSaluteFcRiposo;
+      case _WellnessMetric.hrv: return l10n.progressiSaluteHrv;
+      case _WellnessMetric.passi: return l10n.progressiSalutePassi;
+      case _WellnessMetric.kcalTotali: return l10n.progressiSaluteKcalTotali;
+    }
+  }
+
+  String get unit {
+    switch (this) {
+      case _WellnessMetric.sonno: return 'h';
+      case _WellnessMetric.fcRiposo: return 'bpm';
+      case _WellnessMetric.hrv: return 'ms';
+      case _WellnessMetric.passi: return '';
+      case _WellnessMetric.kcalTotali: return 'kcal';
+    }
+  }
+
+  Color get color {
+    switch (this) {
+      case _WellnessMetric.sonno: return const Color(0xFF7C6FE0);
+      case _WellnessMetric.fcRiposo: return const Color(0xFFE0706F);
+      case _WellnessMetric.hrv: return const Color(0xFF6FB6E0);
+      case _WellnessMetric.passi: return const Color(0xFFE0B96F);
+      case _WellnessMetric.kcalTotali: return const Color(0xFF4CAF8E);
+    }
+  }
+
+  Future<List<DailyMetric>> fetch() {
+    final s = SmartwatchWellnessService.instance;
+    switch (this) {
+      case _WellnessMetric.sonno: return s.sleepHoursByDay();
+      case _WellnessMetric.fcRiposo: return s.restingHeartRateByDay();
+      case _WellnessMetric.hrv: return s.hrvByDay();
+      case _WellnessMetric.passi: return s.stepsByDay();
+      case _WellnessMetric.kcalTotali: return s.totalKcalByDay();
+    }
+  }
+}
 
 extension _CompMetricExt on _CompMetric {
   String get unit {
@@ -111,6 +159,7 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
   _Range _range = _Range.month1;
   _CompMetric _compMetric = _CompMetric.bf;
   String _misuraKey = 'vitaCm';
+  _WellnessMetric _wellnessMetric = _WellnessMetric.sonno;
 
   /// Esporta in PDF esattamente le sezioni mostrate a schermo (peso,
   /// composizione, misurazioni, log allenamenti), filtrate sullo stesso
@@ -296,6 +345,13 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
             _PesoChart(startDate: start, p: p),
             const SizedBox(height: 28),
 
+            // ── Salute (dati smartwatch, sola lettura) ────
+            _WellnessSection(
+              metric: _wellnessMetric,
+              onMetricChanged: (m) => setState(() => _wellnessMetric = m),
+              p: p,
+            ),
+
             // ── Grafico 2: Composizione ───────────────────
             _SectionLabel(context.l10n.progressiSezComposizione, p),
             const SizedBox(height: 10),
@@ -390,6 +446,150 @@ class _PesoChart extends StatelessWidget {
           unit: 'kg',
           color: const Color(0xFF4CAF8E),
           p: p,
+        );
+      },
+    );
+  }
+}
+
+// ── Salute (Fase 6, docs/integrazione_smartwatch.md) ────────────
+//
+// Sola lettura: nessun nuovo calcolo, nessun impatto su TDEE/kcal/target
+// esistenti (sezione 5.3 del documento). Visibile solo se l'utente ha
+// collegato Salute in Impostazioni — altrimenti non ha dati da mostrare.
+
+class _WellnessSection extends StatelessWidget {
+  final _WellnessMetric metric;
+  final ValueChanged<_WellnessMetric> onMetricChanged;
+  final ColorPalette p;
+
+  const _WellnessSection({
+    required this.metric,
+    required this.onMetricChanged,
+    required this.p,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<AppSettings?>(
+      stream: DatabaseService.instance.watchAppSettings(),
+      builder: (context, snap) {
+        if (snap.data?.smartwatchConnected != true) return const SizedBox.shrink();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _SectionLabel(context.l10n.progressiSezSalute, p),
+            const SizedBox(height: 10),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: _WellnessMetric.values.map((m) => Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: _RangeChip(
+                    label: m.label(context),
+                    selected: metric == m,
+                    onTap: () => onMetricChanged(m),
+                    p: p,
+                  ),
+                )).toList(),
+              ),
+            ),
+            const SizedBox(height: 14),
+            _WellnessChart(metric: metric, p: p),
+            const SizedBox(height: 14),
+            _WeeklyActivityStat(p: p),
+            const SizedBox(height: 28),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _WellnessChart extends StatelessWidget {
+  final _WellnessMetric metric;
+  final ColorPalette p;
+
+  const _WellnessChart({required this.metric, required this.p});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<DailyMetric>>(
+      // key sul metric: forza un nuovo FutureBuilder (nuova query) al cambio
+      // di metrica invece di mostrare dati vecchi durante il caricamento.
+      key: ValueKey(metric),
+      future: metric.fetch(),
+      builder: (context, snap) {
+        if (!snap.hasData) {
+          return Container(
+            height: 180,
+            decoration: BoxDecoration(
+              color: p.surface,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: p.cardBorder),
+            ),
+            child: Center(child: CircularProgressIndicator(color: p.accent)),
+          );
+        }
+        final points = snap.data!.map((d) => _Point(d.day, d.value)).toList();
+        return _ChartBox(points: points, unit: metric.unit, color: metric.color, p: p);
+      },
+    );
+  }
+}
+
+/// "120/150 min questa settimana" — linea guida OMS di attività aerobica
+/// moderata settimanale, puro display (docs/integrazione_smartwatch.md
+/// sezione 5.3).
+class _WeeklyActivityStat extends StatelessWidget {
+  static const _weeklyTargetMinutes = 150;
+  final ColorPalette p;
+
+  const _WeeklyActivityStat({required this.p});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<int>(
+      future: SmartwatchWellnessService.instance.weeklyActivityMinutes(),
+      builder: (context, snap) {
+        final minutes = snap.data ?? 0;
+        final progress = (minutes / _weeklyTargetMinutes).clamp(0.0, 1.0);
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: p.surface,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: p.cardBorder),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.directions_run_rounded, color: p.accent, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      context.l10n.progressiSaluteMinutiSettimana(minutes),
+                      style: TextStyle(
+                          color: p.textPrimary, fontSize: 14, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 6),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: progress,
+                        minHeight: 6,
+                        backgroundColor: p.cardBorder,
+                        color: p.accent,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         );
       },
     );

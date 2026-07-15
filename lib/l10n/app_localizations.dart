@@ -1382,6 +1382,48 @@ abstract class AppLocalizations {
   /// **'PESO'**
   String get progressiSezPeso;
 
+  /// No description provided for @progressiSezSalute.
+  ///
+  /// In it, this message translates to:
+  /// **'SALUTE'**
+  String get progressiSezSalute;
+
+  /// No description provided for @progressiSaluteSonno.
+  ///
+  /// In it, this message translates to:
+  /// **'Sonno'**
+  String get progressiSaluteSonno;
+
+  /// No description provided for @progressiSaluteFcRiposo.
+  ///
+  /// In it, this message translates to:
+  /// **'FC a riposo'**
+  String get progressiSaluteFcRiposo;
+
+  /// No description provided for @progressiSaluteHrv.
+  ///
+  /// In it, this message translates to:
+  /// **'HRV'**
+  String get progressiSaluteHrv;
+
+  /// No description provided for @progressiSalutePassi.
+  ///
+  /// In it, this message translates to:
+  /// **'Passi'**
+  String get progressiSalutePassi;
+
+  /// No description provided for @progressiSaluteKcalTotali.
+  ///
+  /// In it, this message translates to:
+  /// **'Kcal totali'**
+  String get progressiSaluteKcalTotali;
+
+  /// No description provided for @progressiSaluteMinutiSettimana.
+  ///
+  /// In it, this message translates to:
+  /// **'{minuti} min questa settimana'**
+  String progressiSaluteMinutiSettimana(int minuti);
+
   /// No description provided for @progressiSezComposizione.
   ///
   /// In it, this message translates to:
