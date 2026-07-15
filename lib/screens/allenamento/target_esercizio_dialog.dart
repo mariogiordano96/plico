@@ -1,40 +1,52 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../models/exercise_definition.dart';
+import '../../models/workout_exercise.dart';
 import '../../models/workout_template_exercise.dart';
 
-/// Dialog per impostare il target (serie/rip/peso o durata) di un esercizio
-/// quando si costruisce una scheda. Ritorna il WorkoutTemplateExercise compilato.
+/// Dialog per impostare il target (serie/rip/peso o durata) di un esercizio,
+/// sia quando si costruisce una scheda sia quando si aggiunge/modifica un
+/// esercizio libero nel log del giorno. Se [initial] è fornito, precompila i
+/// campi con i suoi valori (modifica) invece dei default (3 serie × 10 rip).
+/// Ritorna il WorkoutTemplateExercise compilato.
 Future<WorkoutTemplateExercise?> showTargetEsercizioDialog(
   BuildContext context,
-  ExerciseDefinition exercise,
-) {
+  ExerciseDefinition exercise, {
+  WorkoutExercise? initial,
+}) {
   return showModalBottomSheet<WorkoutTemplateExercise>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => _TargetEsercizioDialog(exercise: exercise),
+    builder: (_) => _TargetEsercizioDialog(exercise: exercise, initial: initial),
   );
 }
 
 class _TargetEsercizioDialog extends StatefulWidget {
   final ExerciseDefinition exercise;
-  const _TargetEsercizioDialog({required this.exercise});
+  final WorkoutExercise? initial;
+  const _TargetEsercizioDialog({required this.exercise, this.initial});
 
   @override
   State<_TargetEsercizioDialog> createState() => _TargetEsercizioDialogState();
 }
 
 class _TargetEsercizioDialogState extends State<_TargetEsercizioDialog> {
-  final _serieCtrl = TextEditingController(text: '3');
-  final _ripCtrl = TextEditingController(text: '10');
-  final _kgCtrl = TextEditingController();
-  final _durataCtrl = TextEditingController(text: '30');
+  late final _initialSet =
+      widget.initial != null && widget.initial!.sets.isNotEmpty ? widget.initial!.sets.first : null;
+  late final _serieCtrl =
+      TextEditingController(text: (widget.initial?.sets.length ?? 3).toString());
+  late final _ripCtrl =
+      TextEditingController(text: (_initialSet?.reps ?? 10).toString());
+  late final _kgCtrl = TextEditingController(text: _initialSet?.weightKg?.toString() ?? '');
+  late final _durataCtrl = TextEditingController(
+      text: (((widget.initial?.durationSeconds ?? 1800)) ~/ 60).toString());
 
-  // Preselezionato dalla categoria del catalogo ma sempre modificabile: il
-  // modello dati supporta target a tempo per qualunque esercizio (vedi i
-  // preset con Plank/Mountain Climbers), non solo quelli taggati cardio.
-  late bool _isCardio = widget.exercise.category == 'cardio';
+  // Preselezionato dai dati esistenti (in modifica) o dalla categoria del
+  // catalogo, ma sempre modificabile: il modello dati supporta target a
+  // tempo per qualunque esercizio (vedi i preset con Plank/Mountain
+  // Climbers), non solo quelli taggati cardio.
+  late bool _isCardio = widget.initial?.isCardio ?? (widget.exercise.category == 'cardio');
 
   @override
   void dispose() {

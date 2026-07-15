@@ -11,12 +11,10 @@ import '../../services/database_service.dart';
 import '../esercizi/catalogo_esercizi_screen.dart';
 import 'calendario_allenamenti_screen.dart';
 import 'le_mie_schede_screen.dart';
-import 'log_cardio_dialog.dart';
-import 'log_serie_dialog.dart';
 import 'sessione_guidata_screen.dart';
 import 'sostituisci_esercizio_sheet.dart';
 import 'storico_esercizio_screen.dart';
-import 'tracking_mode_switch.dart';
+import 'target_esercizio_dialog.dart';
 
 class AllenamentoScreen extends StatefulWidget {
   const AllenamentoScreen({super.key});
@@ -145,19 +143,48 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
     if (scelto != null) _changeDate(scelto);
   }
 
-  /// Aggiunge al log del giorno l'esercizio scelto dal catalogo, con target di
-  /// default (3 serie vuote) da compilare più tardi in modalità guidata
-  /// (`_avviaAllenamento`) — creazione e avvio sono due passi separati, vedi
-  /// `_avviaAllenamento`.
+  /// Aggiunge al log del giorno l'esercizio scelto dal catalogo, chiedendo
+  /// subito il target (serie/rip/kg o durata) con lo stesso dialog compatto
+  /// usato per comporre una scheda (`showTargetEsercizioDialog`), poi lo
+  /// converte in un WorkoutExercise reale con la stessa logica di
+  /// `DatabaseService.startWorkoutFromTemplate`.
   Future<void> _aggiungiEsercizio() async {
     final exercise = await showCatalogoEserciziSheet(context);
     if (exercise == null || !mounted) return;
 
-    final isCardio = exercise.category == 'cardio';
+    final target = await showTargetEsercizioDialog(context, exercise);
+    if (target == null || !mounted) return;
+
+    final isCardio = target.isCardio;
     final workoutExercise = WorkoutExercise()
-      ..exerciseId = exercise.externalId
-      ..exerciseName = exercise.nameIt ?? exercise.name
-      ..sets = isCardio ? [] : List.generate(3, (_) => WorkoutSet());
+      ..exerciseId = target.exerciseId
+      ..exerciseName = target.exerciseName
+      ..durationSeconds = target.targetDurationSeconds
+      ..sets = isCardio
+          ? []
+          : List.generate(
+              target.targetSets ?? 1,
+              (_) => WorkoutSet()
+                ..reps = target.targetReps
+                ..weightKg = target.targetWeightKg,
+            );
+
+    final bodySnapshot = await DatabaseService.instance.getLatestBodySnapshot();
+    final bodyWeightKg = bodySnapshot?.pesoKg;
+    if (isCardio) {
+      workoutExercise.met =
+          CalorieEstimationService.metForCardioExercise(workoutExercise.exerciseId).round();
+      workoutExercise.estimatedKcal = CalorieEstimationService.estimateCardioKcal(
+        exerciseId: workoutExercise.exerciseId,
+        durationSeconds: workoutExercise.durationSeconds!,
+        bodyWeightKg: bodyWeightKg,
+      );
+    } else {
+      workoutExercise.estimatedKcal = CalorieEstimationService.estimateStrengthKcal(
+        workingSetCount: workoutExercise.sets.length,
+        bodyWeightKg: bodyWeightKg,
+      );
+    }
 
     await DatabaseService.instance.addWorkoutExercise(_data, workoutExercise);
   }
@@ -181,52 +208,47 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
     );
   }
 
+  /// Modifica il target di un esercizio già nel log del giorno, con lo
+  /// stesso dialog compatto usato per aggiungerlo (`_aggiungiEsercizio`) e
+  /// per comporre una scheda — uniforme indipendentemente dalla provenienza
+  /// dell'esercizio (libero o da scheda/programma).
   Future<void> _modifica(WorkoutExercise e) async {
-    var isCardio = e.isCardio;
-    Object? result;
-    while (true) {
-      final stub = ExerciseDefinition()
-        ..externalId = e.exerciseId
-        ..name = e.exerciseName
-        ..muscleGroup = ''
-        ..category = isCardio ? 'cardio' : 'strength';
+    final stub = ExerciseDefinition()
+      ..externalId = e.exerciseId
+      ..name = e.exerciseName
+      ..muscleGroup = ''
+      ..category = e.isCardio ? 'cardio' : 'strength';
 
-      result = isCardio
-          ? await showLogCardioDialog(context, stub, initial: e)
-          : await showLogSerieDialog(context, stub, initial: e);
-      if (!mounted) return;
-      if (!identical(result, switchTrackingModeSignal)) break;
+    final target = await showTargetEsercizioDialog(context, stub, initial: e);
+    if (target == null || !mounted) return;
 
-      // L'utente ha chiesto di cambiare modalità di tracciamento: azzera il
-      // campo dell'altra modalità e riapre il dialog corretto (vedi
-      // WorkoutExercise.isCardio, derivato da sets.isEmpty).
-      isCardio = !isCardio;
-      if (isCardio) {
-        e.sets = [];
-      } else {
-        e.durationSeconds = null;
-        e.sets = [WorkoutSet()];
-      }
-    }
-    if (result == null) return;
-    final updated = result as WorkoutExercise;
+    final isCardio = target.isCardio;
+    e.durationSeconds = target.targetDurationSeconds;
+    e.sets = isCardio
+        ? []
+        : List.generate(
+            target.targetSets ?? 1,
+            (_) => WorkoutSet()
+              ..reps = target.targetReps
+              ..weightKg = target.targetWeightKg,
+          );
 
     final bodySnapshot = await DatabaseService.instance.getLatestBodySnapshot();
     final bodyWeightKg = bodySnapshot?.pesoKg;
-    if (updated.isCardio) {
-      updated.met = CalorieEstimationService.metForCardioExercise(updated.exerciseId).round();
-      updated.estimatedKcal = CalorieEstimationService.estimateCardioKcal(
-        exerciseId: updated.exerciseId,
-        durationSeconds: updated.durationSeconds!,
+    if (isCardio) {
+      e.met = CalorieEstimationService.metForCardioExercise(e.exerciseId).round();
+      e.estimatedKcal = CalorieEstimationService.estimateCardioKcal(
+        exerciseId: e.exerciseId,
+        durationSeconds: e.durationSeconds!,
         bodyWeightKg: bodyWeightKg,
       );
     } else {
-      updated.estimatedKcal = CalorieEstimationService.estimateStrengthKcal(
-        workingSetCount: updated.sets.length,
+      e.estimatedKcal = CalorieEstimationService.estimateStrengthKcal(
+        workingSetCount: e.sets.length,
         bodyWeightKg: bodyWeightKg,
       );
     }
-    await DatabaseService.instance.updateWorkoutExercise(updated);
+    await DatabaseService.instance.updateWorkoutExercise(e);
   }
 
   Future<void> _elimina(WorkoutExercise e) async {
