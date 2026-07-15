@@ -142,13 +142,18 @@ const AppSettingsSchema = CollectionSchema(
       name: r'restTimerDefaultSeconds',
       type: IsarType.long,
     ),
-    r'tourCompleted': PropertySchema(
+    r'smartwatchConnected': PropertySchema(
       id: 25,
+      name: r'smartwatchConnected',
+      type: IsarType.bool,
+    ),
+    r'tourCompleted': PropertySchema(
+      id: 26,
       name: r'tourCompleted',
       type: IsarType.bool,
     ),
     r'workoutPresetsSeeded': PropertySchema(
-      id: 26,
+      id: 27,
       name: r'workoutPresetsSeeded',
       type: IsarType.bool,
     )
@@ -207,8 +212,9 @@ void _appSettingsSerialize(
   writer.writeLong(offsets[22], object.obiettivo);
   writer.writeDouble(offsets[23], object.pesoObiettivo);
   writer.writeLong(offsets[24], object.restTimerDefaultSeconds);
-  writer.writeBool(offsets[25], object.tourCompleted);
-  writer.writeBool(offsets[26], object.workoutPresetsSeeded);
+  writer.writeBool(offsets[25], object.smartwatchConnected);
+  writer.writeBool(offsets[26], object.tourCompleted);
+  writer.writeBool(offsets[27], object.workoutPresetsSeeded);
 }
 
 AppSettings _appSettingsDeserialize(
@@ -244,8 +250,9 @@ AppSettings _appSettingsDeserialize(
   object.obiettivo = reader.readLong(offsets[22]);
   object.pesoObiettivo = reader.readDoubleOrNull(offsets[23]);
   object.restTimerDefaultSeconds = reader.readLong(offsets[24]);
-  object.tourCompleted = reader.readBool(offsets[25]);
-  object.workoutPresetsSeeded = reader.readBool(offsets[26]);
+  object.smartwatchConnected = reader.readBool(offsets[25]);
+  object.tourCompleted = reader.readBool(offsets[26]);
+  object.workoutPresetsSeeded = reader.readBool(offsets[27]);
   return object;
 }
 
@@ -309,6 +316,8 @@ P _appSettingsDeserializeProp<P>(
     case 25:
       return (reader.readBool(offset)) as P;
     case 26:
+      return (reader.readBool(offset)) as P;
+    case 27:
       return (reader.readBool(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1310,6 +1319,16 @@ extension AppSettingsQueryFilter
   }
 
   QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      smartwatchConnectedEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'smartwatchConnected',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
       tourCompletedEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -1657,6 +1676,20 @@ extension AppSettingsQuerySortBy
       sortByRestTimerDefaultSecondsDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'restTimerDefaultSeconds', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortBySmartwatchConnected() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'smartwatchConnected', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortBySmartwatchConnectedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'smartwatchConnected', Sort.desc);
     });
   }
 
@@ -2024,6 +2057,20 @@ extension AppSettingsQuerySortThenBy
     });
   }
 
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenBySmartwatchConnected() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'smartwatchConnected', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenBySmartwatchConnectedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'smartwatchConnected', Sort.desc);
+    });
+  }
+
   QueryBuilder<AppSettings, AppSettings, QAfterSortBy> thenByTourCompleted() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'tourCompleted', Sort.asc);
@@ -2214,6 +2261,13 @@ extension AppSettingsQueryWhereDistinct
     });
   }
 
+  QueryBuilder<AppSettings, AppSettings, QDistinct>
+      distinctBySmartwatchConnected() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'smartwatchConnected');
+    });
+  }
+
   QueryBuilder<AppSettings, AppSettings, QDistinct> distinctByTourCompleted() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'tourCompleted');
@@ -2387,6 +2441,13 @@ extension AppSettingsQueryProperty
       restTimerDefaultSecondsProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'restTimerDefaultSeconds');
+    });
+  }
+
+  QueryBuilder<AppSettings, bool, QQueryOperations>
+      smartwatchConnectedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'smartwatchConnected');
     });
   }
 

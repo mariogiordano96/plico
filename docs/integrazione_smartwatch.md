@@ -267,10 +267,17 @@ non necessaria per gli obiettivi delle sezioni 5.1-5.2.
       importata quel giorno (day-level, non orario preciso, stesso limite di cui sopra);
       card esercizio (`allenamento_screen.dart`) nasconde la kcal stimata negli stessi casi
 
-### Fase 4 — UI
-- [ ] Voce Impostazioni "Collega Salute" con toggle e stato permessi
-- [ ] Badge sorgente nella lista Allenamento per le sessioni importate
-- [ ] Import manuale (pull-to-refresh) nella card Attività/tab Allenamento
+### Fase 4 — UI ✅
+- [x] Voce Impostazioni "Collega Salute" con toggle e stato permessi
+      (`SmartwatchScreen`) — su iOS lo stato "connesso" è tracciato in locale
+      (`AppSettings.smartwatchConnected`), perché HealthKit non permette di
+      interrogare lo stato READ per privacy
+- [x] Badge sorgente nella lista Allenamento per le sessioni importate; menu
+      contestuale ridotto alla sola eliminazione per quelle entry (non hanno
+      serie da modificare né senso nel "sostituisci esercizio")
+- [x] Import manuale (pull-to-refresh) nel tab Allenamento, sul giorno
+      visualizzato; se Salute non è collegato guida l'utente verso
+      Impostazioni invece di tentare una lettura senza permessi
 
 ### Fase 5 — Rifinitura
 - [ ] Import automatico in background, valutando impatto batteria

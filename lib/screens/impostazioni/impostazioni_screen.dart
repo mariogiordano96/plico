@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import 'backup_screen.dart';
 import 'notifiche_screen.dart';
+import 'smartwatch_screen.dart';
 
 class ImpostazioniScreen extends StatelessWidget {
   const ImpostazioniScreen({super.key});
@@ -44,6 +45,17 @@ class ImpostazioniScreen extends StatelessWidget {
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const BackupScreen()),
+              ),
+              p: p,
+            ),
+            const SizedBox(height: 10),
+            _MenuTile(
+              icon: Icons.watch_rounded,
+              title: l10n.impostazioniSalute,
+              subtitle: l10n.impostazioniSaluteSub,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SmartwatchScreen()),
               ),
               p: p,
             ),

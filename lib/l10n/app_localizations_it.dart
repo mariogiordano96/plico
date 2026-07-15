@@ -1735,6 +1735,70 @@ class AppLocalizationsIt extends AppLocalizations {
   String get impostazioniBackupSub => 'Esporta o importa i tuoi dati';
 
   @override
+  String get impostazioniSalute => 'Collega Salute';
+
+  @override
+  String get impostazioniSaluteSub => 'Importa allenamenti dal tuo smartwatch';
+
+  @override
+  String get smartwatchTitolo => 'Collega Salute';
+
+  @override
+  String get smartwatchHubIOS => 'Apple Salute';
+
+  @override
+  String get smartwatchHubAndroid => 'Health Connect';
+
+  @override
+  String get smartwatchConnesso => 'Connesso';
+
+  @override
+  String get smartwatchNonConnesso => 'Non connesso';
+
+  @override
+  String get smartwatchNonDisponibile =>
+      'Health Connect non è installato su questo dispositivo';
+
+  @override
+  String get smartwatchConnettiButton => 'Connetti';
+
+  @override
+  String get smartwatchDisconnetti => 'Scollega';
+
+  @override
+  String get smartwatchInstallaHealthConnect => 'Installa Health Connect';
+
+  @override
+  String get smartwatchPermessoNegato =>
+      'Permesso non concesso. Puoi riprovare o autorizzare Plico dalle impostazioni del sistema.';
+
+  @override
+  String get smartwatchDescrizione =>
+      'Importa automaticamente allenamenti cardio e pesi, frequenza cardiaca e calorie attive registrate dal tuo smartwatch, senza doverli inserire a mano.';
+
+  @override
+  String get smartwatchDisclaimer =>
+      'I dati restano solo su questo dispositivo: Plico non li invia a server esterni. Puoi scollegare l\'accesso in qualsiasi momento da questa schermata.';
+
+  @override
+  String get smartwatchImportaButton => 'Importa allenamenti';
+
+  @override
+  String smartwatchImportaSuccesso(int count) {
+    return '$count allenamenti importati';
+  }
+
+  @override
+  String get smartwatchImportaNessuno =>
+      'Nessun nuovo allenamento da importare';
+
+  @override
+  String get smartwatchBadgeHealthKit => 'Apple Salute';
+
+  @override
+  String get smartwatchBadgeHealthConnect => 'Health Connect';
+
+  @override
   String get backupTitolo => 'Backup dati';
 
   @override

@@ -8,7 +8,10 @@ import '../../models/workout_set.dart';
 import '../../models/workout_template.dart';
 import '../../services/calorie_estimation_service.dart';
 import '../../services/database_service.dart';
+import '../../services/smartwatch_import_service.dart';
+import '../../services/smartwatch_service.dart';
 import '../esercizi/catalogo_esercizi_screen.dart';
+import '../impostazioni/smartwatch_screen.dart';
 import 'calendario_allenamenti_screen.dart';
 import 'le_mie_schede_screen.dart';
 import 'sessione_guidata_screen.dart';
@@ -141,6 +144,45 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
       MaterialPageRoute(builder: (_) => const CalendarioAllenamentiScreen()),
     );
     if (scelto != null) _changeDate(scelto);
+  }
+
+  /// Pull-to-refresh: importa dallo smartwatch le sessioni del giorno
+  /// visualizzato (docs/integrazione_smartwatch.md, Fase 4). Se l'utente non
+  /// ha ancora collegato Salute, guida verso quella schermata invece di
+  /// tentare una lettura che fallirebbe silenziosamente (HealthKit) o con
+  /// eccezione (Health Connect senza permessi).
+  Future<void> _importaDalWatch() async {
+    final l10n = context.l10n;
+    final hasPermissions = await SmartwatchService.instance.hasPermissions();
+    if (!hasPermissions) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.smartwatchNonConnesso),
+          action: SnackBarAction(
+            label: l10n.smartwatchConnettiButton,
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SmartwatchScreen()),
+            ),
+          ),
+        ),
+      );
+      return;
+    }
+
+    final dayStart = DateTime(_data.year, _data.month, _data.day);
+    final dayEnd = dayStart.add(const Duration(days: 1));
+    final imported = await SmartwatchImportService.instance
+        .importWorkoutSessions(start: dayStart, end: dayEnd);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(imported > 0
+            ? l10n.smartwatchImportaSuccesso(imported)
+            : l10n.smartwatchImportaNessuno),
+      ),
+    );
   }
 
   /// Aggiunge al log del giorno l'esercizio scelto dal catalogo, chiedendo
@@ -416,8 +458,20 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
             child: !hasData
                 ? Center(child: CircularProgressIndicator(color: p.accent))
                 : esercizi.isEmpty
-                    ? _EmptyState(onStartFromScheda: _apriSchede, onAdd: _aggiungiEsercizio)
-                    : ListView.separated(
+                    ? RefreshIndicator(
+                        onRefresh: _importaDalWatch,
+                        color: p.accent,
+                        child: ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          children: [
+                            _EmptyState(onStartFromScheda: _apriSchede, onAdd: _aggiungiEsercizio),
+                          ],
+                        ),
+                      )
+                    : RefreshIndicator(
+                        onRefresh: _importaDalWatch,
+                        color: p.accent,
+                        child: ListView.separated(
                         // Spazio extra in fondo quando è presente anche il
                         // pulsante "Avvia allenamento"/elimina sopra la riga
                         // nota/esercizio libero, altrimenti l'ultima card
@@ -490,6 +544,7 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
                             ],
                           );
                         },
+                        ),
                       ),
           ),
         ],
@@ -721,9 +776,20 @@ class _ExerciseCard extends StatelessWidget {
               child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(exercise.exerciseName,
-                    style: TextStyle(
-                        color: p.textPrimary, fontWeight: FontWeight.w600, fontSize: 15)),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(exercise.exerciseName,
+                          style: TextStyle(
+                              color: p.textPrimary, fontWeight: FontWeight.w600, fontSize: 15),
+                          overflow: TextOverflow.ellipsis),
+                    ),
+                    if (exercise.source != null) ...[
+                      const SizedBox(width: 6),
+                      _SourceBadge(source: exercise.source!, p: p, l10n: l10n),
+                    ],
+                  ],
+                ),
                 const SizedBox(height: 4),
                 Text(
                   isCardio
@@ -754,15 +820,20 @@ class _ExerciseCard extends StatelessWidget {
                   onDelete();
               }
             },
+            // Le entry importate da smartwatch non hanno serie da modificare
+            // e non ha senso "sostituirle" con un altro esercizio — restano
+            // solo eliminabili (docs/integrazione_smartwatch.md sezione 6).
             itemBuilder: (context) => [
-              PopupMenuItem(
-                value: _ExerciseCardAction.modifica,
-                child: Text(l10n.allenamentoModifica, style: TextStyle(color: p.textPrimary)),
-              ),
-              PopupMenuItem(
-                value: _ExerciseCardAction.sostituisci,
-                child: Text(l10n.allenamentoSostituisci, style: TextStyle(color: p.textPrimary)),
-              ),
+              if (exercise.source == null) ...[
+                PopupMenuItem(
+                  value: _ExerciseCardAction.modifica,
+                  child: Text(l10n.allenamentoModifica, style: TextStyle(color: p.textPrimary)),
+                ),
+                PopupMenuItem(
+                  value: _ExerciseCardAction.sostituisci,
+                  child: Text(l10n.allenamentoSostituisci, style: TextStyle(color: p.textPrimary)),
+                ),
+              ],
               PopupMenuItem(
                 value: _ExerciseCardAction.elimina,
                 child: Text(l10n.appElimina, style: TextStyle(color: p.error)),
@@ -776,6 +847,36 @@ class _ExerciseCard extends StatelessWidget {
 }
 
 enum _ExerciseCardAction { modifica, sostituisci, elimina }
+
+class _SourceBadge extends StatelessWidget {
+  final String source; // WorkoutSource.name
+  final ColorPalette p;
+  final AppLocalizations l10n;
+
+  const _SourceBadge({required this.source, required this.p, required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    final label = source == WorkoutSource.healthKit.name
+        ? l10n.smartwatchBadgeHealthKit
+        : l10n.smartwatchBadgeHealthConnect;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: p.accent.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.watch_rounded, color: p.accent, size: 11),
+          const SizedBox(width: 3),
+          Text(label, style: TextStyle(color: p.accent, fontSize: 10, fontWeight: FontWeight.w600)),
+        ],
+      ),
+    );
+  }
+}
 
 class _DateNav extends StatelessWidget {
   final String label;

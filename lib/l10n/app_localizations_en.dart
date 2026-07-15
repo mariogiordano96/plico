@@ -1725,6 +1725,69 @@ class AppLocalizationsEn extends AppLocalizations {
   String get impostazioniBackupSub => 'Export or import your data';
 
   @override
+  String get impostazioniSalute => 'Connect Health';
+
+  @override
+  String get impostazioniSaluteSub => 'Import workouts from your smartwatch';
+
+  @override
+  String get smartwatchTitolo => 'Connect Health';
+
+  @override
+  String get smartwatchHubIOS => 'Apple Health';
+
+  @override
+  String get smartwatchHubAndroid => 'Health Connect';
+
+  @override
+  String get smartwatchConnesso => 'Connected';
+
+  @override
+  String get smartwatchNonConnesso => 'Not connected';
+
+  @override
+  String get smartwatchNonDisponibile =>
+      'Health Connect is not installed on this device';
+
+  @override
+  String get smartwatchConnettiButton => 'Connect';
+
+  @override
+  String get smartwatchDisconnetti => 'Disconnect';
+
+  @override
+  String get smartwatchInstallaHealthConnect => 'Install Health Connect';
+
+  @override
+  String get smartwatchPermessoNegato =>
+      'Permission not granted. You can try again or authorize Plico from the system settings.';
+
+  @override
+  String get smartwatchDescrizione =>
+      'Automatically import cardio and strength workouts, heart rate and active calories recorded by your smartwatch, without having to enter them manually.';
+
+  @override
+  String get smartwatchDisclaimer =>
+      'Your data stays on this device only: Plico never sends it to external servers. You can disconnect access at any time from this screen.';
+
+  @override
+  String get smartwatchImportaButton => 'Import workouts';
+
+  @override
+  String smartwatchImportaSuccesso(int count) {
+    return '$count workouts imported';
+  }
+
+  @override
+  String get smartwatchImportaNessuno => 'No new workouts to import';
+
+  @override
+  String get smartwatchBadgeHealthKit => 'Apple Health';
+
+  @override
+  String get smartwatchBadgeHealthConnect => 'Health Connect';
+
+  @override
   String get backupTitolo => 'Data backup';
 
   @override

@@ -3188,6 +3188,120 @@ abstract class AppLocalizations {
   /// **'Esporta o importa i tuoi dati'**
   String get impostazioniBackupSub;
 
+  /// No description provided for @impostazioniSalute.
+  ///
+  /// In it, this message translates to:
+  /// **'Collega Salute'**
+  String get impostazioniSalute;
+
+  /// No description provided for @impostazioniSaluteSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Importa allenamenti dal tuo smartwatch'**
+  String get impostazioniSaluteSub;
+
+  /// No description provided for @smartwatchTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'Collega Salute'**
+  String get smartwatchTitolo;
+
+  /// No description provided for @smartwatchHubIOS.
+  ///
+  /// In it, this message translates to:
+  /// **'Apple Salute'**
+  String get smartwatchHubIOS;
+
+  /// No description provided for @smartwatchHubAndroid.
+  ///
+  /// In it, this message translates to:
+  /// **'Health Connect'**
+  String get smartwatchHubAndroid;
+
+  /// No description provided for @smartwatchConnesso.
+  ///
+  /// In it, this message translates to:
+  /// **'Connesso'**
+  String get smartwatchConnesso;
+
+  /// No description provided for @smartwatchNonConnesso.
+  ///
+  /// In it, this message translates to:
+  /// **'Non connesso'**
+  String get smartwatchNonConnesso;
+
+  /// No description provided for @smartwatchNonDisponibile.
+  ///
+  /// In it, this message translates to:
+  /// **'Health Connect non è installato su questo dispositivo'**
+  String get smartwatchNonDisponibile;
+
+  /// No description provided for @smartwatchConnettiButton.
+  ///
+  /// In it, this message translates to:
+  /// **'Connetti'**
+  String get smartwatchConnettiButton;
+
+  /// No description provided for @smartwatchDisconnetti.
+  ///
+  /// In it, this message translates to:
+  /// **'Scollega'**
+  String get smartwatchDisconnetti;
+
+  /// No description provided for @smartwatchInstallaHealthConnect.
+  ///
+  /// In it, this message translates to:
+  /// **'Installa Health Connect'**
+  String get smartwatchInstallaHealthConnect;
+
+  /// No description provided for @smartwatchPermessoNegato.
+  ///
+  /// In it, this message translates to:
+  /// **'Permesso non concesso. Puoi riprovare o autorizzare Plico dalle impostazioni del sistema.'**
+  String get smartwatchPermessoNegato;
+
+  /// No description provided for @smartwatchDescrizione.
+  ///
+  /// In it, this message translates to:
+  /// **'Importa automaticamente allenamenti cardio e pesi, frequenza cardiaca e calorie attive registrate dal tuo smartwatch, senza doverli inserire a mano.'**
+  String get smartwatchDescrizione;
+
+  /// No description provided for @smartwatchDisclaimer.
+  ///
+  /// In it, this message translates to:
+  /// **'I dati restano solo su questo dispositivo: Plico non li invia a server esterni. Puoi scollegare l\'accesso in qualsiasi momento da questa schermata.'**
+  String get smartwatchDisclaimer;
+
+  /// No description provided for @smartwatchImportaButton.
+  ///
+  /// In it, this message translates to:
+  /// **'Importa allenamenti'**
+  String get smartwatchImportaButton;
+
+  /// No description provided for @smartwatchImportaSuccesso.
+  ///
+  /// In it, this message translates to:
+  /// **'{count} allenamenti importati'**
+  String smartwatchImportaSuccesso(int count);
+
+  /// No description provided for @smartwatchImportaNessuno.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessun nuovo allenamento da importare'**
+  String get smartwatchImportaNessuno;
+
+  /// No description provided for @smartwatchBadgeHealthKit.
+  ///
+  /// In it, this message translates to:
+  /// **'Apple Salute'**
+  String get smartwatchBadgeHealthKit;
+
+  /// No description provided for @smartwatchBadgeHealthConnect.
+  ///
+  /// In it, this message translates to:
+  /// **'Health Connect'**
+  String get smartwatchBadgeHealthConnect;
+
   /// No description provided for @backupTitolo.
   ///
   /// In it, this message translates to:

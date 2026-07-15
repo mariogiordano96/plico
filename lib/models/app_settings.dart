@@ -50,4 +50,10 @@ class AppSettings {
 
   // Allenamento — Fase 10
   bool notWorkoutAttiva = false;
+
+  // Integrazione smartwatch (docs/integrazione_smartwatch.md): traccia se
+  // l'utente ha completato con successo il flusso di autorizzazione — su iOS
+  // HealthKit non permette di interrogare lo stato READ per privacy, quindi
+  // non c'è altro modo affidabile di sapere se è "connesso".
+  bool smartwatchConnected = false;
 }
