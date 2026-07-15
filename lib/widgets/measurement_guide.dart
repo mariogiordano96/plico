@@ -217,88 +217,102 @@ class _MeasurementGuideSheetState extends State<_MeasurementGuideSheet>
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    return DraggableScrollableSheet(
-      initialChildSize: 0.74,
-      minChildSize: 0.5,
-      maxChildSize: 0.94,
-      builder: (_, scrollController) => Container(
-        decoration: BoxDecoration(
-          color: p.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          border: Border.all(color: p.cardBorder),
-        ),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 14, 16, 0),
-              child: Row(
-                children: [
-                  const Spacer(),
-                  Container(width: 40, height: 4,
-                      decoration: BoxDecoration(color: p.textMuted.withValues(alpha: 0.35), borderRadius: BorderRadius.circular(2))),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      width: 32, height: 32,
-                      decoration: BoxDecoration(shape: BoxShape.circle, color: p.surfaceVariant, border: Border.all(color: p.cardBorder)),
-                      child: Icon(Icons.close_rounded, color: p.textMuted, size: 18),
-                    ),
-                  ),
-                ],
-              ),
+    // `DraggableScrollableSheet` dentro `showModalBottomSheet(isScrollControlled:
+    // true)` occupa per il proprio gesture handling l'intera area del route, quindi
+    // il tap nella zona "vuota" sopra la sheet visibile non arriva al barrier di
+    // `isDismissible` (viene assorbito prima): serve un `GestureDetector` esplicito
+    // che chiuda al tap fuori, con uno interno che assorbe i tap sul contenuto della
+    // sheet per non farla richiudere quando si interagisce con essa.
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => Navigator.pop(context),
+      child: DraggableScrollableSheet(
+        initialChildSize: 0.74,
+        minChildSize: 0.5,
+        maxChildSize: 0.94,
+        builder: (_, scrollController) => GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {},
+          child: Container(
+            decoration: BoxDecoration(
+              color: p.surface,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              border: Border.all(color: p.cardBorder),
             ),
-            Expanded(
-              child: ListView(
-                controller: scrollController,
-                padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-                children: [
-                  Text(widget.site.label,
-                      style: TextStyle(color: p.accent, fontSize: 21, fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 6),
-                  Text(widget.site.description,
-                      style: TextStyle(color: p.textSecondary, fontSize: 13, height: 1.55)),
-                  const SizedBox(height: 24),
-
-                  Center(
-                    child: AnimatedBuilder(
-                      animation: _pulse,
-                      builder: (_, _) => _BodyWithIndicator(
-                        site: widget.site,
-                        sesso: widget.sesso,
-                        scaleValue: _scaleAnim.value,
-                        ringProgress: _ringAnim.value,
-                        accentColor: p.accent,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Center(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(widget.site.bodyView == BodyView.front ? Icons.person_rounded : Icons.person_outlined,
-                            color: p.textMuted, size: 13),
-                        const SizedBox(width: 5),
-                        Text(
-                          '${widget.sesso == Sesso.maschio ? 'Uomo' : 'Donna'} · '
-                          '${widget.site.bodyView == BodyView.front ? 'Vista frontale' : 'Vista posteriore'}',
-                          style: TextStyle(color: p.textMuted, fontSize: 11, letterSpacing: 1.0),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 14, 16, 0),
+                  child: Row(
+                    children: [
+                      const Spacer(),
+                      Container(width: 40, height: 4,
+                          decoration: BoxDecoration(color: p.textMuted.withValues(alpha: 0.35), borderRadius: BorderRadius.circular(2))),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          width: 32, height: 32,
+                          decoration: BoxDecoration(shape: BoxShape.circle, color: p.surfaceVariant, border: Border.all(color: p.cardBorder)),
+                          child: Icon(Icons.close_rounded, color: p.textMuted, size: 18),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 28),
+                ),
+                Expanded(
+                  child: ListView(
+                    controller: scrollController,
+                    padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+                    children: [
+                      Text(widget.site.label,
+                          style: TextStyle(color: p.accent, fontSize: 21, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 6),
+                      Text(widget.site.description,
+                          style: TextStyle(color: p.textSecondary, fontSize: 13, height: 1.55)),
+                      const SizedBox(height: 24),
 
-                  Text('COME MISURARE',
-                      style: TextStyle(color: p.textMuted, fontSize: 11, letterSpacing: 2.5, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 14),
-                  ...widget.site.steps.asMap().entries
-                      .map((e) => _StepRow(index: e.key + 1, text: e.value, p: p)),
-                ],
-              ),
+                      Center(
+                        child: AnimatedBuilder(
+                          animation: _pulse,
+                          builder: (_, _) => _BodyWithIndicator(
+                            site: widget.site,
+                            sesso: widget.sesso,
+                            scaleValue: _scaleAnim.value,
+                            ringProgress: _ringAnim.value,
+                            accentColor: p.accent,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Center(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(widget.site.bodyView == BodyView.front ? Icons.person_rounded : Icons.person_outlined,
+                                color: p.textMuted, size: 13),
+                            const SizedBox(width: 5),
+                            Text(
+                              '${widget.sesso == Sesso.maschio ? 'Uomo' : 'Donna'} · '
+                              '${widget.site.bodyView == BodyView.front ? 'Vista frontale' : 'Vista posteriore'}',
+                              style: TextStyle(color: p.textMuted, fontSize: 11, letterSpacing: 1.0),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 28),
+
+                      Text('COME MISURARE',
+                          style: TextStyle(color: p.textMuted, fontSize: 11, letterSpacing: 2.5, fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 14),
+                      ...widget.site.steps.asMap().entries
+                          .map((e) => _StepRow(index: e.key + 1, text: e.value, p: p)),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
