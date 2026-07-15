@@ -253,8 +253,8 @@ non necessaria per gli obiettivi delle sezioni 5.1-5.2.
       non installato" (`SmartwatchAuthorizationResult.unavailable`)
 - [x] `SmartwatchService`: legge sessioni allenamento + frequenza cardiaca + kcal attive per
       un intervallo di date (`lib/services/smartwatch_service.dart`)
-- [ ] Verifica manuale su device reale con watch abbinato (nessuna UI ancora) — in attesa
-      dell'utente, vedi istruzioni fornite in chat
+- [x] Verifica manuale su device reale con watch abbinato — confermato funzionante
+      end-to-end (connessione Health Connect, import, dashboard Salute), 2026-07-15
 
 ### Fase 3 — Import e deduplica ✅
 - [x] Nuovi campi su `WorkoutExercise`: `source` (`WorkoutSource?`, null = manuale),
