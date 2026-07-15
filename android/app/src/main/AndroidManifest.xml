@@ -23,6 +23,9 @@
     <uses-permission android:name="android.permission.health.READ_STEPS"/>
     <uses-permission android:name="android.permission.health.READ_TOTAL_CALORIES_BURNED"/>
     <uses-permission android:name="android.permission.health.READ_BASAL_METABOLIC_RATE"/>
+    <!-- Richiesto da Health Connect per accedere ai dati "fitness" come i
+         passi (STEPS), vedi README del package `health`. -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
     <application
         android:label="plico"
         android:name="${applicationName}"
@@ -48,7 +51,26 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- Richiesto dal package `health`: mostra la schermata di
+                 spiegazione permessi di Health Connect, vedi
+                 docs/integrazione_smartwatch.md sezione 7. -->
+            <intent-filter>
+                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE"/>
+            </intent-filter>
         </activity>
+        <!-- Richiesta da Health Connect per il link alla privacy policy dalla
+             sua schermata permessi (vedi README del package `health`);
+             punta a MainActivity finché non esiste una schermata dedicata. -->
+        <activity-alias
+            android:name="ViewPermissionUsageActivity"
+            android:exported="true"
+            android:targetActivity=".MainActivity"
+            android:permission="android.permission.START_VIEW_PERMISSION_USAGE">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE"/>
+                <category android:name="android.intent.category.HEALTH_PERMISSIONS"/>
+            </intent-filter>
+        </activity-alias>
         <receiver
             android:name=".PlicoWidgetProvider"
             android:exported="true">

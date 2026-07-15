@@ -193,6 +193,17 @@ non necessaria per gli obiettivi delle sezioni 5.1-5.2.
   installata" con link allo store; su Android 14+ è integrata nel sistema, nessun setup
 - Dichiarare `<queries>` per l'intent di Health Connect (package visibility richiesta da
   Android 11+)
+- **`MainActivity` deve estendere `FlutterFragmentActivity`, non `FlutterActivity`** — gotcha
+  scoperto testando su device reale (2026-07-15): senza questo, `requestAuthorization`
+  fallisce silenziosamente (nessuna eccezione Dart, solo `"Permission launcher not found"`
+  nei log nativi) perché il plugin usa `registerForActivityResult`, che richiede un cast
+  Activity→ComponentActivity possibile solo con `FlutterFragmentActivity`. Servono inoltre:
+  un secondo `<intent-filter>` con `androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE`
+  sull'activity `.MainActivity` stessa (oltre alla voce già presente in `<queries>`), il
+  permesso `android.permission.ACTIVITY_RECOGNITION` (richiesto per i passi), e un
+  `activity-alias` `ViewPermissionUsageActivity` (link alla privacy policy dalla schermata
+  permessi di Health Connect, punta a `.MainActivity` in assenza di una pagina dedicata).
+  Vedi il README del package `health`, sezione "Android 14"
 
 ---
 
