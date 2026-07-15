@@ -35,9 +35,8 @@ class GuidedSessionService {
     WorkoutExercise? turn;
     var bestDone = 1 << 30;
     for (final e in step) {
-      final total = e.isCardio ? 1 : e.sets.length;
-      final done =
-          e.isCardio ? (e.cardioConfirmed ? 1 : 0) : e.sets.where((s) => s.confirmed).length;
+      final total = _total(e);
+      final done = _done(e);
       if (done >= total) continue;
       if (done < bestDone) {
         bestDone = done;
@@ -47,13 +46,29 @@ class GuidedSessionService {
     return turn;
   }
 
-  /// Vero quando il blocco è a esercizio singolo (nessuna restrizione
-  /// d'ordine, riposo dopo ogni serie) oppure quando l'intero blocco
-  /// superset è completo — condizione per mostrare il timer di riposo solo a
-  /// fine blocco, non tra un esercizio e l'altro né tra un round e il
-  /// successivo.
-  static bool isStepComplete(List<WorkoutExercise> step, bool Function(WorkoutExercise) isDone) =>
-      step.length <= 1 || step.every(isDone);
+  /// Vero quando [e] chiude un round del blocco: nessun altro esercizio dello
+  /// step, tra quelli non ancora esauriti, è rimasto indietro rispetto a
+  /// [e] (cioè con meno unità confermate). Su uno step a esercizio singolo è
+  /// sempre vero (riposo dopo ogni serie, comportamento invariato). Su un
+  /// blocco superset realizza "riposo dopo ogni round" (A1,B1,C1 → riposo;
+  /// A2,B2,C2 → riposo; ...), non solo alla fine dell'ultimo round: un
+  /// esercizio con più serie degli altri, rimasto a proseguire da solo dopo
+  /// che gli altri hanno esaurito le proprie, chiude un "round" (di sé
+  /// stesso) a ogni propria serie confermata, tornando così al normale
+  /// riposo dopo ogni serie.
+  static bool isEndOfRound(WorkoutExercise e, List<WorkoutExercise> step) {
+    final done = _done(e);
+    for (final f in step) {
+      if (identical(f, e)) continue;
+      if (_done(f) < _total(f) && _done(f) < done) return false;
+    }
+    return true;
+  }
+
+  static int _total(WorkoutExercise e) => e.isCardio ? 1 : e.sets.length;
+
+  static int _done(WorkoutExercise e) =>
+      e.isCardio ? (e.cardioConfirmed ? 1 : 0) : e.sets.where((s) => s.confirmed).length;
 
   static int totalEstimatedKcal(List<WorkoutExercise> exercises) =>
       exercises.fold<int>(0, (sum, e) => sum + (e.estimatedKcal ?? 0));

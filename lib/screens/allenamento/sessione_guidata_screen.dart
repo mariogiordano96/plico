@@ -247,12 +247,12 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
   }
 
   /// All'interno di un blocco superset non si riposa tra un esercizio e il
-  /// successivo (né tra un round e il successivo): il timer scatta solo
-  /// quando l'intero blocco è completo (gli esercizi singoli, non in
-  /// superset, mantengono il comportamento originale: riposo dopo ogni
-  /// serie). Vedi `GuidedSessionService.isStepComplete`.
-  bool _isLastInStep() =>
-      GuidedSessionService.isStepComplete(_steps[_stepIndex], _isExerciseDone);
+  /// successivo, ma il timer scatta a fine di ogni round (dopo l'ultimo
+  /// esercizio rimasto attivo in quel giro, non solo all'ultimissimo round);
+  /// gli esercizi singoli, non in superset, mantengono il comportamento
+  /// originale: riposo dopo ogni serie. Vedi `GuidedSessionService.isEndOfRound`.
+  bool _isLastInStep(WorkoutExercise e) =>
+      GuidedSessionService.isEndOfRound(e, _steps[_stepIndex]);
 
   bool _isExerciseDone(WorkoutExercise e) =>
       e.isCardio ? e.cardioConfirmed : e.sets.every((s) => s.confirmed);
@@ -296,7 +296,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     unawaited(_checkpointElapsed());
     if (!mounted) return;
     setState(() {});
-    if (_isLastInStep() && !_sessionComplete) {
+    if (_isLastInStep(e) && !_sessionComplete) {
       await showRestTimerSheet(context, seconds: e.restSeconds ?? _defaultRestSeconds);
     }
     _maybeAdvanceStep();
@@ -316,7 +316,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     unawaited(_checkpointElapsed());
     if (!mounted) return;
     setState(() {});
-    if ((e.restSeconds ?? 0) > 0 && _isLastInStep() && !_sessionComplete) {
+    if ((e.restSeconds ?? 0) > 0 && _isLastInStep(e) && !_sessionComplete) {
       await showRestTimerSheet(context, seconds: e.restSeconds!);
     }
     _maybeAdvanceStep();

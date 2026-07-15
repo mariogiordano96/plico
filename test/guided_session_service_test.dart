@@ -131,25 +131,47 @@ void main() {
     });
   });
 
-  group('isStepComplete', () {
-    bool isDone(WorkoutExercise e) =>
-        e.isCardio ? e.cardioConfirmed : e.sets.every((s) => s.confirmed);
-
-    test('step a esercizio singolo: sempre completo (nessuna restrizione d\'ordine)', () {
+  group('isEndOfRound', () {
+    test('step a esercizio singolo: sempre vero (riposo dopo ogni serie)', () {
       final a = _exercise(id: 'a', sets: _sets(3, confirmedCount: 1));
-      expect(GuidedSessionService.isStepComplete([a], isDone), isTrue);
+      expect(GuidedSessionService.isEndOfRound(a, [a]), isTrue);
     });
 
-    test('blocco superset: false finché non tutti gli esercizi sono fatti', () {
-      final a = _exercise(id: 'a', supersetGroupId: 1, sets: _sets(2, confirmedCount: 2));
-      final b = _exercise(id: 'b', supersetGroupId: 1, sets: _sets(2, confirmedCount: 1));
-      expect(GuidedSessionService.isStepComplete([a, b], isDone), isFalse);
+    test('round 1 (A1,B1,C1): falso su A1 e B1, vero su C1', () {
+      final a = _exercise(id: 'a', supersetGroupId: 1, sets: _sets(3, confirmedCount: 1));
+      final b = _exercise(id: 'b', supersetGroupId: 1, sets: _sets(3, confirmedCount: 0));
+      final c = _exercise(id: 'c', supersetGroupId: 1, sets: _sets(3, confirmedCount: 0));
+      expect(GuidedSessionService.isEndOfRound(a, [a, b, c]), isFalse);
+      b.sets[0].confirmed = true;
+      expect(GuidedSessionService.isEndOfRound(b, [a, b, c]), isFalse);
+      c.sets[0].confirmed = true;
+      expect(GuidedSessionService.isEndOfRound(c, [a, b, c]), isTrue);
     });
 
-    test('blocco superset: true quando tutti gli esercizi sono completi', () {
+    test('round intermedio (non l\'ultimo): riposo comunque a fine round', () {
+      // A e B già a 2/3 serie confermate, si sta chiudendo il round 2 (non
+      // l'ultimo, manca ancora il round 3): il riposo deve scattare comunque.
+      final a = _exercise(id: 'a', supersetGroupId: 1, sets: _sets(3, confirmedCount: 2));
+      final b = _exercise(id: 'b', supersetGroupId: 1, sets: _sets(3, confirmedCount: 2));
+      expect(GuidedSessionService.isEndOfRound(b, [a, b]), isTrue);
+    });
+
+    test('esercizio rimasto da solo dopo che gli altri hanno esaurito le serie: '
+        'torna al riposo dopo ogni propria serie', () {
       final a = _exercise(id: 'a', supersetGroupId: 1, sets: _sets(2, confirmedCount: 2));
-      final b = _exercise(id: 'b', supersetGroupId: 1, sets: _sets(3, confirmedCount: 3));
-      expect(GuidedSessionService.isStepComplete([a, b], isDone), isTrue);
+      final b = _exercise(id: 'b', supersetGroupId: 1, sets: _sets(4, confirmedCount: 2));
+      // a ha finito le sue 2 serie, b prosegue da sola: ogni sua serie
+      // successiva chiude comunque un "round" (di se stessa).
+      b.sets[2].confirmed = true;
+      expect(GuidedSessionService.isEndOfRound(b, [a, b]), isTrue);
+    });
+
+    test('mix strength+cardio: falso finché il cardio non è confermato', () {
+      final cardio = _exercise(id: 'jump', supersetGroupId: 1, durationSeconds: 40);
+      final squat = _exercise(id: 'squat', supersetGroupId: 1, sets: _sets(1, confirmedCount: 1));
+      expect(GuidedSessionService.isEndOfRound(squat, [cardio, squat]), isFalse);
+      cardio.cardioConfirmed = true;
+      expect(GuidedSessionService.isEndOfRound(cardio, [cardio, squat]), isTrue);
     });
   });
 

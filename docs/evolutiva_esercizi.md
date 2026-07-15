@@ -2155,23 +2155,29 @@ preset, test manuale su device — vedi nota a inizio sezione)**
       di una sessione interrotta a metà blocco). Realizza A1,B1,C1,A2,B2,C2...
       con un numero qualunque di esercizi nel blocco; un esercizio con più o
       meno serie degli altri viene saltato quando esaurisce le proprie.
-- [x] `GuidedSessionService.isStepComplete(step, isDone)`: sostituisce il vecchio
-      `_isLastInStep` di `sessione_guidata_screen.dart` — corregge un bug per cui
-      il timer di riposo scattava dopo QUALSIASI serie confermata dell'ultimo
-      esercizio del blocco (bastava la posizione, non serviva fosse davvero la
-      sua ultima serie). Ora il timer scatta solo quando l'intero blocco
-      (tutti gli esercizi, tutte le serie/round) è completo.
+- [x] `GuidedSessionService.isEndOfRound(e, step)`: sostituisce il vecchio
+      `_isLastInStep` di `sessione_guidata_screen.dart` — il riposo scatta a
+      fine di OGNI round del blocco (dopo A1,B1,C1 → riposo; dopo A2,B2,C2 →
+      riposo; ecc.), non solo dopo l'ultimissimo round, correggendo anche un
+      bug per cui prima scattava dopo QUALSIASI serie confermata dell'ultimo
+      esercizio per posizione, indipendentemente dal round. Un esercizio
+      rimasto a proseguire da solo dopo che gli altri hanno esaurito le
+      proprie serie torna al normale riposo dopo ogni propria serie.
 - [x] `sessione_guidata_screen.dart`: `_ExerciseStepCard` riceve `locked`/
-      `highlighted` in base al turno calcolato in `build()`; solo la serie
-      corrente dell'esercizio con il turno è confermabile (`_SetRow.enabled`,
-      bottone cardio incluso) — i campi reps/kg restano sempre editabili,
-      si blocca solo la conferma. Card con il turno evidenziata con bordo
-      `p.accent`.
+      `highlighted` in base al turno calcolato in `build()` (`turnFor`); solo
+      la serie corrente dell'esercizio con il turno è confermabile
+      (`_SetRow.enabled`, bottone cardio incluso) — i campi reps/kg restano
+      sempre editabili, si blocca solo la conferma. Card con il turno
+      evidenziata con bordo `p.accent`.
 - [x] Nuova chiave l10n `sessioneGuidataAspettaTurno` (IT "Aspetta il turno",
       EN "Wait your turn") per il tooltip delle righe/bottone bloccati.
 - [x] Test in `test/guided_session_service_test.dart` per `turnFor`/
-      `isStepComplete`: alternanza base, blocco con 3+ esercizi, esercizi con
-      numero di serie diverso, mix strength+cardio, blocco già completo.
+      `isEndOfRound`: alternanza base, blocco con 3+ esercizi, esercizi con
+      numero di serie diverso (uno prosegue da solo), mix strength+cardio,
+      riposo su round intermedi (non solo l'ultimo).
+- [x] Correzione post-test manuale dell'utente: la prima versione faceva
+      scattare il riposo solo a fine dell'intero blocco (tutti i round);
+      il comportamento voluto è riposo a fine di ogni singolo round.
 
 > Vista lista piatta non guidata (`allenamento_screen.dart`) invariata: mostra
 > solo l'etichetta SUPERSET non interattiva, resta fuori scope.
