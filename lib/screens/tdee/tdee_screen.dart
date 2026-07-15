@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../theme/app_theme.dart';
 import '../../models/enums.dart';
 import '../../models/user_profile.dart';
@@ -312,13 +313,8 @@ class _TdeeScreenState extends State<TdeeScreen> {
     await _load();
   }
 
-  String _formatDate(DateTime d) {
-    const months = [
-      'gen', 'feb', 'mar', 'apr', 'mag', 'giu',
-      'lug', 'ago', 'set', 'ott', 'nov', 'dic'
-    ];
-    return '${d.day} ${months[d.month - 1]} ${d.year}';
-  }
+  String _formatDate(DateTime d) =>
+      DateFormat('d MMM y', Localizations.localeOf(context).toString()).format(d);
 
   @override
   Widget build(BuildContext context) {

@@ -130,17 +130,8 @@ class _GreetingHeader extends StatelessWidget {
     return context.l10n.homeSalutoBuonasera;
   }
 
-  String _formatDate(DateTime d) {
-    const days = [
-      'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì',
-      'Venerdì', 'Sabato', 'Domenica'
-    ];
-    const months = [
-      'gen', 'feb', 'mar', 'apr', 'mag', 'giu',
-      'lug', 'ago', 'set', 'ott', 'nov', 'dic'
-    ];
-    return '${days[d.weekday - 1]} ${d.day} ${months[d.month - 1]}';
-  }
+  String _formatDate(DateTime d, BuildContext context) =>
+      DateFormat('EEEE d MMM', Localizations.localeOf(context).toString()).format(d);
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +158,7 @@ class _GreetingHeader extends StatelessWidget {
                 ),
               ],
             ),
-            Text(_formatDate(DateTime.now()),
+            Text(_formatDate(DateTime.now(), context),
                 style: TextStyle(color: p.textMuted, fontSize: 13)),
           ],
         );

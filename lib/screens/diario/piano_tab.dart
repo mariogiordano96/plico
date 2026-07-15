@@ -456,10 +456,8 @@ class _PlanHeaderCard extends StatelessWidget {
   final ColorPalette p;
   const _PlanHeaderCard({required this.plan, required this.p});
 
-  String _formatDate(DateTime d) {
-    const months = ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic'];
-    return '${d.day} ${months[d.month - 1]} ${d.year}';
-  }
+  String _formatDate(DateTime d, BuildContext context) =>
+      DateFormat('d MMM y', Localizations.localeOf(context).toString()).format(d);
 
   @override
   Widget build(BuildContext context) {
@@ -483,7 +481,7 @@ class _PlanHeaderCard extends StatelessWidget {
                     Text(context.l10n.homeTdeeKcalGiorno('${plan.kcalTotali.round()}'),
                         style: TextStyle(
                             color: p.textPrimary, fontSize: 22, fontWeight: FontWeight.w800)),
-                    Text(context.l10n.pianoGeneratoIl(_formatDate(plan.dataCreazione)),
+                    Text(context.l10n.pianoGeneratoIl(_formatDate(plan.dataCreazione, context)),
                         style: TextStyle(color: p.textMuted, fontSize: 12)),
                   ],
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/exercise_definition.dart';
@@ -49,15 +50,10 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
 
   String _formatDate(DateTime d) {
     final l10n = context.l10n;
-    const weekdays = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
-    const months = [
-      'gen', 'feb', 'mar', 'apr', 'mag', 'giu',
-      'lug', 'ago', 'set', 'ott', 'nov', 'dic'
-    ];
     final today = _dayStart(DateTime.now());
     if (d == today) return l10n.diarioOggi;
     if (d == today.subtract(const Duration(days: 1))) return l10n.diarioIeri;
-    return '${weekdays[d.weekday - 1]} ${d.day} ${months[d.month - 1]}';
+    return DateFormat('EEE d MMM', Localizations.localeOf(context).toString()).format(d);
   }
 
   Future<void> _editNota() async {
