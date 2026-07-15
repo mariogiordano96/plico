@@ -11,6 +11,7 @@ import 'screens/diario/aggiunta_alimento_screen.dart';
 import 'services/achievement_service.dart';
 import 'services/database_service.dart';
 import 'services/notification_service.dart';
+import 'services/smartwatch_import_service.dart';
 import 'services/widget_service.dart';
 import 'utils/locale_utils.dart';
 import 'widgets/dismiss_keyboard_on_tap.dart';
@@ -50,6 +51,16 @@ void main() async {
   await NotificationService.instance.refreshWorkoutReminder();
   await HomeWidget.setAppGroupId(WidgetService.iOSGroupId);
   await WidgetService.refresh();
+  // Sync opportunistica: solo quando l'app è già aperta, mai in vero
+  // background (docs/integrazione_smartwatch.md, Fase 5 — nessun impatto
+  // batteria aggiuntivo, nessuna infrastruttura nativa nuova). Non awaited:
+  // non deve ritardare l'avvio dell'app.
+  if (settings.smartwatchConnected) {
+    unawaited(SmartwatchImportService.instance.importWorkoutSessions(
+      start: DateTime.now().subtract(const Duration(days: 7)),
+      end: DateTime.now(),
+    ));
+  }
   runApp(const PlicoApp());
 }
 

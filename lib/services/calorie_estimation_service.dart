@@ -56,6 +56,19 @@ class CalorieEstimationService {
     return (_strengthMet * weight * hours).round();
   }
 
+  /// Come [estimateStrengthKcal], ma dalla durata reale invece che dal numero
+  /// di serie — per una sessione pesi importata da smartwatch (`sets` vuoto,
+  /// nessuna serie da contare, ma la durata reale è nota). Vedi
+  /// docs/integrazione_smartwatch.md, Fase 5 ("fallback FC senza kcal").
+  static int estimateStrengthKcalFromDuration({
+    required int durationSeconds,
+    double? bodyWeightKg,
+  }) {
+    final weight = bodyWeightKg ?? defaultBodyWeightKg;
+    final hours = durationSeconds / 3600;
+    return (_strengthMet * weight * hours).round();
+  }
+
   /// Totale kcal di [exercises] (un giorno), applicando la regola "il watch
   /// vince sulla stima" (docs/integrazione_smartwatch.md sezione 6): se tra
   /// gli esercizi c'è una sessione pesi importata da smartwatch, le kcal

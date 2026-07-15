@@ -3,6 +3,7 @@ import 'dart:io' show Platform;
 import 'package:health/health.dart';
 
 import '../models/workout_exercise.dart';
+import 'calorie_estimation_service.dart';
 import 'database_service.dart';
 import 'smartwatch_service.dart';
 
@@ -63,9 +64,12 @@ class SmartwatchImportService {
     final sessions = await SmartwatchService.instance.fetchWorkoutSessions(start: start, end: end);
     if (sessions.isEmpty) return 0;
 
+    final bodySnapshot = await DatabaseService.instance.getLatestBodySnapshot();
+    final bodyWeightKg = bodySnapshot?.pesoKg;
+
     var imported = 0;
     for (final session in sessions) {
-      final mapped = _mapSession(session);
+      final mapped = _mapSession(session, bodyWeightKg);
       if (mapped == null) continue;
 
       final existing = await DatabaseService.instance.getWorkoutExercisesForDay(session.start);
@@ -99,20 +103,39 @@ class SmartwatchImportService {
     });
   }
 
-  WorkoutExercise? _mapSession(SmartwatchWorkoutSession session) {
+  WorkoutExercise? _mapSession(SmartwatchWorkoutSession session, double? bodyWeightKg) {
     final cardio = _cardioActivityNames[session.activityType];
     final isStrength = _strengthActivityTypes.contains(session.activityType);
     if (cardio == null && !isStrength) return null;
 
     final source = Platform.isIOS ? WorkoutSource.healthKit : WorkoutSource.healthConnect;
     final (exerciseId, exerciseName) = cardio ?? (_strengthExerciseId, _strengthExerciseName);
+    final durationSeconds = session.duration.inSeconds;
+
+    // Il watch a volte riporta solo la frequenza cardiaca senza le kcal
+    // attive (es. sensore ottico senza stima energetica): invece di scartare
+    // la sessione, si stima con lo stesso MET fisso usato per il log
+    // manuale, dalla durata reale (vedi docs/integrazione_smartwatch.md,
+    // Fase 5). Nessun MET quando le kcal sono reali: `met` resta null.
+    final hasRealKcal = session.energyBurnedKcal != null;
+    final estimatedKcal = hasRealKcal
+        ? session.energyBurnedKcal
+        : (isStrength
+            ? CalorieEstimationService.estimateStrengthKcalFromDuration(
+                durationSeconds: durationSeconds, bodyWeightKg: bodyWeightKg)
+            : CalorieEstimationService.estimateCardioKcal(
+                exerciseId: exerciseId, durationSeconds: durationSeconds, bodyWeightKg: bodyWeightKg));
+    final met = (!hasRealKcal && !isStrength)
+        ? CalorieEstimationService.metForCardioExercise(exerciseId).round()
+        : null;
 
     return WorkoutExercise()
       ..exerciseId = exerciseId
       ..exerciseName = exerciseName
       ..date = session.start
-      ..durationSeconds = session.duration.inSeconds
-      ..estimatedKcal = session.energyBurnedKcal
+      ..durationSeconds = durationSeconds
+      ..estimatedKcal = estimatedKcal
+      ..met = met
       ..avgHeartRate = session.avgHeartRateBpm
       ..source = source.name
       ..sourceStartTime = session.start

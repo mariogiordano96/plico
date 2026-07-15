@@ -38,7 +38,37 @@ class _SmartwatchScreenState extends State<SmartwatchScreen> {
     }
   }
 
+  /// Disclaimer privacy esplicito prima della prima richiesta di
+  /// autorizzazione (docs/integrazione_smartwatch.md sezione 8): un consenso
+  /// deliberato di Plico, distinto dal prompt di sistema di HealthKit/Health
+  /// Connect che segue subito dopo.
+  Future<bool> _confirmDisclaimer() async {
+    final p = context.palette;
+    final l10n = context.l10n;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: p.surface,
+        title: Text(l10n.smartwatchTitolo, style: TextStyle(color: p.textPrimary)),
+        content: Text(l10n.smartwatchDisclaimer, style: TextStyle(color: p.textSecondary)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.diarioAnnulla, style: TextStyle(color: p.textMuted)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n.smartwatchConnettiButton, style: TextStyle(color: p.accent)),
+          ),
+        ],
+      ),
+    );
+    return confirmed ?? false;
+  }
+
   Future<void> _connect() async {
+    if (!await _confirmDisclaimer()) return;
+    if (!mounted) return;
     setState(() => _connecting = true);
     final result = await SmartwatchService.instance.requestAuthorization();
     if (!mounted) return;

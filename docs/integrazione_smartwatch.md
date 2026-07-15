@@ -279,11 +279,18 @@ non necessaria per gli obiettivi delle sezioni 5.1-5.2.
       visualizzato; se Salute non è collegato guida l'utente verso
       Impostazioni invece di tentare una lettura senza permessi
 
-### Fase 5 — Rifinitura
-- [ ] Import automatico in background, valutando impatto batteria
-- [ ] Fallback: se una sessione watch riporta solo frequenza cardiaca senza kcal attive,
-      derivarle con `CalorieEstimationService` invece di scartare la sessione
-- [ ] Disclaimer privacy in UI al primo collegamento
+### Fase 5 — Rifinitura ✅
+- [x] Import automatico — **scelta deliberata: sync opportunistica all'apertura app
+      (`main.dart`), non un vero background task OS-level** (WorkManager/BGAppRefreshTask).
+      Nessun impatto batteria aggiuntivo (gira solo ad app già aperta) e nessuna nuova
+      infrastruttura nativa nell'area che ha già causato un crash release-only in questo
+      progetto (vedi memoria "Crash release WorkManager"). Limite noto: se l'utente non apre
+      l'app per più giorni, l'import resta indietro finché non la riapre o fa pull-to-refresh
+- [x] Fallback: se una sessione watch riporta solo frequenza cardiaca senza kcal attive,
+      derivate con `CalorieEstimationService` (stesso MET fisso del log manuale, dalla durata
+      reale) invece di lasciare la sessione senza kcal
+- [x] Disclaimer privacy esplicito (dialog di conferma) prima della prima richiesta di
+      autorizzazione, distinto dal prompt di sistema HealthKit/Health Connect che segue
 
 ### Fase 6 — *(estensione successiva)* Dashboard Wellness
 - [ ] Nuova sezione "Salute" di sola lettura (es. in Progressi, sotto il grafico peso)
