@@ -122,8 +122,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     themeNotifier.value = _selectedTheme;
 
     if (!mounted) return;
-    Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const MainScreen()));
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const MainScreen()),
+        (route) => false);
   }
 
   @override
