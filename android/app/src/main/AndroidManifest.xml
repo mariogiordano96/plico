@@ -10,6 +10,11 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- Permessi Health Connect per import allenamenti/FC/kcal da smartwatch,
+         vedi docs/integrazione_smartwatch.md sezione 7. -->
+    <uses-permission android:name="android.permission.health.READ_EXERCISE"/>
+    <uses-permission android:name="android.permission.health.READ_HEART_RATE"/>
+    <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED"/>
     <application
         android:label="plico"
         android:name="${applicationName}"
@@ -83,5 +88,9 @@
             <category android:name="android.intent.category.BROWSABLE"/>
             <data android:scheme="https"/>
         </intent>
+        <!-- Package visibility per Health Connect, richiesta da Android 11+
+             (su Android 9-13 è un'app separata da Play Store, su 14+ è di
+             sistema). Vedi docs/integrazione_smartwatch.md sezione 7. -->
+        <package android:name="com.google.android.apps.healthdata"/>
     </queries>
 </manifest>

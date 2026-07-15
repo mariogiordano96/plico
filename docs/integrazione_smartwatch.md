@@ -228,11 +228,13 @@ non necessaria per gli obiettivi delle sezioni 5.1-5.2.
 
 ## 10. Piano di implementazione
 
-### Fase 1 — Setup piattaforma
-- [ ] Aggiungere dipendenza `health` a `pubspec.yaml`
-- [ ] iOS: abilitare capability HealthKit in Xcode, aggiungere `NSHealthShareUsageDescription`
-- [ ] Android: verificare/alzare `minSdk` a 26, dichiarare permessi Health Connect e `<queries>`
-- [ ] Verificare che il progetto compili su entrambe le piattaforme (nessuna feature ancora)
+### Fase 1 — Setup piattaforma ✅
+- [x] Aggiungere dipendenza `health` a `pubspec.yaml` (13.3.1)
+- [x] iOS: abilitare capability HealthKit in Xcode, aggiungere `NSHealthShareUsageDescription`
+- [x] Android: verificare/alzare `minSdk` a 26, dichiarare permessi Health Connect e `<queries>`
+- [x] Verificare che il progetto compili su entrambe le piattaforme (nessuna feature ancora) —
+      Android verificato con `flutter build apk --debug` (build riuscita); iOS non verificabile
+      su questa macchina Linux, richiede `pod install` + build su Mac (vedi nota sotto)
 
 ### Fase 2 — Lettura dati (senza persistenza)
 - [ ] Flusso di richiesta permessi (`requestAuthorization`) con gestione del rifiuto

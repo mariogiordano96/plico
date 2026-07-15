@@ -25,7 +25,9 @@ android {
 
     defaultConfig {
         applicationId = "com.maxio96.plico"
-        minSdk = flutter.minSdkVersion
+        // Health Connect richiede minSdk 26 (default Flutter è 24, vedi
+        // docs/integrazione_smartwatch.md sezione 7)
+        minSdk = maxOf(flutter.minSdkVersion, 26)
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
