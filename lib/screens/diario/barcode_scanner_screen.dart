@@ -43,6 +43,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
     if (_processing) return;
     final code = capture.barcodes.firstOrNull?.rawValue;
     if (code == null) return;
+    final languageCode = Localizations.localeOf(context).languageCode;
 
     setState(() {
       _processing = true;
@@ -50,7 +51,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
     });
     await _controller.stop();
 
-    final food = await OpenFoodFactsService.searchByBarcode(code);
+    final food = await OpenFoodFactsService.searchByBarcode(code, languageCode: languageCode);
     if (!mounted) return;
 
     if (food != null) {

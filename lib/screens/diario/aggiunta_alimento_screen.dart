@@ -86,12 +86,14 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
   }
 
   Future<void> _loadLocal(String q) async {
-    final items = await DatabaseService.instance.searchFoodItems(q);
+    final items = await DatabaseService.instance
+        .searchFoodItems(q, languageCode: Localizations.localeOf(context).languageCode);
     if (!mounted) return;
     setState(() => _localResults = items);
   }
 
   Future<void> _search(String q) async {
+    final languageCode = Localizations.localeOf(context).languageCode;
     await _loadLocal(q);
     if (q.trim().isEmpty) {
       setState(() {
@@ -101,7 +103,7 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
       return;
     }
     setState(() => _searching = true);
-    final results = await OpenFoodFactsService.search(q);
+    final results = await OpenFoodFactsService.search(q, languageCode: languageCode);
     if (!mounted) return;
     setState(() {
       _offResults = results;

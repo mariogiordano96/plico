@@ -18,6 +18,13 @@ class AppSettings {
   // chi aveva installato l'app prima della normalizzazione dei nomi, altrimenti
   // il vecchio nome in Isar non fa più match con `PianoService.curatedNames`.
   bool foodNamesNormalizedV2 = false;
+  // Migrazione una-tantum: risincronizza `nomeInglese` sui FoodItem già in
+  // DB (matching per creaCode) — la normalizzazione di crea_seed.json
+  // (docs/normalizzazione_nomi_alimenti.md) ha cambiato/rimosso molte voci
+  // senza che `migrateFoodNamesV2` (che tocca solo `nome`) le risincronizzasse,
+  // lasciando `nomeInglese` null per chi aveva già seedato il catalogo:
+  // la ricerca in inglese mostrava quindi i nomi italiani come fallback.
+  bool foodNomeIngleseSyncedV1 = false;
   DateTime? goalSetDate;
   double? pesoObiettivo;
 

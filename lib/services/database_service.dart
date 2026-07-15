@@ -353,7 +353,7 @@ class DatabaseService {
   // FoodItem
   // ──────────────────────────────────────────────
 
-  Future<List<FoodItem>> searchFoodItems(String query) async {
+  Future<List<FoodItem>> searchFoodItems(String query, {String languageCode = 'it'}) async {
     final List<FoodItem> items;
     if (query.trim().isEmpty) {
       items = await _isar.foodItems
@@ -363,6 +363,18 @@ class DatabaseService {
           .isCustomEqualTo(true)
           .or()
           .lastUsedAtIsNotNull()
+          .findAll();
+    } else if (languageCode == 'en') {
+      // In inglese cerca anche su nomeInglese, non solo sul nome italiano:
+      // altrimenti un termine come "chicken" non troverebbe mai "Pollo,
+      // petto" (nomeInglese: "Chicken, breast") perché nomeContains lo
+      // ignora — vedi FoodItem.localizedName per lo stesso fallback in
+      // visualizzazione.
+      items = await _isar.foodItems
+          .filter()
+          .nomeContains(query, caseSensitive: false)
+          .or()
+          .nomeIngleseContains(query, caseSensitive: false)
           .findAll();
     } else {
       items = await _isar.foodItems
@@ -501,6 +513,39 @@ class DatabaseService {
       }
       final s = await _isar.appSettings.get(1) ?? AppSettings();
       s.foodNamesNormalizedV2 = true;
+      await _isar.appSettings.put(s);
+    });
+  }
+
+  /// Migrazione una-tantum: risincronizza `nomeInglese` sui `FoodItem` già
+  /// persistiti, matchando per `creaCode` — la normalizzazione di
+  /// `crea_seed.json` (docs/normalizzazione_nomi_alimenti.md) ha
+  /// aggiunto/spostato molte traduzioni senza che `migrateFoodNamesV2`
+  /// (che tocca solo `nome`) le risincronizzasse, lasciando `nomeInglese`
+  /// null o disallineato per chi aveva già seedato il catalogo: la ricerca
+  /// in inglese mostrava quindi i nomi italiani come fallback.
+  Future<void> syncFoodNomeInglese() async {
+    final settings = await _isar.appSettings.get(1);
+    if (settings?.foodNomeIngleseSyncedV1 == true) return;
+
+    final raw = await rootBundle.loadString('assets/data/crea_seed.json');
+    final list = jsonDecode(raw) as List<dynamic>;
+    final nomeIngleseByCode = <String, String?>{
+      for (final e in list.cast<Map<String, dynamic>>())
+        if (e['creaCode'] != null) e['creaCode'] as String: e['nomeInglese'] as String?,
+    };
+
+    await _isar.writeTxn(() async {
+      final existing = await _isar.foodItems.filter().creaCodeIsNotNull().findAll();
+      for (final food in existing) {
+        final newNomeInglese = nomeIngleseByCode[food.creaCode];
+        if (newNomeInglese != food.nomeInglese) {
+          food.nomeInglese = newNomeInglese;
+          await _isar.foodItems.put(food);
+        }
+      }
+      final s = await _isar.appSettings.get(1) ?? AppSettings();
+      s.foodNomeIngleseSyncedV1 = true;
       await _isar.appSettings.put(s);
     });
   }
