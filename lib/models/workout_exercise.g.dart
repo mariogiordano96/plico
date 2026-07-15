@@ -17,79 +17,104 @@ const WorkoutExerciseSchema = CollectionSchema(
   name: r'WorkoutExercise',
   id: 9115529306380274138,
   properties: {
-    r'cardioConfirmed': PropertySchema(
+    r'avgHeartRate': PropertySchema(
       id: 0,
+      name: r'avgHeartRate',
+      type: IsarType.double,
+    ),
+    r'cardioConfirmed': PropertySchema(
+      id: 1,
       name: r'cardioConfirmed',
       type: IsarType.bool,
     ),
     r'date': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'date',
       type: IsarType.dateTime,
     ),
     r'durationSeconds': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'durationSeconds',
       type: IsarType.long,
     ),
     r'estimatedKcal': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'estimatedKcal',
       type: IsarType.long,
     ),
     r'exerciseId': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'exerciseId',
       type: IsarType.string,
     ),
     r'exerciseName': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'exerciseName',
       type: IsarType.string,
     ),
+    r'importedIsStrength': PropertySchema(
+      id: 7,
+      name: r'importedIsStrength',
+      type: IsarType.bool,
+    ),
     r'isCardio': PropertySchema(
-      id: 6,
+      id: 8,
       name: r'isCardio',
       type: IsarType.bool,
     ),
     r'met': PropertySchema(
-      id: 7,
+      id: 9,
       name: r'met',
       type: IsarType.long,
     ),
     r'restSeconds': PropertySchema(
-      id: 8,
+      id: 10,
       name: r'restSeconds',
       type: IsarType.long,
     ),
     r'sets': PropertySchema(
-      id: 9,
+      id: 11,
       name: r'sets',
       type: IsarType.objectList,
       target: r'WorkoutSet',
     ),
+    r'source': PropertySchema(
+      id: 12,
+      name: r'source',
+      type: IsarType.string,
+    ),
+    r'sourceEndTime': PropertySchema(
+      id: 13,
+      name: r'sourceEndTime',
+      type: IsarType.dateTime,
+    ),
     r'sourceProgramId': PropertySchema(
-      id: 10,
+      id: 14,
       name: r'sourceProgramId',
       type: IsarType.long,
     ),
     r'sourceProgramName': PropertySchema(
-      id: 11,
+      id: 15,
       name: r'sourceProgramName',
       type: IsarType.string,
     ),
+    r'sourceStartTime': PropertySchema(
+      id: 16,
+      name: r'sourceStartTime',
+      type: IsarType.dateTime,
+    ),
     r'sourceTemplateId': PropertySchema(
-      id: 12,
+      id: 17,
       name: r'sourceTemplateId',
       type: IsarType.long,
     ),
     r'sourceTemplateName': PropertySchema(
-      id: 13,
+      id: 18,
       name: r'sourceTemplateName',
       type: IsarType.string,
     ),
     r'supersetGroupId': PropertySchema(
-      id: 14,
+      id: 19,
       name: r'supersetGroupId',
       type: IsarType.long,
     )
@@ -152,6 +177,12 @@ int _workoutExerciseEstimateSize(
     }
   }
   {
+    final value = object.source;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
     final value = object.sourceProgramName;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
@@ -172,26 +203,31 @@ void _workoutExerciseSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeBool(offsets[0], object.cardioConfirmed);
-  writer.writeDateTime(offsets[1], object.date);
-  writer.writeLong(offsets[2], object.durationSeconds);
-  writer.writeLong(offsets[3], object.estimatedKcal);
-  writer.writeString(offsets[4], object.exerciseId);
-  writer.writeString(offsets[5], object.exerciseName);
-  writer.writeBool(offsets[6], object.isCardio);
-  writer.writeLong(offsets[7], object.met);
-  writer.writeLong(offsets[8], object.restSeconds);
+  writer.writeDouble(offsets[0], object.avgHeartRate);
+  writer.writeBool(offsets[1], object.cardioConfirmed);
+  writer.writeDateTime(offsets[2], object.date);
+  writer.writeLong(offsets[3], object.durationSeconds);
+  writer.writeLong(offsets[4], object.estimatedKcal);
+  writer.writeString(offsets[5], object.exerciseId);
+  writer.writeString(offsets[6], object.exerciseName);
+  writer.writeBool(offsets[7], object.importedIsStrength);
+  writer.writeBool(offsets[8], object.isCardio);
+  writer.writeLong(offsets[9], object.met);
+  writer.writeLong(offsets[10], object.restSeconds);
   writer.writeObjectList<WorkoutSet>(
-    offsets[9],
+    offsets[11],
     allOffsets,
     WorkoutSetSchema.serialize,
     object.sets,
   );
-  writer.writeLong(offsets[10], object.sourceProgramId);
-  writer.writeString(offsets[11], object.sourceProgramName);
-  writer.writeLong(offsets[12], object.sourceTemplateId);
-  writer.writeString(offsets[13], object.sourceTemplateName);
-  writer.writeLong(offsets[14], object.supersetGroupId);
+  writer.writeString(offsets[12], object.source);
+  writer.writeDateTime(offsets[13], object.sourceEndTime);
+  writer.writeLong(offsets[14], object.sourceProgramId);
+  writer.writeString(offsets[15], object.sourceProgramName);
+  writer.writeDateTime(offsets[16], object.sourceStartTime);
+  writer.writeLong(offsets[17], object.sourceTemplateId);
+  writer.writeString(offsets[18], object.sourceTemplateName);
+  writer.writeLong(offsets[19], object.supersetGroupId);
 }
 
 WorkoutExercise _workoutExerciseDeserialize(
@@ -201,27 +237,32 @@ WorkoutExercise _workoutExerciseDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = WorkoutExercise();
-  object.cardioConfirmed = reader.readBool(offsets[0]);
-  object.date = reader.readDateTime(offsets[1]);
-  object.durationSeconds = reader.readLongOrNull(offsets[2]);
-  object.estimatedKcal = reader.readLongOrNull(offsets[3]);
-  object.exerciseId = reader.readString(offsets[4]);
-  object.exerciseName = reader.readString(offsets[5]);
+  object.avgHeartRate = reader.readDoubleOrNull(offsets[0]);
+  object.cardioConfirmed = reader.readBool(offsets[1]);
+  object.date = reader.readDateTime(offsets[2]);
+  object.durationSeconds = reader.readLongOrNull(offsets[3]);
+  object.estimatedKcal = reader.readLongOrNull(offsets[4]);
+  object.exerciseId = reader.readString(offsets[5]);
+  object.exerciseName = reader.readString(offsets[6]);
   object.id = id;
-  object.met = reader.readLongOrNull(offsets[7]);
-  object.restSeconds = reader.readLongOrNull(offsets[8]);
+  object.importedIsStrength = reader.readBool(offsets[7]);
+  object.met = reader.readLongOrNull(offsets[9]);
+  object.restSeconds = reader.readLongOrNull(offsets[10]);
   object.sets = reader.readObjectList<WorkoutSet>(
-        offsets[9],
+        offsets[11],
         WorkoutSetSchema.deserialize,
         allOffsets,
         WorkoutSet(),
       ) ??
       [];
-  object.sourceProgramId = reader.readLongOrNull(offsets[10]);
-  object.sourceProgramName = reader.readStringOrNull(offsets[11]);
-  object.sourceTemplateId = reader.readLongOrNull(offsets[12]);
-  object.sourceTemplateName = reader.readStringOrNull(offsets[13]);
-  object.supersetGroupId = reader.readLongOrNull(offsets[14]);
+  object.source = reader.readStringOrNull(offsets[12]);
+  object.sourceEndTime = reader.readDateTimeOrNull(offsets[13]);
+  object.sourceProgramId = reader.readLongOrNull(offsets[14]);
+  object.sourceProgramName = reader.readStringOrNull(offsets[15]);
+  object.sourceStartTime = reader.readDateTimeOrNull(offsets[16]);
+  object.sourceTemplateId = reader.readLongOrNull(offsets[17]);
+  object.sourceTemplateName = reader.readStringOrNull(offsets[18]);
+  object.supersetGroupId = reader.readLongOrNull(offsets[19]);
   return object;
 }
 
@@ -233,24 +274,28 @@ P _workoutExerciseDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readBool(offset)) as P;
+      return (reader.readDoubleOrNull(offset)) as P;
     case 1:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 2:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readDateTime(offset)) as P;
     case 3:
       return (reader.readLongOrNull(offset)) as P;
     case 4:
-      return (reader.readString(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 5:
       return (reader.readString(offset)) as P;
     case 6:
-      return (reader.readBool(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 7:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 8:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 9:
+      return (reader.readLongOrNull(offset)) as P;
+    case 10:
+      return (reader.readLongOrNull(offset)) as P;
+    case 11:
       return (reader.readObjectList<WorkoutSet>(
             offset,
             WorkoutSetSchema.deserialize,
@@ -258,15 +303,21 @@ P _workoutExerciseDeserializeProp<P>(
             WorkoutSet(),
           ) ??
           []) as P;
-    case 10:
-      return (reader.readLongOrNull(offset)) as P;
-    case 11:
-      return (reader.readStringOrNull(offset)) as P;
     case 12:
-      return (reader.readLongOrNull(offset)) as P;
-    case 13:
       return (reader.readStringOrNull(offset)) as P;
+    case 13:
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 14:
+      return (reader.readLongOrNull(offset)) as P;
+    case 15:
+      return (reader.readStringOrNull(offset)) as P;
+    case 16:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 17:
+      return (reader.readLongOrNull(offset)) as P;
+    case 18:
+      return (reader.readStringOrNull(offset)) as P;
+    case 19:
       return (reader.readLongOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -617,6 +668,90 @@ extension WorkoutExerciseQueryWhere
 
 extension WorkoutExerciseQueryFilter
     on QueryBuilder<WorkoutExercise, WorkoutExercise, QFilterCondition> {
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      avgHeartRateIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'avgHeartRate',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      avgHeartRateIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'avgHeartRate',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      avgHeartRateEqualTo(
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'avgHeartRate',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      avgHeartRateGreaterThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'avgHeartRate',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      avgHeartRateLessThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'avgHeartRate',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      avgHeartRateBetween(
+    double? lower,
+    double? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'avgHeartRate',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
   QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
       cardioConfirmedEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
@@ -1160,6 +1295,16 @@ extension WorkoutExerciseQueryFilter
   }
 
   QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      importedIsStrengthEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'importedIsStrength',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
       isCardioEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -1407,6 +1552,234 @@ extension WorkoutExerciseQueryFilter
   }
 
   QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'source',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'source',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'source',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'source',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'source',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'source',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'source',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'source',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'source',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'source',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'source',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'source',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceEndTimeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'sourceEndTime',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceEndTimeIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'sourceEndTime',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceEndTimeEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'sourceEndTime',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceEndTimeGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'sourceEndTime',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceEndTimeLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'sourceEndTime',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceEndTimeBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'sourceEndTime',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
       sourceProgramIdIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -1630,6 +2003,80 @@ extension WorkoutExerciseQueryFilter
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'sourceProgramName',
         value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceStartTimeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'sourceStartTime',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceStartTimeIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'sourceStartTime',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceStartTimeEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'sourceStartTime',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceStartTimeGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'sourceStartTime',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceStartTimeLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'sourceStartTime',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      sourceStartTimeBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'sourceStartTime',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
       ));
     });
   }
@@ -1953,6 +2400,20 @@ extension WorkoutExerciseQueryLinks
 extension WorkoutExerciseQuerySortBy
     on QueryBuilder<WorkoutExercise, WorkoutExercise, QSortBy> {
   QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      sortByAvgHeartRate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'avgHeartRate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      sortByAvgHeartRateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'avgHeartRate', Sort.desc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
       sortByCardioConfirmed() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'cardioConfirmed', Sort.asc);
@@ -2036,6 +2497,20 @@ extension WorkoutExerciseQuerySortBy
   }
 
   QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      sortByImportedIsStrength() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'importedIsStrength', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      sortByImportedIsStrengthDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'importedIsStrength', Sort.desc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
       sortByIsCardio() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isCardio', Sort.asc);
@@ -2075,6 +2550,33 @@ extension WorkoutExerciseQuerySortBy
     });
   }
 
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy> sortBySource() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'source', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      sortBySourceDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'source', Sort.desc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      sortBySourceEndTime() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sourceEndTime', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      sortBySourceEndTimeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sourceEndTime', Sort.desc);
+    });
+  }
+
   QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
       sortBySourceProgramId() {
     return QueryBuilder.apply(this, (query) {
@@ -2100,6 +2602,20 @@ extension WorkoutExerciseQuerySortBy
       sortBySourceProgramNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'sourceProgramName', Sort.desc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      sortBySourceStartTime() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sourceStartTime', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      sortBySourceStartTimeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sourceStartTime', Sort.desc);
     });
   }
 
@@ -2148,6 +2664,20 @@ extension WorkoutExerciseQuerySortBy
 
 extension WorkoutExerciseQuerySortThenBy
     on QueryBuilder<WorkoutExercise, WorkoutExercise, QSortThenBy> {
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      thenByAvgHeartRate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'avgHeartRate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      thenByAvgHeartRateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'avgHeartRate', Sort.desc);
+    });
+  }
+
   QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
       thenByCardioConfirmed() {
     return QueryBuilder.apply(this, (query) {
@@ -2244,6 +2774,20 @@ extension WorkoutExerciseQuerySortThenBy
   }
 
   QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      thenByImportedIsStrength() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'importedIsStrength', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      thenByImportedIsStrengthDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'importedIsStrength', Sort.desc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
       thenByIsCardio() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isCardio', Sort.asc);
@@ -2283,6 +2827,33 @@ extension WorkoutExerciseQuerySortThenBy
     });
   }
 
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy> thenBySource() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'source', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      thenBySourceDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'source', Sort.desc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      thenBySourceEndTime() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sourceEndTime', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      thenBySourceEndTimeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sourceEndTime', Sort.desc);
+    });
+  }
+
   QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
       thenBySourceProgramId() {
     return QueryBuilder.apply(this, (query) {
@@ -2308,6 +2879,20 @@ extension WorkoutExerciseQuerySortThenBy
       thenBySourceProgramNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'sourceProgramName', Sort.desc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      thenBySourceStartTime() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sourceStartTime', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      thenBySourceStartTimeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sourceStartTime', Sort.desc);
     });
   }
 
@@ -2357,6 +2942,13 @@ extension WorkoutExerciseQuerySortThenBy
 extension WorkoutExerciseQueryWhereDistinct
     on QueryBuilder<WorkoutExercise, WorkoutExercise, QDistinct> {
   QueryBuilder<WorkoutExercise, WorkoutExercise, QDistinct>
+      distinctByAvgHeartRate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'avgHeartRate');
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QDistinct>
       distinctByCardioConfirmed() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'cardioConfirmed');
@@ -2398,6 +2990,13 @@ extension WorkoutExerciseQueryWhereDistinct
   }
 
   QueryBuilder<WorkoutExercise, WorkoutExercise, QDistinct>
+      distinctByImportedIsStrength() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'importedIsStrength');
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QDistinct>
       distinctByIsCardio() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'isCardio');
@@ -2417,6 +3016,20 @@ extension WorkoutExerciseQueryWhereDistinct
     });
   }
 
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QDistinct> distinctBySource(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'source', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QDistinct>
+      distinctBySourceEndTime() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'sourceEndTime');
+    });
+  }
+
   QueryBuilder<WorkoutExercise, WorkoutExercise, QDistinct>
       distinctBySourceProgramId() {
     return QueryBuilder.apply(this, (query) {
@@ -2429,6 +3042,13 @@ extension WorkoutExerciseQueryWhereDistinct
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'sourceProgramName',
           caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QDistinct>
+      distinctBySourceStartTime() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'sourceStartTime');
     });
   }
 
@@ -2460,6 +3080,13 @@ extension WorkoutExerciseQueryProperty
   QueryBuilder<WorkoutExercise, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, double?, QQueryOperations>
+      avgHeartRateProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'avgHeartRate');
     });
   }
 
@@ -2503,6 +3130,13 @@ extension WorkoutExerciseQueryProperty
     });
   }
 
+  QueryBuilder<WorkoutExercise, bool, QQueryOperations>
+      importedIsStrengthProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'importedIsStrength');
+    });
+  }
+
   QueryBuilder<WorkoutExercise, bool, QQueryOperations> isCardioProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'isCardio');
@@ -2528,6 +3162,19 @@ extension WorkoutExerciseQueryProperty
     });
   }
 
+  QueryBuilder<WorkoutExercise, String?, QQueryOperations> sourceProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'source');
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, DateTime?, QQueryOperations>
+      sourceEndTimeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'sourceEndTime');
+    });
+  }
+
   QueryBuilder<WorkoutExercise, int?, QQueryOperations>
       sourceProgramIdProperty() {
     return QueryBuilder.apply(this, (query) {
@@ -2539,6 +3186,13 @@ extension WorkoutExerciseQueryProperty
       sourceProgramNameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'sourceProgramName');
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, DateTime?, QQueryOperations>
+      sourceStartTimeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'sourceStartTime');
     });
   }
 

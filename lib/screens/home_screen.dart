@@ -12,6 +12,7 @@ import '../models/daily_log.dart';
 import '../models/meal_plan.dart';
 import '../models/achievement.dart';
 import '../models/workout_exercise.dart';
+import '../services/calorie_estimation_service.dart';
 import '../services/database_service.dart';
 import '../services/streak_service.dart';
 import '../services/insights_service.dart';
@@ -438,8 +439,7 @@ class _AttivitaCardState extends State<_AttivitaCard> {
     final p = context.palette;
     final l10n = context.l10n;
     final kcalIngerite = (_log?.kcalTotali ?? 0).round();
-    final kcalAttivita =
-        _esercizi.fold<int>(0, (s, e) => s + (e.estimatedKcal ?? 0));
+    final kcalAttivita = CalorieEstimationService.dailyKcal(_esercizi);
     final bilancioNetto = kcalIngerite - kcalAttivita;
 
     return GestureDetector(

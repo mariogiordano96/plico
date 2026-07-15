@@ -352,6 +352,11 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
 
   Widget _buildScaffold(BuildContext context, ColorPalette p, AppLocalizations l10n,
       bool hasData, List<WorkoutExercise> esercizi) {
+    // Il watch vince sempre sulla stima MET per i pesi (vedi
+    // docs/integrazione_smartwatch.md sezione 6): se c'è una sessione pesi
+    // importata quel giorno, i log manuali di forza nascondono la kcal
+    // stimata invece di sommarla a quella reale della sessione.
+    final hasWatchStrengthSession = esercizi.any((e) => e.source != null && e.importedIsStrength);
     return Scaffold(
       backgroundColor: p.background,
       appBar: AppBar(
@@ -476,6 +481,8 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
                                 exercise: e,
                                 p: p,
                                 l10n: l10n,
+                                hideEstimatedKcal:
+                                    hasWatchStrengthSession && e.source == null && !e.isCardio,
                                 onDelete: () => _elimina(e),
                                 onSostituisci: () => _sostituisci(e),
                                 onModifica: () => _modifica(e),
@@ -662,6 +669,7 @@ class _ExerciseCard extends StatelessWidget {
   final WorkoutExercise exercise;
   final ColorPalette p;
   final AppLocalizations l10n;
+  final bool hideEstimatedKcal;
   final VoidCallback onDelete;
   final VoidCallback onSostituisci;
   final VoidCallback onModifica;
@@ -670,6 +678,7 @@ class _ExerciseCard extends StatelessWidget {
     required this.exercise,
     required this.p,
     required this.l10n,
+    this.hideEstimatedKcal = false,
     required this.onDelete,
     required this.onSostituisci,
     required this.onModifica,
@@ -685,7 +694,9 @@ class _ExerciseCard extends StatelessWidget {
         : exercise.sets
             .map((s) => '${s.reps ?? '-'}×${s.weightKg != null ? '${s.weightKg}kg' : '-'}')
             .join(', ');
-    final kcalLabel = exercise.estimatedKcal != null ? '≈ ${exercise.estimatedKcal} kcal' : null;
+    final kcalLabel = (exercise.estimatedKcal != null && !hideEstimatedKcal)
+        ? '≈ ${exercise.estimatedKcal} kcal'
+        : null;
 
     return Container(
       padding: const EdgeInsets.all(14),

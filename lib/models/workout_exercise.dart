@@ -3,6 +3,11 @@ import 'workout_set.dart';
 
 part 'workout_exercise.g.dart';
 
+/// Sorgente di un'entry importata da smartwatch (vedi
+/// docs/integrazione_smartwatch.md sezione 6). Il log manuale non ha
+/// bisogno di un valore: [WorkoutExercise.source] resta null in quel caso.
+enum WorkoutSource { healthKit, healthConnect }
+
 @collection
 class WorkoutExercise {
   Id id = Isar.autoIncrement;
@@ -30,11 +35,23 @@ class WorkoutExercise {
 
   int? estimatedKcal; // calcolato e persistito al salvataggio (Fase 5)
 
-  /// Sempre affidabile fin dalla creazione (sia `_aggiungiEsercizio` sia
-  /// `startWorkoutFromTemplate` impostano `sets=[]` solo per cardio), a
-  /// differenza di `durationSeconds`, che può restare null anche per un
-  /// esercizio cardio non ancora compilato dall'utente.
-  bool get isCardio => sets.isEmpty;
+  // Import smartwatch (vedi docs/integrazione_smartwatch.md sezione 6): tutti
+  // null/false per il log manuale, valorizzati solo per le entry importate.
+  String? source; // WorkoutSource.name
+  DateTime? sourceStartTime;
+  DateTime? sourceEndTime;
+  double? avgHeartRate;
+  // Un allenamento pesi rilevato dal watch ha sets=[] come il cardio (nessun
+  // sensore misura il carico su un bilanciere), ma non è cardio: senza questo
+  // flag `isCardio` lo classificherebbe erroneamente, rompendo sessione
+  // guidata, PDF export, storico e la card lista giorno.
+  bool importedIsStrength = false;
+
+  /// Per il log manuale resta affidabile fin dalla creazione (sia
+  /// `_aggiungiEsercizio` sia `startWorkoutFromTemplate` impostano `sets=[]`
+  /// solo per cardio), a differenza di `durationSeconds`, che può restare
+  /// null anche per un esercizio cardio non ancora compilato dall'utente.
+  bool get isCardio => sets.isEmpty && !importedIsStrength;
 
   // Fase 21: tracciabilità della scheda/programma di provenienza, valorizzati solo
   // quando l'esercizio nasce da startWorkoutFromTemplate (null per il log libero).

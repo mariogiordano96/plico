@@ -28,6 +28,7 @@ import '../models/workout_template_exercise.dart';
 import '../models/workout_program.dart';
 import '../models/workout_set.dart';
 import '../models/personal_record.dart';
+import 'calorie_estimation_service.dart';
 import 'exercise_alternatives_service.dart';
 import 'workout_progress_service.dart';
 
@@ -1167,7 +1168,7 @@ class DatabaseService {
 
   Future<int> getWorkoutKcalForDay(DateTime date) async {
     final esercizi = await getWorkoutExercisesForDay(date);
-    return esercizi.fold<int>(0, (sum, e) => sum + (e.estimatedKcal ?? 0));
+    return CalorieEstimationService.dailyKcal(esercizi);
   }
 
   /// Giorni con almeno un allenamento nella settimana corrente (lunedì-oggi,

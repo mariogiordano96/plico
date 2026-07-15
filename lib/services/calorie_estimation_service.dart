@@ -1,3 +1,5 @@
+import '../models/workout_exercise.dart';
+
 /// Stima indicativa delle kcal bruciate in allenamento — non un dato medico.
 /// Vedi docs/evolutiva_esercizi.md, sezione "Stima calorie bruciate".
 class CalorieEstimationService {
@@ -52,5 +54,21 @@ class CalorieEstimationService {
     final weight = bodyWeightKg ?? defaultBodyWeightKg;
     final hours = (workingSetCount * _secondsPerSetEstimate) / 3600;
     return (_strengthMet * weight * hours).round();
+  }
+
+  /// Totale kcal di [exercises] (un giorno), applicando la regola "il watch
+  /// vince sulla stima" (docs/integrazione_smartwatch.md sezione 6): se tra
+  /// gli esercizi c'è una sessione pesi importata da smartwatch, le kcal
+  /// stimate (MET) dei log manuali di forza dello stesso giorno non vengono
+  /// sommate — solo il dato reale del watch conta, senza somma né media.
+  static int dailyKcal(List<WorkoutExercise> exercises) {
+    final hasWatchStrengthSession =
+        exercises.any((e) => e.source != null && e.importedIsStrength);
+
+    return exercises.fold<int>(0, (sum, e) {
+      final isManualStrengthEstimate = e.source == null && !e.isCardio;
+      if (hasWatchStrengthSession && isManualStrengthEstimate) return sum;
+      return sum + (e.estimatedKcal ?? 0);
+    });
   }
 }

@@ -245,14 +245,27 @@ non necessaria per gli obiettivi delle sezioni 5.1-5.2.
 - [ ] Verifica manuale su device reale con watch abbinato (nessuna UI ancora) — in attesa
       dell'utente, vedi istruzioni fornite in chat
 
-### Fase 3 — Import e deduplica
-- [ ] Nuovi campi su `WorkoutExercise`: `source` (`manual | healthKit | healthConnect`),
-      `sourceStartTime`/`sourceEndTime`, `avgHeartRate`
-- [ ] Mapping sessione importata → `WorkoutExercise` (+ `WorkoutLog` del giorno se assente);
-      `sets` vuoto per le sessioni pesi
-- [ ] Deduplica cardio contro log manuali esistenti (match su orario sessione)
-- [ ] Regola "watch vince sulla stima MET" per il totale kcal pesi + card esercizio senza
-      kcal quando esiste una sessione watch sovrapposta in orario
+### Fase 3 — Import e deduplica ✅
+- [x] Nuovi campi su `WorkoutExercise`: `source` (`WorkoutSource?`, null = manuale),
+      `sourceStartTime`/`sourceEndTime`, `avgHeartRate` — più `importedIsStrength`, non
+      previsto dal piano ma necessario: `isCardio` era `sets.isEmpty`, invariante violato
+      dalle sessioni pesi importate (sets vuoto ma non cardio), usato ovunque (sessione
+      guidata, PDF export, storico, card lista giorno). Vedi commento in
+      `lib/models/workout_exercise.dart`
+- [x] Mapping sessione importata → `WorkoutExercise` (`SmartwatchImportService`, +
+      `WorkoutLog` del giorno via `addWorkoutExercise` esistente); `sets` vuoto per le
+      sessioni pesi; solo attività cardio/pesi mappate, il resto (yoga, sport di squadra...)
+      scartato come da sezione 1. Cardio importato marcato `cardioConfirmed = true` (è un
+      allenamento già svolto, non un target per la sessione guidata)
+- [x] Deduplica cardio contro log manuali esistenti — **semplificazione rispetto al testo
+      della sezione 6**: i log manuali non registrano l'orario di inizio (solo il giorno),
+      quindi il match "su `sourceStartTime`/`sourceEndTime`" descritto lì non è calcolabile
+      con il modello dati attuale. Implementato invece un proxy per durata (±15%) sullo
+      stesso giorno — approssimato, da validare nel test su device reale
+- [x] Regola "watch vince sulla stima MET": `CalorieEstimationService.dailyKcal` esclude le
+      kcal stimate dei log manuali di forza dal totale quando esiste una sessione pesi
+      importata quel giorno (day-level, non orario preciso, stesso limite di cui sopra);
+      card esercizio (`allenamento_screen.dart`) nasconde la kcal stimata negli stessi casi
 
 ### Fase 4 — UI
 - [ ] Voce Impostazioni "Collega Salute" con toggle e stato permessi
