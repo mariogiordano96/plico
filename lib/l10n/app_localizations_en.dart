@@ -1685,6 +1685,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get sessioneGuidataAspettaTurno => 'Wait your turn';
+
+  @override
   String get sessioneRiepilogoTitle => 'Session complete';
 
   @override

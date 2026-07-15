@@ -550,6 +550,7 @@
   "sessioneGuidataRiscaldamento": "WARM-UP",
   "sessioneGuidataSaltaRiscaldamento": "Skip warm-up",
   "sessioneGuidataRiscaldamentoSerieLabel": "Warm-up {n}",
+  "sessioneGuidataAspettaTurno": "Wait your turn",
 
   "sessioneRiepilogoTitle": "Session complete",
   "sessioneRiepilogoKcal": "{kcal} kcal estimated",

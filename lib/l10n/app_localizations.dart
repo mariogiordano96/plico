@@ -3116,6 +3116,12 @@ abstract class AppLocalizations {
   /// **'Risc. {n}'**
   String sessioneGuidataRiscaldamentoSerieLabel(int n);
 
+  /// No description provided for @sessioneGuidataAspettaTurno.
+  ///
+  /// In it, this message translates to:
+  /// **'Aspetta il turno'**
+  String get sessioneGuidataAspettaTurno;
+
   /// No description provided for @sessioneRiepilogoTitle.
   ///
   /// In it, this message translates to:

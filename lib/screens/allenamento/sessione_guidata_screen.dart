@@ -247,13 +247,12 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
   }
 
   /// All'interno di un blocco superset non si riposa tra un esercizio e il
-  /// successivo: il timer scatta solo dopo l'ultimo esercizio del blocco
-  /// (gli esercizi singoli, non in superset, mantengono il comportamento
-  /// originale: riposo dopo ogni serie).
-  bool _isLastInStep(WorkoutExercise e) {
-    final step = _steps[_stepIndex];
-    return step.length <= 1 || identical(step.last, e);
-  }
+  /// successivo (né tra un round e il successivo): il timer scatta solo
+  /// quando l'intero blocco è completo (gli esercizi singoli, non in
+  /// superset, mantengono il comportamento originale: riposo dopo ogni
+  /// serie). Vedi `GuidedSessionService.isStepComplete`.
+  bool _isLastInStep() =>
+      GuidedSessionService.isStepComplete(_steps[_stepIndex], _isExerciseDone);
 
   bool _isExerciseDone(WorkoutExercise e) =>
       e.isCardio ? e.cardioConfirmed : e.sets.every((s) => s.confirmed);
@@ -297,7 +296,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     unawaited(_checkpointElapsed());
     if (!mounted) return;
     setState(() {});
-    if (_isLastInStep(e) && !_sessionComplete) {
+    if (_isLastInStep() && !_sessionComplete) {
       await showRestTimerSheet(context, seconds: e.restSeconds ?? _defaultRestSeconds);
     }
     _maybeAdvanceStep();
@@ -317,7 +316,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     unawaited(_checkpointElapsed());
     if (!mounted) return;
     setState(() {});
-    if ((e.restSeconds ?? 0) > 0 && _isLastInStep(e) && !_sessionComplete) {
+    if ((e.restSeconds ?? 0) > 0 && _isLastInStep() && !_sessionComplete) {
       await showRestTimerSheet(context, seconds: e.restSeconds!);
     }
     _maybeAdvanceStep();
@@ -421,6 +420,9 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     }
 
     final step = _steps[_stepIndex];
+    // Solo nei blocchi superset (più di un esercizio) si applica l'alternanza
+    // a turni: negli step a esercizio singolo nessuna restrizione, come oggi.
+    final turn = step.length > 1 ? GuidedSessionService.turnFor(step) : null;
 
     return Scaffold(
       backgroundColor: p.background,
@@ -479,6 +481,8 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
             onConfirmCardio: () => _confirmCardio(e),
             onSostituisci: () => _sostituisci(e),
             onSkipWarmup: () => _skipWarmup(e),
+            locked: step.length > 1 && !identical(e, turn),
+            highlighted: step.length > 1 && identical(e, turn),
             p: p,
             l10n: l10n,
           ),
@@ -534,6 +538,12 @@ class _ExerciseStepCard extends StatelessWidget {
   final VoidCallback onConfirmCardio;
   final VoidCallback onSostituisci;
   final VoidCallback onSkipWarmup;
+  /// Vero se questo esercizio fa parte di un blocco superset e non è il suo
+  /// turno: le conferme sono disabilitate finché non tocca a lui.
+  final bool locked;
+  /// Vero se questo esercizio fa parte di un blocco superset ed è il suo
+  /// turno: solo la sua serie corrente è confermabile, evidenziata nel bordo.
+  final bool highlighted;
   final ColorPalette p;
   final dynamic l10n;
 
@@ -548,6 +558,8 @@ class _ExerciseStepCard extends StatelessWidget {
     required this.onConfirmCardio,
     required this.onSostituisci,
     required this.onSkipWarmup,
+    required this.locked,
+    required this.highlighted,
     required this.p,
     required this.l10n,
   });
@@ -590,6 +602,13 @@ class _ExerciseStepCard extends StatelessWidget {
           if (!exercise.sets[i].isWarmup) i
       ];
 
+  /// Indice piatto (include riscaldamento) della prossima serie da
+  /// confermare per questo esercizio — è l'unica abilitata quando la card è
+  /// `highlighted` all'interno di un blocco superset a turni.
+  int get _activeSetIndex => exercise.sets.indexWhere((s) => !s.confirmed);
+
+  bool _setEnabled(int flatIndex) => !locked && (!highlighted || flatIndex == _activeSetIndex);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -598,7 +617,7 @@ class _ExerciseStepCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: p.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: p.cardBorder),
+        border: Border.all(color: highlighted ? p.accent : p.cardBorder, width: highlighted ? 1.5 : 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -653,14 +672,16 @@ class _ExerciseStepCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 IconButton(
-                  onPressed: onConfirmCardio,
+                  onPressed: locked ? null : onConfirmCardio,
                   icon: Icon(
-                    exercise.cardioConfirmed
-                        ? Icons.check_circle_rounded
-                        : Icons.check_circle_outline_rounded,
+                    locked
+                        ? Icons.lock_outline_rounded
+                        : exercise.cardioConfirmed
+                            ? Icons.check_circle_rounded
+                            : Icons.check_circle_outline_rounded,
                     color: exercise.cardioConfirmed ? p.accent : p.textMuted,
                   ),
-                  tooltip: l10n.sessioneGuidataConferma,
+                  tooltip: locked ? l10n.sessioneGuidataAspettaTurno : l10n.sessioneGuidataConferma,
                 ),
               ],
             )
@@ -690,6 +711,7 @@ class _ExerciseStepCard extends StatelessWidget {
                   reps: repsCtrls![_warmupIndices[w]],
                   kg: kgCtrls![_warmupIndices[w]],
                   done: exercise.sets[_warmupIndices[w]].confirmed,
+                  enabled: _setEnabled(_warmupIndices[w]),
                   onConfirm: () => onConfirmSerie(_warmupIndices[w]),
                   p: p,
                 ),
@@ -703,6 +725,7 @@ class _ExerciseStepCard extends StatelessWidget {
                 reps: repsCtrls![_workIndices[i]],
                 kg: kgCtrls![_workIndices[i]],
                 done: exercise.sets[_workIndices[i]].confirmed,
+                enabled: _setEnabled(_workIndices[i]),
                 onConfirm: () => onConfirmSerie(_workIndices[i]),
                 p: p,
               ),
@@ -757,6 +780,7 @@ class _SetRow extends StatelessWidget {
   final TextEditingController reps;
   final TextEditingController kg;
   final bool done;
+  final bool enabled;
   final VoidCallback onConfirm;
   final ColorPalette p;
 
@@ -765,6 +789,7 @@ class _SetRow extends StatelessWidget {
     required this.reps,
     required this.kg,
     required this.done,
+    required this.enabled,
     required this.onConfirm,
     required this.p,
   });
@@ -784,12 +809,16 @@ class _SetRow extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(child: _NumberField(controller: kg, hint: l10n.serieDialogKgHint, p: p)),
           IconButton(
-            onPressed: onConfirm,
+            onPressed: enabled ? onConfirm : null,
             icon: Icon(
-              done ? Icons.check_circle_rounded : Icons.check_circle_outline_rounded,
+              !enabled && !done
+                  ? Icons.lock_outline_rounded
+                  : done
+                      ? Icons.check_circle_rounded
+                      : Icons.check_circle_outline_rounded,
               color: done ? p.accent : p.textMuted,
             ),
-            tooltip: l10n.sessioneGuidataConferma,
+            tooltip: !enabled && !done ? l10n.sessioneGuidataAspettaTurno : l10n.sessioneGuidataConferma,
           ),
         ],
       ),

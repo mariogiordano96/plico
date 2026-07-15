@@ -700,6 +700,7 @@
   "@sessioneGuidataRiscaldamentoSerieLabel": {
     "placeholders": { "n": { "type": "int" } }
   },
+  "sessioneGuidataAspettaTurno": "Aspetta il turno",
 
   "sessioneRiepilogoTitle": "Sessione completata",
   "sessioneRiepilogoKcal": "{kcal} kcal stimate",

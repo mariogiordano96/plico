@@ -1581,6 +1581,10 @@ posizionamento/stile già visto in Progressi.
       mostrano il timer di riposo solo se l'esercizio è l'ultimo dello step
       corrente (gli esercizi singoli, non in superset, mantengono il
       comportamento originale: riposo dopo ogni serie)
+      — **superato dalla Fase 34**: la condizione originale si basava solo
+      sulla posizione dell'esercizio nello step, non su quale fosse davvero
+      la sua ultima serie; la Fase 34 introduce anche l'alternanza a turni
+      round-robin tra gli esercizi del blocco (prima l'ordine era libero)
 - [x] Preset "Circuito Cardio/HIIT" aggiornato in `workout_presets.json`:
       tutti i 5 esercizi condividono `supersetGroupId: 1`, `restSeconds: 120`
       solo sull'ultimo (Burpee) per il riposo tra round del circuito
@@ -2140,6 +2144,37 @@ preset, test manuale su device — vedi nota a inizio sezione)**
       sempre dietro la stessa modale di conferma già esistente (`_eliminaGiornata`, invariata).
 
 > nessun nuovo test temporaneo — rimozione di una singola condizione booleana in un `if` di UI.
+
+---
+
+### Fase 34 — Alternanza round-robin nelle superserie ✅ completata
+- [x] `GuidedSessionService.turnFor(step)`: nuovo metodo statico puro che calcola
+      quale esercizio del blocco ha il turno (quello, tra i non completati, con
+      meno unità confermate — a parità il primo del blocco), derivato solo da
+      `confirmed`/`cardioConfirmed` (nessun cursore separato, robusto al resume
+      di una sessione interrotta a metà blocco). Realizza A1,B1,C1,A2,B2,C2...
+      con un numero qualunque di esercizi nel blocco; un esercizio con più o
+      meno serie degli altri viene saltato quando esaurisce le proprie.
+- [x] `GuidedSessionService.isStepComplete(step, isDone)`: sostituisce il vecchio
+      `_isLastInStep` di `sessione_guidata_screen.dart` — corregge un bug per cui
+      il timer di riposo scattava dopo QUALSIASI serie confermata dell'ultimo
+      esercizio del blocco (bastava la posizione, non serviva fosse davvero la
+      sua ultima serie). Ora il timer scatta solo quando l'intero blocco
+      (tutti gli esercizi, tutte le serie/round) è completo.
+- [x] `sessione_guidata_screen.dart`: `_ExerciseStepCard` riceve `locked`/
+      `highlighted` in base al turno calcolato in `build()`; solo la serie
+      corrente dell'esercizio con il turno è confermabile (`_SetRow.enabled`,
+      bottone cardio incluso) — i campi reps/kg restano sempre editabili,
+      si blocca solo la conferma. Card con il turno evidenziata con bordo
+      `p.accent`.
+- [x] Nuova chiave l10n `sessioneGuidataAspettaTurno` (IT "Aspetta il turno",
+      EN "Wait your turn") per il tooltip delle righe/bottone bloccati.
+- [x] Test in `test/guided_session_service_test.dart` per `turnFor`/
+      `isStepComplete`: alternanza base, blocco con 3+ esercizi, esercizi con
+      numero di serie diverso, mix strength+cardio, blocco già completo.
+
+> Vista lista piatta non guidata (`allenamento_screen.dart`) invariata: mostra
+> solo l'etichetta SUPERSET non interattiva, resta fuori scope.
 
 ---
 
