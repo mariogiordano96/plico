@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../theme/app_theme.dart';
@@ -40,6 +41,22 @@ class HomeScreen extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         actions: [
+          if (kDebugMode)
+            ValueListenableBuilder<Locale?>(
+              valueListenable: localeNotifier,
+              builder: (context, locale, _) {
+                final isEnglish = locale?.languageCode == 'en';
+                return IconButton(
+                  tooltip: isEnglish ? 'Switch to Italian' : 'Passa a inglese',
+                  icon: Text(isEnglish ? '🇬🇧' : '🇮🇹',
+                      style: const TextStyle(fontSize: 20)),
+                  onPressed: () {
+                    localeNotifier.value =
+                        isEnglish ? const Locale('it') : const Locale('en');
+                  },
+                );
+              },
+            ),
           IconButton(
             icon: Icon(Icons.settings_outlined, color: p.accent),
             onPressed: () => Navigator.push(
