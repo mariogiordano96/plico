@@ -388,7 +388,14 @@ class _QuestionarioScreenState extends State<QuestionarioScreen> {
 
   String _shortName(String nome) {
     if (nome.length <= 26) return nome;
-    final comma = nome.indexOf(',');
+    var comma = nome.indexOf(',');
+    // Se la prima virgola arriva troppo presto (es. "Beans, Borlotti, ..."
+    // nei nomi inglesi CREA), il pezzo iniziale da solo non distingue le
+    // varietà: prova con la virgola successiva.
+    if (comma > 0 && comma <= 8) {
+      final next = nome.indexOf(',', comma + 1);
+      if (next > 0) comma = next;
+    }
     if (comma > 0 && comma <= 26) return nome.substring(0, comma);
     return '${nome.substring(0, 23)}…';
   }
