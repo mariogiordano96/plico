@@ -102,6 +102,15 @@ class _RestTimerSheetState extends State<_RestTimerSheet> with WidgetsBindingObs
     if (newRemaining == 0) _onDone();
   }
 
+  void _setAbsolute(int totalSeconds) {
+    if (_done) return;
+    setState(() {
+      _remaining = totalSeconds;
+      _endTime = DateTime.now().add(Duration(seconds: totalSeconds));
+    });
+    NotificationService.instance.scheduleRestTimer(Duration(seconds: totalSeconds));
+  }
+
   void _close() {
     if (_closed) return;
     _closed = true;
@@ -153,6 +162,19 @@ class _RestTimerSheetState extends State<_RestTimerSheet> with WidgetsBindingObs
                 fontWeight: FontWeight.w700,
               ),
             ),
+            if (!_done) ...[
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _PresetChip(label: '1 min', seconds: 60, remaining: _remaining, onTap: _setAbsolute, p: p),
+                  const SizedBox(width: 10),
+                  _PresetChip(label: '2 min', seconds: 120, remaining: _remaining, onTap: _setAbsolute, p: p),
+                  const SizedBox(width: 10),
+                  _PresetChip(label: '3 min', seconds: 180, remaining: _remaining, onTap: _setAbsolute, p: p),
+                ],
+              ),
+            ],
             const SizedBox(height: 20),
             if (!_done)
               Row(
@@ -170,6 +192,45 @@ class _RestTimerSheetState extends State<_RestTimerSheet> with WidgetsBindingObs
               ),
           ],
         ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PresetChip extends StatelessWidget {
+  final String label;
+  final int seconds;
+  final int remaining;
+  final void Function(int) onTap;
+  final ColorPalette p;
+  const _PresetChip({
+    required this.label,
+    required this.seconds,
+    required this.remaining,
+    required this.onTap,
+    required this.p,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = remaining == seconds;
+    return GestureDetector(
+      onTap: () => onTap(seconds),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected ? p.accent.withValues(alpha: 0.12) : p.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: selected ? p.accent : p.cardBorder),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: selected ? p.accent : p.textSecondary,
+            fontSize: 13,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+          ),
         ),
       ),
     );
