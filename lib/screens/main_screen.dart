@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_tour.dart';
 import 'home_screen.dart';
@@ -6,6 +7,11 @@ import 'diario/diario_screen.dart';
 import 'allenamento/allenamento_screen.dart';
 import 'progressi/progressi_screen.dart';
 import 'tdee/tdee_screen.dart';
+
+/// Etichette della bottom navigation bar, nell'ordine delle tab.
+@visibleForTesting
+List<String> mainTabLabels(AppLocalizations l10n) =>
+    [l10n.tabHome, l10n.tabDiario, l10n.tabAllenamento, l10n.tabProgressi, l10n.tabTdee];
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -22,6 +28,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
+    final labels = mainTabLabels(context.l10n);
     return AppTour(
       onSwitchTab: _switchTab,
       child: Scaffold(
@@ -55,23 +62,23 @@ class _MainScreenState extends State<MainScreen> {
           items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.home_rounded),
-              label: context.l10n.tabHome,
+              label: labels[0],
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.restaurant_menu_rounded),
-              label: context.l10n.tabDiario,
+              label: labels[1],
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.fitness_center_rounded),
-              label: context.l10n.tabAllenamento,
+              label: labels[2],
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.bar_chart_rounded),
-              label: context.l10n.tabProgressi,
+              label: labels[3],
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.local_fire_department_rounded),
-              label: context.l10n.tabTdee,
+              label: labels[4],
             ),
           ],
         ),

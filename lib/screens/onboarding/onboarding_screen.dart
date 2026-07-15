@@ -5,6 +5,7 @@ import '../../models/user_profile.dart';
 import '../../models/body_snapshot.dart';
 import '../../models/enums.dart';
 import '../../services/database_service.dart';
+import '../../utils/navigation_utils.dart';
 import '../main_screen.dart';
 import '../../main.dart';
 
@@ -122,9 +123,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     themeNotifier.value = _selectedTheme;
 
     if (!mounted) return;
-    Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const MainScreen()),
-        (route) => false);
+    replaceEntireStack(context, (_) => const MainScreen());
   }
 
   @override

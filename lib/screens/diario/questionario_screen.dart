@@ -4,6 +4,7 @@ import '../../models/food_item.dart';
 import '../../models/user_food_preferences.dart';
 import '../../services/database_service.dart';
 import '../../services/piano_service.dart';
+import '../../utils/food_label.dart';
 
 class QuestionarioScreen extends StatefulWidget {
   const QuestionarioScreen({super.key});
@@ -282,7 +283,7 @@ class _QuestionarioScreenState extends State<QuestionarioScreen> {
                                 const SizedBox(width: 4),
                               ],
                               Text(
-                                _shortName(food
+                                shortFoodLabel(food
                                     .localizedName(Localizations.localeOf(context).languageCode)),
                                 style: TextStyle(
                                   color: liked ? p.accent : p.textSecondary,
@@ -386,19 +387,6 @@ class _QuestionarioScreenState extends State<QuestionarioScreen> {
     );
   }
 
-  String _shortName(String nome) {
-    if (nome.length <= 26) return nome;
-    var comma = nome.indexOf(',');
-    // Se la prima virgola arriva troppo presto (es. "Beans, Borlotti, ..."
-    // nei nomi inglesi CREA), il pezzo iniziale da solo non distingue le
-    // varietà: prova con la virgola successiva.
-    if (comma > 0 && comma <= 8) {
-      final next = nome.indexOf(',', comma + 1);
-      if (next > 0) comma = next;
-    }
-    if (comma > 0 && comma <= 26) return nome.substring(0, comma);
-    return '${nome.substring(0, 23)}…';
-  }
 }
 
 // ── Sub-widgets ───────────────────────────────────────────────

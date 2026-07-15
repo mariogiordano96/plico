@@ -12,9 +12,11 @@ import 'services/achievement_service.dart';
 import 'services/database_service.dart';
 import 'services/notification_service.dart';
 import 'services/widget_service.dart';
+import 'utils/locale_utils.dart';
+import 'widgets/dismiss_keyboard_on_tap.dart';
 
 final themeNotifier = ValueNotifier<ThemeMode>(ThemeMode.light);
-/// Lingua attiva, fissata una volta all'avvio (vedi [_resolveInitialLocale])
+/// Lingua attiva, fissata una volta all'avvio (vedi [_initialLocale])
 /// e modificabile solo esplicitamente (es. bandiera debug in HomeScreen).
 /// Passata sempre non-null a `MaterialApp.locale` per evitare che l'app
 /// segua reattivamente i cambi di lingua di sistema durante la sessione
@@ -23,20 +25,13 @@ final themeNotifier = ValueNotifier<ThemeMode>(ThemeMode.light);
 final localeNotifier = ValueNotifier<Locale?>(null);
 final navigatorKey = GlobalKey<NavigatorState>();
 
-/// Sceglie la lingua iniziale in base alle preferenze di sistema al cold
-/// start, replicando la logica di fallback di Flutter (prima lingua
-/// preferita supportata, altrimenti la prima di [AppLocalizations.supportedLocales]).
-Locale _resolveInitialLocale() {
-  final supported = AppLocalizations.supportedLocales.map((l) => l.languageCode).toSet();
-  for (final locale in WidgetsBinding.instance.platformDispatcher.locales) {
-    if (supported.contains(locale.languageCode)) return Locale(locale.languageCode);
-  }
-  return AppLocalizations.supportedLocales.first;
-}
+/// Lingua di sistema al cold start (vedi [resolveInitialLocale]).
+Locale _initialLocale() => resolveInitialLocale(
+    WidgetsBinding.instance.platformDispatcher.locales, AppLocalizations.supportedLocales);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  localeNotifier.value = _resolveInitialLocale();
+  localeNotifier.value = _initialLocale();
   await DatabaseService.instance.init();
   await DatabaseService.instance.seedCreaFoods();
   await DatabaseService.instance.migrateFoodNamesV2();
@@ -155,11 +150,7 @@ class _PlicoAppState extends State<PlicoApp> with WidgetsBindingObserver {
           builder: (context, child) {
             final l10n = AppLocalizations.of(context);
             if (l10n != null) NotificationService.instance.setL10n(l10n);
-            return GestureDetector(
-              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-              behavior: HitTestBehavior.opaque,
-              child: child,
-            );
+            return DismissKeyboardOnTap(child: child);
           },
           home: FutureBuilder<bool>(
             future: DatabaseService.instance.hasUserProfile(),
