@@ -539,7 +539,11 @@
   "eserciziSalva": "Salva",
   "eserciziNomeObbligatorio": "Il nome è obbligatorio",
 
+  "tabHome": "Home",
+  "tabDiario": "Diario",
   "tabAllenamento": "Allenamento",
+  "tabProgressi": "Progressi",
+  "tabTdee": "TDEE",
   "allenamentoVuotoTitle": "Nessun esercizio oggi",
   "allenamentoVuotoSub": "Inizia da una scheda per l'allenamento guidato, oppure registra un esercizio al volo",
   "allenamentoIniziaDaScheda": "Inizia da una scheda",

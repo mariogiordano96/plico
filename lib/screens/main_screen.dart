@@ -55,11 +55,11 @@ class _MainScreenState extends State<MainScreen> {
           items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.home_rounded),
-              label: 'Home',
+              label: context.l10n.tabHome,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.restaurant_menu_rounded),
-              label: 'Diario',
+              label: context.l10n.tabDiario,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.fitness_center_rounded),
@@ -67,11 +67,11 @@ class _MainScreenState extends State<MainScreen> {
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.bar_chart_rounded),
-              label: 'Progressi',
+              label: context.l10n.tabProgressi,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.local_fire_department_rounded),
-              label: 'TDEE',
+              label: context.l10n.tabTdee,
             ),
           ],
         ),

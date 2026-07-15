@@ -1300,7 +1300,19 @@ class AppLocalizationsIt extends AppLocalizations {
   String get eserciziNomeObbligatorio => 'Il nome è obbligatorio';
 
   @override
+  String get tabHome => 'Home';
+
+  @override
+  String get tabDiario => 'Diario';
+
+  @override
   String get tabAllenamento => 'Allenamento';
+
+  @override
+  String get tabProgressi => 'Progressi';
+
+  @override
+  String get tabTdee => 'TDEE';
 
   @override
   String get allenamentoVuotoTitle => 'Nessun esercizio oggi';

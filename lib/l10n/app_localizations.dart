@@ -2438,11 +2438,35 @@ abstract class AppLocalizations {
   /// **'Il nome è obbligatorio'**
   String get eserciziNomeObbligatorio;
 
+  /// No description provided for @tabHome.
+  ///
+  /// In it, this message translates to:
+  /// **'Home'**
+  String get tabHome;
+
+  /// No description provided for @tabDiario.
+  ///
+  /// In it, this message translates to:
+  /// **'Diario'**
+  String get tabDiario;
+
   /// No description provided for @tabAllenamento.
   ///
   /// In it, this message translates to:
   /// **'Allenamento'**
   String get tabAllenamento;
+
+  /// No description provided for @tabProgressi.
+  ///
+  /// In it, this message translates to:
+  /// **'Progressi'**
+  String get tabProgressi;
+
+  /// No description provided for @tabTdee.
+  ///
+  /// In it, this message translates to:
+  /// **'TDEE'**
+  String get tabTdee;
 
   /// No description provided for @allenamentoVuotoTitle.
   ///

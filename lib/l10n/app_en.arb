@@ -418,7 +418,11 @@
   "eserciziSalva": "Save",
   "eserciziNomeObbligatorio": "Name is required",
 
+  "tabHome": "Home",
+  "tabDiario": "Diary",
   "tabAllenamento": "Workout",
+  "tabProgressi": "Progress",
+  "tabTdee": "TDEE",
   "allenamentoVuotoTitle": "No exercise today",
   "allenamentoVuotoSub": "Start from a template for a guided workout, or log a one-off exercise",
   "allenamentoIniziaDaScheda": "Start from a template",
