@@ -237,10 +237,13 @@ non necessaria per gli obiettivi delle sezioni 5.1-5.2.
       su questa macchina Linux, richiede `pod install` + build su Mac (vedi nota sotto)
 
 ### Fase 2 — Lettura dati (senza persistenza)
-- [ ] Flusso di richiesta permessi (`requestAuthorization`) con gestione del rifiuto
-- [ ] `SmartwatchService`: legge sessioni allenamento + frequenza cardiaca + kcal attive per
-      un intervallo di date
-- [ ] Verifica manuale su device reale con watch abbinato (nessuna UI ancora)
+- [x] Flusso di richiesta permessi (`requestAuthorization`) con gestione del rifiuto —
+      `SmartwatchService.requestAuthorization()` distingue anche il caso "Health Connect
+      non installato" (`SmartwatchAuthorizationResult.unavailable`)
+- [x] `SmartwatchService`: legge sessioni allenamento + frequenza cardiaca + kcal attive per
+      un intervallo di date (`lib/services/smartwatch_service.dart`)
+- [ ] Verifica manuale su device reale con watch abbinato (nessuna UI ancora) — in attesa
+      dell'utente, vedi istruzioni fornite in chat
 
 ### Fase 3 — Import e deduplica
 - [ ] Nuovi campi su `WorkoutExercise`: `source` (`manual | healthKit | healthConnect`),
