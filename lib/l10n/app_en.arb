@@ -528,6 +528,8 @@
   "creaSchedaNomeObbligatorio": "Name is required",
   "creaSchedaSupersetUnisci": "Group as superset",
   "creaSchedaSupersetUnito": "Superset",
+  "creaSchedaRuoloEsplosiva": "Explosive",
+  "creaSchedaRuoloLenta": "Slow",
 
   "creaProgrammaTitle": "New program",
   "creaProgrammaNomeLabel": "Program name",

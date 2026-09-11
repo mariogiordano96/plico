@@ -661,6 +661,8 @@
   "creaSchedaNomeObbligatorio": "Il nome è obbligatorio",
   "creaSchedaSupersetUnisci": "Unisci in superset",
   "creaSchedaSupersetUnito": "Superset",
+  "creaSchedaRuoloEsplosiva": "Esplosiva",
+  "creaSchedaRuoloLenta": "Lenta",
 
   "creaProgrammaTitle": "Nuovo programma",
   "creaProgrammaNomeLabel": "Nome programma",

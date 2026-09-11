@@ -14,6 +14,11 @@ class WorkoutTemplateExercise {
 
   int? supersetGroupId; // Fase 12: esercizi eseguiti senza riposo tra loro
   int? restSeconds; // Fase 8: riposo target dopo l'ultima serie/il completamento
+  // SupersetRole.name (docs/tecniche_allenamento.md, Fase 3) — abbinamento
+  // esplosiva/lenta nel superset, scelta strutturale sulla coppia quindi a
+  // livello di template (diversamente dalla piramide, decisa il giorno
+  // stesso su WorkoutExercise/WorkoutSet, non qui).
+  String? supersetRole;
 
   bool get isCardio => targetDurationSeconds != null;
 }

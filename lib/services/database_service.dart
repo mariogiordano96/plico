@@ -1324,7 +1324,8 @@ class DatabaseService {
             ..targetWeightKg = (e['targetWeightKg'] as num?)?.toDouble()
             ..targetDurationSeconds = e['targetDurationSeconds'] as int?
             ..supersetGroupId = e['supersetGroupId'] as int?
-            ..restSeconds = e['restSeconds'] as int?)
+            ..restSeconds = e['restSeconds'] as int?
+            ..supersetRole = e['supersetRole'] as String?)
           .toList();
   }
 
@@ -1417,7 +1418,8 @@ class DatabaseService {
             ..targetWeightKg = e.targetWeightKg
             ..targetDurationSeconds = e.targetDurationSeconds
             ..supersetGroupId = e.supersetGroupId
-            ..restSeconds = e.restSeconds)
+            ..restSeconds = e.restSeconds
+            ..supersetRole = e.supersetRole)
           .toList();
     copy.id = await saveWorkoutTemplate(copy);
     return copy;
@@ -1453,6 +1455,7 @@ class DatabaseService {
         ..date = day
         ..supersetGroupId = te.supersetGroupId
         ..restSeconds = te.restSeconds
+        ..supersetRole = te.supersetRole
         ..durationSeconds = te.targetDurationSeconds
         ..sourceTemplateId = template.id
         ..sourceTemplateName = template.name

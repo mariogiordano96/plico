@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
+import '../../models/workout_exercise.dart' show SupersetRole;
 import '../../models/workout_template.dart';
 import '../../models/workout_template_exercise.dart';
 import '../../services/database_service.dart';
@@ -80,6 +81,7 @@ class _CreaSchedaScreenState extends State<CreaSchedaScreen> {
       final prev = updated[i - 1];
       if (current.supersetGroupId != null && current.supersetGroupId == prev.supersetGroupId) {
         current.supersetGroupId = null;
+        current.supersetRole = null;
         _normalizeGroups(updated);
       } else {
         final groupId = prev.supersetGroupId ?? _nextGroupId();
@@ -87,6 +89,16 @@ class _CreaSchedaScreenState extends State<CreaSchedaScreen> {
         current.supersetGroupId = groupId;
       }
       _esercizi = updated;
+    });
+  }
+
+  /// Fase 3 di docs/tecniche_allenamento.md: assegna/toglie il ruolo
+  /// esplosiva/lenta nella variante "superset veloce/lento" — tap sullo
+  /// stesso ruolo già selezionato lo azzera (torna al superset semplice).
+  void _setSupersetRole(int i, String role) {
+    setState(() {
+      final e = _esercizi[i];
+      e.supersetRole = e.supersetRole == role ? null : role;
     });
   }
 
@@ -168,7 +180,9 @@ class _CreaSchedaScreenState extends State<CreaSchedaScreen> {
             _EsercizioRow(
               esercizio: _esercizi[i],
               p: p,
+              l10n: l10n,
               onDelete: () => _rimuoviEsercizio(i),
+              onSetRole: (role) => _setSupersetRole(i, role),
             ),
           ],
           const SizedBox(height: 8),
@@ -195,8 +209,16 @@ class _CreaSchedaScreenState extends State<CreaSchedaScreen> {
 class _EsercizioRow extends StatelessWidget {
   final WorkoutTemplateExercise esercizio;
   final ColorPalette p;
+  final AppLocalizations l10n;
   final VoidCallback onDelete;
-  const _EsercizioRow({required this.esercizio, required this.p, required this.onDelete});
+  final ValueChanged<String> onSetRole;
+  const _EsercizioRow({
+    required this.esercizio,
+    required this.p,
+    required this.l10n,
+    required this.onDelete,
+    required this.onSetRole,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -227,6 +249,29 @@ class _EsercizioRow extends StatelessWidget {
                 Text(esercizio.exerciseName,
                     style: TextStyle(color: p.textPrimary, fontWeight: FontWeight.w600)),
                 Text(target, style: TextStyle(color: p.textMuted, fontSize: 12)),
+                // Fase 3 di docs/tecniche_allenamento.md: ruolo esplosiva/lenta,
+                // solo per righe già in un gruppo superset — variante "veloce/
+                // lento" della tecnica, opzionale.
+                if (grouped) ...[
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 6,
+                    children: [
+                      _RoleChip(
+                        label: l10n.creaSchedaRuoloEsplosiva,
+                        selected: esercizio.supersetRole == SupersetRole.esplosiva.name,
+                        p: p,
+                        onTap: () => onSetRole(SupersetRole.esplosiva.name),
+                      ),
+                      _RoleChip(
+                        label: l10n.creaSchedaRuoloLenta,
+                        selected: esercizio.supersetRole == SupersetRole.lenta.name,
+                        p: p,
+                        onTap: () => onSetRole(SupersetRole.lenta.name),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
@@ -264,6 +309,39 @@ class _SupersetConnector extends StatelessWidget {
           minimumSize: Size.zero,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
+      ),
+    );
+  }
+}
+
+/// Chip compatto per il ruolo esplosiva/lenta (superset veloce/lento,
+/// docs/tecniche_allenamento.md Fase 3) — tap sullo stesso ruolo selezionato
+/// lo azzera, gestito dal chiamante (`onTap`).
+class _RoleChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final ColorPalette p;
+  final VoidCallback onTap;
+  const _RoleChip(
+      {required this.label, required this.selected, required this.p, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: selected ? p.accent.withValues(alpha: 0.15) : p.surfaceVariant,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: selected ? p.accent : p.cardBorder),
+        ),
+        child: Text(label,
+            style: TextStyle(
+                fontSize: 11,
+                color: selected ? p.accent : p.textMuted,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w400)),
       ),
     );
   }

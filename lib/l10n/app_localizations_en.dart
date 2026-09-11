@@ -1614,6 +1614,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get creaSchedaSupersetUnito => 'Superset';
 
   @override
+  String get creaSchedaRuoloEsplosiva => 'Explosive';
+
+  @override
+  String get creaSchedaRuoloLenta => 'Slow';
+
+  @override
   String get creaProgrammaTitle => 'New program';
 
   @override

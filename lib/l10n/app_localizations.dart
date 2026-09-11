@@ -3014,6 +3014,18 @@ abstract class AppLocalizations {
   /// **'Superset'**
   String get creaSchedaSupersetUnito;
 
+  /// No description provided for @creaSchedaRuoloEsplosiva.
+  ///
+  /// In it, this message translates to:
+  /// **'Esplosiva'**
+  String get creaSchedaRuoloEsplosiva;
+
+  /// No description provided for @creaSchedaRuoloLenta.
+  ///
+  /// In it, this message translates to:
+  /// **'Lenta'**
+  String get creaSchedaRuoloLenta;
+
   /// No description provided for @creaProgrammaTitle.
   ///
   /// In it, this message translates to:

@@ -38,23 +38,28 @@ const WorkoutTemplateExerciseSchema = Schema(
       name: r'supersetGroupId',
       type: IsarType.long,
     ),
-    r'targetDurationSeconds': PropertySchema(
+    r'supersetRole': PropertySchema(
       id: 5,
+      name: r'supersetRole',
+      type: IsarType.string,
+    ),
+    r'targetDurationSeconds': PropertySchema(
+      id: 6,
       name: r'targetDurationSeconds',
       type: IsarType.long,
     ),
     r'targetReps': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'targetReps',
       type: IsarType.long,
     ),
     r'targetSets': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'targetSets',
       type: IsarType.long,
     ),
     r'targetWeightKg': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'targetWeightKg',
       type: IsarType.double,
     )
@@ -73,6 +78,12 @@ int _workoutTemplateExerciseEstimateSize(
   var bytesCount = offsets.last;
   bytesCount += 3 + object.exerciseId.length * 3;
   bytesCount += 3 + object.exerciseName.length * 3;
+  {
+    final value = object.supersetRole;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   return bytesCount;
 }
 
@@ -87,10 +98,11 @@ void _workoutTemplateExerciseSerialize(
   writer.writeBool(offsets[2], object.isCardio);
   writer.writeLong(offsets[3], object.restSeconds);
   writer.writeLong(offsets[4], object.supersetGroupId);
-  writer.writeLong(offsets[5], object.targetDurationSeconds);
-  writer.writeLong(offsets[6], object.targetReps);
-  writer.writeLong(offsets[7], object.targetSets);
-  writer.writeDouble(offsets[8], object.targetWeightKg);
+  writer.writeString(offsets[5], object.supersetRole);
+  writer.writeLong(offsets[6], object.targetDurationSeconds);
+  writer.writeLong(offsets[7], object.targetReps);
+  writer.writeLong(offsets[8], object.targetSets);
+  writer.writeDouble(offsets[9], object.targetWeightKg);
 }
 
 WorkoutTemplateExercise _workoutTemplateExerciseDeserialize(
@@ -104,10 +116,11 @@ WorkoutTemplateExercise _workoutTemplateExerciseDeserialize(
   object.exerciseName = reader.readString(offsets[1]);
   object.restSeconds = reader.readLongOrNull(offsets[3]);
   object.supersetGroupId = reader.readLongOrNull(offsets[4]);
-  object.targetDurationSeconds = reader.readLongOrNull(offsets[5]);
-  object.targetReps = reader.readLongOrNull(offsets[6]);
-  object.targetSets = reader.readLongOrNull(offsets[7]);
-  object.targetWeightKg = reader.readDoubleOrNull(offsets[8]);
+  object.supersetRole = reader.readStringOrNull(offsets[5]);
+  object.targetDurationSeconds = reader.readLongOrNull(offsets[6]);
+  object.targetReps = reader.readLongOrNull(offsets[7]);
+  object.targetSets = reader.readLongOrNull(offsets[8]);
+  object.targetWeightKg = reader.readDoubleOrNull(offsets[9]);
   return object;
 }
 
@@ -129,12 +142,14 @@ P _workoutTemplateExerciseDeserializeProp<P>(
     case 4:
       return (reader.readLongOrNull(offset)) as P;
     case 5:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 6:
       return (reader.readLongOrNull(offset)) as P;
     case 7:
       return (reader.readLongOrNull(offset)) as P;
     case 8:
+      return (reader.readLongOrNull(offset)) as P;
+    case 9:
       return (reader.readDoubleOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -573,6 +588,162 @@ extension WorkoutTemplateExerciseQueryFilter on QueryBuilder<
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutTemplateExercise, WorkoutTemplateExercise,
+      QAfterFilterCondition> supersetRoleIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'supersetRole',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutTemplateExercise, WorkoutTemplateExercise,
+      QAfterFilterCondition> supersetRoleIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'supersetRole',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutTemplateExercise, WorkoutTemplateExercise,
+      QAfterFilterCondition> supersetRoleEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'supersetRole',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutTemplateExercise, WorkoutTemplateExercise,
+      QAfterFilterCondition> supersetRoleGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'supersetRole',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutTemplateExercise, WorkoutTemplateExercise,
+      QAfterFilterCondition> supersetRoleLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'supersetRole',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutTemplateExercise, WorkoutTemplateExercise,
+      QAfterFilterCondition> supersetRoleBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'supersetRole',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutTemplateExercise, WorkoutTemplateExercise,
+      QAfterFilterCondition> supersetRoleStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'supersetRole',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutTemplateExercise, WorkoutTemplateExercise,
+      QAfterFilterCondition> supersetRoleEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'supersetRole',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutTemplateExercise, WorkoutTemplateExercise,
+          QAfterFilterCondition>
+      supersetRoleContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'supersetRole',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutTemplateExercise, WorkoutTemplateExercise,
+          QAfterFilterCondition>
+      supersetRoleMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'supersetRole',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutTemplateExercise, WorkoutTemplateExercise,
+      QAfterFilterCondition> supersetRoleIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'supersetRole',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutTemplateExercise, WorkoutTemplateExercise,
+      QAfterFilterCondition> supersetRoleIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'supersetRole',
+        value: '',
       ));
     });
   }

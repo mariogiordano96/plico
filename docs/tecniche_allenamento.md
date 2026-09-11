@@ -185,8 +185,18 @@ In `crea_scheda_screen.dart` / `target_esercizio_dialog.dart`, per ogni serie:
   non un target fisso da salvare nella scheda riutilizzabile.
 - **Superset veloce/lento**: quando si crea un superset (toggle già
   esistente), un secondo selettore per esercizio: "Esplosiva" / "Lenta".
-  Suggerire `restSeconds = 0` come default per questa variante (oggi il
-  default è quello impostato dall'utente).
+  **Nota**: il riposo *tra* i membri di un gruppo superset è già zero per
+  costruzione (`showRestTimerSheet` scatta solo dopo l'ultimo esercizio del
+  giro, non tra un membro e l'altro — vedi `sessione_guidata_screen.dart`),
+  quindi non serve nessun default speciale su `restSeconds` per questa
+  variante: la riga sul punto era una sovra-ingegnerizzazione dell'analisi
+  iniziale, rimossa in fase di implementazione (Fase 3).
+  **A differenza della piramide**, `supersetRole` va anche su
+  `WorkoutTemplateExercise` (non solo `WorkoutExercise`): l'abbinamento
+  esplosiva/lenta è una scelta strutturale sulla coppia di esercizi, stabile
+  tra una sessione e l'altra — stesso motivo per cui `supersetGroupId` è già
+  a livello di template oggi, diversamente dalla piramide (numeri concreti,
+  decisi il giorno stesso).
 
 ## 7. UX — sessione guidata
 
@@ -248,13 +258,28 @@ In `sessione_guidata_screen.dart` (`_ExerciseStepCard`):
       ancora verdi (nessuna migrazione necessaria, tutti i campi nuovi sono
       opzionali)
 
-### Fase 3 — UI creazione scheda
-- [ ] Selettore tecnica per serie (chip), campi dinamici per rest-pause/
-      stripping
-- [ ] Selettore ruolo esplosiva/lenta sul toggle superset esistente,
-      default `restSeconds = 0` per quella variante
+### Fase 3 — UI creazione scheda ✅
+- [x] Campo `supersetRole` anche su `WorkoutTemplateExercise` (non solo
+      `WorkoutExercise`, aggiunto in Fase 2) — copiato in `WorkoutExercise`
+      da `startWorkoutFromTemplate`, e propagato anche da `duplicateTemplate`
+      e dal caricamento dei preset (`_presetTemplateFromJson`), non solo da
+      `startWorkoutFromTemplate` come previsto inizialmente — altrimenti
+      duplicare una scheda con superset veloce/lento avrebbe perso il tag
+- [x] Selettore ruolo esplosiva/lenta (`_RoleChip`) su `_EsercizioRow` in
+      `crea_scheda_screen.dart`, visibile solo per righe in un gruppo
+      superset (`supersetGroupId != null`); tap sullo stesso ruolo già
+      selezionato lo azzera; azzerato anche quando l'esercizio esce dal
+      gruppo (`_toggleSuperset`)
+- [ ] **Riallocate a Fase 4** (non "creazione scheda"): selettore tecnica
+      per serie e campi dinamici rest-pause/stripping — richiedono editing
+      per-`WorkoutSet`, che esiste solo in sessione guidata, non nel target
+      singolo di `WorkoutTemplateExercise` (stesso vincolo della piramide,
+      Fase 1)
 
 ### Fase 4 — UI sessione guidata
+- [ ] Selettore tecnica per serie (chip: normale/forzate/rest-pause/
+      stripping/super slow) su `_ExerciseStepCard`, campi dinamici per
+      rest-pause (N cluster) e stripping (N gradini)
 - [ ] Conferma multi-stadio per rest-pause/stripping in
       `_ExerciseStepCard`
 - [ ] Badge tecnica (forzate, super slow, esplosiva/lenta) sulle card
