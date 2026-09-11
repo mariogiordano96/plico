@@ -807,6 +807,7 @@ class _ExerciseCard extends StatelessWidget {
               ),
             ),
           ),
+          Icon(Icons.chevron_right_rounded, color: p.textMuted, size: 22),
           PopupMenuButton<_ExerciseCardAction>(
             icon: Icon(Icons.more_vert_rounded, color: p.textMuted),
             color: p.surface,

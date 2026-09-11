@@ -451,42 +451,60 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-        children: [
-          if (step.length > 1)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Row(
-                children: [
-                  Icon(Icons.link_rounded, color: p.accent, size: 16),
-                  const SizedBox(width: 6),
-                  Text(l10n.sessioneGuidataSuperset,
-                      style: TextStyle(
-                          color: p.accent,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1)),
-                ],
-              ),
-            ),
-          for (final e in step) _ExerciseStepCard(
-            exercise: e,
-            suggestion: _suggestionById[e.id],
-            repsCtrls: _repsCtrls[e.id],
-            kgCtrls: _kgCtrls[e.id],
-            durataCtrl: _durataCtrls[e.id],
-            onAddSerie: () => _addSerie(e),
-            onConfirmSerie: (i) => _confirmSerie(e, i),
-            onConfirmCardio: () => _confirmCardio(e),
-            onSostituisci: () => _sostituisci(e),
-            onSkipWarmup: () => _skipWarmup(e),
-            locked: step.length > 1 && !identical(e, turn),
-            highlighted: step.length > 1 && identical(e, turn),
-            p: p,
-            l10n: l10n,
+      // AnimatedSwitcher, non solo ListView: rende visibile il cambio step
+      // anche quando scatta da solo (_maybeAdvanceStep, a fine esercizio),
+      // che altrimenti sostituirebbe il contenuto di colpo senza alcun
+      // segnale — disorientante soprattutto nei superset a turni, dove più
+      // conferme ravvicinate possono far avanzare lo step senza un'azione
+      // esplicita dell'utente.
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 250),
+        transitionBuilder: (child, animation) => FadeTransition(
+          opacity: animation,
+          child: SlideTransition(
+            position: Tween<Offset>(begin: const Offset(0, 0.03), end: Offset.zero)
+                .animate(animation),
+            child: child,
           ),
-        ],
+        ),
+        child: ListView(
+          key: ValueKey(_stepIndex),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+          children: [
+            if (step.length > 1)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Row(
+                  children: [
+                    Icon(Icons.link_rounded, color: p.accent, size: 16),
+                    const SizedBox(width: 6),
+                    Text(l10n.sessioneGuidataSuperset,
+                        style: TextStyle(
+                            color: p.accent,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1)),
+                  ],
+                ),
+              ),
+            for (final e in step) _ExerciseStepCard(
+              exercise: e,
+              suggestion: _suggestionById[e.id],
+              repsCtrls: _repsCtrls[e.id],
+              kgCtrls: _kgCtrls[e.id],
+              durataCtrl: _durataCtrls[e.id],
+              onAddSerie: () => _addSerie(e),
+              onConfirmSerie: (i) => _confirmSerie(e, i),
+              onConfirmCardio: () => _confirmCardio(e),
+              onSostituisci: () => _sostituisci(e),
+              onSkipWarmup: () => _skipWarmup(e),
+              locked: step.length > 1 && !identical(e, turn),
+              highlighted: step.length > 1 && identical(e, turn),
+              p: p,
+              l10n: l10n,
+            ),
+          ],
+        ),
       ),
       bottomNavigationBar: SafeArea(
         child: Padding(
