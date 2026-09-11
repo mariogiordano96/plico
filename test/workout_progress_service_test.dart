@@ -15,12 +15,21 @@ WorkoutExercise _exercise({
     ..sets = sets ?? [];
 }
 
-WorkoutSet _set({int? reps, double? weightKg, int? rpe, bool isWarmup = false}) {
+WorkoutSet _set({
+  int? reps,
+  double? weightKg,
+  int? rpe,
+  bool isWarmup = false,
+  List<int>? restPauseClusters,
+  List<DropStage>? dropStages,
+}) {
   return WorkoutSet()
     ..reps = reps
     ..weightKg = weightKg
     ..rpe = rpe
-    ..isWarmup = isWarmup;
+    ..isWarmup = isWarmup
+    ..restPauseClusters = restPauseClusters
+    ..dropStages = dropStages;
 }
 
 void main() {
@@ -76,6 +85,39 @@ void main() {
       ]);
       expect(WorkoutProgressService.sessionVolume(e), 900);
     });
+
+    test('rest-pause: reps è già la somma dei cluster, nessun aggiustamento extra', () {
+      // 8+4+3=15 rip già scritte in reps da _confirmSerie prima della persistenza.
+      final e = _exercise(sets: [
+        _set(reps: 15, weightKg: 50, restPauseClusters: [8, 4, 3]),
+      ]);
+      expect(WorkoutProgressService.sessionVolume(e), 750); // 15 * 50
+    });
+
+    test('stripping: somma anche i gradini di dropStages, non solo il primo', () {
+      final e = _exercise(sets: [
+        _set(
+          reps: 8,
+          weightKg: 60, // primo gradino: 8*60 = 480
+          dropStages: [
+            DropStage()
+              ..reps = 6
+              ..weightKg = 50, // 6*50 = 300
+            DropStage()
+              ..reps = 5
+              ..weightKg = 40, // 5*40 = 200
+          ],
+        ),
+      ]);
+      expect(WorkoutProgressService.sessionVolume(e), 980); // 480+300+200
+    });
+
+    test('forzate: forcedReps non è mai incluso nel volume', () {
+      final e = _exercise(sets: [
+        (_set(reps: 8, weightKg: 50)..forcedReps = 3), // volume = solo 8*50
+      ]);
+      expect(WorkoutProgressService.sessionVolume(e), 400);
+    });
   });
 
   group('sessionMaxWeight', () {
@@ -121,6 +163,22 @@ void main() {
         _set(reps: 10, weightKg: 80), // 80 * (1 + 10/30) = 106.67
       ]);
       expect(WorkoutProgressService.estimatedOneRepMax(e), closeTo(116.67, 0.01));
+    });
+
+    test('esclude le serie rest-pause: reps è la somma dei cluster, non uno sforzo continuo', () {
+      final e = _exercise(sets: [
+        // Se non escluso: 100 * (1 + 15/30) = 150, molto sopra il reale 1RM.
+        _set(reps: 15, weightKg: 100, restPauseClusters: [8, 4, 3]),
+        _set(reps: 5, weightKg: 90), // 90 * (1 + 5/30) = 105
+      ]);
+      expect(WorkoutProgressService.estimatedOneRepMax(e), closeTo(105, 0.01));
+    });
+
+    test('tutte rest-pause → null, come nessuna serie valida', () {
+      final e = _exercise(sets: [
+        _set(reps: 15, weightKg: 100, restPauseClusters: [8, 4, 3]),
+      ]);
+      expect(WorkoutProgressService.estimatedOneRepMax(e), isNull);
     });
   });
 

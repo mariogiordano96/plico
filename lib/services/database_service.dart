@@ -1257,7 +1257,7 @@ class DatabaseService {
       if (group == null) continue;
       final volume = e.sets
           .where((s) => !s.isWarmup)
-          .fold(0.0, (sum, s) => sum + (s.reps ?? 0) * (s.weightKg ?? 0));
+          .fold(0.0, (sum, s) => sum + WorkoutProgressService.setVolume(s));
       volumeByGroup[group] = (volumeByGroup[group] ?? 0) + volume;
     }
     return volumeByGroup;

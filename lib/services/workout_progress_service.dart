@@ -28,6 +28,22 @@ class WorkoutProgressService {
   static List<WorkoutSet> _workSets(WorkoutExercise e) =>
       e.sets.where((s) => !s.isWarmup).toList();
 
+  /// Volume (kg sollevati) di una singola serie, tecniche incluse
+  /// (docs/tecniche_allenamento.md, Fase 5, sezione 5):
+  /// - stripping: somma anche i gradini in `dropStages` (peso diverso a ogni
+  ///   gradino, la formula base conterebbe solo il primo)
+  /// - rest-pause: nessun aggiustamento, `reps` è già la somma dei cluster
+  ///   (scritta da `_SetRow`/`_confirmSerie` in sessione guidata)
+  /// - forzate: nessun aggiustamento, `forcedReps` non è mai incluso in
+  ///   `reps` (campo separato, non sono ripetizioni sollevate in autonomia)
+  static double setVolume(WorkoutSet s) {
+    var volume = (s.reps ?? 0).toDouble() * (s.weightKg ?? 0);
+    for (final stage in s.dropStages ?? const []) {
+      volume += (stage.reps ?? 0).toDouble() * (stage.weightKg ?? 0);
+    }
+    return volume;
+  }
+
   /// Soglia minima di carico (kg) sotto la quale il riscaldamento non viene
   /// suggerito: carichi leggeri non richiedono una rampa di avvicinamento.
   static const double warmupSkipThresholdKg = 20;
@@ -70,8 +86,7 @@ class WorkoutProgressService {
   }
 
   static double sessionVolume(WorkoutExercise e) {
-    return _workSets(e).fold<double>(
-        0, (sum, s) => sum + (s.reps ?? 0) * (s.weightKg ?? 0));
+    return _workSets(e).fold<double>(0, (sum, s) => sum + setVolume(s));
   }
 
   static double? sessionMaxWeight(WorkoutExercise e) {
@@ -88,8 +103,14 @@ class WorkoutProgressService {
   }
 
   /// Stima 1RM (formula di Epley) sulla serie migliore della sessione.
+  /// Esclude le serie rest-pause (docs/tecniche_allenamento.md, Fase 5,
+  /// sezione 8): `reps` è la somma dei cluster, non ripetizioni di uno
+  /// sforzo continuo — userebbe la formula di Epley su un valore che la
+  /// sovrastimerebbe. Trattate come le serie di riscaldamento, già escluse
+  /// da `_workSets`.
   static double? estimatedOneRepMax(WorkoutExercise e) {
-    final sets = _workSets(e).where((s) => s.weightKg != null && s.reps != null);
+    final sets = _workSets(e).where((s) =>
+        s.weightKg != null && s.reps != null && (s.restPauseClusters?.isEmpty ?? true));
     if (sets.isEmpty) return null;
     double best = 0;
     for (final s in sets) {

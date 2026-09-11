@@ -303,11 +303,31 @@ In `sessione_guidata_screen.dart` (`_ExerciseStepCard`):
       di `_SetRow`, non recuperati se l'app si riavvia a metà compilazione
       di una serie non ancora confermata — l'utente li reinserisce
 
-### Fase 5 — Calcoli
-- [ ] Volume: includere i gradini di `dropStages` nella formula
-      (`database_service.dart`, `workout_progress_service.dart`)
-- [ ] Escludere `forcedReps` dal volume "pulito"
-- [ ] Decisione + implementazione 1RM su rest-pause (vedi sezione 8)
+### Fase 5 — Calcoli ✅
+- [x] Nuovo `WorkoutProgressService.setVolume(WorkoutSet)`, unico punto che
+      calcola il volume di una serie (reps×peso + gradini `dropStages`) —
+      usato sia da `sessionVolume` sia da `database_service.dart`
+      (`volumeByGroup`), che prima duplicavano la stessa formula inline
+- [x] `forcedReps` già escluso dal volume senza bisogno di codice: `_SetRow`
+      (Fase 4) non lo somma mai a `reps`, campo separato fin dalla scrittura
+- [x] 1RM su rest-pause: **decisione presa** — escluse dal calcolo
+      (`estimatedOneRepMax`), stesso trattamento delle serie di
+      riscaldamento. `reps` è la somma dei cluster, non ripetizioni di uno
+      sforzo continuo: la formula di Epley le sovrastimerebbe
+      (es. 15 rip a 100kg → 150kg stimati, contro un 1RM reale molto più
+      basso)
+- [x] 5 nuovi test in `workout_progress_service_test.dart`: volume
+      rest-pause (nessun aggiustamento), volume stripping (gradini
+      sommati), volume forzate (forcedReps escluso), 1RM con rest-pause
+      escluso, 1RM null se tutte le serie sono rest-pause
+- [x] **Non risolto, fuori scope Fase 5**: `suggestNextSession` (target
+      della sessione successiva) usa `sets.first.reps` come riferimento —
+      se la prima serie di lavoro fosse una rest-pause, il confronto con le
+      serie successive userebbe un numero non comparabile (somma cluster
+      contro reps singole). Nella pratica il rest-pause si usa quasi sempre
+      sull'ultima serie di un esercizio, non la prima: rischio basso, non
+      un bug che si manifesta nell'uso tipico. Da rivedere se emerge come
+      problema reale
 
 ### Fase 6 — Storico e PDF export
 - [ ] Rappresentare la tecnica nel grafico storico esercizio
