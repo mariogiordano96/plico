@@ -235,13 +235,18 @@ In `sessione_guidata_screen.dart` (`_ExerciseStepCard`):
 - [x] Nessuna modifica al modello dati — solo nuove stringhe l10n
       (`allenamentoGeneraPiramide`, `piramideDialog*`)
 
-### Fase 2 — Modello dati tecniche
-- [ ] Nuovi campi su `WorkoutSet`: `forcedReps`, `isSuperSlow`,
-      `restPauseClusters`, `dropStages` (+ classe `DropStage`)
-- [ ] Nuovo campo `supersetRole` su `WorkoutExercise`
-- [ ] `dart run build_runner build --delete-conflicting-outputs`,
-      verifica che una build di prova con liste di embedded annidate
-      funzioni
+### Fase 2 — Modello dati tecniche ✅
+- [x] Nuovi campi su `WorkoutSet`: `forcedReps`, `isSuperSlow`,
+      `restPauseClusters`, `dropStages` (+ classe `DropStage` embedded)
+- [x] Nuovo campo `supersetRole` su `WorkoutExercise` (enum `SupersetRole`,
+      stesso pattern `.name` già usato per `WorkoutSource`/`source`)
+- [x] `dart run build_runner build --delete-conflicting-outputs` —
+      **confermato**: Isar 3.1 gestisce correttamente liste di embedded
+      annidate (`WorkoutSet.dropStages` dentro `WorkoutExercise.sets`),
+      `readObjectList<DropStage>`/`DropStageSchema` generati senza problemi.
+      `flutter analyze` pulito, 65 test esistenti su workout/database
+      ancora verdi (nessuna migrazione necessaria, tutti i campi nuovi sono
+      opzionali)
 
 ### Fase 3 — UI creazione scheda
 - [ ] Selettore tecnica per serie (chip), campi dinamici per rest-pause/

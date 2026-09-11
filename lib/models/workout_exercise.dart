@@ -8,6 +8,13 @@ part 'workout_exercise.g.dart';
 /// bisogno di un valore: [WorkoutExercise.source] resta null in quel caso.
 enum WorkoutSource { healthKit, healthConnect }
 
+/// Ruolo nella variante "superset veloce/lento" (docs/tecniche_allenamento.md,
+/// Fase 2): due esercizi consecutivi senza riposo, uno a carico alto eseguito
+/// esplosivo, uno a carico più basso eseguito lento. Non è un nuovo
+/// meccanismo di raggruppamento — usa lo stesso `supersetGroupId` del
+/// superset semplice, questo campo resta null per quello.
+enum SupersetRole { esplosiva, lenta }
+
 @collection
 class WorkoutExercise {
   Id id = Isar.autoIncrement;
@@ -21,6 +28,7 @@ class WorkoutExercise {
 
   int? supersetGroupId; // Fase 12: esercizi eseguiti in sequenza senza riposo tra loro
   int? restSeconds; // Fase 8: riposo dopo l'ultima serie/il completamento
+  String? supersetRole; // SupersetRole.name, vedi sopra
 
   // Per cardio
   int? durationSeconds;

@@ -41,6 +41,10 @@ class ExerciseDefinition {
   /// da free-exercise-db). Non tutti gli esercizi ne hanno una (mancava nel
   /// dataset sorgente, o l'esercizio è custom): il chiamante deve gestire
   /// l'assenza del file con un errorBuilder, non verificarla qui.
+  /// `@ignore`: è un getter calcolato, non un campo — senza questa
+  /// annotazione Isar lo tratta come proprietà persistita (scrive una
+  /// stringa ridondante a ogni put e aggiunge filtri di query spuri).
+  @ignore
   String? get imageAssetPath =>
       isCustom ? null : 'assets/img/exercises/$externalId.webp';
 }

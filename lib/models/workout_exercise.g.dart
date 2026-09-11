@@ -117,6 +117,11 @@ const WorkoutExerciseSchema = CollectionSchema(
       id: 19,
       name: r'supersetGroupId',
       type: IsarType.long,
+    ),
+    r'supersetRole': PropertySchema(
+      id: 20,
+      name: r'supersetRole',
+      type: IsarType.string,
     )
   },
   estimateSize: _workoutExerciseEstimateSize,
@@ -153,7 +158,10 @@ const WorkoutExerciseSchema = CollectionSchema(
     )
   },
   links: {},
-  embeddedSchemas: {r'WorkoutSet': WorkoutSetSchema},
+  embeddedSchemas: {
+    r'WorkoutSet': WorkoutSetSchema,
+    r'DropStage': DropStageSchema
+  },
   getId: _workoutExerciseGetId,
   getLinks: _workoutExerciseGetLinks,
   attach: _workoutExerciseAttach,
@@ -194,6 +202,12 @@ int _workoutExerciseEstimateSize(
       bytesCount += 3 + value.length * 3;
     }
   }
+  {
+    final value = object.supersetRole;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   return bytesCount;
 }
 
@@ -228,6 +242,7 @@ void _workoutExerciseSerialize(
   writer.writeLong(offsets[17], object.sourceTemplateId);
   writer.writeString(offsets[18], object.sourceTemplateName);
   writer.writeLong(offsets[19], object.supersetGroupId);
+  writer.writeString(offsets[20], object.supersetRole);
 }
 
 WorkoutExercise _workoutExerciseDeserialize(
@@ -263,6 +278,7 @@ WorkoutExercise _workoutExerciseDeserialize(
   object.sourceTemplateId = reader.readLongOrNull(offsets[17]);
   object.sourceTemplateName = reader.readStringOrNull(offsets[18]);
   object.supersetGroupId = reader.readLongOrNull(offsets[19]);
+  object.supersetRole = reader.readStringOrNull(offsets[20]);
   return object;
 }
 
@@ -319,6 +335,8 @@ P _workoutExerciseDeserializeProp<P>(
       return (reader.readStringOrNull(offset)) as P;
     case 19:
       return (reader.readLongOrNull(offset)) as P;
+    case 20:
+      return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -2382,6 +2400,160 @@ extension WorkoutExerciseQueryFilter
       ));
     });
   }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      supersetRoleIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'supersetRole',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      supersetRoleIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'supersetRole',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      supersetRoleEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'supersetRole',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      supersetRoleGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'supersetRole',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      supersetRoleLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'supersetRole',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      supersetRoleBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'supersetRole',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      supersetRoleStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'supersetRole',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      supersetRoleEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'supersetRole',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      supersetRoleContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'supersetRole',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      supersetRoleMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'supersetRole',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      supersetRoleIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'supersetRole',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterFilterCondition>
+      supersetRoleIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'supersetRole',
+        value: '',
+      ));
+    });
+  }
 }
 
 extension WorkoutExerciseQueryObject
@@ -2658,6 +2830,20 @@ extension WorkoutExerciseQuerySortBy
       sortBySupersetGroupIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'supersetGroupId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      sortBySupersetRole() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'supersetRole', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      sortBySupersetRoleDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'supersetRole', Sort.desc);
     });
   }
 }
@@ -2937,6 +3123,20 @@ extension WorkoutExerciseQuerySortThenBy
       return query.addSortBy(r'supersetGroupId', Sort.desc);
     });
   }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      thenBySupersetRole() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'supersetRole', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QAfterSortBy>
+      thenBySupersetRoleDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'supersetRole', Sort.desc);
+    });
+  }
 }
 
 extension WorkoutExerciseQueryWhereDistinct
@@ -3071,6 +3271,13 @@ extension WorkoutExerciseQueryWhereDistinct
       distinctBySupersetGroupId() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'supersetGroupId');
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, WorkoutExercise, QDistinct>
+      distinctBySupersetRole({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'supersetRole', caseSensitive: caseSensitive);
     });
   }
 }
@@ -3214,6 +3421,13 @@ extension WorkoutExerciseQueryProperty
       supersetGroupIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'supersetGroupId');
+    });
+  }
+
+  QueryBuilder<WorkoutExercise, String?, QQueryOperations>
+      supersetRoleProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'supersetRole');
     });
   }
 }
