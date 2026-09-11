@@ -38,6 +38,7 @@ void main() async {
   await DatabaseService.instance.migrateFoodNamesV2();
   await DatabaseService.instance.syncFoodNomeInglese();
   await DatabaseService.instance.seedExercises();
+  await DatabaseService.instance.syncExerciseNamesIt();
   await DatabaseService.instance.seedWorkoutPresets();
   final isDark = await DatabaseService.instance.getIsDarkMode();
   themeNotifier.value = isDark ? ThemeMode.dark : ThemeMode.light;

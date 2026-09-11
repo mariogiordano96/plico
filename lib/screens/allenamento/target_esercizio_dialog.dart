@@ -60,7 +60,8 @@ class _TargetEsercizioDialogState extends State<_TargetEsercizioDialog> {
   void _salva() {
     final result = WorkoutTemplateExercise()
       ..exerciseId = widget.exercise.externalId
-      ..exerciseName = widget.exercise.nameIt ?? widget.exercise.name;
+      ..exerciseName =
+          widget.exercise.localizedName(Localizations.localeOf(context).languageCode);
 
     if (_isCardio) {
       final min = int.tryParse(_durataCtrl.text);
@@ -95,7 +96,8 @@ class _TargetEsercizioDialogState extends State<_TargetEsercizioDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              l10n.targetDialogTitle(widget.exercise.nameIt ?? widget.exercise.name),
+              l10n.targetDialogTitle(
+                  widget.exercise.localizedName(Localizations.localeOf(context).languageCode)),
               style: TextStyle(color: p.accent, fontSize: 16, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 16),

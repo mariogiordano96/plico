@@ -353,7 +353,7 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
     if (alt == null || !mounted) return;
 
     e.exerciseId = alt.externalId;
-    e.exerciseName = alt.nameIt ?? alt.name;
+    e.exerciseName = alt.localizedName(Localizations.localeOf(context).languageCode);
 
     final bodySnapshot = await DatabaseService.instance.getLatestBodySnapshot();
     final bodyWeightKg = bodySnapshot?.pesoKg;

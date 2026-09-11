@@ -327,7 +327,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     if (alt == null || !mounted) return;
 
     e.exerciseId = alt.externalId;
-    e.exerciseName = alt.nameIt ?? alt.name;
+    e.exerciseName = alt.localizedName(Localizations.localeOf(context).languageCode);
 
     if (e.isCardio) {
       // durationSeconds può essere ancora null se non è mai stato compilato:

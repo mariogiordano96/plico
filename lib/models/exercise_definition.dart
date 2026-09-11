@@ -24,4 +24,16 @@ class ExerciseDefinition {
 
   bool isCustom = false;
   bool isDeleted = false;
+
+  /// Nome da mostrare per la lingua corrente. Il dataset esterno ha solo
+  /// `name` (inglese, originale) e `nameIt` (traduzione italiana curata, non
+  /// ancora completa per tutti gli esercizi) — con locale inglese va sempre
+  /// mostrato `name`, anche quando esiste una `nameIt`, altrimenti un utente
+  /// EN vedrebbe nomi in italiano.
+  String localizedName(String languageCode) {
+    if (languageCode == 'it' && nameIt != null && nameIt!.isNotEmpty) {
+      return nameIt!;
+    }
+    return name;
+  }
 }

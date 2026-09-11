@@ -92,6 +92,7 @@ Future<bool> confirmAndImportBackup(BuildContext context, File file) async {
   await DatabaseService.instance.seedCreaFoods();
   await DatabaseService.instance.migrateFoodNamesV2();
   await DatabaseService.instance.seedExercises();
+  await DatabaseService.instance.syncExerciseNamesIt();
   await DatabaseService.instance.seedWorkoutPresets();
 
   if (!context.mounted) return true;

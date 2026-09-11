@@ -90,7 +90,8 @@ class _SostituisciEsercizioSheet extends StatelessWidget {
                             ),
                             child: ListTile(
                               onTap: () => Navigator.pop(context, e),
-                              title: Text(e.nameIt ?? e.name,
+                              title: Text(
+                                  e.localizedName(Localizations.localeOf(context).languageCode),
                                   style: TextStyle(
                                       color: p.textPrimary, fontWeight: FontWeight.w600)),
                               subtitle: Text(sottotitolo,

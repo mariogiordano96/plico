@@ -30,11 +30,17 @@ class _CatalogoEserciziSheetState extends State<_CatalogoEserciziSheet> {
   Timer? _debounce;
   String? _gruppoSelezionato;
   List<ExerciseDefinition> _risultati = [];
+  bool _didInitialSearch = false;
 
   @override
-  void initState() {
-    super.initState();
-    _search();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Non in initState: _search() legge Localizations.localeOf(context), che
+    // richiede il widget montato nell'albero (initState è troppo presto).
+    if (!_didInitialSearch) {
+      _didInitialSearch = true;
+      _search();
+    }
   }
 
   @override
@@ -50,9 +56,11 @@ class _CatalogoEserciziSheetState extends State<_CatalogoEserciziSheet> {
   }
 
   Future<void> _search() async {
+    final languageCode = Localizations.localeOf(context).languageCode;
     final results = await DatabaseService.instance
         .searchExercises(_searchCtrl.text, muscleGroup: _gruppoSelezionato);
-    results.sort((a, b) => (a.nameIt ?? a.name).compareTo(b.nameIt ?? b.name));
+    results.sort((a, b) =>
+        a.localizedName(languageCode).compareTo(b.localizedName(languageCode)));
     if (mounted) setState(() => _risultati = results);
   }
 
@@ -230,7 +238,7 @@ class _ExerciseTile extends StatelessWidget {
       ),
       child: ListTile(
         onTap: onTap,
-        title: Text(exercise.nameIt ?? exercise.name,
+        title: Text(exercise.localizedName(Localizations.localeOf(context).languageCode),
             style: TextStyle(color: p.textPrimary, fontWeight: FontWeight.w600)),
         subtitle: Text(sottotitolo, style: TextStyle(color: p.textMuted, fontSize: 12)),
         trailing: exercise.isCustom

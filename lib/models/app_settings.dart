@@ -25,6 +25,12 @@ class AppSettings {
   // lasciando `nomeInglese` null per chi aveva già seedato il catalogo:
   // la ricerca in inglese mostrava quindi i nomi italiani come fallback.
   bool foodNomeIngleseSyncedV1 = false;
+  // Migrazione una-tantum: risincronizza `nameIt` sugli ExerciseDefinition
+  // già in DB (matching per externalId) — il catalogo esercizi è stato
+  // tradotto in italiano dopo il primo rilascio, ma `seedExercises` seeda
+  // una sola volta: senza questa sincronizzazione chi aveva già installato
+  // l'app restava con i nomi in inglese per gli esercizi tradotti dopo.
+  bool exerciseNamesItSyncedV1 = false;
   DateTime? goalSetDate;
   double? pesoObiettivo;
 

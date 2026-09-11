@@ -844,10 +844,35 @@ class DatabaseService {
       s.notSpuntinoMin = 630;
       s.notPostWoMin = 1020;
       s.notSorMin = 1260;
+      // notColAttiva/notPranzoAttiva/notCenaAttiva sono arrivati nello stesso
+      // commit dei _Min sopra: se quelli risultano corrotti, il record è
+      // precedente all'intera feature promemoria pasti, quindi anche questi
+      // tre flag erano assenti (letti come `false`, sentinel Isar per un
+      // bool mancante, non il default dichiarato `true`) — sicuro forzarli.
+      s.notColAttiva = true;
+      s.notPranzoAttiva = true;
+      s.notCenaAttiva = true;
       needsSave = true;
     }
     if (s.restTimerDefaultSeconds < 15 || s.restTimerDefaultSeconds > 600) {
       s.restTimerDefaultSeconds = 90;
+      needsSave = true;
+    }
+    // livelloAttivita/metodoTdee/obiettivo: stesso problema dei _Min sopra,
+    // ma per record ancora più vecchi (introdotti prima dei promemoria
+    // pasti) — senza questo controllo, un metodoTdee corrotto fa sparire
+    // silenziosamente il calcolo del target kcal/macro (calcolaTdee cade nel
+    // default: return null).
+    if (s.livelloAttivita < 0 || s.livelloAttivita > 4) {
+      s.livelloAttivita = 2;
+      needsSave = true;
+    }
+    if (s.metodoTdee < 0 || s.metodoTdee > 3) {
+      s.metodoTdee = 0;
+      needsSave = true;
+    }
+    if (s.obiettivo < 0 || s.obiettivo > 2) {
+      s.obiettivo = 1;
       needsSave = true;
     }
     if (needsSave) {
@@ -882,6 +907,46 @@ class DatabaseService {
       });
     }
     await _fixMiscategorizedExercises();
+  }
+
+  /// Migrazione una-tantum: risincronizza `nameIt` sugli ExerciseDefinition
+  /// già persistiti, matchando per `externalId` — il catalogo è stato
+  /// tradotto in italiano dopo il primo rilascio, e `seedExercises` seeda
+  /// una sola volta, quindi la traduzione da sola non arriva a chi aveva
+  /// già installato l'app. Non tocca gli esercizi personalizzati dell'utente.
+  Future<void> syncExerciseNamesIt() async {
+    final settings = await _isar.appSettings.get(1);
+    if (settings?.exerciseNamesItSyncedV1 == true) return;
+
+    final raw = await rootBundle.loadString('assets/data/exercises_seed.json');
+    final list = jsonDecode(raw) as List<dynamic>;
+    final nameItByExternalId = <String, String?>{
+      for (final e in list.cast<Map<String, dynamic>>())
+        e['externalId'] as String: e['nameIt'] as String?,
+    };
+
+    await _isar.writeTxn(() async {
+      final existing = await _isar.exerciseDefinitions.filter().isCustomEqualTo(false).findAll();
+      final changed = <ExerciseDefinition>[];
+      for (final exercise in existing) {
+        // containsKey, non solo il valore: un externalId assente dal seed
+        // corrente (voce rimossa/rinominata a monte) non deve azzerare una
+        // nameIt già persistita, a differenza di una nameIt tornata a null
+        // esplicitamente nel JSON.
+        if (!nameItByExternalId.containsKey(exercise.externalId)) continue;
+        final newNameIt = nameItByExternalId[exercise.externalId];
+        if (newNameIt != exercise.nameIt) {
+          exercise.nameIt = newNameIt;
+          changed.add(exercise);
+        }
+      }
+      if (changed.isNotEmpty) {
+        await _isar.exerciseDefinitions.putAll(changed);
+      }
+      final s = await _isar.appSettings.get(1) ?? AppSettings();
+      s.exerciseNamesItSyncedV1 = true;
+      await _isar.appSettings.put(s);
+    });
   }
 
   /// Corregge in-place la categoria di voci del catalogo preinstallato già
