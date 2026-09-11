@@ -1749,6 +1749,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sessioneGuidataAspettaTurno => 'Wait your turn';
 
   @override
+  String get sessioneGuidataTecnicaNormale => 'Normal';
+
+  @override
+  String get sessioneGuidataTecnicaForzate => 'Forced';
+
+  @override
+  String get sessioneGuidataTecnicaRestPause => 'Rest-pause';
+
+  @override
+  String get sessioneGuidataTecnicaStripping => 'Stripping';
+
+  @override
+  String get sessioneGuidataTecnicaSuperSlow => 'Super slow';
+
+  @override
+  String get sessioneGuidataForzateHint => '+forced';
+
+  @override
+  String sessioneGuidataClusterLabel(int n) {
+    return 'Cluster $n';
+  }
+
+  @override
+  String get sessioneGuidataAggiungiCluster => '+ cluster';
+
+  @override
+  String sessioneGuidataGradinoLabel(int n) {
+    return 'Stage $n';
+  }
+
+  @override
+  String get sessioneGuidataAggiungiGradino => '+ stage';
+
+  @override
   String get sessioneRiepilogoTitle => 'Session complete';
 
   @override

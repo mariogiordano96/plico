@@ -573,6 +573,17 @@
   "sessioneGuidataRiscaldamentoSerieLabel": "Warm-up {n}",
   "sessioneGuidataAspettaTurno": "Wait your turn",
 
+  "sessioneGuidataTecnicaNormale": "Normal",
+  "sessioneGuidataTecnicaForzate": "Forced",
+  "sessioneGuidataTecnicaRestPause": "Rest-pause",
+  "sessioneGuidataTecnicaStripping": "Stripping",
+  "sessioneGuidataTecnicaSuperSlow": "Super slow",
+  "sessioneGuidataForzateHint": "+forced",
+  "sessioneGuidataClusterLabel": "Cluster {n}",
+  "sessioneGuidataAggiungiCluster": "+ cluster",
+  "sessioneGuidataGradinoLabel": "Stage {n}",
+  "sessioneGuidataAggiungiGradino": "+ stage",
+
   "sessioneRiepilogoTitle": "Session complete",
   "sessioneRiepilogoKcal": "{kcal} kcal estimated",
   "sessioneRiepilogoNuoviRecord": "NEW PERSONAL RECORDS",

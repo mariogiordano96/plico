@@ -723,6 +723,23 @@
   },
   "sessioneGuidataAspettaTurno": "Aspetta il turno",
 
+  "sessioneGuidataTecnicaNormale": "Normale",
+  "sessioneGuidataTecnicaForzate": "Forzate",
+  "sessioneGuidataTecnicaRestPause": "Rest-pause",
+  "sessioneGuidataTecnicaStripping": "Stripping",
+  "sessioneGuidataTecnicaSuperSlow": "Super slow",
+  "sessioneGuidataForzateHint": "+forz.",
+  "sessioneGuidataClusterLabel": "Cluster {n}",
+  "@sessioneGuidataClusterLabel": {
+    "placeholders": { "n": { "type": "int" } }
+  },
+  "sessioneGuidataAggiungiCluster": "+ cluster",
+  "sessioneGuidataGradinoLabel": "Gradino {n}",
+  "@sessioneGuidataGradinoLabel": {
+    "placeholders": { "n": { "type": "int" } }
+  },
+  "sessioneGuidataAggiungiGradino": "+ gradino",
+
   "sessioneRiepilogoTitle": "Sessione completata",
   "sessioneRiepilogoKcal": "{kcal} kcal stimate",
   "@sessioneRiepilogoKcal": {

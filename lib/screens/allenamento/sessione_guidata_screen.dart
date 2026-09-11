@@ -284,8 +284,17 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
   Future<void> _confirmSerie(WorkoutExercise e, int setIndex) async {
     final reps = int.tryParse(_repsCtrls[e.id]![setIndex].text);
     final kg = double.tryParse(_kgCtrls[e.id]![setIndex].text.replaceAll(',', '.'));
-    e.sets[setIndex]
-      ..reps = reps
+    final set = e.sets[setIndex];
+    // Rest-pause (docs/tecniche_allenamento.md, Fase 4): `_SetRow` scrive
+    // `restPauseClusters` direttamente sull'oggetto prima di chiamare questo
+    // confirm — `reps` diventa la somma dei cluster, non il valore del
+    // campo principale, così volume/overload (WorkoutProgressService,
+    // database_service) restano corretti senza modifiche, come da sezione 5.
+    final clusters = set.restPauseClusters;
+    final effectiveReps =
+        (clusters != null && clusters.isNotEmpty) ? clusters.reduce((a, b) => a + b) : reps;
+    set
+      ..reps = effectiveReps
       ..weightKg = kg
       ..confirmed = true;
     e.estimatedKcal = CalorieEstimationService.estimateStrengthKcal(
@@ -661,6 +670,15 @@ class _ExerciseStepCard extends StatelessWidget {
               ),
             ],
           ),
+          if (exercise.supersetRole != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              exercise.supersetRole == SupersetRole.esplosiva.name
+                  ? '🚀 ${l10n.creaSchedaRuoloEsplosiva}'
+                  : '🐌 ${l10n.creaSchedaRuoloLenta}',
+              style: TextStyle(color: p.accent, fontSize: 12, fontWeight: FontWeight.w600),
+            ),
+          ],
           if (suggestion != null) ...[
             const SizedBox(height: 6),
             _SuggestionLine(suggestion: suggestion!, p: p, l10n: l10n),
@@ -728,6 +746,8 @@ class _ExerciseStepCard extends StatelessWidget {
                   label: l10n.sessioneGuidataRiscaldamentoSerieLabel(w + 1),
                   reps: repsCtrls![_warmupIndices[w]],
                   kg: kgCtrls![_warmupIndices[w]],
+                  workoutSet: exercise.sets[_warmupIndices[w]],
+                  showTechnique: false, // tecniche non applicabili al riscaldamento
                   done: exercise.sets[_warmupIndices[w]].confirmed,
                   enabled: _setEnabled(_warmupIndices[w]),
                   onConfirm: () => onConfirmSerie(_warmupIndices[w]),
@@ -742,6 +762,8 @@ class _ExerciseStepCard extends StatelessWidget {
                 label: l10n.serieDialogSerieLabel(i + 1),
                 reps: repsCtrls![_workIndices[i]],
                 kg: kgCtrls![_workIndices[i]],
+                workoutSet: exercise.sets[_workIndices[i]],
+                showTechnique: true,
                 done: exercise.sets[_workIndices[i]].confirmed,
                 enabled: _setEnabled(_workIndices[i]),
                 onConfirm: () => onConfirmSerie(_workIndices[i]),
@@ -793,10 +815,19 @@ class _SuggestionLine extends StatelessWidget {
   }
 }
 
-class _SetRow extends StatelessWidget {
+/// Tecniche di allenamento selezionabili per una singola serie (Fase 4 di
+/// docs/tecniche_allenamento.md). Piramidale e superset veloce/lento non ci
+/// sono: la prima è un generatore a parte (Fase 1, menu esercizio), il
+/// secondo è una proprietà dell'esercizio non della singola serie (Fase 3).
+enum _SetTechnique { normale, forzate, restPause, stripping, superSlow }
+
+class _SetRow extends StatefulWidget {
   final String label;
   final TextEditingController reps;
   final TextEditingController kg;
+  final WorkoutSet workoutSet;
+  /// false per le serie di riscaldamento: le tecniche non hanno senso lì.
+  final bool showTechnique;
   final bool done;
   final bool enabled;
   final VoidCallback onConfirm;
@@ -806,6 +837,8 @@ class _SetRow extends StatelessWidget {
     required this.label,
     required this.reps,
     required this.kg,
+    required this.workoutSet,
+    required this.showTechnique,
     required this.done,
     required this.enabled,
     required this.onConfirm,
@@ -813,32 +846,315 @@ class _SetRow extends StatelessWidget {
   });
 
   @override
+  State<_SetRow> createState() => _SetRowState();
+}
+
+class _SetRowState extends State<_SetRow> {
+  late _SetTechnique _technique;
+  late final TextEditingController _forcedCtrl;
+  // Cluster/gradini aggiuntivi oltre al primo (che resta reps/kg del campo
+  // principale, invariato) — costruiti da zero a ogni apertura della riga,
+  // non recuperati da un'eventuale serie parzialmente compilata prima di un
+  // riavvio app: limite noto, non bloccante (l'utente li reinserisce).
+  final List<TextEditingController> _clusterCtrls = [];
+  final List<(TextEditingController, TextEditingController)> _stageCtrls = [];
+
+  @override
+  void initState() {
+    super.initState();
+    final w = widget.workoutSet;
+    if (w.forcedReps != null) {
+      _technique = _SetTechnique.forzate;
+    } else if (w.isSuperSlow) {
+      _technique = _SetTechnique.superSlow;
+    } else if (w.restPauseClusters?.isNotEmpty == true) {
+      _technique = _SetTechnique.restPause;
+    } else if (w.dropStages?.isNotEmpty == true) {
+      _technique = _SetTechnique.stripping;
+    } else {
+      _technique = _SetTechnique.normale;
+    }
+    _forcedCtrl = TextEditingController(text: w.forcedReps?.toString() ?? '');
+  }
+
+  @override
+  void dispose() {
+    _forcedCtrl.dispose();
+    for (final c in _clusterCtrls) {
+      c.dispose();
+    }
+    for (final (r, k) in _stageCtrls) {
+      r.dispose();
+      k.dispose();
+    }
+    super.dispose();
+  }
+
+  /// Scrive la tecnica scelta sulla WorkoutSet prima di confermare — solo a
+  /// questo punto, non a ogni digitazione (stesso principio di `_confirmSerie`
+  /// nel parent, che legge reps/kg solo alla conferma).
+  void _handleConfirm() {
+    final w = widget.workoutSet;
+    w.forcedReps = null;
+    w.isSuperSlow = false;
+    w.restPauseClusters = null;
+    w.dropStages = null;
+    switch (_technique) {
+      case _SetTechnique.forzate:
+        w.forcedReps = int.tryParse(_forcedCtrl.text);
+      case _SetTechnique.superSlow:
+        w.isSuperSlow = true;
+      case _SetTechnique.restPause:
+        final primo = int.tryParse(widget.reps.text);
+        final altri = _clusterCtrls.map((c) => int.tryParse(c.text)).whereType<int>().toList();
+        if (primo != null) w.restPauseClusters = [primo, ...altri];
+      case _SetTechnique.stripping:
+        final stages = [
+          for (final (r, k) in _stageCtrls)
+            if (int.tryParse(r.text) != null)
+              DropStage()
+                ..reps = int.tryParse(r.text)
+                ..weightKg = double.tryParse(k.text.replaceAll(',', '.')),
+        ];
+        if (stages.isNotEmpty) w.dropStages = stages;
+      case _SetTechnique.normale:
+        break;
+    }
+    widget.onConfirm();
+  }
+
+  String _techniqueLabel(_SetTechnique t, dynamic l10n) => switch (t) {
+        _SetTechnique.normale => l10n.sessioneGuidataTecnicaNormale,
+        _SetTechnique.forzate => l10n.sessioneGuidataTecnicaForzate,
+        _SetTechnique.restPause => l10n.sessioneGuidataTecnicaRestPause,
+        _SetTechnique.stripping => l10n.sessioneGuidataTecnicaStripping,
+        _SetTechnique.superSlow => l10n.sessioneGuidataTecnicaSuperSlow,
+      };
+
+  Widget? _confirmedBadge(dynamic l10n) {
+    final w = widget.workoutSet;
+    final p = widget.p;
+    String label;
+    if (w.forcedReps != null) {
+      label = '💪 +${w.forcedReps} ${l10n.sessioneGuidataTecnicaForzate.toLowerCase()}';
+    } else if (w.isSuperSlow) {
+      label = '🐌 ${l10n.sessioneGuidataTecnicaSuperSlow}';
+    } else if (w.restPauseClusters?.isNotEmpty == true) {
+      label = '🔥 ${w.restPauseClusters!.join("+")}';
+    } else if (w.dropStages?.isNotEmpty == true) {
+      label = '⬇️ ${l10n.sessioneGuidataTecnicaStripping}';
+    } else {
+      return null;
+    }
+    return Padding(
+      padding: const EdgeInsets.only(left: 56, top: 2, bottom: 4),
+      child: Text(label, style: TextStyle(color: p.accent, fontSize: 11, fontWeight: FontWeight.w600)),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final p = widget.p;
+    final badge = widget.done ? _confirmedBadge(l10n) : null;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 56,
-            child: Text(label, style: TextStyle(color: p.textMuted, fontSize: 12)),
+          Row(
+            children: [
+              SizedBox(
+                width: 56,
+                child: Text(widget.label, style: TextStyle(color: p.textMuted, fontSize: 12)),
+              ),
+              Expanded(
+                  child:
+                      _NumberField(controller: widget.reps, hint: l10n.serieDialogRipHint, p: p)),
+              const SizedBox(width: 8),
+              Expanded(
+                  child: _NumberField(controller: widget.kg, hint: l10n.serieDialogKgHint, p: p)),
+              if (widget.showTechnique &&
+                  !widget.done &&
+                  _technique == _SetTechnique.forzate) ...[
+                const SizedBox(width: 8),
+                SizedBox(
+                  width: 56,
+                  child: _NumberField(
+                      controller: _forcedCtrl, hint: l10n.sessioneGuidataForzateHint, p: p),
+                ),
+              ],
+              IconButton(
+                onPressed: widget.enabled ? _handleConfirm : null,
+                icon: Icon(
+                  !widget.enabled && !widget.done
+                      ? Icons.lock_outline_rounded
+                      : widget.done
+                          ? Icons.check_circle_rounded
+                          : Icons.check_circle_outline_rounded,
+                  color: widget.done ? p.accent : p.textMuted,
+                ),
+                tooltip: !widget.enabled && !widget.done
+                    ? l10n.sessioneGuidataAspettaTurno
+                    : l10n.sessioneGuidataConferma,
+              ),
+            ],
           ),
-          Expanded(child: _NumberField(controller: reps, hint: l10n.serieDialogRipHint, p: p)),
-          const SizedBox(width: 8),
-          Expanded(child: _NumberField(controller: kg, hint: l10n.serieDialogKgHint, p: p)),
-          IconButton(
-            onPressed: enabled ? onConfirm : null,
-            icon: Icon(
-              !enabled && !done
-                  ? Icons.lock_outline_rounded
-                  : done
-                      ? Icons.check_circle_rounded
-                      : Icons.check_circle_outline_rounded,
-              color: done ? p.accent : p.textMuted,
+          ?badge,
+          if (widget.showTechnique && !widget.done) ...[
+            Padding(
+              padding: const EdgeInsets.only(left: 56, bottom: 4),
+              child: Wrap(
+                spacing: 6,
+                runSpacing: 4,
+                children: [
+                  for (final t in _SetTechnique.values)
+                    _TechniqueChip(
+                      label: _techniqueLabel(t, l10n),
+                      selected: _technique == t,
+                      p: p,
+                      onTap: () => setState(() => _technique = t),
+                    ),
+                ],
+              ),
             ),
-            tooltip: !enabled && !done ? l10n.sessioneGuidataAspettaTurno : l10n.sessioneGuidataConferma,
-          ),
+            if (_technique == _SetTechnique.restPause)
+              Padding(
+                padding: const EdgeInsets.only(left: 56, bottom: 4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (var i = 0; i < _clusterCtrls.length; i++)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 64,
+                              child: Text(l10n.sessioneGuidataClusterLabel(i + 2),
+                                  style: TextStyle(color: p.textMuted, fontSize: 11)),
+                            ),
+                            SizedBox(
+                              width: 70,
+                              child: _NumberField(
+                                  controller: _clusterCtrls[i],
+                                  hint: l10n.serieDialogRipHint,
+                                  p: p),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.close_rounded, size: 16, color: p.textMuted),
+                              visualDensity: VisualDensity.compact,
+                              onPressed: () => setState(() {
+                                _clusterCtrls[i].dispose();
+                                _clusterCtrls.removeAt(i);
+                              }),
+                            ),
+                          ],
+                        ),
+                      ),
+                    TextButton.icon(
+                      onPressed: () => setState(() => _clusterCtrls.add(TextEditingController())),
+                      icon: Icon(Icons.add_rounded, size: 14, color: p.accent),
+                      label: Text(l10n.sessioneGuidataAggiungiCluster,
+                          style: TextStyle(color: p.accent, fontSize: 11)),
+                      style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                    ),
+                  ],
+                ),
+              ),
+            if (_technique == _SetTechnique.stripping)
+              Padding(
+                padding: const EdgeInsets.only(left: 56, bottom: 4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (var i = 0; i < _stageCtrls.length; i++)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 56,
+                              child: Text(l10n.sessioneGuidataGradinoLabel(i + 2),
+                                  style: TextStyle(color: p.textMuted, fontSize: 11)),
+                            ),
+                            SizedBox(
+                              width: 56,
+                              child: _NumberField(
+                                  controller: _stageCtrls[i].$1,
+                                  hint: l10n.serieDialogRipHint,
+                                  p: p),
+                            ),
+                            const SizedBox(width: 4),
+                            SizedBox(
+                              width: 56,
+                              child: _NumberField(
+                                  controller: _stageCtrls[i].$2,
+                                  hint: l10n.serieDialogKgHint,
+                                  p: p),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.close_rounded, size: 16, color: p.textMuted),
+                              visualDensity: VisualDensity.compact,
+                              onPressed: () => setState(() {
+                                _stageCtrls[i].$1.dispose();
+                                _stageCtrls[i].$2.dispose();
+                                _stageCtrls.removeAt(i);
+                              }),
+                            ),
+                          ],
+                        ),
+                      ),
+                    TextButton.icon(
+                      onPressed: () => setState(
+                          () => _stageCtrls.add((TextEditingController(), TextEditingController()))),
+                      icon: Icon(Icons.add_rounded, size: 14, color: p.accent),
+                      label: Text(l10n.sessioneGuidataAggiungiGradino,
+                          style: TextStyle(color: p.accent, fontSize: 11)),
+                      style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                    ),
+                  ],
+                ),
+              ),
+          ],
         ],
+      ),
+    );
+  }
+}
+
+class _TechniqueChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final ColorPalette p;
+  final VoidCallback onTap;
+  const _TechniqueChip(
+      {required this.label, required this.selected, required this.p, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: selected ? p.accent.withValues(alpha: 0.15) : p.surfaceVariant,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: selected ? p.accent : p.cardBorder),
+        ),
+        child: Text(label,
+            style: TextStyle(
+                fontSize: 11,
+                color: selected ? p.accent : p.textMuted,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w400)),
       ),
     );
   }

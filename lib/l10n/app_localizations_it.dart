@@ -1758,6 +1758,40 @@ class AppLocalizationsIt extends AppLocalizations {
   String get sessioneGuidataAspettaTurno => 'Aspetta il turno';
 
   @override
+  String get sessioneGuidataTecnicaNormale => 'Normale';
+
+  @override
+  String get sessioneGuidataTecnicaForzate => 'Forzate';
+
+  @override
+  String get sessioneGuidataTecnicaRestPause => 'Rest-pause';
+
+  @override
+  String get sessioneGuidataTecnicaStripping => 'Stripping';
+
+  @override
+  String get sessioneGuidataTecnicaSuperSlow => 'Super slow';
+
+  @override
+  String get sessioneGuidataForzateHint => '+forz.';
+
+  @override
+  String sessioneGuidataClusterLabel(int n) {
+    return 'Cluster $n';
+  }
+
+  @override
+  String get sessioneGuidataAggiungiCluster => '+ cluster';
+
+  @override
+  String sessioneGuidataGradinoLabel(int n) {
+    return 'Gradino $n';
+  }
+
+  @override
+  String get sessioneGuidataAggiungiGradino => '+ gradino';
+
+  @override
   String get sessioneRiepilogoTitle => 'Sessione completata';
 
   @override

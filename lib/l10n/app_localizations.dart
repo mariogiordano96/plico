@@ -3236,6 +3236,66 @@ abstract class AppLocalizations {
   /// **'Aspetta il turno'**
   String get sessioneGuidataAspettaTurno;
 
+  /// No description provided for @sessioneGuidataTecnicaNormale.
+  ///
+  /// In it, this message translates to:
+  /// **'Normale'**
+  String get sessioneGuidataTecnicaNormale;
+
+  /// No description provided for @sessioneGuidataTecnicaForzate.
+  ///
+  /// In it, this message translates to:
+  /// **'Forzate'**
+  String get sessioneGuidataTecnicaForzate;
+
+  /// No description provided for @sessioneGuidataTecnicaRestPause.
+  ///
+  /// In it, this message translates to:
+  /// **'Rest-pause'**
+  String get sessioneGuidataTecnicaRestPause;
+
+  /// No description provided for @sessioneGuidataTecnicaStripping.
+  ///
+  /// In it, this message translates to:
+  /// **'Stripping'**
+  String get sessioneGuidataTecnicaStripping;
+
+  /// No description provided for @sessioneGuidataTecnicaSuperSlow.
+  ///
+  /// In it, this message translates to:
+  /// **'Super slow'**
+  String get sessioneGuidataTecnicaSuperSlow;
+
+  /// No description provided for @sessioneGuidataForzateHint.
+  ///
+  /// In it, this message translates to:
+  /// **'+forz.'**
+  String get sessioneGuidataForzateHint;
+
+  /// No description provided for @sessioneGuidataClusterLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'Cluster {n}'**
+  String sessioneGuidataClusterLabel(int n);
+
+  /// No description provided for @sessioneGuidataAggiungiCluster.
+  ///
+  /// In it, this message translates to:
+  /// **'+ cluster'**
+  String get sessioneGuidataAggiungiCluster;
+
+  /// No description provided for @sessioneGuidataGradinoLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'Gradino {n}'**
+  String sessioneGuidataGradinoLabel(int n);
+
+  /// No description provided for @sessioneGuidataAggiungiGradino.
+  ///
+  /// In it, this message translates to:
+  /// **'+ gradino'**
+  String get sessioneGuidataAggiungiGradino;
+
   /// No description provided for @sessioneRiepilogoTitle.
   ///
   /// In it, this message translates to:

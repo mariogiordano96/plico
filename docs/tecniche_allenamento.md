@@ -276,13 +276,32 @@ In `sessione_guidata_screen.dart` (`_ExerciseStepCard`):
       singolo di `WorkoutTemplateExercise` (stesso vincolo della piramide,
       Fase 1)
 
-### Fase 4 — UI sessione guidata
-- [ ] Selettore tecnica per serie (chip: normale/forzate/rest-pause/
-      stripping/super slow) su `_ExerciseStepCard`, campi dinamici per
-      rest-pause (N cluster) e stripping (N gradini)
-- [ ] Conferma multi-stadio per rest-pause/stripping in
-      `_ExerciseStepCard`
-- [ ] Badge tecnica (forzate, super slow, esplosiva/lenta) sulle card
+### Fase 4 — UI sessione guidata ✅
+- [x] Selettore tecnica per serie (chip: normale/forzate/rest-pause/
+      stripping/super slow) su `_SetRow` (ora `StatefulWidget`, riceve la
+      `WorkoutSet` reale), campi dinamici per rest-pause (N cluster
+      aggiuntivi oltre al primo, che resta il campo reps principale) e
+      stripping (N gradini aggiuntivi con reps+peso propri, il primo resta
+      reps/peso della serie). Solo per serie di lavoro, non riscaldamento
+      (`showTechnique: false` lì)
+- [x] **Deviazione dal piano iniziale**: non "conferma multi-stadio" (tap
+      separati per cluster/gradino durante l'esecuzione) — in pratica
+      l'utente non interagisce col telefono tra un cluster/gradino e l'altro
+      di un rest-pause/drop-set reale (10-15s di recupero, o stripping senza
+      pausa). La riga espone invece tutti i campi extra subito ed è
+      confermata in un solo tap a fine serie, coerente con come l'app già
+      funziona oggi (si logga dopo aver fatto la serie, non durante)
+- [x] Badge tecnica sulle card dopo la conferma (`_confirmedBadge`: 💪
+      forzate, 🐌 super slow, 🔥 cluster rest-pause, ⬇️ stripping) e badge
+      esplosiva/lenta (🚀/🐌) sull'header della card esercizio quando
+      `supersetRole != null`
+- [x] `_confirmSerie` nel parent: `reps` finale = somma dei
+      `restPauseClusters` quando presenti (scritti da `_SetRow` prima del
+      confirm), altrimenti invariato — volume/overload restano corretti
+      senza altre modifiche, come da sezione 5
+- [x] **Limite noto**: i campi cluster/gradino aggiuntivi sono stato locale
+      di `_SetRow`, non recuperati se l'app si riavvia a metà compilazione
+      di una serie non ancora confermata — l'utente li reinserisce
 
 ### Fase 5 — Calcoli
 - [ ] Volume: includere i gradini di `dropStages` nella formula
