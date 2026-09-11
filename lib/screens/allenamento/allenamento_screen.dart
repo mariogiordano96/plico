@@ -13,6 +13,7 @@ import '../../services/smartwatch_service.dart';
 import '../esercizi/catalogo_esercizi_screen.dart';
 import '../impostazioni/smartwatch_screen.dart';
 import 'calendario_allenamenti_screen.dart';
+import 'genera_piramide_dialog.dart';
 import 'le_mie_schede_screen.dart';
 import 'sessione_guidata_screen.dart';
 import 'sostituisci_esercizio_sheet.dart';
@@ -293,6 +294,23 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
     await DatabaseService.instance.updateWorkoutExercise(e);
   }
 
+  /// Fase 1 di docs/tecniche_allenamento.md: sovrascrive le serie di un
+  /// esercizio già nel log del giorno con una progressione piramidale.
+  /// Nessuna modifica al modello dati — usa `WorkoutSet.reps`/`weightKg`
+  /// già esistenti, non diversamente da `_modifica`.
+  Future<void> _generaPiramide(WorkoutExercise e) async {
+    final sets = await showGeneraPiramideSheet(context, exerciseName: e.exerciseName);
+    if (sets == null || !mounted) return;
+
+    e.sets = sets;
+    final bodySnapshot = await DatabaseService.instance.getLatestBodySnapshot();
+    e.estimatedKcal = CalorieEstimationService.estimateStrengthKcal(
+      workingSetCount: e.sets.length,
+      bodyWeightKg: bodySnapshot?.pesoKg,
+    );
+    await DatabaseService.instance.updateWorkoutExercise(e);
+  }
+
   Future<void> _elimina(WorkoutExercise e) async {
     final p = context.palette;
     final l10n = context.l10n;
@@ -540,6 +558,7 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
                                 onDelete: () => _elimina(e),
                                 onSostituisci: () => _sostituisci(e),
                                 onModifica: () => _modifica(e),
+                                onGeneraPiramide: () => _generaPiramide(e),
                               ),
                             ],
                           );
@@ -728,6 +747,7 @@ class _ExerciseCard extends StatelessWidget {
   final VoidCallback onDelete;
   final VoidCallback onSostituisci;
   final VoidCallback onModifica;
+  final VoidCallback onGeneraPiramide;
 
   const _ExerciseCard({
     required this.exercise,
@@ -737,6 +757,7 @@ class _ExerciseCard extends StatelessWidget {
     required this.onDelete,
     required this.onSostituisci,
     required this.onModifica,
+    required this.onGeneraPiramide,
   });
 
   @override
@@ -817,6 +838,8 @@ class _ExerciseCard extends StatelessWidget {
                   onModifica();
                 case _ExerciseCardAction.sostituisci:
                   onSostituisci();
+                case _ExerciseCardAction.generaPiramide:
+                  onGeneraPiramide();
                 case _ExerciseCardAction.elimina:
                   onDelete();
               }
@@ -834,6 +857,14 @@ class _ExerciseCard extends StatelessWidget {
                   value: _ExerciseCardAction.sostituisci,
                   child: Text(l10n.allenamentoSostituisci, style: TextStyle(color: p.textPrimary)),
                 ),
+                // La piramide agisce su reps/peso della serie: non ha senso
+                // per il cardio, che traccia solo una durata.
+                if (!isCardio)
+                  PopupMenuItem(
+                    value: _ExerciseCardAction.generaPiramide,
+                    child: Text(l10n.allenamentoGeneraPiramide,
+                        style: TextStyle(color: p.textPrimary)),
+                  ),
               ],
               PopupMenuItem(
                 value: _ExerciseCardAction.elimina,
@@ -847,7 +878,7 @@ class _ExerciseCard extends StatelessWidget {
   }
 }
 
-enum _ExerciseCardAction { modifica, sostituisci, elimina }
+enum _ExerciseCardAction { modifica, sostituisci, generaPiramide, elimina }
 
 class _SourceBadge extends StatelessWidget {
   final String source; // WorkoutSource.name

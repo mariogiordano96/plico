@@ -1423,6 +1423,38 @@ class AppLocalizationsIt extends AppLocalizations {
   String get allenamentoDurataDaImpostare => 'Durata da impostare';
 
   @override
+  String get allenamentoGeneraPiramide => 'Genera piramide';
+
+  @override
+  String piramideDialogTitle(String nome) {
+    return 'Piramide — $nome';
+  }
+
+  @override
+  String get piramideDialogNumeroSerie => 'Serie';
+
+  @override
+  String get piramideDialogPesoIniziale => 'Peso iniziale (kg)';
+
+  @override
+  String get piramideDialogRipIniziali => 'Rip iniziali';
+
+  @override
+  String get piramideDialogIncrementoKg => 'Incremento (kg)';
+
+  @override
+  String get piramideDialogDecrementoRip => 'Decremento rip';
+
+  @override
+  String get piramideDialogAscendente => 'Ascendente';
+
+  @override
+  String get piramideDialogDiscendente => 'Discendente';
+
+  @override
+  String get piramideDialogAnteprima => 'Anteprima';
+
+  @override
   String get targetDialogTipoSerie => 'Serie e ripetizioni';
 
   @override

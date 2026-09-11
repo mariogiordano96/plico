@@ -2654,6 +2654,66 @@ abstract class AppLocalizations {
   /// **'Durata da impostare'**
   String get allenamentoDurataDaImpostare;
 
+  /// No description provided for @allenamentoGeneraPiramide.
+  ///
+  /// In it, this message translates to:
+  /// **'Genera piramide'**
+  String get allenamentoGeneraPiramide;
+
+  /// No description provided for @piramideDialogTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Piramide — {nome}'**
+  String piramideDialogTitle(String nome);
+
+  /// No description provided for @piramideDialogNumeroSerie.
+  ///
+  /// In it, this message translates to:
+  /// **'Serie'**
+  String get piramideDialogNumeroSerie;
+
+  /// No description provided for @piramideDialogPesoIniziale.
+  ///
+  /// In it, this message translates to:
+  /// **'Peso iniziale (kg)'**
+  String get piramideDialogPesoIniziale;
+
+  /// No description provided for @piramideDialogRipIniziali.
+  ///
+  /// In it, this message translates to:
+  /// **'Rip iniziali'**
+  String get piramideDialogRipIniziali;
+
+  /// No description provided for @piramideDialogIncrementoKg.
+  ///
+  /// In it, this message translates to:
+  /// **'Incremento (kg)'**
+  String get piramideDialogIncrementoKg;
+
+  /// No description provided for @piramideDialogDecrementoRip.
+  ///
+  /// In it, this message translates to:
+  /// **'Decremento rip'**
+  String get piramideDialogDecrementoRip;
+
+  /// No description provided for @piramideDialogAscendente.
+  ///
+  /// In it, this message translates to:
+  /// **'Ascendente'**
+  String get piramideDialogAscendente;
+
+  /// No description provided for @piramideDialogDiscendente.
+  ///
+  /// In it, this message translates to:
+  /// **'Discendente'**
+  String get piramideDialogDiscendente;
+
+  /// No description provided for @piramideDialogAnteprima.
+  ///
+  /// In it, this message translates to:
+  /// **'Anteprima'**
+  String get piramideDialogAnteprima;
+
   /// No description provided for @targetDialogTipoSerie.
   ///
   /// In it, this message translates to:
