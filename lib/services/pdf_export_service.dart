@@ -16,6 +16,7 @@ import '../models/workout_template.dart';
 import '../models/workout_template_exercise.dart';
 import '../models/workout_program.dart';
 import '../models/workout_exercise.dart';
+import '../models/workout_set.dart';
 import '../services/database_service.dart';
 import '../services/workout_progress_service.dart';
 import '../screens/tdee/tdee_screen.dart' show calcolaTdee;
@@ -50,6 +51,12 @@ class PdfStrings {
   final String prBadge;
   final String Function(int min) durataMin;
 
+  // Fase 6 di docs/tecniche_allenamento.md: etichette tecniche nello storico PDF
+  final String tecnicaForzate;
+  final String tecnicaRestPause;
+  final String tecnicaStripping;
+  final String tecnicaSuperSlow;
+
   // Export "Progressi" (peso/composizione/misurazioni/allenamenti)
   final String progressiPdfTitle;
   final String progressiSezPeso;
@@ -83,6 +90,10 @@ class PdfStrings {
     required this.nessunaSessione,
     required this.prBadge,
     required this.durataMin,
+    this.tecnicaForzate = 'forz.',
+    this.tecnicaRestPause = 'RP',
+    this.tecnicaStripping = 'stripping',
+    this.tecnicaSuperSlow = 'super slow',
     this.progressiPdfTitle = 'Progressi',
     this.progressiSezPeso = 'PESO',
     this.progressiSezComposizione = 'COMPOSIZIONE CORPOREA',
@@ -889,6 +900,21 @@ class PdfExportService {
     return doc.save();
   }
 
+  /// Etichetta di una serie per lo storico PDF, tecnica inclusa
+  /// (docs/tecniche_allenamento.md, Fase 6) — niente emoji: il font PDF
+  /// (NotoSans) non ne garantisce il rendering, diversamente dalla stessa
+  /// etichetta a schermo (`storico_esercizio_screen.dart`).
+  static String _setLabelPdf(WorkoutSet s, PdfStrings strings) {
+    final base = '${s.reps ?? '-'}×${s.weightKg ?? '-'}kg';
+    if (s.forcedReps != null) return '$base (+${s.forcedReps} ${strings.tecnicaForzate})';
+    if (s.isSuperSlow) return '$base (${strings.tecnicaSuperSlow})';
+    if (s.restPauseClusters?.isNotEmpty == true) {
+      return '$base (${strings.tecnicaRestPause} ${s.restPauseClusters!.join("+")})';
+    }
+    if (s.dropStages?.isNotEmpty == true) return '$base (${strings.tecnicaStripping})';
+    return base;
+  }
+
   static pw.Widget _buildStoricoRow({
     required WorkoutExercise session,
     required bool isPr,
@@ -902,7 +928,7 @@ class PdfExportService {
         ? (session.durationSeconds != null
             ? strings.durataMin(session.durationSeconds! ~/ 60)
             : '-')
-        : session.sets.map((s) => '${s.reps ?? '-'}×${s.weightKg ?? '-'}kg').join(', ');
+        : session.sets.map((s) => _setLabelPdf(s, strings)).join(', ');
 
     return pw.Padding(
       padding: const pw.EdgeInsets.symmetric(vertical: 3),

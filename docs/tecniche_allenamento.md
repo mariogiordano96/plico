@@ -1,5 +1,8 @@
 # Tecniche di Allenamento — Analisi Funzionale
 
+> ✅ **COMPLETATA** — Fasi 1-6 implementate e pushate su `main`. Vedi "Stato
+> finale" in fondo al documento.
+
 > Obiettivo: estendere il modello "serie = reps + peso" con le tecniche di
 > intensità più usate da chi allena da intermedio in su — oggi Plico supporta
 > solo il superset semplice (`WorkoutExercise.supersetGroupId`, esercizi in
@@ -329,7 +332,36 @@ In `sessione_guidata_screen.dart` (`_ExerciseStepCard`):
       un bug che si manifesta nell'uso tipico. Da rivedere se emerge come
       problema reale
 
-### Fase 6 — Storico e PDF export
-- [ ] Rappresentare la tecnica nel grafico storico esercizio
-      (`StoricoEsercizioScreen`)
-- [ ] Rappresentare la tecnica nell'export PDF del riepilogo allenamento
+### Fase 6 — Storico e PDF export ✅
+- [x] `StoricoEsercizioScreen`: ogni serie nello storico mostra un indicatore
+      tecnica inline (💪+N forzate, 🐌 super slow, 🔥8+4+3 rest-pause,
+      ⬇️ stripping) tramite `_setLabel`, un solo indicatore per serie (le
+      tecniche sono mutualmente esclusive per costruzione)
+- [x] Export PDF storico esercizio (`generateStoricoEsercizio`): stesso
+      indicatore ma testuale, non emoji — il font PDF (NotoSans) non ne
+      garantisce il rendering a differenza dello schermo. 4 nuove stringhe
+      opzionali su `PdfStrings` (`tecnicaForzate`/`RestPause`/`Stripping`/
+      `SuperSlow`, default italiano hardcoded, stesso pattern già usato per
+      le stringhe "Progressi") — così i 4 chiamanti di `PdfStrings` che non
+      c'entrano con lo storico esercizio non hanno bisogno di modifiche
+- [x] **Fuori scope, gap pre-esistente non toccato**: l'export PDF di
+      scheda/programma (`generateScheda`/`generateProgramma`,
+      `_buildSchedaEsercizi`) non rappresenta i superset (nessun indicatore
+      di gruppo) da prima di questo piano — aggiungere solo il badge
+      esplosiva/lenta lì sarebbe incoerente senza prima risolvere quel gap
+      più ampio, non specifico alle tecniche di allenamento
+
+---
+
+## Stato finale
+
+Piano completato: tutte le 6 fasi implementate, testate (`flutter analyze`
+pulito, 182 test verdi) e pushate su `main`. Le 6 tecniche (piramidale,
+forzate, rest-pause, stripping, super slow, superset veloce/lento) sono
+editabili nei punti giusti del flusso (menu esercizio per la piramide,
+creazione scheda per il ruolo superset, sessione guidata per le altre
+quattro) e visibili in storico/PDF. Limiti noti lasciati aperti, non
+bloccanti: 1RM su `suggestNextSession` non technique-aware se la prima
+serie è rest-pause (sezione Fase 5); campi cluster/gradino non recuperati
+da un riavvio app a metà compilazione di una serie (sezione Fase 4); export
+PDF scheda/programma senza indicatore superset (sezione Fase 6).

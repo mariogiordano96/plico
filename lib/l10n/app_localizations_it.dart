@@ -1250,6 +1250,18 @@ class AppLocalizationsIt extends AppLocalizations {
   String get pdfStoricoTitle => 'Storico Esercizio';
 
   @override
+  String get pdfTecnicaForzate => 'forz.';
+
+  @override
+  String get pdfTecnicaRestPause => 'RP';
+
+  @override
+  String get pdfTecnicaStripping => 'stripping';
+
+  @override
+  String get pdfTecnicaSuperSlow => 'super slow';
+
+  @override
   String get muscleGroupAll => 'Tutti';
 
   @override

@@ -5,6 +5,7 @@ import 'package:printing/printing.dart';
 import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/workout_exercise.dart';
+import '../../models/workout_set.dart';
 import '../../services/database_service.dart';
 import '../../services/pdf_export_service.dart';
 import '../../services/workout_progress_service.dart';
@@ -76,6 +77,10 @@ class _StoricoEsercizioScreenState extends State<StoricoEsercizioScreen> {
           nessunaSessione: l10n.storicoNessunaSessione,
           prBadge: l10n.storicoPrBadge,
           durataMin: l10n.allenamentoDurataMin,
+          tecnicaForzate: l10n.pdfTecnicaForzate,
+          tecnicaRestPause: l10n.pdfTecnicaRestPause,
+          tecnicaStripping: l10n.pdfTecnicaStripping,
+          tecnicaSuperSlow: l10n.pdfTecnicaSuperSlow,
         ),
         locale: locale,
       );
@@ -206,6 +211,21 @@ class _WeightChart extends StatelessWidget {
   }
 }
 
+/// Etichetta di una serie per lo storico, tecnica inclusa
+/// (docs/tecniche_allenamento.md, Fase 6) — un solo indicatore per serie,
+/// le tecniche sono mutualmente esclusive per costruzione (`_SetRow`,
+/// sessione guidata).
+String _setLabel(WorkoutSet s) {
+  final base = '${s.reps ?? '-'}×${s.weightKg ?? '-'}kg';
+  if (s.forcedReps != null) return '$base 💪+${s.forcedReps}';
+  if (s.isSuperSlow) return '$base 🐌';
+  if (s.restPauseClusters?.isNotEmpty == true) {
+    return '$base 🔥${s.restPauseClusters!.join("+")}';
+  }
+  if (s.dropStages?.isNotEmpty == true) return '$base ⬇️';
+  return base;
+}
+
 class _SessionRow extends StatelessWidget {
   final WorkoutExercise session;
   final bool isPr;
@@ -227,7 +247,7 @@ class _SessionRow extends StatelessWidget {
         ? (session.durationSeconds != null
             ? l10n.allenamentoDurataMin(session.durationSeconds! ~/ 60)
             : l10n.allenamentoDurataDaImpostare)
-        : session.sets.map((s) => '${s.reps ?? '-'}×${s.weightKg ?? '-'}kg').join(', ');
+        : session.sets.map(_setLabel).join(', ');
     final avgRpe = isCardio ? null : WorkoutProgressService.averageRpe(session);
 
     return Container(

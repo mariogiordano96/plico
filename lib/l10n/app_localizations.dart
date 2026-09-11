@@ -2336,6 +2336,30 @@ abstract class AppLocalizations {
   /// **'Storico Esercizio'**
   String get pdfStoricoTitle;
 
+  /// No description provided for @pdfTecnicaForzate.
+  ///
+  /// In it, this message translates to:
+  /// **'forz.'**
+  String get pdfTecnicaForzate;
+
+  /// No description provided for @pdfTecnicaRestPause.
+  ///
+  /// In it, this message translates to:
+  /// **'RP'**
+  String get pdfTecnicaRestPause;
+
+  /// No description provided for @pdfTecnicaStripping.
+  ///
+  /// In it, this message translates to:
+  /// **'stripping'**
+  String get pdfTecnicaStripping;
+
+  /// No description provided for @pdfTecnicaSuperSlow.
+  ///
+  /// In it, this message translates to:
+  /// **'super slow'**
+  String get pdfTecnicaSuperSlow;
+
   /// No description provided for @muscleGroupAll.
   ///
   /// In it, this message translates to:

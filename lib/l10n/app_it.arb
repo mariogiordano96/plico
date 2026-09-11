@@ -519,6 +519,10 @@
   "pdfSchedaTitle": "Scheda Allenamento",
   "pdfProgrammaTitle": "Programma di Allenamento",
   "pdfStoricoTitle": "Storico Esercizio",
+  "pdfTecnicaForzate": "forz.",
+  "pdfTecnicaRestPause": "RP",
+  "pdfTecnicaStripping": "stripping",
+  "pdfTecnicaSuperSlow": "super slow",
 
   "muscleGroupAll": "Tutti",
   "muscleGroupChest": "Petto",

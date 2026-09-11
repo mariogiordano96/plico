@@ -398,6 +398,10 @@
   "pdfSchedaTitle": "Workout Plan",
   "pdfProgrammaTitle": "Workout Program",
   "pdfStoricoTitle": "Exercise History",
+  "pdfTecnicaForzate": "forced",
+  "pdfTecnicaRestPause": "RP",
+  "pdfTecnicaStripping": "stripping",
+  "pdfTecnicaSuperSlow": "super slow",
 
   "muscleGroupAll": "All",
   "muscleGroupChest": "Chest",
