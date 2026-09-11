@@ -36,4 +36,11 @@ class ExerciseDefinition {
     }
     return name;
   }
+
+  /// Percorso dell'asset immagine (foto di riferimento posizione iniziale,
+  /// da free-exercise-db). Non tutti gli esercizi ne hanno una (mancava nel
+  /// dataset sorgente, o l'esercizio è custom): il chiamante deve gestire
+  /// l'assenza del file con un errorBuilder, non verificarla qui.
+  String? get imageAssetPath =>
+      isCustom ? null : 'assets/img/exercises/$externalId.webp';
 }

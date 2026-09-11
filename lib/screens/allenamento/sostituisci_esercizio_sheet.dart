@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../models/exercise_definition.dart';
 import '../../services/database_service.dart';
+import '../../widgets/exercise_thumbnail.dart';
 import '../esercizi/muscle_group_labels.dart';
 
 /// Bottom sheet per la sostituzione esercizio al volo (Fase 13): mostra le
@@ -90,6 +91,7 @@ class _SostituisciEsercizioSheet extends StatelessWidget {
                             ),
                             child: ListTile(
                               onTap: () => Navigator.pop(context, e),
+                              leading: ExerciseThumbnail(exercise: e),
                               title: Text(
                                   e.localizedName(Localizations.localeOf(context).languageCode),
                                   style: TextStyle(

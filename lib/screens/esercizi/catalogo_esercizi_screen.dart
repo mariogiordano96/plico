@@ -4,6 +4,7 @@ import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/exercise_definition.dart';
 import '../../services/database_service.dart';
+import '../../widgets/exercise_thumbnail.dart';
 import 'aggiungi_esercizio_personalizzato_screen.dart';
 import 'muscle_group_labels.dart';
 
@@ -238,6 +239,7 @@ class _ExerciseTile extends StatelessWidget {
       ),
       child: ListTile(
         onTap: onTap,
+        leading: ExerciseThumbnail(exercise: exercise),
         title: Text(exercise.localizedName(Localizations.localeOf(context).languageCode),
             style: TextStyle(color: p.textPrimary, fontWeight: FontWeight.w600)),
         subtitle: Text(sottotitolo, style: TextStyle(color: p.textMuted, fontSize: 12)),
