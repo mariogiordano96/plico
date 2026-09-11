@@ -2,6 +2,13 @@ import 'package:isar/isar.dart';
 
 part 'workout_set.g.dart';
 
+/// Tecnica di allenamento applicabile a una singola serie
+/// (docs/tecniche_allenamento.md). Piramidale e superset veloce/lento non ci
+/// sono: la prima è un generatore a parte (menu esercizio in
+/// allenamento_screen.dart), il secondo è una proprietà dell'esercizio
+/// (`WorkoutExercise.supersetRole`), non della singola serie.
+enum SetTechnique { normale, forzate, restPause, stripping, superSlow }
+
 @embedded
 class WorkoutSet {
   int? reps;
@@ -39,6 +46,21 @@ class WorkoutSet {
   // sommato su tutti i gradini (WorkoutProgressService/database_service),
   // diversamente da rest-pause.
   List<DropStage>? dropStages;
+
+  /// Tecnica dedotta dai campi valorizzati — priorità forzate > super slow >
+  /// rest-pause > stripping, mutuamente esclusive per costruzione (`_SetRow`
+  /// in sessione_guidata_screen.dart scrive un solo gruppo di campi per
+  /// conferma). Unica fonte di verità per badge/etichette (sessione guidata,
+  /// storico, PDF export): centralizzata qui dopo che la stessa priorità si
+  /// era duplicata in 4 punti diversi del codice.
+  @ignore
+  SetTechnique get technique {
+    if (forcedReps != null) return SetTechnique.forzate;
+    if (isSuperSlow) return SetTechnique.superSlow;
+    if (restPauseClusters?.isNotEmpty == true) return SetTechnique.restPause;
+    if (dropStages?.isNotEmpty == true) return SetTechnique.stripping;
+    return SetTechnique.normale;
+  }
 }
 
 /// Un gradino di uno stripping/drop set successivo alla serie principale.

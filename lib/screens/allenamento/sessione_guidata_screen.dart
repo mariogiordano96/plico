@@ -815,12 +815,6 @@ class _SuggestionLine extends StatelessWidget {
   }
 }
 
-/// Tecniche di allenamento selezionabili per una singola serie (Fase 4 di
-/// docs/tecniche_allenamento.md). Piramidale e superset veloce/lento non ci
-/// sono: la prima è un generatore a parte (Fase 1, menu esercizio), il
-/// secondo è una proprietà dell'esercizio non della singola serie (Fase 3).
-enum _SetTechnique { normale, forzate, restPause, stripping, superSlow }
-
 class _SetRow extends StatefulWidget {
   final String label;
   final TextEditingController reps;
@@ -850,7 +844,7 @@ class _SetRow extends StatefulWidget {
 }
 
 class _SetRowState extends State<_SetRow> {
-  late _SetTechnique _technique;
+  late SetTechnique _technique;
   late final TextEditingController _forcedCtrl;
   // Cluster/gradini aggiuntivi oltre al primo (che resta reps/kg del campo
   // principale, invariato) — costruiti da zero a ogni apertura della riga,
@@ -863,17 +857,7 @@ class _SetRowState extends State<_SetRow> {
   void initState() {
     super.initState();
     final w = widget.workoutSet;
-    if (w.forcedReps != null) {
-      _technique = _SetTechnique.forzate;
-    } else if (w.isSuperSlow) {
-      _technique = _SetTechnique.superSlow;
-    } else if (w.restPauseClusters?.isNotEmpty == true) {
-      _technique = _SetTechnique.restPause;
-    } else if (w.dropStages?.isNotEmpty == true) {
-      _technique = _SetTechnique.stripping;
-    } else {
-      _technique = _SetTechnique.normale;
-    }
+    _technique = w.technique;
     _forcedCtrl = TextEditingController(text: w.forcedReps?.toString() ?? '');
   }
 
@@ -900,15 +884,15 @@ class _SetRowState extends State<_SetRow> {
     w.restPauseClusters = null;
     w.dropStages = null;
     switch (_technique) {
-      case _SetTechnique.forzate:
+      case SetTechnique.forzate:
         w.forcedReps = int.tryParse(_forcedCtrl.text);
-      case _SetTechnique.superSlow:
+      case SetTechnique.superSlow:
         w.isSuperSlow = true;
-      case _SetTechnique.restPause:
+      case SetTechnique.restPause:
         final primo = int.tryParse(widget.reps.text);
         final altri = _clusterCtrls.map((c) => int.tryParse(c.text)).whereType<int>().toList();
         if (primo != null) w.restPauseClusters = [primo, ...altri];
-      case _SetTechnique.stripping:
+      case SetTechnique.stripping:
         final stages = [
           for (final (r, k) in _stageCtrls)
             if (int.tryParse(r.text) != null)
@@ -917,35 +901,32 @@ class _SetRowState extends State<_SetRow> {
                 ..weightKg = double.tryParse(k.text.replaceAll(',', '.')),
         ];
         if (stages.isNotEmpty) w.dropStages = stages;
-      case _SetTechnique.normale:
+      case SetTechnique.normale:
         break;
     }
     widget.onConfirm();
   }
 
-  String _techniqueLabel(_SetTechnique t, dynamic l10n) => switch (t) {
-        _SetTechnique.normale => l10n.sessioneGuidataTecnicaNormale,
-        _SetTechnique.forzate => l10n.sessioneGuidataTecnicaForzate,
-        _SetTechnique.restPause => l10n.sessioneGuidataTecnicaRestPause,
-        _SetTechnique.stripping => l10n.sessioneGuidataTecnicaStripping,
-        _SetTechnique.superSlow => l10n.sessioneGuidataTecnicaSuperSlow,
+  String _techniqueLabel(SetTechnique t, dynamic l10n) => switch (t) {
+        SetTechnique.normale => l10n.sessioneGuidataTecnicaNormale,
+        SetTechnique.forzate => l10n.sessioneGuidataTecnicaForzate,
+        SetTechnique.restPause => l10n.sessioneGuidataTecnicaRestPause,
+        SetTechnique.stripping => l10n.sessioneGuidataTecnicaStripping,
+        SetTechnique.superSlow => l10n.sessioneGuidataTecnicaSuperSlow,
       };
 
   Widget? _confirmedBadge(dynamic l10n) {
     final w = widget.workoutSet;
     final p = widget.p;
-    String label;
-    if (w.forcedReps != null) {
-      label = '💪 +${w.forcedReps} ${l10n.sessioneGuidataTecnicaForzate.toLowerCase()}';
-    } else if (w.isSuperSlow) {
-      label = '🐌 ${l10n.sessioneGuidataTecnicaSuperSlow}';
-    } else if (w.restPauseClusters?.isNotEmpty == true) {
-      label = '🔥 ${w.restPauseClusters!.join("+")}';
-    } else if (w.dropStages?.isNotEmpty == true) {
-      label = '⬇️ ${l10n.sessioneGuidataTecnicaStripping}';
-    } else {
-      return null;
-    }
+    final label = switch (w.technique) {
+      SetTechnique.forzate =>
+        '💪 +${w.forcedReps} ${l10n.sessioneGuidataTecnicaForzate.toLowerCase()}',
+      SetTechnique.superSlow => '🐌 ${l10n.sessioneGuidataTecnicaSuperSlow}',
+      SetTechnique.restPause => '🔥 ${w.restPauseClusters!.join("+")}',
+      SetTechnique.stripping => '⬇️ ${l10n.sessioneGuidataTecnicaStripping}',
+      SetTechnique.normale => null,
+    };
+    if (label == null) return null;
     return Padding(
       padding: const EdgeInsets.only(left: 56, top: 2, bottom: 4),
       child: Text(label, style: TextStyle(color: p.accent, fontSize: 11, fontWeight: FontWeight.w600)),
@@ -977,7 +958,7 @@ class _SetRowState extends State<_SetRow> {
                   child: _NumberField(controller: widget.kg, hint: l10n.serieDialogKgHint, p: p)),
               if (widget.showTechnique &&
                   !widget.done &&
-                  _technique == _SetTechnique.forzate) ...[
+                  _technique == SetTechnique.forzate) ...[
                 const SizedBox(width: 8),
                 SizedBox(
                   width: 56,
@@ -1001,7 +982,11 @@ class _SetRowState extends State<_SetRow> {
               ),
             ],
           ),
-          ?badge,
+          // Non `?badge,`: l'analyzer più vecchio impacchettato con
+          // isar_generator non parsa la sintassi null-aware element e manda
+          // in errore `dart run build_runner build` (SEVERE, non solo un
+          // warning) su questo file, che ha un modello Isar embedded.
+          if (badge != null) badge,
           if (widget.showTechnique && !widget.done) ...[
             Padding(
               padding: const EdgeInsets.only(left: 56, bottom: 4),
@@ -1009,7 +994,7 @@ class _SetRowState extends State<_SetRow> {
                 spacing: 6,
                 runSpacing: 4,
                 children: [
-                  for (final t in _SetTechnique.values)
+                  for (final t in SetTechnique.values)
                     _TechniqueChip(
                       label: _techniqueLabel(t, l10n),
                       selected: _technique == t,
@@ -1019,7 +1004,7 @@ class _SetRowState extends State<_SetRow> {
                 ],
               ),
             ),
-            if (_technique == _SetTechnique.restPause)
+            if (_technique == SetTechnique.restPause)
               Padding(
                 padding: const EdgeInsets.only(left: 56, bottom: 4),
                 child: Column(
@@ -1066,7 +1051,7 @@ class _SetRowState extends State<_SetRow> {
                   ],
                 ),
               ),
-            if (_technique == _SetTechnique.stripping)
+            if (_technique == SetTechnique.stripping)
               Padding(
                 padding: const EdgeInsets.only(left: 56, bottom: 4),
                 child: Column(

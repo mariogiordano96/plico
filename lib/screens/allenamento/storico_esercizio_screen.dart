@@ -217,13 +217,13 @@ class _WeightChart extends StatelessWidget {
 /// sessione guidata).
 String _setLabel(WorkoutSet s) {
   final base = '${s.reps ?? '-'}×${s.weightKg ?? '-'}kg';
-  if (s.forcedReps != null) return '$base 💪+${s.forcedReps}';
-  if (s.isSuperSlow) return '$base 🐌';
-  if (s.restPauseClusters?.isNotEmpty == true) {
-    return '$base 🔥${s.restPauseClusters!.join("+")}';
-  }
-  if (s.dropStages?.isNotEmpty == true) return '$base ⬇️';
-  return base;
+  return switch (s.technique) {
+    SetTechnique.forzate => '$base 💪+${s.forcedReps}',
+    SetTechnique.superSlow => '$base 🐌',
+    SetTechnique.restPause => '$base 🔥${s.restPauseClusters!.join("+")}',
+    SetTechnique.stripping => '$base ⬇️',
+    SetTechnique.normale => base,
+  };
 }
 
 class _SessionRow extends StatelessWidget {

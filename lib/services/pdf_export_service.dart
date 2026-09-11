@@ -906,13 +906,14 @@ class PdfExportService {
   /// etichetta a schermo (`storico_esercizio_screen.dart`).
   static String _setLabelPdf(WorkoutSet s, PdfStrings strings) {
     final base = '${s.reps ?? '-'}×${s.weightKg ?? '-'}kg';
-    if (s.forcedReps != null) return '$base (+${s.forcedReps} ${strings.tecnicaForzate})';
-    if (s.isSuperSlow) return '$base (${strings.tecnicaSuperSlow})';
-    if (s.restPauseClusters?.isNotEmpty == true) {
-      return '$base (${strings.tecnicaRestPause} ${s.restPauseClusters!.join("+")})';
-    }
-    if (s.dropStages?.isNotEmpty == true) return '$base (${strings.tecnicaStripping})';
-    return base;
+    return switch (s.technique) {
+      SetTechnique.forzate => '$base (+${s.forcedReps} ${strings.tecnicaForzate})',
+      SetTechnique.superSlow => '$base (${strings.tecnicaSuperSlow})',
+      SetTechnique.restPause =>
+        '$base (${strings.tecnicaRestPause} ${s.restPauseClusters!.join("+")})',
+      SetTechnique.stripping => '$base (${strings.tecnicaStripping})',
+      SetTechnique.normale => base,
+    };
   }
 
   static pw.Widget _buildStoricoRow({
