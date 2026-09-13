@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -40,6 +41,13 @@ void main() async {
   await DatabaseService.instance.seedExercises();
   await DatabaseService.instance.syncExerciseNamesIt();
   await DatabaseService.instance.seedWorkoutPresets();
+  // Solo per test manuali durante lo sviluppo (docs/tecniche_allenamento.md,
+  // Fase 7): scheda fissa con un esercizio per tecnica, ricreata a ogni
+  // avvio in debug così riflette sempre l'ultima versione — mai in release
+  // (kDebugMode è false in un `flutter install` senza --debug).
+  if (kDebugMode) {
+    await DatabaseService.instance.seedTestTemplateTecniche();
+  }
   final isDark = await DatabaseService.instance.getIsDarkMode();
   themeNotifier.value = isDark ? ThemeMode.dark : ThemeMode.light;
   await NotificationService.instance.init();

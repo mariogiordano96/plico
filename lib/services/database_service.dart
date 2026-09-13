@@ -23,6 +23,7 @@ import '../models/meal_combo.dart';
 import '../models/exercise_definition.dart';
 import '../models/workout_log.dart';
 import '../models/workout_exercise.dart';
+import '../models/workout_set.dart';
 import '../models/workout_template.dart';
 import '../models/workout_template_exercise.dart';
 import '../models/workout_program.dart';
@@ -1338,6 +1339,123 @@ class DatabaseService {
       s.workoutPresetsSeeded = true;
       await _isar.appSettings.put(s);
     });
+  }
+
+  /// Solo per test manuali in debug (docs/tecniche_allenamento.md, Fase 7):
+  /// crea/ricrea una scheda fissa con un esercizio per ogni tecnica, così non
+  /// serve ricomporla a mano a ogni build durante lo sviluppo. Cancella e
+  /// ricrea ogni volta (idempotente sul nome), non solo se assente, così
+  /// riflette sempre l'ultima versione di questo metodo dopo un reinstall.
+  /// Chiamata solo da `main.dart` sotto `kDebugMode`, mai in release.
+  Future<void> seedTestTemplateTecniche() async {
+    final existing =
+        (await getStandaloneTemplates()).where((t) => t.name == 'TEST — Tecniche').toList();
+    for (final t in existing) {
+      await deleteWorkoutTemplate(t.id);
+    }
+
+    final template = WorkoutTemplate()
+      ..name = 'TEST — Tecniche'
+      ..createdAt = DateTime.now()
+      ..exercises = [
+        // Normale, target uniforme — baseline di regressione (comportamento pre-Fase 7).
+        WorkoutTemplateExercise()
+          ..exerciseId = 'Barbell_Bench_Press_-_Medium_Grip'
+          ..exerciseName = 'Barbell Bench Press - Medium Grip'
+          ..targetSets = 3
+          ..targetReps = 10
+          ..targetWeightKg = 60,
+        // Piramide pianificata — reps/peso diversi per serie, nessuna tecnica particolare.
+        WorkoutTemplateExercise()
+          ..exerciseId = 'Barbell_Incline_Bench_Press_-_Medium_Grip'
+          ..exerciseName = 'Barbell Incline Bench Press - Medium Grip'
+          ..plannedSets = [
+            WorkoutTemplateSet()
+              ..reps = 12
+              ..weightKg = 40,
+            WorkoutTemplateSet()
+              ..reps = 10
+              ..weightKg = 45,
+            WorkoutTemplateSet()
+              ..reps = 8
+              ..weightKg = 50,
+            WorkoutTemplateSet()
+              ..reps = 6
+              ..weightKg = 55,
+          ],
+        // Rest-pause pianificato sull'ultima serie.
+        WorkoutTemplateExercise()
+          ..exerciseId = 'Dumbbell_Bench_Press'
+          ..exerciseName = 'Dumbbell Bench Press'
+          ..plannedSets = [
+            WorkoutTemplateSet()
+              ..reps = 12
+              ..weightKg = 24,
+            WorkoutTemplateSet()
+              ..reps = 10
+              ..weightKg = 24
+              ..restPauseClusters = [10, 5, 3],
+          ],
+        // Stripping (drop set) pianificato.
+        WorkoutTemplateExercise()
+          ..exerciseId = 'Wide-Grip_Lat_Pulldown'
+          ..exerciseName = 'Wide-Grip Lat Pulldown'
+          ..plannedSets = [
+            WorkoutTemplateSet()
+              ..reps = 10
+              ..weightKg = 50
+              ..dropStages = [
+                DropStage()
+                  ..reps = 8
+                  ..weightKg = 40,
+                DropStage()
+                  ..reps = 6
+                  ..weightKg = 30,
+              ],
+          ],
+        // Forzate pianificate.
+        WorkoutTemplateExercise()
+          ..exerciseId = 'Barbell_Squat'
+          ..exerciseName = 'Barbell Squat'
+          ..plannedSets = [
+            WorkoutTemplateSet()
+              ..reps = 6
+              ..weightKg = 100
+              ..forcedReps = 2,
+          ],
+        // Super slow pianificato.
+        WorkoutTemplateExercise()
+          ..exerciseId = 'Leg_Press'
+          ..exerciseName = 'Leg Press'
+          ..plannedSets = [
+            WorkoutTemplateSet()
+              ..reps = 8
+              ..weightKg = 120
+              ..isSuperSlow = true,
+          ],
+        // Superset esplosiva/lenta.
+        WorkoutTemplateExercise()
+          ..exerciseId = 'Seated_Cable_Rows'
+          ..exerciseName = 'Seated Cable Rows'
+          ..targetSets = 3
+          ..targetReps = 10
+          ..targetWeightKg = 40
+          ..supersetGroupId = 1
+          ..supersetRole = SupersetRole.esplosiva.name,
+        WorkoutTemplateExercise()
+          ..exerciseId = 'Pullups'
+          ..exerciseName = 'Pullups'
+          ..targetSets = 3
+          ..targetReps = 8
+          ..supersetGroupId = 1
+          ..supersetRole = SupersetRole.lenta.name,
+        // Cardio — baseline di regressione.
+        WorkoutTemplateExercise()
+          ..exerciseId = 'Running_Treadmill'
+          ..exerciseName = 'Running Treadmill'
+          ..targetDurationSeconds = 1200,
+      ];
+    await saveWorkoutTemplate(template);
   }
 
   WorkoutTemplate _presetTemplateFromJson(Map<String, dynamic> j) {

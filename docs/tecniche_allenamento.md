@@ -485,3 +485,20 @@ Deciderla è un'azione di creazione scheda, non di esecuzione.
 - [x] Rimossa la stringa l10n `sessioneGuidataModificaTecnica` (mai arrivata
       in produzione, introdotta e tolta nella stessa iterazione).
 - [x] `flutter analyze` pulito, 184 test verdi.
+
+### Fase 7e — Scheda di test fissa per QA manuale ✅
+
+**Richiesta dell'utente**: ricreare a mano una scheda con tutte le tecniche
+a ogni build da testare è lento. `DatabaseService.seedTestTemplateTecniche()`
+crea/ricrea (cancella prima eventuali omonime, così riflette sempre
+l'ultima versione del metodo) una scheda standalone "TEST — Tecniche" con
+un esercizio per ciascun caso: normale uniforme, piramide pianificata,
+rest-pause pianificato, stripping pianificato, forzate pianificate, super
+slow pianificato, superset esplosiva/lenta, cardio.
+
+- [x] Chiamata da `main.dart` solo sotto `kDebugMode` (mai in release: un
+      `flutter install` senza `--debug` non la esegue) — stesso pattern già
+      usato per il toggle lingua debug in `home_screen.dart`. Per vederla,
+      installare con `flutter install --debug` invece del comando release.
+- [x] `flutter analyze` pulito, 184 test verdi (nessun nuovo test: è un
+      helper di QA manuale, non logica di prodotto).
