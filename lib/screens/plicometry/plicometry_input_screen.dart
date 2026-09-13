@@ -141,7 +141,7 @@ class _PlicometryInputScreenState extends State<PlicometryInputScreen> {
     final keys = _isCircumference(widget.metodo)
         ? _circumKeys(widget.metodo, _profile!.sesso)
         : _plicaKeys(widget.metodo, _profile!.sesso);
-    return keys.every((k) => _parse(_ctrls[k]?.text ?? '') != null);
+    return keys.every((k) => (_parse(_ctrls[k]?.text ?? '') ?? 0) > 0);
   }
 
   Future<void> _calculate() async {
@@ -158,9 +158,23 @@ class _PlicometryInputScreenState extends State<PlicometryInputScreen> {
         ? _circumKeys(widget.metodo, _profile!.sesso)
         : _plicaKeys(widget.metodo, _profile!.sesso);
 
-    if (keys.any((k) => _parse(_ctrls[k]?.text ?? '') == null)) {
+    if (keys.any((k) => (_parse(_ctrls[k]?.text ?? '') ?? 0) <= 0)) {
       _snack(isCm ? 'Inserisci tutte le circonferenze' : 'Inserisci tutte le pliche richieste');
       return;
+    }
+
+    if (widget.metodo == MetodoPlicometria.usNavy) {
+      final collo = _parse(_ctrls['collo']!.text)!;
+      final vita = _parse(_ctrls['vita']!.text)!;
+      final fianchi = _profile!.sesso == Sesso.maschio ? 0.0 : _parse(_ctrls['fianchi']!.text)!;
+      // La formula US Navy fa log10(vita - collo) (uomo) o
+      // log10(vita + fianchi - collo) (donna): un valore non positivo
+      // produce NaN/-infinito e, dopo il clamp, un falso 70% invece di un
+      // errore visibile — vedi PlicometryCalculator._usNavy.
+      if (vita + fianchi - collo <= 0) {
+        _snack('Vita (+ fianchi) deve essere maggiore del collo');
+        return;
+      }
     }
 
     setState(() => _saving = true);

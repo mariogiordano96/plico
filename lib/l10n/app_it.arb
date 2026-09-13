@@ -743,6 +743,8 @@
   },
   "sessioneGuidataAspettaTurno": "Aspetta il turno",
   "sessioneGuidataErrorePeso": "Inserisci il peso (anche 0 se a corpo libero)",
+  "sessioneGuidataErroreRip": "Inserisci le ripetizioni",
+  "sessioneGuidataErroreDurata": "Inserisci una durata valida",
 
   "sessioneGuidataTecnicaNormale": "Normale",
   "sessioneGuidataTecnicaForzate": "Forzate",

@@ -102,37 +102,41 @@ class _DiarioScreenState extends State<DiarioScreen> {
     await _load();
   }
 
-  Future<String?> _askComboName() {
+  Future<String?> _askComboName() async {
     final ctrl = TextEditingController();
     final p = context.palette;
     final l10n = context.l10n;
-    return showDialog<String>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: p.surface,
-        title: Text(l10n.diarioSalvaComePref,
-            style: TextStyle(color: p.textPrimary)),
-        content: TextField(
-          controller: ctrl,
-          autofocus: true,
-          style: TextStyle(color: p.textPrimary),
-          decoration: InputDecoration(
-            hintText: l10n.diarioSalvaHint,
-            hintStyle: TextStyle(color: p.textMuted),
+    try {
+      return await showDialog<String>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: p.surface,
+          title: Text(l10n.diarioSalvaComePref,
+              style: TextStyle(color: p.textPrimary)),
+          content: TextField(
+            controller: ctrl,
+            autofocus: true,
+            style: TextStyle(color: p.textPrimary),
+            decoration: InputDecoration(
+              hintText: l10n.diarioSalvaHint,
+              hintStyle: TextStyle(color: p.textMuted),
+            ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(l10n.diarioAnnulla),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, ctrl.text),
+              child: Text(l10n.diarioBtnSalva),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(l10n.diarioAnnulla),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, ctrl.text),
-            child: Text(l10n.diarioBtnSalva),
-          ),
-        ],
-      ),
-    );
+      );
+    } finally {
+      ctrl.dispose();
+    }
   }
 
   Future<void> _saveAsCombo(int pastoTipo, List<MealEntry> entries) async {
@@ -179,9 +183,40 @@ class _DiarioScreenState extends State<DiarioScreen> {
     return indices;
   }
 
-  Future<void> _removeEntry(int index) async {
-    await DatabaseService.instance.removeMealEntry(_date, index);
-    await _load();
+  // Coda di rimozioni serializzata: due swipe ravvicinati (prima che il primo
+  // `_load()` sia tornato e abbia aggiornato `_log`/gli indici in UI) non
+  // devono eseguire due `removeMealEntry` concorrenti sullo stesso indice
+  // "vecchio" — la seconda rimozione, una volta eseguita in coda dopo la
+  // prima, ricalcola la posizione dell'entry dal `_log` già aggiornato,
+  // invece di fidarsi di un indice globale calcolato nel build precedente
+  // (che dopo la prima rimozione punterebbe all'entry sbagliata).
+  Future<void> _pendingRemoval = Future.value();
+
+  // MealEntry è @embedded (nessun id proprio): dopo un `_load()` intermedio
+  // `_log` è un oggetto completamente nuovo deserializzato da Isar, quindi il
+  // confronto non può essere per identità (`==`) ma per contenuto — la
+  // combinazione di tutti i campi, incluso il timestamp di inserimento, è
+  // praticamente unica per ogni entry realmente distinta.
+  bool _sameEntry(MealEntry a, MealEntry b) =>
+      a.foodNome == b.foodNome &&
+      a.foodBrand == b.foodBrand &&
+      a.kcalPer100g == b.kcalPer100g &&
+      a.proteinPer100g == b.proteinPer100g &&
+      a.fatPer100g == b.fatPer100g &&
+      a.carbsPer100g == b.carbsPer100g &&
+      a.quantitaG == b.quantitaG &&
+      a.pastoTipo == b.pastoTipo &&
+      a.orarioInserimento == b.orarioInserimento;
+
+  Future<void> _removeEntry(MealEntry entry) {
+    final chained = _pendingRemoval.then((_) async {
+      final idx = _log?.entries.indexWhere((e) => _sameEntry(e, entry)) ?? -1;
+      if (idx == -1) return; // già rimossa (es. doppio swipe sulla stessa riga)
+      await DatabaseService.instance.removeMealEntry(_date, idx);
+      await _load();
+    });
+    _pendingRemoval = chained;
+    return chained;
   }
 
   Future<void> _openAdd(int pastoTipo) async {
@@ -580,7 +615,7 @@ class _PastoSection extends StatelessWidget {
   final List<dynamic> entries; // MealEntry filtered
   final List<int> globalIndices;
   final VoidCallback onAdd;
-  final ValueChanged<int> onRemove;
+  final ValueChanged<MealEntry> onRemove;
   final bool canRepeatYesterday;
   final VoidCallback? onRepeatYesterday;
   final VoidCallback? onSaveCombo;
@@ -666,7 +701,7 @@ class _PastoSection extends StatelessWidget {
                 child: const Icon(Icons.delete_outline_rounded,
                     color: Color(0xFFE74C3C)),
               ),
-              onDismissed: (_) => onRemove(globalIdx),
+              onDismissed: (_) => onRemove(entry as MealEntry),
               child: Container(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 14, vertical: 10),

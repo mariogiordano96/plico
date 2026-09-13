@@ -593,6 +593,8 @@
   "sessioneGuidataRiscaldamentoSerieLabel": "Warm-up {n}",
   "sessioneGuidataAspettaTurno": "Wait your turn",
   "sessioneGuidataErrorePeso": "Enter the weight (use 0 for bodyweight)",
+  "sessioneGuidataErroreRip": "Enter the reps",
+  "sessioneGuidataErroreDurata": "Enter a valid duration",
 
   "sessioneGuidataTecnicaNormale": "Normal",
   "sessioneGuidataTecnicaForzate": "Forced",

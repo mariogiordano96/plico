@@ -1830,6 +1830,12 @@ class AppLocalizationsIt extends AppLocalizations {
       'Inserisci il peso (anche 0 se a corpo libero)';
 
   @override
+  String get sessioneGuidataErroreRip => 'Inserisci le ripetizioni';
+
+  @override
+  String get sessioneGuidataErroreDurata => 'Inserisci una durata valida';
+
+  @override
   String get sessioneGuidataTecnicaNormale => 'Normale';
 
   @override

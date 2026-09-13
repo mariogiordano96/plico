@@ -184,27 +184,30 @@ class WorkoutProgressService {
     );
   }
 
-  static String _weekKey(DateTime date) {
-    final monday = date.subtract(Duration(days: date.weekday - 1));
-    return '${monday.year}-${monday.month.toString().padLeft(2, '0')}-${monday.day.toString().padLeft(2, '0')}';
+  static DateTime _weekMonday(DateTime date) {
+    final d = DateTime(date.year, date.month, date.day);
+    return d.subtract(Duration(days: d.weekday - 1));
   }
 
-  /// true se nelle ultime [weeks] settimane (default 4) il carico massimo per
-  /// settimana non è mai diminuito — segnale che potrebbe servire una settimana
-  /// di scarico prima di continuare a progredire.
+  /// true se nelle ultime [weeks] settimane CONSECUTIVE (default 4) il carico
+  /// massimo per settimana non è mai diminuito — segnale che potrebbe servire
+  /// una settimana di scarico prima di continuare a progredire. Settimane
+  /// senza nessuna sessione registrata interrompono la sequenza: non basta
+  /// che esistano N settimane con dati, devono susseguirsi senza salti.
   static bool needsDeload(List<WorkoutExercise> history, {int weeks = 4}) {
-    final byWeek = <String, double>{};
+    final byWeek = <DateTime, double>{};
     for (final e in history) {
       final maxW = sessionMaxWeight(e);
       if (maxW == null) continue;
-      final key = _weekKey(e.date);
+      final key = _weekMonday(e.date);
       if (!byWeek.containsKey(key) || maxW > byWeek[key]!) byWeek[key] = maxW;
     }
-    final weekKeys = byWeek.keys.toList()..sort();
-    if (weekKeys.length < weeks) return false;
+    final weekStarts = byWeek.keys.toList()..sort();
+    if (weekStarts.length < weeks) return false;
 
-    final recent = weekKeys.sublist(weekKeys.length - weeks);
+    final recent = weekStarts.sublist(weekStarts.length - weeks);
     for (var i = 1; i < recent.length; i++) {
+      if (recent[i].difference(recent[i - 1]).inDays != 7) return false;
       if (byWeek[recent[i]]! < byWeek[recent[i - 1]]!) return false;
     }
     return true;

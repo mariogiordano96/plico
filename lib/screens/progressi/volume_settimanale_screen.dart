@@ -47,7 +47,14 @@ class _VolumeSettimanaleScreenState extends State<VolumeSettimanaleScreen> {
   Widget build(BuildContext context) {
     final p = context.palette;
     final l10n = context.l10n;
-    final neglected = WorkoutProgressService.neglectedMuscleGroups(_volumeByGroup);
+    // Un gruppo mai allenato in settimana non compare in _volumeByGroup (la
+    // query aggrega solo esercizi effettivamente loggati): va aggiunto con
+    // volume 0 prima del controllo "trascurato", altrimenti il caso più
+    // evidente (nessun allenamento per quel gruppo) non viene mai segnalato.
+    final volumeConGruppiVuoti = {
+      for (final g in _gruppi) g: _volumeByGroup[g] ?? 0.0,
+    };
+    final neglected = WorkoutProgressService.neglectedMuscleGroups(volumeConGruppiVuoti);
     final maxVolume = _gruppi
         .map((g) => _volumeByGroup[g] ?? 0)
         .fold<double>(0, (max, v) => v > max ? v : max);
