@@ -27,6 +27,12 @@ Future<WorkoutTemplateExercise?> showTargetEsercizioDialog(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
+    // Senza un tetto esplicito, `isScrollControlled` lascia che il foglio
+    // cresca oltre l'altezza schermo con molte "serie personalizzate" (Fase
+    // 7) e finisca sotto la status bar/notch — stesso fix di
+    // genera_piramide_dialog.dart. Il contenuto resta scrollabile
+    // internamente (SingleChildScrollView sotto).
+    constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9),
     builder: (_) => _TargetEsercizioDialog(exercise: exercise, initial: initial),
   );
 }

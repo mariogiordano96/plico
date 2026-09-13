@@ -16,6 +16,12 @@ Future<List<WorkoutSet>?> showGeneraPiramideSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
+    // Senza un tetto esplicito, `isScrollControlled` lascia che il foglio
+    // cresca oltre l'altezza schermo (l'anteprima piramide può sforare su
+    // molte serie) e finisca sotto la status bar/notch — visto su Samsung.
+    // Il contenuto interno resta scrollabile (SafeArea/SingleChildScrollView
+    // sotto), qui si limita solo quanto il foglio può crescere.
+    constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9),
     builder: (_) => _GeneraPiramideSheet(exerciseName: exerciseName),
   );
 }
@@ -108,7 +114,8 @@ class _GeneraPiramideSheetState extends State<_GeneraPiramideSheet> {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           ),
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-          child: Column(
+          child: SingleChildScrollView(
+            child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -193,6 +200,7 @@ class _GeneraPiramideSheetState extends State<_GeneraPiramideSheet> {
                 ],
               ),
             ],
+            ),
           ),
         ),
       ),
