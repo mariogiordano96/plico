@@ -26,7 +26,6 @@ import '../models/workout_exercise.dart';
 import '../models/workout_template.dart';
 import '../models/workout_template_exercise.dart';
 import '../models/workout_program.dart';
-import '../models/workout_set.dart';
 import '../models/personal_record.dart';
 import 'calorie_estimation_service.dart';
 import 'exercise_alternatives_service.dart';
@@ -1493,14 +1492,7 @@ class DatabaseService {
         ..sourceTemplateName = template.name
         ..sourceProgramId = program?.id
         ..sourceProgramName = program?.name
-        ..sets = isCardio
-            ? []
-            : List.generate(
-                te.targetSets ?? 1,
-                (_) => WorkoutSet()
-                  ..reps = te.targetReps
-                  ..weightKg = te.targetWeightKg,
-              );
+        ..sets = isCardio ? [] : te.materializeSets();
       await addWorkoutExercise(day, we);
       created.add(we);
     }

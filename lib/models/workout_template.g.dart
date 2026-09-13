@@ -75,7 +75,11 @@ const WorkoutTemplateSchema = CollectionSchema(
     )
   },
   links: {},
-  embeddedSchemas: {r'WorkoutTemplateExercise': WorkoutTemplateExerciseSchema},
+  embeddedSchemas: {
+    r'WorkoutTemplateExercise': WorkoutTemplateExerciseSchema,
+    r'WorkoutTemplateSet': WorkoutTemplateSetSchema,
+    r'DropStage': DropStageSchema
+  },
   getId: _workoutTemplateGetId,
   getLinks: _workoutTemplateGetLinks,
   attach: _workoutTemplateAttach,

@@ -4,7 +4,6 @@ import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/exercise_definition.dart';
 import '../../models/workout_exercise.dart';
-import '../../models/workout_set.dart';
 import '../../models/workout_template.dart';
 import '../../services/calorie_estimation_service.dart';
 import '../../services/database_service.dart';
@@ -203,14 +202,7 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
       ..exerciseId = target.exerciseId
       ..exerciseName = target.exerciseName
       ..durationSeconds = target.targetDurationSeconds
-      ..sets = isCardio
-          ? []
-          : List.generate(
-              target.targetSets ?? 1,
-              (_) => WorkoutSet()
-                ..reps = target.targetReps
-                ..weightKg = target.targetWeightKg,
-            );
+      ..sets = isCardio ? [] : target.materializeSets();
 
     final bodySnapshot = await DatabaseService.instance.getLatestBodySnapshot();
     final bodyWeightKg = bodySnapshot?.pesoKg;
@@ -267,14 +259,7 @@ class _AllenamentoScreenState extends State<AllenamentoScreen> {
 
     final isCardio = target.isCardio;
     e.durationSeconds = target.targetDurationSeconds;
-    e.sets = isCardio
-        ? []
-        : List.generate(
-            target.targetSets ?? 1,
-            (_) => WorkoutSet()
-              ..reps = target.targetReps
-              ..weightKg = target.targetWeightKg,
-          );
+    e.sets = isCardio ? [] : target.materializeSets();
 
     final bodySnapshot = await DatabaseService.instance.getLatestBodySnapshot();
     final bodyWeightKg = bodySnapshot?.pesoKg;

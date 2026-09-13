@@ -1,4 +1,7 @@
 import 'package:isar/isar.dart';
+import 'workout_set.dart'; // DropStage: nested in WorkoutTemplateExercise.plannedSets, isar_generator
+                            // ha bisogno dell'import diretto qui, non basta quello transitivo
+                            // via workout_template_exercise.dart (DropStageSchema non risolto altrimenti)
 import 'workout_template_exercise.dart';
 
 part 'workout_template.g.dart';
