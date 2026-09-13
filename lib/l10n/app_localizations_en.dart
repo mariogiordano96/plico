@@ -1675,10 +1675,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get targetDialogSeriePersonalizzateHint =>
-      'Plan reps/weight and technique per set, ready to go in the guided session';
+      'Plan different reps/weight per set (e.g. a pyramid), ready to go in the guided session';
 
   @override
-  String get targetDialogAggiungiTecnica => '+ Technique';
+  String get targetDialogTecnicaLabel => 'Technique';
+
+  @override
+  String get targetDialogTecnicaDescrizioneForzate =>
+      'Applied to every set: past failure, extra reps completed with a spotter\'s help.';
+
+  @override
+  String get targetDialogTecnicaDescrizioneRestPause =>
+      'Applied to every set: failure, short pause, more reps at the same weight.';
+
+  @override
+  String get targetDialogTecnicaDescrizioneStripping =>
+      'Applied to every set: failure, the weight drops immediately with no pause and you keep going.';
+
+  @override
+  String get targetDialogTecnicaDescrizioneSuperSlow =>
+      'Applied to every set: same set, but performed very slowly.';
 
   @override
   String storicoTitle(String nome) {

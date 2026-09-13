@@ -551,3 +551,43 @@ piramide), ma non è più sempre visibile.
 - [x] `_PlannedSetRow` mostra un link discreto "+ Tecnica" al posto dei
       chip quando `showPicker` è `false`; un tocco lo apre per quella riga.
 - [x] `flutter analyze` pulito, 184 test verdi.
+
+### Fase 7h — Redesign: tecnica a livello di esercizio, non per-serie ✅
+
+**Feedback dell'utente, dopo tre iterazioni sul punto (Fase 7c/7d/7g)**: la
+tecnica (forzate/rest-pause/stripping/super slow) non è un concetto
+per-serie — nell'uso reale si decide "questo esercizio lo faccio a
+rest-pause", non riga per riga. Il picker per-serie (anche nascosto di
+default, Fase 7g) restava concettualmente sbagliato. Richiesta esplicita:
+un selettore "Tecnica" in alto, sopra l'elenco serie, con una descrizione
+di cosa fa la tecnica scelta.
+
+- [x] **Rimossa la tecnica da `_PlannedSetState`** (`target_esercizio_dialog.dart`):
+      la riga di una serie pianificata torna a contenere solo reps/peso —
+      niente più `technique`/`showPicker`/`forcedCtrl`/cluster/gradini per
+      riga. `_PlannedSetRow` è tornata una riga semplicissima.
+- [x] Nuova sezione "Tecnica" in `_TargetEsercizioDialogState`, sopra
+      l'elenco serie (sia in modalità uniforme sia "Serie personalizzate"):
+      chip Normale/Forzate/Rest-pause/Stripping/Super slow, con una
+      descrizione testuale sotto quando non è "Normale"
+      (`targetDialogTecnicaDescrizione*`) e i campi extra (reps forzate,
+      cluster, gradini) una sola volta, condivisi.
+- [x] `_applyTecnica` applica la tecnica scelta **identica a ogni serie**
+      generata (sia dal target uniforme sia dalle serie personalizzate) al
+      salvataggio — non più letta/scritta riga per riga.
+- [x] `plannedSets` ora si popola anche quando l'unica personalizzazione è
+      la tecnica (prima serviva "Serie personalizzate" attivo): il target
+      resta invece uniforme (`targetSets`/`targetReps`/`targetWeightKg`,
+      nessun `plannedSets`) solo quando tecnica è "Normale" e le serie non
+      sono personalizzate — percorso più semplice invariato per chi non usa
+      nessuna delle due funzionalità.
+- [x] `_detectTechnique`/`_looksCustomSets` separano di nuovo le due
+      dimensioni in modifica: la tecnica si rileva dalla prima serie
+      (uniforme per costruzione, essendo scritta identica su tutte), le
+      serie personalizzate dal confronto reps/peso tra le serie.
+- [x] `crea_scheda_screen.dart` (`_EsercizioRow`): il riepilogo mostra ora
+      anche l'etichetta della tecnica (es. "Rest-pause") sotto le
+      reps/peso, quando presente.
+- [x] `flutter analyze` pulito, 184 test verdi (nessun nuovo test: modifica
+      di UI/dialog, la logica di materializzazione già coperta dai test di
+      Fase 7a non cambia).

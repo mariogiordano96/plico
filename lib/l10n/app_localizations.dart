@@ -3131,14 +3131,38 @@ abstract class AppLocalizations {
   /// No description provided for @targetDialogSeriePersonalizzateHint.
   ///
   /// In it, this message translates to:
-  /// **'Pianifica reps/peso e tecnica per ogni serie, subito riproposti in sessione guidata'**
+  /// **'Pianifica reps/peso diversi per ogni serie (es. piramide), subito riproposti in sessione guidata'**
   String get targetDialogSeriePersonalizzateHint;
 
-  /// No description provided for @targetDialogAggiungiTecnica.
+  /// No description provided for @targetDialogTecnicaLabel.
   ///
   /// In it, this message translates to:
-  /// **'+ Tecnica'**
-  String get targetDialogAggiungiTecnica;
+  /// **'Tecnica'**
+  String get targetDialogTecnicaLabel;
+
+  /// No description provided for @targetDialogTecnicaDescrizioneForzate.
+  ///
+  /// In it, this message translates to:
+  /// **'Applicata a ogni serie: oltre il cedimento, ripetizioni aggiuntive completate con l\'aiuto di un compagno.'**
+  String get targetDialogTecnicaDescrizioneForzate;
+
+  /// No description provided for @targetDialogTecnicaDescrizioneRestPause.
+  ///
+  /// In it, this message translates to:
+  /// **'Applicata a ogni serie: cedimento, pausa breve, altre ripetizioni allo stesso peso.'**
+  String get targetDialogTecnicaDescrizioneRestPause;
+
+  /// No description provided for @targetDialogTecnicaDescrizioneStripping.
+  ///
+  /// In it, this message translates to:
+  /// **'Applicata a ogni serie: cedimento, il peso si riduce subito senza pausa e si continua.'**
+  String get targetDialogTecnicaDescrizioneStripping;
+
+  /// No description provided for @targetDialogTecnicaDescrizioneSuperSlow.
+  ///
+  /// In it, this message translates to:
+  /// **'Applicata a ogni serie: stessa serie, ma con esecuzione molto lenta.'**
+  String get targetDialogTecnicaDescrizioneSuperSlow;
 
   /// No description provided for @storicoTitle.
   ///

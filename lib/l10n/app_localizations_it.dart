@@ -1684,10 +1684,26 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get targetDialogSeriePersonalizzateHint =>
-      'Pianifica reps/peso e tecnica per ogni serie, subito riproposti in sessione guidata';
+      'Pianifica reps/peso diversi per ogni serie (es. piramide), subito riproposti in sessione guidata';
 
   @override
-  String get targetDialogAggiungiTecnica => '+ Tecnica';
+  String get targetDialogTecnicaLabel => 'Tecnica';
+
+  @override
+  String get targetDialogTecnicaDescrizioneForzate =>
+      'Applicata a ogni serie: oltre il cedimento, ripetizioni aggiuntive completate con l\'aiuto di un compagno.';
+
+  @override
+  String get targetDialogTecnicaDescrizioneRestPause =>
+      'Applicata a ogni serie: cedimento, pausa breve, altre ripetizioni allo stesso peso.';
+
+  @override
+  String get targetDialogTecnicaDescrizioneStripping =>
+      'Applicata a ogni serie: cedimento, il peso si riduce subito senza pausa e si continua.';
+
+  @override
+  String get targetDialogTecnicaDescrizioneSuperSlow =>
+      'Applicata a ogni serie: stessa serie, ma con esecuzione molto lenta.';
 
   @override
   String storicoTitle(String nome) {

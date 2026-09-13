@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/workout_exercise.dart' show SupersetRole;
+import '../../models/workout_set.dart' show SetTechnique;
 import '../../models/workout_template.dart';
 import '../../models/workout_template_exercise.dart';
 import '../../services/database_service.dart';
@@ -223,6 +224,7 @@ class _EsercizioRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final planned = esercizio.plannedSets;
+    final tecnica = planned != null && planned.isNotEmpty ? planned.first.technique : SetTechnique.normale;
     final target = esercizio.isCardio
         ? '${esercizio.targetDurationSeconds! ~/ 60} min'
         : planned != null && planned.isNotEmpty
@@ -231,6 +233,13 @@ class _EsercizioRow extends StatelessWidget {
                 .join(' · ')
             : '${esercizio.targetSets ?? '-'}×${esercizio.targetReps ?? '-'}'
                 '${esercizio.targetWeightKg != null ? ' · ${esercizio.targetWeightKg}kg' : ''}';
+    final tecnicaLabel = switch (tecnica) {
+      SetTechnique.forzate => l10n.sessioneGuidataTecnicaForzate,
+      SetTechnique.restPause => l10n.sessioneGuidataTecnicaRestPause,
+      SetTechnique.stripping => l10n.sessioneGuidataTecnicaStripping,
+      SetTechnique.superSlow => l10n.sessioneGuidataTecnicaSuperSlow,
+      SetTechnique.normale => null,
+    };
     final grouped = esercizio.supersetGroupId != null;
 
     return Container(
@@ -254,6 +263,9 @@ class _EsercizioRow extends StatelessWidget {
                 Text(esercizio.exerciseName,
                     style: TextStyle(color: p.textPrimary, fontWeight: FontWeight.w600)),
                 Text(target, style: TextStyle(color: p.textMuted, fontSize: 12)),
+                if (tecnicaLabel != null)
+                  Text(tecnicaLabel,
+                      style: TextStyle(color: p.accent, fontSize: 11, fontWeight: FontWeight.w600)),
                 // Fase 3 di docs/tecniche_allenamento.md: ruolo esplosiva/lenta,
                 // solo per righe già in un gruppo superset — variante "veloce/
                 // lento" della tecnica, opzionale.
