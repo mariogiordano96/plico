@@ -85,16 +85,25 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
     _debounce = Timer(const Duration(milliseconds: 450), () => _search(q));
   }
 
-  Future<void> _loadLocal(String q) async {
+  Future<void> _loadLocal(String q, {int? generation}) async {
     final items = await DatabaseService.instance
         .searchFoodItems(q, languageCode: Localizations.localeOf(context).languageCode);
     if (!mounted) return;
+    if (generation != null && generation != _searchGeneration) return;
     setState(() => _localResults = items);
   }
 
+  // Incrementato a ogni _search: una risposta (locale o di rete) che torna
+  // dopo che l'utente ha digitato altro non deve più sovrascrivere risultati
+  // più recenti — il debounce evita solo timer sovrapposti, non risposte
+  // di richieste già in volo che arrivano fuori ordine.
+  int _searchGeneration = 0;
+
   Future<void> _search(String q) async {
+    final generation = ++_searchGeneration;
     final languageCode = Localizations.localeOf(context).languageCode;
-    await _loadLocal(q);
+    await _loadLocal(q, generation: generation);
+    if (!mounted || generation != _searchGeneration) return;
     if (q.trim().isEmpty) {
       setState(() {
         _offResults = [];
@@ -104,7 +113,7 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
     }
     setState(() => _searching = true);
     final results = await OpenFoodFactsService.search(q, languageCode: languageCode);
-    if (!mounted) return;
+    if (!mounted || generation != _searchGeneration) return;
     setState(() {
       _offResults = results;
       _searching = false;
@@ -734,6 +743,17 @@ class _CustomFoodSheetState extends State<_CustomFoodSheet> {
   final _fatCtrl = TextEditingController();
   final _carbsCtrl = TextEditingController();
   bool _saving = false;
+
+  @override
+  void dispose() {
+    _nomeCtrl.dispose();
+    _brandCtrl.dispose();
+    _kcalCtrl.dispose();
+    _proteinCtrl.dispose();
+    _fatCtrl.dispose();
+    _carbsCtrl.dispose();
+    super.dispose();
+  }
 
   Future<void> _save() async {
     final nome = _nomeCtrl.text.trim();
