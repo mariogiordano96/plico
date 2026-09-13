@@ -430,3 +430,35 @@ sola, non ridecidere ogni volta il giorno stesso in sessione guidata.
       esercizio già aggiunto a una scheda in `crea_scheda_screen.dart` —
       limite preesistente anche per il target uniforme (si rimuove e si
       riaggiunge), non introdotto da questa fase.
+
+### Fase 7c — Fix: tecnica pianificata in sessione guidata ✅
+
+**Bug segnalato dall'utente dopo il primo test reale**: una serie
+rest-pause/stripping pianificata in scheda arrivava in sessione guidata con
+la tecnica già selezionata (chip evidenziata), ma `_SetRowState.initState`
+non recuperava i cluster/gradini aggiuntivi da `WorkoutSet.restPauseClusters`
+/`dropStages` — confermare la serie senza toccare nulla li azzerava
+silenziosamente (`_handleConfirm` li ricalcola dai campi extra, vuoti se mai
+popolati). Il fix di Fase 4 al riavvio app era lo stesso limite, ma raro; con
+la pianificazione in scheda diventa il percorso comune.
+
+Feedback aggiuntivo, più di UX: se la scheda ha già deciso la tecnica, i
+pulsanti normale/forzate/rest-pause/stripping/super slow in sessione guidata
+non devono richiedere nessuna interazione — si segue con le spunte, non si
+"risetta" niente.
+
+- [x] `_SetRowState.initState` ora idrata `_clusterCtrls`/`_stageCtrls` da
+      `w.restPauseClusters`/`w.dropStages` quando presenti — confermare senza
+      modifiche preserva esattamente il piano.
+- [x] Nuovo stato `_editingTechnique`: `false` di default quando la tecnica
+      arriva già decisa (`w.technique != normale` all'apertura, quindi non
+      scelta ora dall'utente) — al posto del picker si vede solo un'etichetta
+      (`_plannedBadge`, stesso formato di `_confirmedBadge` ma pre-conferma)
+      con un tocco "Modifica" per riaprirlo se si vuole cambiare per oggi.
+      Per una serie senza tecnica pianificata (`normale` all'apertura) il
+      picker resta visibile come prima — scelta spontanea di una tecnica a
+      metà sessione resta un caso d'uso valido, non solo la pianificazione.
+- [x] `flutter analyze` pulito, 184 test verdi (nessun nuovo test: fix
+      puramente di widget state, non c'è un test harness per
+      `sessione_guidata_screen.dart` in questo repo — verificato manualmente
+      dall'utente sul device).

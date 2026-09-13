@@ -848,18 +848,41 @@ class _SetRowState extends State<_SetRow> {
   late SetTechnique _technique;
   late final TextEditingController _forcedCtrl;
   // Cluster/gradini aggiuntivi oltre al primo (che resta reps/kg del campo
-  // principale, invariato) — costruiti da zero a ogni apertura della riga,
-  // non recuperati da un'eventuale serie parzialmente compilata prima di un
-  // riavvio app: limite noto, non bloccante (l'utente li reinserisce).
+  // principale, invariato) — recuperati da `workoutSet` quando la tecnica
+  // arriva già pianificata dalla scheda (Fase 7 di docs/tecniche_allenamento.md,
+  // `WorkoutTemplateExercise.plannedSets`), altrimenti costruiti da zero.
+  // Non sopravvivono comunque a un riavvio app a metà compilazione di una
+  // serie non ancora confermata: limite noto, non bloccante.
   final List<TextEditingController> _clusterCtrls = [];
   final List<(TextEditingController, TextEditingController)> _stageCtrls = [];
+
+  // Fase 7: quando la tecnica arriva già decisa dalla scheda (non "normale"
+  // fin dall'inizio, quindi non scelta ora dall'utente), il picker resta
+  // chiuso — si vede solo un'etichetta e si conferma con la spunta come
+  // qualunque altra serie, senza dover riselezionare nulla. Un tocco su
+  // "Modifica" lo riapre per cambiarla per oggi.
+  late bool _editingTechnique;
 
   @override
   void initState() {
     super.initState();
     final w = widget.workoutSet;
     _technique = w.technique;
+    _editingTechnique = _technique == SetTechnique.normale;
     _forcedCtrl = TextEditingController(text: w.forcedReps?.toString() ?? '');
+    if (w.restPauseClusters != null && w.restPauseClusters!.length > 1) {
+      for (final v in w.restPauseClusters!.skip(1)) {
+        _clusterCtrls.add(TextEditingController(text: v.toString()));
+      }
+    }
+    if (w.dropStages != null) {
+      for (final d in w.dropStages!) {
+        _stageCtrls.add((
+          TextEditingController(text: d.reps?.toString() ?? ''),
+          TextEditingController(text: d.weightKg?.toString() ?? ''),
+        ));
+      }
+    }
   }
 
   @override
@@ -934,11 +957,48 @@ class _SetRowState extends State<_SetRow> {
     );
   }
 
+  /// Etichetta + "Modifica" mostrata al posto del picker quando la tecnica
+  /// arriva già decisa dalla scheda (`_editingTechnique == false`) — stessa
+  /// formattazione di `_confirmedBadge`, ma prima della conferma: l'utente
+  /// vede cosa farà, non deve risceglierlo, tocca solo la spunta per andare
+  /// avanti come per una serie normale.
+  Widget? _plannedBadge(dynamic l10n) {
+    if (_technique == SetTechnique.normale) return null;
+    final p = widget.p;
+    final emoji = switch (_technique) {
+      SetTechnique.forzate => '💪',
+      SetTechnique.superSlow => '🐌',
+      SetTechnique.restPause => '🔥',
+      SetTechnique.stripping => '⬇️',
+      SetTechnique.normale => '',
+    };
+    return Padding(
+      padding: const EdgeInsets.only(left: 56, top: 2, bottom: 4),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('$emoji ${_techniqueLabel(_technique, l10n)}',
+              style: TextStyle(color: p.accent, fontSize: 11, fontWeight: FontWeight.w600)),
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: () => setState(() => _editingTechnique = true),
+            child: Text(l10n.sessioneGuidataModificaTecnica,
+                style: TextStyle(
+                    color: p.textMuted,
+                    fontSize: 11,
+                    decoration: TextDecoration.underline)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final p = widget.p;
     final badge = widget.done ? _confirmedBadge(l10n) : null;
+    final plannedBadge = !_editingTechnique ? _plannedBadge(l10n) : null;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -988,7 +1048,9 @@ class _SetRowState extends State<_SetRow> {
           // in errore `dart run build_runner build` (SEVERE, non solo un
           // warning) su questo file, che ha un modello Isar embedded.
           if (badge != null) badge,
-          if (widget.showTechnique && !widget.done) ...[
+          if (widget.showTechnique && !widget.done && !_editingTechnique && plannedBadge != null)
+            plannedBadge,
+          if (widget.showTechnique && !widget.done && _editingTechnique) ...[
             Padding(
               padding: const EdgeInsets.only(left: 56, bottom: 4),
               child: Wrap(

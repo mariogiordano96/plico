@@ -3332,6 +3332,12 @@ abstract class AppLocalizations {
   /// **'+ gradino'**
   String get sessioneGuidataAggiungiGradino;
 
+  /// No description provided for @sessioneGuidataModificaTecnica.
+  ///
+  /// In it, this message translates to:
+  /// **'Modifica'**
+  String get sessioneGuidataModificaTecnica;
+
   /// No description provided for @sessioneRiepilogoTitle.
   ///
   /// In it, this message translates to:

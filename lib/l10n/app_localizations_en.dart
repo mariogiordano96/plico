@@ -1802,6 +1802,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sessioneGuidataAggiungiGradino => '+ stage';
 
   @override
+  String get sessioneGuidataModificaTecnica => 'Change';
+
+  @override
   String get sessioneRiepilogoTitle => 'Session complete';
 
   @override
