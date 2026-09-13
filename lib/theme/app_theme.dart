@@ -69,17 +69,17 @@ extension L10nX on BuildContext {
 // Dark theme colors
 // ──────────────────────────────────────────────
 class AppColors {
-  static const background = Color(0xFF0A0A0A);
-  static const surface = Color(0xFF1A1A2E);
-  static const surfaceVariant = Color(0xFF16213E);
-  static const accent = Color(0xFF00FF88);
-  static const accentSecondary = Color(0xFF7FFF00);
+  static const background = _dark.background;
+  static const surface = _dark.surface;
+  static const surfaceVariant = _dark.surfaceVariant;
+  static const accent = _dark.accent;
+  static const accentSecondary = _dark.accentSecondary;
   static const accentDim = Color(0xFF00CC6A);
-  static const textPrimary = Color(0xFFE8F5E9);
-  static const textSecondary = Color(0xFF80CBC4);
-  static const textMuted = Color(0xFF4A6572);
-  static const cardBorder = Color(0xFF1E3A2F);
-  static const error = Color(0xFFFF4D6D);
+  static const textPrimary = _dark.textPrimary;
+  static const textSecondary = _dark.textSecondary;
+  static const textMuted = _dark.textMuted;
+  static const cardBorder = _dark.cardBorder;
+  static const error = _dark.error;
 }
 
 // ──────────────────────────────────────────────
