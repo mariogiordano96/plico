@@ -3362,6 +3362,18 @@ abstract class AppLocalizations {
   /// **'Inserisci il peso (anche 0 se a corpo libero)'**
   String get sessioneGuidataErrorePeso;
 
+  /// No description provided for @sessioneGuidataErroreRip.
+  ///
+  /// In it, this message translates to:
+  /// **'Inserisci le ripetizioni'**
+  String get sessioneGuidataErroreRip;
+
+  /// No description provided for @sessioneGuidataErroreDurata.
+  ///
+  /// In it, this message translates to:
+  /// **'Inserisci una durata valida'**
+  String get sessioneGuidataErroreDurata;
+
   /// No description provided for @sessioneGuidataTecnicaNormale.
   ///
   /// In it, this message translates to:

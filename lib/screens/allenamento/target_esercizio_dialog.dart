@@ -78,8 +78,15 @@ class _TargetEsercizioDialog extends StatefulWidget {
 class _TargetEsercizioDialogState extends State<_TargetEsercizioDialog> {
   late final _initialSet =
       widget.initial != null && widget.initial!.sets.isNotEmpty ? widget.initial!.sets.first : null;
-  late final _serieCtrl =
-      TextEditingController(text: (widget.initial?.sets.length ?? 3).toString());
+  // Un esercizio cardio esistente non ha `sets` (lista sempre vuota): usare
+  // .length darebbe "0" come numero di serie precompilato passando a
+  // "Serie", un valore che fallisce subito la validazione al salvataggio
+  // senza che l'utente abbia toccato quel campo.
+  late final _serieCtrl = TextEditingController(
+      text: (widget.initial != null && widget.initial!.sets.isNotEmpty
+              ? widget.initial!.sets.length
+              : 3)
+          .toString());
   late final _ripCtrl =
       TextEditingController(text: (_initialSet?.reps ?? 10).toString());
   late final _kgCtrl = TextEditingController(text: _initialSet?.weightKg?.toString() ?? '');

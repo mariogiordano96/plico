@@ -63,6 +63,7 @@ class _CreaSchedaScreenState extends State<CreaSchedaScreen> {
     for (final e in list) {
       if (e.supersetGroupId != null && counts[e.supersetGroupId] == 1) {
         e.supersetGroupId = null;
+        e.supersetRole = null;
       }
     }
     _clearRolesIfNotSamePair(list);

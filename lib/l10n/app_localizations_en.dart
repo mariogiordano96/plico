@@ -1821,6 +1821,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Enter the weight (use 0 for bodyweight)';
 
   @override
+  String get sessioneGuidataErroreRip => 'Enter the reps';
+
+  @override
+  String get sessioneGuidataErroreDurata => 'Enter a valid duration';
+
+  @override
   String get sessioneGuidataTecnicaNormale => 'Normal';
 
   @override

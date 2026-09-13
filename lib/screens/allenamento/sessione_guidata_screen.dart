@@ -314,7 +314,12 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
 
   Future<void> _confirmCardio(WorkoutExercise e) async {
     final minuti = int.tryParse(_durataCtrls[e.id]!.text);
-    if (minuti == null || minuti <= 0) return;
+    if (minuti == null || minuti <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.sessioneGuidataErroreDurata)),
+      );
+      return;
+    }
     e.durationSeconds = minuti * 60;
     e.cardioConfirmed = true;
     e.estimatedKcal = CalorieEstimationService.estimateCardioKcal(
@@ -671,7 +676,7 @@ class _ExerciseStepCard extends StatelessWidget {
               ),
             ],
           ),
-          if (exercise.supersetRole != null) ...[
+          if (exercise.supersetRole != null && exercise.supersetGroupId != null) ...[
             const SizedBox(height: 4),
             Text(
               exercise.supersetRole == SupersetRole.esplosiva.name
@@ -908,6 +913,13 @@ class _SetRowState extends State<_SetRow> {
     if (kg == null || kg < 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.l10n.sessioneGuidataErrorePeso)),
+      );
+      return;
+    }
+    final rip = int.tryParse(widget.reps.text);
+    if (rip == null || rip <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.sessioneGuidataErroreRip)),
       );
       return;
     }
