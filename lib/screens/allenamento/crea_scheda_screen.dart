@@ -222,10 +222,15 @@ class _EsercizioRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final planned = esercizio.plannedSets;
     final target = esercizio.isCardio
         ? '${esercizio.targetDurationSeconds! ~/ 60} min'
-        : '${esercizio.targetSets ?? '-'}×${esercizio.targetReps ?? '-'}'
-            '${esercizio.targetWeightKg != null ? ' · ${esercizio.targetWeightKg}kg' : ''}';
+        : planned != null && planned.isNotEmpty
+            ? planned
+                .map((s) => '${s.reps ?? '-'}×${s.weightKg != null ? '${s.weightKg}kg' : '-'}')
+                .join(' · ')
+            : '${esercizio.targetSets ?? '-'}×${esercizio.targetReps ?? '-'}'
+                '${esercizio.targetWeightKg != null ? ' · ${esercizio.targetWeightKg}kg' : ''}';
     final grouped = esercizio.supersetGroupId != null;
 
     return Container(

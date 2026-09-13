@@ -87,4 +87,17 @@ class WorkoutTemplateSet {
     if (dropStages?.isNotEmpty == true) return SetTechnique.stripping;
     return SetTechnique.normale;
   }
+
+  /// Copia profonda — usata da `duplicateTemplate` per non condividere le
+  /// liste embedded (`restPauseClusters`/`dropStages`) tra scheda originale
+  /// e duplicata prima che entrambe vengano scritte su Isar.
+  WorkoutTemplateSet copy() => WorkoutTemplateSet()
+    ..reps = reps
+    ..weightKg = weightKg
+    ..forcedReps = forcedReps
+    ..isSuperSlow = isSuperSlow
+    ..restPauseClusters = restPauseClusters != null ? List<int>.from(restPauseClusters!) : null
+    ..dropStages = dropStages?.map((d) => DropStage()
+      ..reps = d.reps
+      ..weightKg = d.weightKg).toList();
 }

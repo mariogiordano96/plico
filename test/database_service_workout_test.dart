@@ -114,6 +114,43 @@ void main() {
       expect(reloaded.lastUsedAt, day);
     });
 
+    test('Fase 7: plannedSets riproduce reps/peso/tecnica per-serie invece del target uniforme',
+        () async {
+      final db = DatabaseService.instance;
+      final template = WorkoutTemplate()
+        ..name = 'Push Day'
+        ..createdAt = DateTime.now()
+        ..exercises = [
+          WorkoutTemplateExercise()
+            ..exerciseId = 'bench'
+            ..exerciseName = 'bench'
+            // Target uniforme presente ma ignorato: plannedSets ha priorità.
+            ..targetSets = 1
+            ..targetReps = 99
+            ..plannedSets = [
+              WorkoutTemplateSet()
+                ..reps = 12
+                ..weightKg = 40,
+              WorkoutTemplateSet()
+                ..reps = 8
+                ..weightKg = 50
+                ..restPauseClusters = [8, 4, 3],
+            ],
+        ];
+      final id = await db.saveWorkoutTemplate(template);
+      template.id = id;
+
+      final created = await db.startWorkoutFromTemplate(template, DateTime(2026, 1, 10));
+
+      final sets = created.first.sets;
+      expect(sets, hasLength(2));
+      expect(sets[0].reps, 12);
+      expect(sets[0].weightKg, 40);
+      expect(sets[0].technique, SetTechnique.normale);
+      expect(sets[1].restPauseClusters, [8, 4, 3]);
+      expect(sets[1].technique, SetTechnique.restPause);
+    });
+
     test('esercizio cardio (targetDurationSeconds) non genera serie', () async {
       final db = DatabaseService.instance;
       final template = WorkoutTemplate()
@@ -233,6 +270,36 @@ void main() {
       expect(copy.exercises, hasLength(1));
       expect(copy.exercises.first.exerciseId, 'bench');
       expect(copy.isPreset, isFalse);
+    });
+
+    test('duplicateTemplate copia plannedSets senza condividere le liste embedded con l\'originale',
+        () async {
+      final db = DatabaseService.instance;
+      final original = WorkoutTemplate()
+        ..name = 'Push Day'
+        ..createdAt = DateTime.now()
+        ..exercises = [
+          WorkoutTemplateExercise()
+            ..exerciseId = 'bench'
+            ..exerciseName = 'bench'
+            ..plannedSets = [
+              WorkoutTemplateSet()
+                ..reps = 12
+                ..weightKg = 40
+                ..restPauseClusters = [12, 5],
+            ],
+        ];
+      await db.saveWorkoutTemplate(original);
+
+      final copy = await db.duplicateTemplate(original);
+
+      final copiedPlanned = copy.exercises.first.plannedSets!;
+      expect(copiedPlanned, hasLength(1));
+      expect(copiedPlanned.first.restPauseClusters, [12, 5]);
+
+      // Mutare la copia non deve riflettersi sull'originale in memoria.
+      copiedPlanned.first.restPauseClusters!.add(99);
+      expect(original.exercises.first.plannedSets!.first.restPauseClusters, [12, 5]);
     });
 
     test('duplicateProgram copia il programma e tutti i suoi giorni', () async {

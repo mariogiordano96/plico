@@ -3122,6 +3122,18 @@ abstract class AppLocalizations {
   /// **'Durata (minuti)'**
   String get targetDialogDurataMin;
 
+  /// No description provided for @targetDialogSeriePersonalizzate.
+  ///
+  /// In it, this message translates to:
+  /// **'Serie personalizzate'**
+  String get targetDialogSeriePersonalizzate;
+
+  /// No description provided for @targetDialogSeriePersonalizzateHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Pianifica reps/peso e tecnica per ogni serie, subito riproposti in sessione guidata'**
+  String get targetDialogSeriePersonalizzateHint;
+
   /// No description provided for @storicoTitle.
   ///
   /// In it, this message translates to:

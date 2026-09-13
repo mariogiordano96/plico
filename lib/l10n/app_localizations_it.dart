@@ -1680,6 +1680,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get targetDialogDurataMin => 'Durata (minuti)';
 
   @override
+  String get targetDialogSeriePersonalizzate => 'Serie personalizzate';
+
+  @override
+  String get targetDialogSeriePersonalizzateHint =>
+      'Pianifica reps/peso e tecnica per ogni serie, subito riproposti in sessione guidata';
+
+  @override
   String storicoTitle(String nome) {
     return 'Storico — $nome';
   }

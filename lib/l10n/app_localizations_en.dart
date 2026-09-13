@@ -1671,6 +1671,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get targetDialogDurataMin => 'Duration (minutes)';
 
   @override
+  String get targetDialogSeriePersonalizzate => 'Custom sets';
+
+  @override
+  String get targetDialogSeriePersonalizzateHint =>
+      'Plan reps/weight and technique per set, ready to go in the guided session';
+
+  @override
   String storicoTitle(String nome) {
     return 'History — $nome';
   }

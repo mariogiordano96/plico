@@ -1,7 +1,8 @@
 # Tecniche di Allenamento — Analisi Funzionale
 
 > ✅ **COMPLETATA** — Fasi 1-6 implementate e pushate su `main`. Vedi "Stato
-> finale" in fondo al documento.
+> finale" in fondo al documento. Fase 7 (pianificazione in creazione scheda)
+> aggiunta successivamente, vedi in fondo al piano.
 
 > Obiettivo: estendere il modello "serie = reps + peso" con le tecniche di
 > intensità più usate da chi allena da intermedio in su — oggi Plico supporta
@@ -365,3 +366,67 @@ bloccanti: 1RM su `suggestNextSession` non technique-aware se la prima
 serie è rest-pause (sezione Fase 5); campi cluster/gradino non recuperati
 da un riavvio app a metà compilazione di una serie (sezione Fase 4); export
 PDF scheda/programma senza indicatore superset (sezione Fase 6).
+
+---
+
+## Fase 7 — Pianificazione tecniche in creazione scheda ✅
+
+**Motivazione**: le Fasi 3/4 (sopra) avevano deliberatamente escluso
+piramide/rest-pause/stripping/forzate/super slow dalla creazione scheda,
+perché richiedevano editing per-serie che il modello dati del target
+(`WorkoutTemplateExercise`, un solo target uniforme) non poteva
+rappresentare. Feedback dell'utente: se so già che farò un piramidale (o un
+rest-pause) su un esercizio, voglio poterlo salvare nella scheda una volta
+sola, non ridecidere ogni volta il giorno stesso in sessione guidata.
+
+- [x] **Modello dati**: nuovo `WorkoutTemplateExercise.plannedSets`
+      (`List<WorkoutTemplateSet>?`, embedded) — quando valorizzato sostituisce
+      il target uniforme. `WorkoutTemplateSet` ha gli stessi campi tecnica di
+      `WorkoutSet` (`forcedReps`, `isSuperSlow`, `restPauseClusters`,
+      `dropStages`) ma non `rpe`/`isWarmup`/`confirmed` (concetti solo
+      dell'esecuzione reale). Campo opzionale, nessuna migrazione.
+- [x] `WorkoutTemplateExercise.materializeSets()` consolida in un solo posto
+      la generazione delle `WorkoutSet` del giorno (prima duplicata identica
+      in `startWorkoutFromTemplate`, `_aggiungiEsercizio`, `_modifica`):
+      copia `plannedSets` 1:1 se presente, altrimenti torna al
+      `List.generate` uniforme di prima.
+- [x] `duplicateTemplate` propaga `plannedSets` (con deep copy via
+      `WorkoutTemplateSet.copy()`) — stesso bug di categoria già risolto per
+      `supersetRole` in Fase 3 (dimenticarlo avrebbe fatto perdere la
+      pianificazione duplicando una scheda). **Non esteso** a
+      `_presetTemplateFromJson`: nessun preset JSON usa oggi `plannedSets`,
+      stesso principio "nessun codice per dati che non esistono ancora".
+- [x] **UI** in `target_esercizio_dialog.dart` (condiviso da creazione
+      scheda e dal log libero/`_modifica` in `allenamento_screen.dart`):
+      toggle "Serie personalizzate" che sostituisce i 3 campi uniformi
+      (Serie/Rip/Kg) con una lista di righe per-serie, ciascuna con reps/peso
+      e lo stesso selettore tecnica (chip + campi extra rest-pause/
+      stripping/forzate) già usato in sessione guidata. Pulsante "Genera
+      piramide" riusa `showGeneraPiramideSheet` esistente (Fase 1) per
+      precompilare la lista con una progressione, poi ogni riga resta
+      modificabile (es. aggiungere rest-pause solo sull'ultima serie della
+      piramide).
+- [x] Estratti in `widgets/technique_widgets.dart` i due widget presentazionali
+      (`TechniqueChip`, `NumberField`) prima privati e duplicati in
+      `sessione_guidata_screen.dart` — riusati identici nella nuova UI,
+      nessuna duplicazione di ~150 righe di logica stateful cluster/gradino
+      (quella resta specifica per contesto: sessione guidata conferma una
+      serie alla volta, qui si pianificano N serie in anticipo).
+- [x] `crea_scheda_screen.dart` (`_EsercizioRow`): il riepilogo mostra
+      `12×40kg · 8×50kg` per-serie quando `plannedSets` è presente, invece
+      del riepilogo uniforme `3×10 · 40kg`.
+- [x] **Riconoscimento "era personalizzata" in modifica**: `_modifica`
+      (`allenamento_screen.dart`) passa un `WorkoutExercise` già
+      materializzato, non il `WorkoutTemplateExercise` originale (che non
+      esiste più a quel punto, o non è mai esistito per il log libero) —
+      `_looksCustom` deduce l'euristica dalle `WorkoutSet` stesse (reps/peso
+      non uniformi, o almeno una tecnica non normale).
+- [x] Nuovi test in `database_service_workout_test.dart`:
+      `plannedSets` materializzato correttamente da `startWorkoutFromTemplate`
+      (tecnica inclusa, target uniforme ignorato quando presente), e
+      `duplicateTemplate` non condivide le liste embedded con l'originale.
+- [x] `flutter analyze` pulito, 184 test verdi (182 + 2 nuovi).
+- [ ] **Non affrontato, fuori scope**: nessun flusso di modifica per un
+      esercizio già aggiunto a una scheda in `crea_scheda_screen.dart` —
+      limite preesistente anche per il target uniforme (si rimuove e si
+      riaggiunge), non introdotto da questa fase.

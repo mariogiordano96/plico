@@ -15,6 +15,7 @@ import '../../services/workout_progress_service.dart';
 import 'rest_timer_sheet.dart';
 import 'sessione_riepilogo_screen.dart';
 import 'sostituisci_esercizio_sheet.dart';
+import 'widgets/technique_widgets.dart';
 
 /// Modalità esecuzione guidata: schermo singolo che guida l'esecuzione di una
 /// scheda esercizio per esercizio, con timer di recupero automatico tra le serie.
@@ -952,17 +953,17 @@ class _SetRowState extends State<_SetRow> {
               ),
               Expanded(
                   child:
-                      _NumberField(controller: widget.reps, hint: l10n.serieDialogRipHint, p: p)),
+                      NumberField(controller: widget.reps, hint: l10n.serieDialogRipHint, p: p)),
               const SizedBox(width: 8),
               Expanded(
-                  child: _NumberField(controller: widget.kg, hint: l10n.serieDialogKgHint, p: p)),
+                  child: NumberField(controller: widget.kg, hint: l10n.serieDialogKgHint, p: p)),
               if (widget.showTechnique &&
                   !widget.done &&
                   _technique == SetTechnique.forzate) ...[
                 const SizedBox(width: 8),
                 SizedBox(
                   width: 56,
-                  child: _NumberField(
+                  child: NumberField(
                       controller: _forcedCtrl, hint: l10n.sessioneGuidataForzateHint, p: p),
                 ),
               ],
@@ -995,7 +996,7 @@ class _SetRowState extends State<_SetRow> {
                 runSpacing: 4,
                 children: [
                   for (final t in SetTechnique.values)
-                    _TechniqueChip(
+                    TechniqueChip(
                       label: _techniqueLabel(t, l10n),
                       selected: _technique == t,
                       p: p,
@@ -1022,7 +1023,7 @@ class _SetRowState extends State<_SetRow> {
                             ),
                             SizedBox(
                               width: 70,
-                              child: _NumberField(
+                              child: NumberField(
                                   controller: _clusterCtrls[i],
                                   hint: l10n.serieDialogRipHint,
                                   p: p),
@@ -1069,7 +1070,7 @@ class _SetRowState extends State<_SetRow> {
                             ),
                             SizedBox(
                               width: 56,
-                              child: _NumberField(
+                              child: NumberField(
                                   controller: _stageCtrls[i].$1,
                                   hint: l10n.serieDialogRipHint,
                                   p: p),
@@ -1077,7 +1078,7 @@ class _SetRowState extends State<_SetRow> {
                             const SizedBox(width: 4),
                             SizedBox(
                               width: 56,
-                              child: _NumberField(
+                              child: NumberField(
                                   controller: _stageCtrls[i].$2,
                                   hint: l10n.serieDialogKgHint,
                                   p: p),
@@ -1110,64 +1111,6 @@ class _SetRowState extends State<_SetRow> {
               ),
           ],
         ],
-      ),
-    );
-  }
-}
-
-class _TechniqueChip extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final ColorPalette p;
-  final VoidCallback onTap;
-  const _TechniqueChip(
-      {required this.label, required this.selected, required this.p, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: selected ? p.accent.withValues(alpha: 0.15) : p.surfaceVariant,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: selected ? p.accent : p.cardBorder),
-        ),
-        child: Text(label,
-            style: TextStyle(
-                fontSize: 11,
-                color: selected ? p.accent : p.textMuted,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w400)),
-      ),
-    );
-  }
-}
-
-class _NumberField extends StatelessWidget {
-  final TextEditingController controller;
-  final String hint;
-  final ColorPalette p;
-  const _NumberField({required this.controller, required this.hint, required this.p});
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      style: TextStyle(color: p.textPrimary),
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: TextStyle(color: p.textMuted),
-        isDense: true,
-        filled: true,
-        fillColor: p.background,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: p.cardBorder),
-        ),
       ),
     );
   }

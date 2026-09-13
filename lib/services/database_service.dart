@@ -1450,7 +1450,8 @@ class DatabaseService {
             ..targetDurationSeconds = e.targetDurationSeconds
             ..supersetGroupId = e.supersetGroupId
             ..restSeconds = e.restSeconds
-            ..supersetRole = e.supersetRole)
+            ..supersetRole = e.supersetRole
+            ..plannedSets = e.plannedSets?.map((s) => s.copy()).toList())
           .toList();
     copy.id = await saveWorkoutTemplate(copy);
     return copy;
