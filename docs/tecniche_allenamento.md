@@ -669,3 +669,17 @@ Kg diventa obbligatorio con la piramide).
       la piramide, incremento/decremento non validi) invece di un
       `return` senza feedback.
 - [x] `flutter analyze` pulito, 184 test verdi.
+
+### Fase 7l — Fix: peso obbligatorio (≥0) per confermare una serie in sessione guidata ✅
+
+**Feedback dell'utente**: in sessione guidata si poteva confermare una serie
+(tap sulla spunta) senza aver scritto nulla nel campo peso, o con un valore
+negativo — il peso deve essere obbligatorio, `0` è un valore valido (a
+corpo libero o su macchine assistite che sottraggono peso).
+
+- [x] `_SetRowState._handleConfirm` valida il campo peso prima di
+      procedere: se vuoto o negativo, mostra uno `SnackBar` con messaggio
+      (`sessioneGuidataErrorePeso`) e non conferma la serie. `0` passa la
+      validazione. Vale sia per le serie di riscaldamento sia per quelle
+      di lavoro (stesso punto di conferma per entrambe).
+- [x] `flutter analyze` pulito, 184 test verdi.

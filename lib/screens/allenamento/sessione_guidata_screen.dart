@@ -899,7 +899,18 @@ class _SetRowState extends State<_SetRow> {
   /// Scrive la tecnica scelta sulla WorkoutSet prima di confermare — solo a
   /// questo punto, non a ogni digitazione (stesso principio di `_confirmSerie`
   /// nel parent, che legge reps/kg solo alla conferma).
+  /// Il peso è obbligatorio per confermare una serie — `0` è un valore
+  /// valido (a corpo libero o su una macchina assistita che sottrae peso),
+  /// negativo o mancante no. Richiesta esplicita dell'utente: prima si
+  /// poteva confermare senza aver scritto nulla nel campo kg.
   void _handleConfirm() {
+    final kg = double.tryParse(widget.kg.text.replaceAll(',', '.'));
+    if (kg == null || kg < 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.sessioneGuidataErrorePeso)),
+      );
+      return;
+    }
     final w = widget.workoutSet;
     w.forcedReps = null;
     w.isSuperSlow = false;

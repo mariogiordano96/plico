@@ -1826,6 +1826,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get sessioneGuidataAspettaTurno => 'Aspetta il turno';
 
   @override
+  String get sessioneGuidataErrorePeso =>
+      'Inserisci il peso (anche 0 se a corpo libero)';
+
+  @override
   String get sessioneGuidataTecnicaNormale => 'Normale';
 
   @override

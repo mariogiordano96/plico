@@ -3356,6 +3356,12 @@ abstract class AppLocalizations {
   /// **'Aspetta il turno'**
   String get sessioneGuidataAspettaTurno;
 
+  /// No description provided for @sessioneGuidataErrorePeso.
+  ///
+  /// In it, this message translates to:
+  /// **'Inserisci il peso (anche 0 se a corpo libero)'**
+  String get sessioneGuidataErrorePeso;
+
   /// No description provided for @sessioneGuidataTecnicaNormale.
   ///
   /// In it, this message translates to:

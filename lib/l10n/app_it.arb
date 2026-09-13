@@ -742,6 +742,7 @@
     "placeholders": { "n": { "type": "int" } }
   },
   "sessioneGuidataAspettaTurno": "Aspetta il turno",
+  "sessioneGuidataErrorePeso": "Inserisci il peso (anche 0 se a corpo libero)",
 
   "sessioneGuidataTecnicaNormale": "Normale",
   "sessioneGuidataTecnicaForzate": "Forzate",

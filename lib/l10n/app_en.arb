@@ -592,6 +592,7 @@
   "sessioneGuidataSaltaRiscaldamento": "Skip warm-up",
   "sessioneGuidataRiscaldamentoSerieLabel": "Warm-up {n}",
   "sessioneGuidataAspettaTurno": "Wait your turn",
+  "sessioneGuidataErrorePeso": "Enter the weight (use 0 for bodyweight)",
 
   "sessioneGuidataTecnicaNormale": "Normal",
   "sessioneGuidataTecnicaForzate": "Forced",
