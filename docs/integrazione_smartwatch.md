@@ -325,6 +325,48 @@ non necessaria per gli obiettivi delle sezioni 5.1-5.2.
   Android possono quindi risultare leggermente più alte che su iOS, stesso caveat generale
   di asimmetria tra le due piattaforme già presente altrove nel documento (sezione 9)
 
+### Fase 7 — Hardening dedup multi-sessione stesso giorno (pianificata)
+
+**Problema identificato** (non un feedback utente, emerso da revisione
+codice): la Fase 3 segnala esplicitamente due semplificazioni come "da
+validare" e non ancora coperte da test automatici:
+- dedup cardio via proxy sulla durata (±15%) sullo stesso giorno, invece
+  che sull'orario reale (i log manuali non hanno `sourceStartTime`)
+- regola "watch vince sulla stima MET" per i pesi, anche questa a livello
+  di giorno intero, non di sessione specifica
+
+Scenari a rischio non ancora coperti da test, individuati dalla lettura
+della sezione 8 ("resta la parte più delicata da testare bene"):
+1. **Due sessioni cardio lo stesso giorno** (es. corsa al mattino importata
+   dal watch + bici la sera loggata a mano): se le durate capitano per caso
+   dentro la finestra ±15%, il proxy potrebbe far scomparire la sessione
+   manuale credendola un duplicato di quella importata.
+2. **Due sessioni pesi lo stesso giorno**, una manuale e una importata dal
+   watch in orari diversi: la regola day-level sopprime la kcal stimata di
+   *tutte* le sessioni pesi manuali di quel giorno, non solo di quella
+   effettivamente duplicata — kcal perse per la sessione manuale che non
+   era affatto un duplicato.
+3. **Sessione watch con solo frequenza cardiaca** (senza kcal attive, già
+   gestito con fallback in Fase 5) lo stesso giorno di un log manuale di
+   forza — verificare che il fallback e la regola MET non interagiscano
+   producendo un doppio conteggio o un azzeramento scorretto.
+
+**Nota**: non è ancora chiaro se questi scenari producano un bug reale o
+se il comportamento attuale sia già corretto — il gap oggi è l'assenza di
+test automatici che lo dimostrino, non necessariamente un bug noto.
+
+- [ ] Scrivere test automatici (unit/widget, non serve device) per i tre
+      scenari sopra, usando dati sintetici per `WorkoutExercise` con
+      `source`/`sourceStartTime`/`sourceEndTime` popolati come farebbe
+      un import reale.
+- [ ] Far girare i test: se passano già, chiudere la fase aggiornando la
+      sezione 8 da "delicato, da testare" a "coperto da test automatici
+      (elenco file test)" — nessun fix di codice necessario.
+- [ ] Se emerge un bug reale in uno degli scenari, valutare fix mirato
+      (es. includere anche l'orario approssimato nel confronto invece del
+      solo giorno, se disponibile) prima di aggiungere altri automatismi.
+- [ ] `flutter analyze` pulito, suite di test verde, commit.
+
 ---
 
 ## Riferimenti

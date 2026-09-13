@@ -683,3 +683,49 @@ corpo libero o su macchine assistite che sottraggono peso).
       validazione. Vale sia per le serie di riscaldamento sia per quelle
       di lavoro (stesso punto di conferma per entrambe).
 - [x] `flutter analyze` pulito, 184 test verdi.
+
+### Fase 7m — Persistenza draft tecniche avanzate su kill/riavvio app (pianificata)
+
+**Problema identificato** (non un feedback utente, emerso da revisione codice):
+i valori extra di una serie con tecnica avanzata non ancora confermata —
+cluster oltre al primo nel rest-pause (`_clusterCtrls`), gradini dello
+stripping (`_stageCtrls`) in `_SetRowState` — vivono solo in
+`TextEditingController` locali finché non si conferma la serie: non
+toccano `WorkoutSet` né Isar prima di quel momento. Se il processo viene
+ucciso dal sistema (background prolungato, memoria bassa) o il telefono si
+riavvia mentre l'utente sta ancora compilando una serie di questo tipo,
+quei valori extra si perdono e vanno ridigitati. Limite già annotato nel
+codice (commento sopra `class _SetRowState`, "non sopravvivono comunque a
+un riavvio app a metà compilazione... limite noto, non bloccante").
+
+**Approccio proposto**: riusare il pattern di checkpoint periodico già
+esistente per il timer di sessione (`_checkpointElapsed`, scritto su Isar
+ogni 10 tick del `_tickTimer` già attivo in `initState`) — estenderlo per
+scrivere, nello stesso giro, anche i valori draft (reps/kg dei campi
+principali + cluster/gradini extra) sui `WorkoutSet` corrispondenti delle
+serie non ancora confermate. Nessun nuovo timer, nessuna nuova
+infrastruttura: stesso trigger già validato in produzione per il tempo
+sessione.
+
+- [ ] Estendere `_checkpointElapsed` (o un metodo analogo chiamato dallo
+      stesso tick) per scrivere su Isar, per ogni serie non confermata
+      della sessione attiva: reps/kg correnti dei controller principali,
+      `restPauseClusters`/`dropStages` letti dai controller extra
+      (`_clusterCtrls`/`_stageCtrls`) — serve un modo per `_SetRowState`
+      di esporre questi valori al parent (`SessioneGuidataScreen`), oggi
+      non ha un riferimento diretto ai controller extra della child.
+- [ ] All'apertura/ripristino di una sessione (`_prepare`, già gestisce il
+      resume del timer via `getPendingSessionSeconds`), inizializzare i
+      controller extra (`_clusterCtrls`/`_stageCtrls` in `_SetRowState`)
+      dai valori draft persistiti invece che vuoti, quando la serie non è
+      confermata ma ha già dei dati draft salvati.
+- [ ] Decisione da confermare: il costo di una scrittura Isar ogni 10s
+      anche per dati "in bozza" è lo stesso già accettato per il tempo
+      sessione — nessun impatto aggiuntivo previsto, ma va verificato che
+      non introduca lag percepibile durante la digitazione se il giro di
+      scrittura capita a metà.
+- [ ] Test manuale: compilare cluster/gradini extra di una serie non
+      confermata, forzare il kill del processo (o attendere >10s e
+      simulare riavvio), verificare che alla riapertura i valori siano
+      ancora presenti.
+- [ ] `flutter analyze` pulito, suite di test verde, commit.

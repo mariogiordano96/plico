@@ -7,6 +7,17 @@
 > sotto; e il modello scelto è **Qwen3 1.7B/0.6B**, non Gemma (vedi "Raccomandazione"
 > aggiornata più sotto). Il resto — RAG-first, avvertimento legale, confronto modelli —
 > resta valido come contesto.
+>
+> **Aggiornamento 2026-09**: verifica puntuale su `pub.dev/packages/flutter_gemma` (v1.8.2)
+> — il pacchetto elenca ufficialmente **solo Qwen3 0.6B**, non 1.7B, tra i modelli Qwen3
+> pronti all'uso. Il piano "1.7B di default" in `integrazione_flutter_gemma.md` sezione 2 va
+> quindi riverificato prima dell'implementazione; **Qwen 2.5 1.5B** (Apache 2.0, confermato
+> supportato dal pacchetto) resta un'alternativa gratuita già pronta se la 0.6B non basta in
+> qualità — dettagli e motivazione in quel documento. Verificata anche l'esistenza della
+> nuova famiglia **Qwen 3.5 Small (0.8B/2B/4B/9B, Apache 2.0, marzo 2026)**: non ancora
+> supportata da `flutter_gemma` al momento di questa verifica, quindi non utilizzabile oggi
+> nonostante sia gratuita e più recente — da tenere d'occhio per un futuro aggiornamento del
+> pacchetto.
 
 ---
 

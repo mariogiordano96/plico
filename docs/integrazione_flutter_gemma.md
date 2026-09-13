@@ -47,12 +47,31 @@ questa sezione la aggiorna sul punto licenza/modello dopo verifica puntuale.
   licenza — ma la taglia più piccola pubblicata (Gemma 4 E2B) resta nella classe di peso
   pesante (~2GB), mentre Qwen3 offre licenza pulita **e** taglie leggere insieme. Per
   questo si è scelto Qwen3 anche a parità di problema di licenza risolto da entrambi.
-- **Qwen3 1.7B come modello di default**, **Qwen3 0.6B come fallback** su device con RAM
-  limitata (più leggero ancora del default) — footprint di entrambi nell'ordine delle
-  centinaia di MB, coerente con l'impostazione di sezione 5.1
-- **Italiano**: Qwen3 dichiara supporto multilingue su 100+ lingue, italiano incluso
-  esplicitamente nella lista ufficiale, anche sulle taglie piccole (0.6B/1.7B, tramite
-  distillazione "strong-to-weak" dai modelli Qwen3 più grandi). Il supporto dichiarato
+- **Aggiornamento 2026-09 — verifica puntuale su pub.dev**: `flutter_gemma` v1.8.2 (pubblicata
+  di recente) elenca esplicitamente come modello Qwen3 supportato **solo "Qwen3 0.6B"** —
+  **nessun Qwen3 1.7B** nell'elenco ufficiale dei modelli curati dal pacchetto (verificato sia
+  su `pub.dev/packages/flutter_gemma` sia su `fluttergemma.dev/docs/models`, stessa fonte,
+  stesso autore). La scelta "1.7B di default" sotto va quindi trattata come **da riverificare
+  prima dell'implementazione**, non confermata: il modello Qwen3-1.7B esiste ed è Apache 2.0
+  (Hugging Face), ma non risulta tra quelli che il pacchetto scarica/esegue "out of the box" —
+  andrebbe capito se è comunque caricabile (formato `.task`/`.litertlm` convertito a mano) o
+  se in pratica l'unica opzione Qwen3 disponibile senza lavoro extra è la 0.6B.
+  **Alternativa già pronta nello stesso pacchetto, se la 0.6B risultasse troppo debole**:
+  **Qwen 2.5 1.5B (1.6GB)** — anch'esso Apache 2.0 (confermato: tutti i modelli Qwen2.5 tranne
+  3B e 72B sono Apache 2.0), function calling supportato, esplicitamente nell'elenco ufficiale
+  del pacchetto. Non è Qwen3 (niente "thinking mode"), ma è più pesante/capace della 0.6B e
+  resta gratuito e già supportato senza lavoro di conversione.
+  **Non ancora disponibile**: la nuova famiglia **Qwen 3.5 Small (0.8B/2B/4B/9B, Apache 2.0,
+  rilasciata marzo 2026)** non risulta nell'elenco modelli di `flutter_gemma` al momento di
+  questa verifica — potenziale upgrade futuro se/quando il pacchetto la supporterà, non
+  un'opzione utilizzabile oggi.
+- **Piano rivisto in attesa di riverifica**: **Qwen3 0.6B come modello di default** (unico
+  Qwen3 confermato supportato), **Qwen 2.5 1.5B come opzione più capace** se la qualità della
+  0.6B non basta (in particolare per la generazione ricette, sezione 3.2/6 — task più
+  esigente delle semplici risposte fattuali già previste) — footprint di entrambi comunque
+  nell'ordine delle centinaia di MB/pochi GB, coerente con l'impostazione di sezione 5.1
+- **Italiano**: Qwen3/Qwen2.5 dichiarano supporto multilingue su 100+ lingue, italiano incluso
+  esplicitamente nella lista ufficiale, anche sulle taglie piccole. Il supporto dichiarato
   **non equivale a qualità verificata sul dominio nutrizione/allenamento in italiano** —
   da validare concretamente in Fase 1 con domande reali, non assunto solo perché l'italiano
   è nell'elenco delle lingue supportate
@@ -102,12 +121,27 @@ tool con uno schema chiaro per il modello, non scrivere nuove query.
 | Storico di un esercizio | `getHistoryForExercise(exerciseId)` | "Quando ho fatto squat l'ultima volta?" |
 | Record personali | `getAllPersonalRecords()` | "Qual è il mio massimale in panca?" |
 | Kcal bruciate in allenamento (giorno) | `getWorkoutKcalForDay(date)` | "Quante kcal ho bruciato oggi in palestra?" |
-| Piano alimentare attivo | `getMealPlan()` | "Cosa devo mangiare oggi secondo il piano?" |
+| Piano alimentare attivo | `getMealPlan()` | "Cosa devo mangiare oggi secondo il piano?" / "Dammi una ricetta per pranzo con queste grammature" |
 | Volume settimanale per gruppo muscolare | `getWeeklyVolumeByMuscleGroup(weekStart)` | "Sto allenando abbastanza le gambe questa settimana?" |
 | Impostazioni/obiettivo TDEE | `getAppSettings()` | "Qual è il mio obiettivo calorico attuale?" |
 
 > Nessun tool con effetti collaterali in v1 (niente `save*`/`add*`/`delete*`): coerente con
 > la decisione "sola lettura" di questo documento.
+
+**Nota su "dammi una ricetta"**: a differenza degli altri esempi in tabella (risposte brevi e
+fattuali su dati già noti), generare una ricetta è un output lungo e strutturato
+(ingredienti + procedimento) — un task generativo più esigente, non solo un lookup. Due
+conseguenze da tenere esplicite:
+- Va validato in Fase 1 con lo stesso rigore riservato alla qualità in italiano (vedi
+  sezione 2): non basta che il modello "sappia l'italiano", deve produrre una ricetta
+  coerente e seguibile, specialmente sul modello più leggero (0.6B).
+- Ricerca esterna (2026) su generazione di ricette con LLM segnala che anche modelli
+  fine-tunati ad hoc faticano a rispettare con precisione le quantità di ingredienti fornite
+  in input — per Plico questo significa che la validazione non deve limitarsi a "la ricetta
+  suona bene", ma controllare esplicitamente che le grammature citate nella ricetta generata
+  siano vicine a quelle del piano passato come contesto (`getMealPlan()`), non reinventate dal
+  modello. Se lo scostamento è sistematico, va gestito lato prompt (istruzione esplicita di
+  rispettare le grammature date) prima di considerare la feature pronta.
 
 ### 3.3 RAG — contenuti di dominio
 
@@ -202,9 +236,25 @@ database alimenti CREA) è sotto i 2 MB in totale.
 
 ### Fase 1 — Setup
 - [ ] Aggiungere `flutter_gemma` (+ package RAG `flutter_gemma_rag_qdrant`)
-- [ ] Scaricare/testare Qwen3 1.7B (default) e Qwen3 0.6B (fallback) su device reale
+- [ ] Scaricare/testare Qwen3 0.6B (unico Qwen3 confermato supportato, vedi sezione 2) e,
+      se la qualità non basta, Qwen 2.5 1.5B come alternativa più capace — su device reale
 - [ ] Verificare qualità delle risposte in italiano su domande di dominio reali (non solo
       fidarsi del supporto multilingue dichiarato, sezione 2)
+- [x] **Test negativo, 2026-09** — generazione ricette con `qwen3.5:2b` via Ollama
+      (`--think=false`), stesso prompt di test di questo doc (sezione 3.2): risultato
+      inutilizzabile. Il modello ha inventato un ingrediente non presente nel piano ("lardo
+      crudo" al posto del pollo), ha prodotto un procedimento incoerente e contraddittorio
+      (impanatura, un impasto steso a mano, frittura, congelamento, bollitura in acqua per
+      un piatto pollo/riso/zucchine) ed è entrato in un loop di elaborazione senza arrivare
+      a una conclusione sensata, richiedendo interruzione manuale. Non risolto disattivando
+      il thinking mode — non è (solo) un problema di ragionamento visibile, ma di coerenza
+      generativa di base a questa taglia. **Non testata la Fase 2 di verifica prevista**
+      (prompt più vincolante, o `qwen3.5:4b` laptop-class) — decisione presa di non investire
+      altro tempo su questo prima di avere il fallback cloud pronto, vedi Fase 7
+- [ ] *(eventuale, se si vuole dare un'altra possibilità al modello locale prima di
+      considerarlo chiuso)* Ripetere il test con un prompt più vincolante (limite di
+      passaggi, divieto esplicito di ingredienti/tecniche fuori lista) e/o con `qwen3.5:4b`
+      — non prioritario, la strada decisa per ora è il fallback Gemini opt-in (Fase 7)
 - [ ] Configurare e verificare la modalità "non-thinking" per la latenza in chat
 - [ ] Confermare il supporto function calling su Qwen3 con un test end-to-end minimo
 - [ ] Misurare concretamente l'impatto sulla dimensione dell'app da store (libreria nativa,
@@ -236,6 +286,80 @@ questa fase: richiederebbe conferme utente più stringenti prima di ogni azione 
 separata dei guardrail (un'AI che scrive dati per errore è un rischio diverso da una che
 risponde male a una domanda).
 
+### Fase 7 — *(percorso scelto per le ricette)* Modello cloud bring-your-own-key (pianificata)
+
+**Motivazione — non più solo un'ipotesi, confermata da un test reale**: il test negativo di
+Fase 1 (2026-09, `qwen3.5:2b`) ha mostrato che il modello locale nella classe di taglia
+adatta a mobile non è affidabile per generare ricette — ingredienti inventati, procedimento
+incoerente, nessun miglioramento disattivando il thinking mode. **Decisione presa**: per la
+generazione ricette specificamente, non si insiste sul modello locale — si offre da subito
+l'iscrizione (enrollment) al fallback **Gemini Flash** via API se l'utente lo desidera,
+invece di investire altro tempo di validazione su modelli locali più grandi o prompt più
+elaborati. Il modello locale resta comunque il default per il resto della chat (domande
+fattuali sui propri dati, sezione 3.2, dove il test *non* ha mostrato problemi) — la scelta
+riguarda solo la generazione ricette, non tutto l'assistente. Senza rompere il principio
+offline-first per chi non attiva l'opzione: resta opt-in, mai automatico.
+
+**Meccanismo — bring-your-own-key, non una chiave Plico condivisa**:
+- L'utente genera **la propria** API key gratuita su [Google AI Studio](https://aistudio.google.com)
+  (nessuna carta richiesta) e la incolla in un campo nelle Impostazioni di Plico — non è un
+  "Accedi con Google" via OAuth dentro l'app (richiederebbe la registrazione/verifica
+  dell'app presso Google, più complesso), solo un campo testo per la chiave
+- **Perché non una chiave unica incorporata in Plico**: il free tier di Gemini Flash è
+  limitato **per progetto** (10 richieste/minuto, 1.500/giorno — verificato su
+  `ai.google.dev/gemini-api/docs/rate-limits`, 2026-09), non per utente finale. Una chiave
+  condivisa da tutti gli utenti Plico esaurirebbe quel limite quasi subito con più di
+  qualche utente contemporaneo, oltre al rischio di estrazione della chiave dall'APK. Con
+  bring-your-own-key ogni utente ha la propria quota separata, e un eventuale sforamento a
+  pagamento resterebbe a suo carico, non di Plico
+- Nessun backend, nessuna chiave di Plico da proteggere — le chiamate partono direttamente
+  dal client verso l'API Google usando la chiave incollata dall'utente
+
+**Implementazione — REST diretta, non `firebase_ai`**:
+- L'SDK ufficiale Dart `google_generative_ai` è **deprecato**; il sostituto raccomandato da
+  Google è `firebase_ai`. **Da evitare per questo caso d'uso**: `firebase_ai` richiede un
+  progetto Firebase collegato all'app (file di configurazione, inizializzazione Firebase) —
+  e quel progetto sarebbe **di Plico**, non dell'utente. L'uso dell'API passerebbe quindi
+  per la quota/fatturazione del progetto di Plico, non per quella personale dell'utente,
+  vanificando l'intero motivo per cui si è scelto bring-your-own-key
+- **Scelta**: chiamata HTTP diretta alla REST API di Gemini (package `http`, nessuna
+  dipendenza nuova pesante, nessun progetto Firebase/Google Cloud lato Plico):
+  ```
+  POST https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=<chiave_utente>
+  Body: { "contents": [{ "parts": [{ "text": "<prompt costruito>" }] }] }
+  ```
+  Per lo streaming in UI (token per token, come già previsto per il modello locale in
+  sezione 4) c'è l'endpoint equivalente `:streamGenerateContent`
+- **Nessun function calling verso Gemini necessario per le ricette**: a differenza del
+  modello locale (sezione 3.2, tool registry su `DatabaseService`), qui il piano alimentare
+  lo si legge già in locale con `getMealPlan()` **prima** di costruire la richiesta, e si
+  scrive direttamente nel prompt come testo/dati — più semplice che far scoprire al modello
+  cloud i dati tramite una tool call
+- La UI di chat/streaming già pianificata per il modello locale (sezione 4) può essere
+  riusata cambiando solo il "motore" dietro le quinte — non serve una schermata separata
+
+**Privacy — punto distinto dal costo, da comunicare esplicitamente**:
+- Google dichiara che le richieste sul free tier **possono essere usate per migliorare i
+  modelli** — a differenza del modello locale, i dati inviati (piano alimentare, e
+  indirettamente peso/obiettivi se passati come contesto) lasciano il device e potrebbero
+  finire nei dati di addestramento di Google
+- Serve un disclaimer esplicito **prima** di attivare l'opzione, stesso pattern già usato
+  per il consenso dati smartwatch (`integrazione_smartwatch.md`, Fase 5) — non un'attivazione
+  silenziosa o un fallback automatico quando il modello locale è "abbastanza buono"
+
+- [ ] UI: campo "API key Gemini (opzionale)" nelle Impostazioni, con link diretto a
+      Google AI Studio e spiegazione di cosa succede attivandola
+- [ ] Disclaimer esplicito pre-attivazione: dati inviati a Google, possibile uso per
+      training sul free tier, costi di eventuale sforamento a carico dell'utente
+- [ ] Selettore modello locale/cloud in chat, o fallback automatico **solo su errore/timeout
+      del modello locale**, mai come sostituzione silenziosa per "qualità percepita bassa"
+      (quella resta una scelta esplicita dell'utente, non euristica automatica)
+- [ ] Gestione errori specifici dell'API cloud: chiave non valida, quota esaurita (10 RPM/
+      1.500 RPD), nessuna connessione — messaggi distinti, non un errore generico
+- [ ] Verificare se serve gestire il caso "utente ha una chiave con billing attivo oltre il
+      free tier" in modo diverso (nessuna azione lato Plico prevista oggi, ma da tenere
+      presente se emergono segnalazioni)
+
 ---
 
 ## Riferimenti
@@ -248,3 +372,7 @@ risponde male a una domanda).
 - [Gemma Terms of Use](https://ai.google.dev/gemma/terms) — Prohibited Use Policy e diritto di revoca, ancora validi per Gemma 3n/Gemma 3
 - [Gemma 4: Expanding the Gemmaverse with Apache 2.0 — Google Open Source Blog](https://opensource.googleblog.com/2026/03/gemma-4-expanding-the-gemmaverse-with-apache-20.html) — rilascio aprile 2026, Apache 2.0, ma taglia minima E2B resta in classe ~2GB
 - `evolutiva_esercizi.md` — pattern seed/contenuto curato a mano già in uso in Plico (preset allenamento)
+- [Gemini API — Rate limits](https://ai.google.dev/gemini-api/docs/rate-limits) — quote free tier per progetto, Fase 7
+- [Google AI Studio](https://aistudio.google.com) — dove l'utente genera la propria API key gratuita per Fase 7
+- [Gemini API — generateContent REST reference](https://ai.google.dev/api/generate-content) — endpoint usato in Fase 7, chiamata diretta senza SDK
+- [Firebase AI Logic — pricing/billing](https://firebase.google.com/docs/ai-logic/pricing) — motivo per cui `firebase_ai` non va usato in Fase 7 (quota sul progetto Firebase di Plico, non dell'utente)
