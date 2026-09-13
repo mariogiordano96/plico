@@ -188,36 +188,14 @@ class _TargetEsercizioDialogState extends State<_TargetEsercizioDialog> {
     }
   }
 
-  /// Genera le serie di base secondo `_progressione` — target uniforme, o
-  /// piramide ascendente/discendente da serie/rip/kg + incremento/decremento
-  /// (stessa formula di `genera_piramide_dialog.dart`, ora inline: niente
-  /// più un foglio separato da aprire per questo).
-  List<WorkoutTemplateSet>? _generaSerieBase() {
-    final numeroSerie = int.tryParse(_serieCtrl.text);
-    if (numeroSerie == null || numeroSerie <= 0) return null;
-    final reps = int.tryParse(_ripCtrl.text);
-    final kg = double.tryParse(_kgCtrl.text.replaceAll(',', '.'));
-
-    if (_progressione == _Progressione.normale) {
-      return List.generate(
-          numeroSerie, (_) => WorkoutTemplateSet()
-            ..reps = reps
-            ..weightKg = kg);
-    }
-    final incremento = double.tryParse(_incrementoCtrl.text.replaceAll(',', '.'));
-    final decremento = int.tryParse(_decrementoCtrl.text);
-    if (kg == null || reps == null || incremento == null || decremento == null) return null;
-    final ascendente = _progressione == _Progressione.piramidale;
-    return [
-      for (var i = 0; i < numeroSerie; i++)
-        WorkoutTemplateSet()
-          ..weightKg =
-              ascendente ? kg + i * incremento : (kg - i * incremento).clamp(0, double.infinity)
-          ..reps = ascendente ? (reps - i * decremento).clamp(1, 1000).toInt() : reps + i * decremento,
-    ];
-  }
+  /// Errore di validazione mostrato sotto i campi, invece di un fallimento
+  /// silenzioso di `_salva` — es. peso mancante con la piramide selezionata,
+  /// dove il campo Kg smette di essere opzionale ma non lo comunicava.
+  String? _errore;
 
   void _salva() {
+    final l10n = context.l10n;
+    setState(() => _errore = null);
     final result = WorkoutTemplateExercise()
       ..exerciseId = widget.exercise.externalId
       ..exerciseName =
@@ -225,14 +203,51 @@ class _TargetEsercizioDialogState extends State<_TargetEsercizioDialog> {
 
     if (_isCardio) {
       final min = int.tryParse(_durataCtrl.text);
-      if (min == null || min <= 0) return;
+      if (min == null || min <= 0) {
+        setState(() => _errore = l10n.targetDialogErroreDurata);
+        return;
+      }
       result.targetDurationSeconds = min * 60;
       Navigator.pop(context, result);
       return;
     }
 
-    final baseSets = _generaSerieBase();
-    if (baseSets == null || baseSets.isEmpty) return;
+    final numeroSerie = int.tryParse(_serieCtrl.text);
+    if (numeroSerie == null || numeroSerie <= 0) {
+      setState(() => _errore = l10n.targetDialogErroreSerie);
+      return;
+    }
+    final reps = int.tryParse(_ripCtrl.text);
+    final kg = double.tryParse(_kgCtrl.text.replaceAll(',', '.'));
+
+    final List<WorkoutTemplateSet> baseSets;
+    if (_progressione == _Progressione.normale) {
+      baseSets = List.generate(
+          numeroSerie, (_) => WorkoutTemplateSet()
+            ..reps = reps
+            ..weightKg = kg);
+    } else {
+      if (reps == null || kg == null) {
+        setState(() => _errore = l10n.targetDialogErrorePiramideKgRip);
+        return;
+      }
+      final incremento = double.tryParse(_incrementoCtrl.text.replaceAll(',', '.'));
+      final decremento = int.tryParse(_decrementoCtrl.text);
+      if (incremento == null || decremento == null) {
+        setState(() => _errore = l10n.targetDialogErrorePiramideIncremento);
+        return;
+      }
+      final ascendente = _progressione == _Progressione.piramidale;
+      baseSets = [
+        for (var i = 0; i < numeroSerie; i++)
+          WorkoutTemplateSet()
+            ..weightKg = ascendente
+                ? kg + i * incremento
+                : (kg - i * incremento).clamp(0, double.infinity)
+            ..reps =
+                ascendente ? (reps - i * decremento).clamp(1, 1000).toInt() : reps + i * decremento,
+      ];
+    }
     _applyTecnica(baseSets);
 
     result.targetSets = baseSets.length;
@@ -489,7 +504,18 @@ class _TargetEsercizioDialogState extends State<_TargetEsercizioDialog> {
                   const SizedBox(width: 10),
                   Expanded(child: _Field(label: l10n.targetDialogRip, controller: _ripCtrl, p: p)),
                   const SizedBox(width: 10),
-                  Expanded(child: _Field(label: l10n.targetDialogKg, controller: _kgCtrl, p: p)),
+                  Expanded(
+                      child: _Field(
+                          // Con la piramide selezionata Kg e Rip smettono di
+                          // essere opzionali (servono come punto di partenza
+                          // della progressione) — la label lo comunica,
+                          // altrimenti il salvataggio fallisce senza che sia
+                          // chiaro perché.
+                          label: _progressione == _Progressione.normale
+                              ? l10n.targetDialogKg
+                              : l10n.targetDialogKgObbligatorio,
+                          controller: _kgCtrl,
+                          p: p)),
                 ],
               ),
               const SizedBox(height: 16),
@@ -498,6 +524,10 @@ class _TargetEsercizioDialogState extends State<_TargetEsercizioDialog> {
               // personalizzate" a compilazione manuale (meno click, meno
               // sezioni).
               _buildProgressioneSection(p, l10n),
+            ],
+            if (_errore != null) ...[
+              const SizedBox(height: 8),
+              Text(_errore!, style: const TextStyle(color: Colors.red, fontSize: 12)),
             ],
             const SizedBox(height: 20),
             Row(

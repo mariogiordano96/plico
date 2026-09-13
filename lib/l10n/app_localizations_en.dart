@@ -1710,6 +1710,23 @@ class AppLocalizationsEn extends AppLocalizations {
       'Weight decreases and reps increase set after set, starting from the values above.';
 
   @override
+  String get targetDialogKgObbligatorio => 'Kg (required for the pyramid)';
+
+  @override
+  String get targetDialogErroreSerie => 'Invalid number of sets.';
+
+  @override
+  String get targetDialogErroreDurata => 'Invalid duration.';
+
+  @override
+  String get targetDialogErrorePiramideKgRip =>
+      'Enter starting reps and weight to generate the pyramid.';
+
+  @override
+  String get targetDialogErrorePiramideIncremento =>
+      'Enter a valid increment and decrement.';
+
+  @override
   String storicoTitle(String nome) {
     return 'History — $nome';
   }

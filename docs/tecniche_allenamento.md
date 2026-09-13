@@ -650,3 +650,22 @@ ruolo non si applica.
       propagato (badge esplosiva/lenta in sessione guidata) senza che
       l'utente lo veda più nel punto dove lo ha impostato.
 - [x] `flutter analyze` pulito, 184 test verdi.
+
+### Fase 7k — Fix: peso obbligatorio nella piramide non comunicato, salvataggio silenzioso ✅
+
+**Feedback dell'utente**: con "Piramidale"/"Piramidale inverso" selezionato,
+salvare senza Kg non faceva procedere — ma il campo restava etichettato
+"Kg (opzionale)" come nel caso normale, e il tap su "Salva" falliva senza
+nessun messaggio (stesso comportamento silenzioso, in realtà preesistente
+anche per "Serie" invalido nel caso normale, solo più visibile ora che il
+Kg diventa obbligatorio con la piramide).
+
+- [x] Label del campo Kg dinamica: "Kg (opzionale)" con progressione
+      normale, "Kg (richiesto per la piramide)" con piramide/piramide
+      inverso selezionato.
+- [x] `_salva` non fallisce più in silenzio: nuovo stato `_errore`,
+      mostrato come testo rosso sotto i campi, con messaggi specifici
+      (serie non valido, durata non valida, ripetizioni/peso mancanti per
+      la piramide, incremento/decremento non validi) invece di un
+      `return` senza feedback.
+- [x] `flutter analyze` pulito, 184 test verdi.

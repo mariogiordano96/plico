@@ -1719,6 +1719,23 @@ class AppLocalizationsIt extends AppLocalizations {
       'Peso calante e ripetizioni crescenti serie dopo serie, a partire dai valori sopra.';
 
   @override
+  String get targetDialogKgObbligatorio => 'Kg (richiesto per la piramide)';
+
+  @override
+  String get targetDialogErroreSerie => 'Numero di serie non valido.';
+
+  @override
+  String get targetDialogErroreDurata => 'Durata non valida.';
+
+  @override
+  String get targetDialogErrorePiramideKgRip =>
+      'Inserisci ripetizioni e peso iniziali per generare la piramide.';
+
+  @override
+  String get targetDialogErrorePiramideIncremento =>
+      'Inserisci incremento e decremento validi.';
+
+  @override
   String storicoTitle(String nome) {
     return 'Storico — $nome';
   }

@@ -694,6 +694,11 @@
   "targetDialogProgressionePiramidaleInverso": "Piramidale inverso",
   "targetDialogProgressionePiramidaleDescrizione": "Peso crescente e ripetizioni calanti serie dopo serie, a partire dai valori sopra.",
   "targetDialogProgressionePiramidaleInversoDescrizione": "Peso calante e ripetizioni crescenti serie dopo serie, a partire dai valori sopra.",
+  "targetDialogKgObbligatorio": "Kg (richiesto per la piramide)",
+  "targetDialogErroreSerie": "Numero di serie non valido.",
+  "targetDialogErroreDurata": "Durata non valida.",
+  "targetDialogErrorePiramideKgRip": "Inserisci ripetizioni e peso iniziali per generare la piramide.",
+  "targetDialogErrorePiramideIncremento": "Inserisci incremento e decremento validi.",
 
   "storicoTitle": "Storico — {nome}",
   "@storicoTitle": { "placeholders": { "nome": { "type": "String" } } },

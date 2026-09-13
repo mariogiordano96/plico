@@ -3188,6 +3188,36 @@ abstract class AppLocalizations {
   /// **'Peso calante e ripetizioni crescenti serie dopo serie, a partire dai valori sopra.'**
   String get targetDialogProgressionePiramidaleInversoDescrizione;
 
+  /// No description provided for @targetDialogKgObbligatorio.
+  ///
+  /// In it, this message translates to:
+  /// **'Kg (richiesto per la piramide)'**
+  String get targetDialogKgObbligatorio;
+
+  /// No description provided for @targetDialogErroreSerie.
+  ///
+  /// In it, this message translates to:
+  /// **'Numero di serie non valido.'**
+  String get targetDialogErroreSerie;
+
+  /// No description provided for @targetDialogErroreDurata.
+  ///
+  /// In it, this message translates to:
+  /// **'Durata non valida.'**
+  String get targetDialogErroreDurata;
+
+  /// No description provided for @targetDialogErrorePiramideKgRip.
+  ///
+  /// In it, this message translates to:
+  /// **'Inserisci ripetizioni e peso iniziali per generare la piramide.'**
+  String get targetDialogErrorePiramideKgRip;
+
+  /// No description provided for @targetDialogErrorePiramideIncremento.
+  ///
+  /// In it, this message translates to:
+  /// **'Inserisci incremento e decremento validi.'**
+  String get targetDialogErrorePiramideIncremento;
+
   /// No description provided for @storicoTitle.
   ///
   /// In it, this message translates to:

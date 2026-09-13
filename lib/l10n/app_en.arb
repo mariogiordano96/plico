@@ -560,6 +560,11 @@
   "targetDialogProgressionePiramidaleInverso": "Reverse pyramid",
   "targetDialogProgressionePiramidaleDescrizione": "Weight increases and reps decrease set after set, starting from the values above.",
   "targetDialogProgressionePiramidaleInversoDescrizione": "Weight decreases and reps increase set after set, starting from the values above.",
+  "targetDialogKgObbligatorio": "Kg (required for the pyramid)",
+  "targetDialogErroreSerie": "Invalid number of sets.",
+  "targetDialogErroreDurata": "Invalid duration.",
+  "targetDialogErrorePiramideKgRip": "Enter starting reps and weight to generate the pyramid.",
+  "targetDialogErrorePiramideIncremento": "Enter a valid increment and decrement.",
 
   "storicoTitle": "History — {nome}",
   "storicoNessunaSessione": "No session logged for this exercise yet",
