@@ -51,6 +51,13 @@ class _PlannedSetState {
   final List<TextEditingController> clusterCtrls = [];
   final List<(TextEditingController, TextEditingController)> stageCtrls = [];
 
+  // Il picker tecnica è nascosto di default — dire "questo è un piramidale"
+  // (Genera piramide) o aggiungere una serie non significa voler scegliere
+  // anche una tecnica per forza: si mostra solo se la riga arriva già con
+  // una tecnica (modifica di un esercizio esistente) o se l'utente la apre
+  // esplicitamente per aggiungerne una a una riga specifica.
+  late bool showPicker;
+
   _PlannedSetState({
     int? reps,
     double? weightKg,
@@ -61,6 +68,7 @@ class _PlannedSetState {
   })  : repsCtrl = TextEditingController(text: reps?.toString() ?? ''),
         kgCtrl = TextEditingController(text: weightKg?.toString() ?? ''),
         forcedCtrl = TextEditingController(text: forcedReps?.toString() ?? '') {
+    showPicker = technique != SetTechnique.normale;
     if (restPauseClusters != null && restPauseClusters.length > 1) {
       for (final v in restPauseClusters.skip(1)) {
         clusterCtrls.add(TextEditingController(text: v.toString()));
@@ -440,25 +448,43 @@ class _PlannedSetRow extends StatelessWidget {
                 ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 48, top: 4),
-            child: Wrap(
-              spacing: 6,
-              runSpacing: 4,
-              children: [
-                for (final t in SetTechnique.values)
-                  TechniqueChip(
-                    label: _techniqueLabel(t, l10n),
-                    selected: state.technique == t,
-                    p: p,
-                    onTap: () {
-                      state.technique = t;
-                      onChanged();
-                    },
-                  ),
-              ],
+          if (!state.showPicker)
+            Padding(
+              padding: const EdgeInsets.only(left: 48, top: 2),
+              child: TextButton.icon(
+                onPressed: () {
+                  state.showPicker = true;
+                  onChanged();
+                },
+                icon: Icon(Icons.add_rounded, size: 14, color: p.textMuted),
+                label: Text(l10n.targetDialogAggiungiTecnica,
+                    style: TextStyle(color: p.textMuted, fontSize: 11)),
+                style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+              ),
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.only(left: 48, top: 4),
+              child: Wrap(
+                spacing: 6,
+                runSpacing: 4,
+                children: [
+                  for (final t in SetTechnique.values)
+                    TechniqueChip(
+                      label: _techniqueLabel(t, l10n),
+                      selected: state.technique == t,
+                      p: p,
+                      onTap: () {
+                        state.technique = t;
+                        onChanged();
+                      },
+                    ),
+                ],
+              ),
             ),
-          ),
           if (state.technique == SetTechnique.restPause)
             Padding(
               padding: const EdgeInsets.only(left: 48, top: 4),

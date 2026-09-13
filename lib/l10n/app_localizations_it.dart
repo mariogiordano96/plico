@@ -1687,6 +1687,9 @@ class AppLocalizationsIt extends AppLocalizations {
       'Pianifica reps/peso e tecnica per ogni serie, subito riproposti in sessione guidata';
 
   @override
+  String get targetDialogAggiungiTecnica => '+ Tecnica';
+
+  @override
   String storicoTitle(String nome) {
     return 'Storico — $nome';
   }

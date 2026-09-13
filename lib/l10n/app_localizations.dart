@@ -3134,6 +3134,12 @@ abstract class AppLocalizations {
   /// **'Pianifica reps/peso e tecnica per ogni serie, subito riproposti in sessione guidata'**
   String get targetDialogSeriePersonalizzateHint;
 
+  /// No description provided for @targetDialogAggiungiTecnica.
+  ///
+  /// In it, this message translates to:
+  /// **'+ Tecnica'**
+  String get targetDialogAggiungiTecnica;
+
   /// No description provided for @storicoTitle.
   ///
   /// In it, this message translates to:

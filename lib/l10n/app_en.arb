@@ -551,6 +551,7 @@
   "targetDialogDurataMin": "Duration (minutes)",
   "targetDialogSeriePersonalizzate": "Custom sets",
   "targetDialogSeriePersonalizzateHint": "Plan reps/weight and technique per set, ready to go in the guided session",
+  "targetDialogAggiungiTecnica": "+ Technique",
 
   "storicoTitle": "History — {nome}",
   "storicoNessunaSessione": "No session logged for this exercise yet",

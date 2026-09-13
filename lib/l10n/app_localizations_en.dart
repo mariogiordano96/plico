@@ -1678,6 +1678,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Plan reps/weight and technique per set, ready to go in the guided session';
 
   @override
+  String get targetDialogAggiungiTecnica => '+ Technique';
+
+  @override
   String storicoTitle(String nome) {
     return 'History — $nome';
   }

@@ -685,6 +685,7 @@
   "targetDialogDurataMin": "Durata (minuti)",
   "targetDialogSeriePersonalizzate": "Serie personalizzate",
   "targetDialogSeriePersonalizzateHint": "Pianifica reps/peso e tecnica per ogni serie, subito riproposti in sessione guidata",
+  "targetDialogAggiungiTecnica": "+ Tecnica",
 
   "storicoTitle": "Storico — {nome}",
   "@storicoTitle": { "placeholders": { "nome": { "type": "String" } } },

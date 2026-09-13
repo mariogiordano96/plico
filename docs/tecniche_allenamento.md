@@ -517,3 +517,37 @@ slow pianificato, superset esplosiva/lenta, cardio.
       il che azzera tutto il database locale, non solo il profilo — non
       un bug di questa fase, comportamento standard di Android su firme
       incompatibili.
+
+### Fase 7f — Fix: foglio "Genera piramide" sotto la status bar (Samsung) ✅
+
+`showModalBottomSheet` con `isScrollControlled: true` e nessun `constraints`
+esplicito lascia crescere il foglio oltre l'altezza schermo quando il
+contenuto è alto (anteprima piramide su molte serie) — segnalato
+dall'utente su Samsung, il foglio finiva sotto la status bar/notch invece
+di scorrere internamente.
+
+- [x] `constraints: BoxConstraints(maxHeight: 90% schermo)` su
+      `genera_piramide_dialog.dart` e `target_esercizio_dialog.dart`
+      (stesso rischio con molte "serie personalizzate"), con
+      `SingleChildScrollView` sul contenuto interno così l'eccesso scorre
+      invece di sforare.
+- [x] `flutter analyze` pulito, 184 test verdi.
+
+### Fase 7g — Fix: picker tecnica nascosto di default per-serie in creazione ✅
+
+**Feedback dell'utente**: dopo "Genera piramide" ogni riga mostrava comunque
+tutti i chip tecnica (Normale/Forzate/Rest-pause/Stripping/Super slow) —
+ridondante, avendo già dichiarato che è un piramidale generandolo. Stesso
+principio già applicato in sessione guidata (Fase 7c/7d), qui adattato alla
+creazione: la tecnica resta scelta esplicita, non sparisce del tutto (a
+differenza della sessione guidata, in creazione ha senso poterne aggiungere
+una a una riga specifica, es. rest-pause solo sull'ultima serie della
+piramide), ma non è più sempre visibile.
+
+- [x] `_PlannedSetState.showPicker` (nuovo campo): `false` di default per
+      una riga senza tecnica (nuova riga, o generata da "Genera piramide"),
+      `true` se la riga arriva già con una tecnica (modifica di un
+      esercizio esistente via `_looksCustom`/`fromWorkoutSets`).
+- [x] `_PlannedSetRow` mostra un link discreto "+ Tecnica" al posto dei
+      chip quando `showPicker` è `false`; un tocco lo apre per quella riga.
+- [x] `flutter analyze` pulito, 184 test verdi.
