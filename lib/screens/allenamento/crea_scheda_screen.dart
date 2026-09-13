@@ -65,6 +65,36 @@ class _CreaSchedaScreenState extends State<CreaSchedaScreen> {
         e.supersetGroupId = null;
       }
     }
+    _clearRolesIfNotSamePair(list);
+  }
+
+  /// Esplosiva/lenta ha senso solo tra due card dello **stesso** esercizio
+  /// (docs/tecniche_allenamento.md: contrasto carico alto esplosivo/carico
+  /// più basso lento sullo stesso movimento) — un gruppo con esercizi
+  /// diversi è un superset standard. Azzera il ruolo altrimenti rimasto
+  /// "appeso" quando il gruppo cambia forma (rimozione, unione con un terzo
+  /// esercizio diverso).
+  void _clearRolesIfNotSamePair(List<WorkoutTemplateExercise> list) {
+    final byGroup = <int, List<WorkoutTemplateExercise>>{};
+    for (final e in list) {
+      final g = e.supersetGroupId;
+      if (g != null) (byGroup[g] ??= []).add(e);
+    }
+    for (final members in byGroup.values) {
+      final samePair = members.length == 2 && members[0].exerciseId == members[1].exerciseId;
+      if (!samePair) {
+        for (final e in members) {
+          e.supersetRole = null;
+        }
+      }
+    }
+  }
+
+  bool _isSameExerciseSuperset(int i) {
+    final g = _esercizi[i].supersetGroupId;
+    if (g == null) return false;
+    final members = _esercizi.where((e) => e.supersetGroupId == g).toList();
+    return members.length == 2 && members[0].exerciseId == members[1].exerciseId;
   }
 
   int _nextGroupId() {
@@ -88,6 +118,7 @@ class _CreaSchedaScreenState extends State<CreaSchedaScreen> {
         final groupId = prev.supersetGroupId ?? _nextGroupId();
         prev.supersetGroupId = groupId;
         current.supersetGroupId = groupId;
+        _clearRolesIfNotSamePair(updated);
       }
       _esercizi = updated;
     });
@@ -180,6 +211,7 @@ class _CreaSchedaScreenState extends State<CreaSchedaScreen> {
             ),
             _EsercizioRow(
               esercizio: _esercizi[i],
+              showRoles: _isSameExerciseSuperset(i),
               p: p,
               l10n: l10n,
               onDelete: () => _rimuoviEsercizio(i),
@@ -209,12 +241,14 @@ class _CreaSchedaScreenState extends State<CreaSchedaScreen> {
 
 class _EsercizioRow extends StatelessWidget {
   final WorkoutTemplateExercise esercizio;
+  final bool showRoles;
   final ColorPalette p;
   final AppLocalizations l10n;
   final VoidCallback onDelete;
   final ValueChanged<String> onSetRole;
   const _EsercizioRow({
     required this.esercizio,
+    required this.showRoles,
     required this.p,
     required this.l10n,
     required this.onDelete,
@@ -267,9 +301,10 @@ class _EsercizioRow extends StatelessWidget {
                   Text(tecnicaLabel,
                       style: TextStyle(color: p.accent, fontSize: 11, fontWeight: FontWeight.w600)),
                 // Fase 3 di docs/tecniche_allenamento.md: ruolo esplosiva/lenta,
-                // solo per righe già in un gruppo superset — variante "veloce/
-                // lento" della tecnica, opzionale.
-                if (grouped) ...[
+                // solo se il gruppo è formato da due card dello stesso
+                // esercizio (Fase 7j) — un gruppo con esercizi diversi è un
+                // superset standard, il ruolo non ha senso lì.
+                if (showRoles) ...[
                   const SizedBox(height: 6),
                   Wrap(
                     spacing: 6,

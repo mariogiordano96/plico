@@ -629,3 +629,24 @@ senza aprire un foglio a parte.
 - [x] `flutter analyze` pulito, 184 test verdi (nessun nuovo test: la
       formula piramide è la stessa già in `genera_piramide_dialog.dart`,
       non testata prima nemmeno lì).
+
+### Fase 7j — Fix: esplosiva/lenta solo tra due card dello stesso esercizio ✅
+
+**Feedback dell'utente**: il ruolo esplosiva/lenta compariva per qualunque
+coppia in superset, ma ha senso solo tra due card dello **stesso**
+esercizio (carico alto esplosivo/carico più basso lento sullo stesso
+movimento) — con due esercizi diversi collegati è un superset standard, il
+ruolo non si applica.
+
+- [x] `_isSameExerciseSuperset(i)` in `crea_scheda_screen.dart`: vero solo
+      se il gruppo ha esattamente 2 membri con lo stesso `exerciseId`.
+      `_EsercizioRow` mostra i chip esplosiva/lenta solo quando
+      `showRoles` è vero, altrimenti la card resta un superset standard
+      (icona/bordo di gruppo, nessun ruolo).
+- [x] `_clearRolesIfNotSamePair`: azzera `supersetRole` sui membri di un
+      gruppo che non è più una coppia dello stesso esercizio (rimozione di
+      un membro, unione con un terzo esercizio diverso) — evita un ruolo
+      "appeso" che non sarebbe più visibile in UI ma resterebbe salvato e
+      propagato (badge esplosiva/lenta in sessione guidata) senza che
+      l'utente lo veda più nel punto dove lo ha impostato.
+- [x] `flutter analyze` pulito, 184 test verdi.
