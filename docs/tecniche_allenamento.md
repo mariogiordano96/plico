@@ -502,3 +502,18 @@ slow pianificato, superset esplosiva/lenta, cardio.
       installare con `flutter install --debug` invece del comando release.
 - [x] `flutter analyze` pulito, 184 test verdi (nessun nuovo test: è un
       helper di QA manuale, non logica di prodotto).
+- [x] **Seguito**: `DatabaseService.seedTestUserProfileIfMissing()` crea
+      anche un profilo utente/onboarding completo (nome, sesso, altezza,
+      peso, obiettivo) se assente, per non dover rifare l'onboarding a mano
+      a ogni build di test — chiamata insieme alla scheda, sempre sotto
+      `kDebugMode`. **A differenza della scheda, non sovrascrive mai un
+      profilo già esistente**: se lo stesso device viene usato anche per
+      l'uso quotidiano vero dell'app, sovrascrivere il profilo reale
+      cancellerebbe dati reali.
+      **Nota per l'utente**: se il device richiede comunque l'onboarding
+      dopo `flutter install --debug`, è probabile che Android abbia dovuto
+      disinstallare l'app prima di reinstallarla (firma debug diversa da
+      quella usata per le build precedenti installate su questo device),
+      il che azzera tutto il database locale, non solo il profilo — non
+      un bug di questa fase, comportamento standard di Android su firme
+      incompatibili.

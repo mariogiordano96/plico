@@ -46,6 +46,7 @@ void main() async {
   // avvio in debug così riflette sempre l'ultima versione — mai in release
   // (kDebugMode è false in un `flutter install` senza --debug).
   if (kDebugMode) {
+    await DatabaseService.instance.seedTestUserProfileIfMissing();
     await DatabaseService.instance.seedTestTemplateTecniche();
   }
   final isDark = await DatabaseService.instance.getIsDarkMode();

@@ -80,6 +80,32 @@ class DatabaseService {
     });
   }
 
+  /// Solo per test manuali in debug: crea un profilo utente/onboarding
+  /// completo se assente, per non dover rifare l'onboarding a mano a ogni
+  /// build di test. **Non tocca mai un profilo già esistente** — a
+  /// differenza di `seedTestTemplateTecniche` (una scheda in più è
+  /// innocua), qui sovrascrivere significherebbe cancellare dati reali se
+  /// questo stesso device viene anche usato per l'uso quotidiano vero
+  /// dell'app. Chiamata solo da `main.dart` sotto `kDebugMode`.
+  Future<void> seedTestUserProfileIfMissing() async {
+    if (await hasUserProfile()) return;
+    final profile = UserProfile()
+      ..nome = 'Test'
+      ..cognome = 'Plico'
+      ..dataNascita = DateTime(1996, 1, 1)
+      ..sesso = Sesso.maschio
+      ..altezzaCm = 178
+      ..bodyFatIniziale = 15
+      ..createdAt = DateTime.now();
+    await saveUserProfile(profile);
+    await addBodySnapshot(BodySnapshot()
+      ..data = DateTime.now()
+      ..pesoKg = 78
+      ..bodyFatManuale = 15
+      ..note = 'Peso iniziale (test)');
+    await activateGoal(livello: 2, metodo: 0, obiettivo: 1);
+  }
+
   Stream<UserProfile?> watchUserProfile() {
     return _isar.userProfiles.watchObject(1, fireImmediately: true);
   }
