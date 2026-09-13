@@ -589,7 +589,6 @@
   "sessioneGuidataAggiungiCluster": "+ cluster",
   "sessioneGuidataGradinoLabel": "Stage {n}",
   "sessioneGuidataAggiungiGradino": "+ stage",
-  "sessioneGuidataModificaTecnica": "Change",
 
   "sessioneRiepilogoTitle": "Session complete",
   "sessioneRiepilogoKcal": "{kcal} kcal estimated",

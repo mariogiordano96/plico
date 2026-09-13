@@ -462,3 +462,26 @@ non devono richiedere nessuna interazione — si segue con le spunte, non si
       puramente di widget state, non c'è un test harness per
       `sessione_guidata_screen.dart` in questo repo — verificato manualmente
       dall'utente sul device).
+
+### Fase 7d — Fix: nessuna modifica tecnica in sessione guidata ✅
+
+**Feedback dell'utente dopo aver provato la Fase 7c**: il tocco "Modifica"
+introdotto lì non ha senso — la sessione guidata deve solo eseguire la
+scheda (spunte), non permettere di cambiare la tecnica di un esercizio.
+Deciderla è un'azione di creazione scheda, non di esecuzione.
+
+- [x] Rimossi del tutto `_editingTechnique` e il picker a chip
+      (normale/forzate/rest-pause/stripping/super slow) da
+      `sessione_guidata_screen.dart` — la tecnica è fissata una volta per
+      tutte in `initState` da `WorkoutSet.technique` e non è più
+      modificabile in sessione guidata, né per una serie pianificata né per
+      una libera (prima si poteva scegliere spontaneamente a metà sessione;
+      tolto su richiesta esplicita, non solo il caso pianificato).
+- [x] Restano editabili solo i **numeri** della tecnica già fissata — reps
+      forzate, valori dei cluster rest-pause, reps/peso dei gradini
+      stripping — stessa logica di "reps/kg restano editabili" già valida
+      per ogni altra serie: non è la categoria di tecnica a cambiare, solo
+      cosa si è realmente fatto quel giorno.
+- [x] Rimossa la stringa l10n `sessioneGuidataModificaTecnica` (mai arrivata
+      in produzione, introdotta e tolta nella stessa iterazione).
+- [x] `flutter analyze` pulito, 184 test verdi.

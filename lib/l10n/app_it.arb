@@ -745,7 +745,6 @@
     "placeholders": { "n": { "type": "int" } }
   },
   "sessioneGuidataAggiungiGradino": "+ gradino",
-  "sessioneGuidataModificaTecnica": "Modifica",
 
   "sessioneRiepilogoTitle": "Sessione completata",
   "sessioneRiepilogoKcal": "{kcal} kcal stimate",

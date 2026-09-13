@@ -856,19 +856,17 @@ class _SetRowState extends State<_SetRow> {
   final List<TextEditingController> _clusterCtrls = [];
   final List<(TextEditingController, TextEditingController)> _stageCtrls = [];
 
-  // Fase 7: quando la tecnica arriva già decisa dalla scheda (non "normale"
-  // fin dall'inizio, quindi non scelta ora dall'utente), il picker resta
-  // chiuso — si vede solo un'etichetta e si conferma con la spunta come
-  // qualunque altra serie, senza dover riselezionare nulla. Un tocco su
-  // "Modifica" lo riapre per cambiarla per oggi.
-  late bool _editingTechnique;
-
   @override
   void initState() {
     super.initState();
     final w = widget.workoutSet;
+    // Fase 7c (docs/tecniche_allenamento.md): la tecnica si decide solo in
+    // creazione scheda (o resta "normale" per un esercizio libero) — non è
+    // più modificabile qui, fissata una volta per tutte all'apertura della
+    // riga. In sessione guidata si segue e si conferma, i numeri (reps/kg,
+    // ripetizioni forzate, cluster, gradini) restano editabili come dati di
+    // quello che si è realmente fatto, non la categoria di tecnica stessa.
     _technique = w.technique;
-    _editingTechnique = _technique == SetTechnique.normale;
     _forcedCtrl = TextEditingController(text: w.forcedReps?.toString() ?? '');
     if (w.restPauseClusters != null && w.restPauseClusters!.length > 1) {
       for (final v in w.restPauseClusters!.skip(1)) {
@@ -957,11 +955,10 @@ class _SetRowState extends State<_SetRow> {
     );
   }
 
-  /// Etichetta + "Modifica" mostrata al posto del picker quando la tecnica
-  /// arriva già decisa dalla scheda (`_editingTechnique == false`) — stessa
-  /// formattazione di `_confirmedBadge`, ma prima della conferma: l'utente
-  /// vede cosa farà, non deve risceglierlo, tocca solo la spunta per andare
-  /// avanti come per una serie normale.
+  /// Etichetta pura (nessuna interazione) con la tecnica già decisa in
+  /// scheda — stessa formattazione di `_confirmedBadge`, ma prima della
+  /// conferma: la tecnica non è più modificabile qui (Fase 7c), solo i
+  /// numeri sotto (reps forzate, cluster, gradini) restano editabili.
   Widget? _plannedBadge(dynamic l10n) {
     if (_technique == SetTechnique.normale) return null;
     final p = widget.p;
@@ -974,22 +971,8 @@ class _SetRowState extends State<_SetRow> {
     };
     return Padding(
       padding: const EdgeInsets.only(left: 56, top: 2, bottom: 4),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text('$emoji ${_techniqueLabel(_technique, l10n)}',
-              style: TextStyle(color: p.accent, fontSize: 11, fontWeight: FontWeight.w600)),
-          const SizedBox(width: 8),
-          GestureDetector(
-            onTap: () => setState(() => _editingTechnique = true),
-            child: Text(l10n.sessioneGuidataModificaTecnica,
-                style: TextStyle(
-                    color: p.textMuted,
-                    fontSize: 11,
-                    decoration: TextDecoration.underline)),
-          ),
-        ],
-      ),
+      child: Text('$emoji ${_techniqueLabel(_technique, l10n)}',
+          style: TextStyle(color: p.accent, fontSize: 11, fontWeight: FontWeight.w600)),
     );
   }
 
@@ -998,7 +981,7 @@ class _SetRowState extends State<_SetRow> {
     final l10n = context.l10n;
     final p = widget.p;
     final badge = widget.done ? _confirmedBadge(l10n) : null;
-    final plannedBadge = !_editingTechnique ? _plannedBadge(l10n) : null;
+    final plannedBadge = _plannedBadge(l10n);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -1048,25 +1031,13 @@ class _SetRowState extends State<_SetRow> {
           // in errore `dart run build_runner build` (SEVERE, non solo un
           // warning) su questo file, che ha un modello Isar embedded.
           if (badge != null) badge,
-          if (widget.showTechnique && !widget.done && !_editingTechnique && plannedBadge != null)
-            plannedBadge,
-          if (widget.showTechnique && !widget.done && _editingTechnique) ...[
-            Padding(
-              padding: const EdgeInsets.only(left: 56, bottom: 4),
-              child: Wrap(
-                spacing: 6,
-                runSpacing: 4,
-                children: [
-                  for (final t in SetTechnique.values)
-                    TechniqueChip(
-                      label: _techniqueLabel(t, l10n),
-                      selected: _technique == t,
-                      p: p,
-                      onTap: () => setState(() => _technique = t),
-                    ),
-                ],
-              ),
-            ),
+          if (widget.showTechnique && !widget.done && plannedBadge != null) plannedBadge,
+          // Fase 7c: la tecnica non si sceglie/cambia più qui (era possibile
+          // fino alla Fase 4/7, tolto su richiesta esplicita — la sessione
+          // guidata segue la scheda, non la ridecide). Restano editabili solo
+          // i numeri della tecnica già fissata (cluster/gradini), non la
+          // categoria stessa.
+          if (widget.showTechnique && !widget.done) ...[
             if (_technique == SetTechnique.restPause)
               Padding(
                 padding: const EdgeInsets.only(left: 56, bottom: 4),
