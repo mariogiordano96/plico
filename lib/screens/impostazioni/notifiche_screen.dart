@@ -59,7 +59,8 @@ class _NotificheScreenState extends State<NotificheScreen> {
     if (_s == null) return;
     if (val) {
       final granted = await NotificationService.instance.requestPermissions();
-      if (!granted && mounted) {
+      if (!mounted) return;
+      if (!granted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Permesso notifiche non concesso'),
