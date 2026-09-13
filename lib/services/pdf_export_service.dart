@@ -140,7 +140,7 @@ class PdfExportService {
         const protMatrix = [
           [1.4, 1.8, 2.3, 2.6, 3.1],
           [0.8, 1.2, 1.4, 1.8, 2.0],
-          [0.8, 1.2, 1.6, 1.8, 2.0],
+          [1.6, 1.8, 2.0, 2.2, 2.4],
         ];
         protTarget = (snapshot.pesoKg *
                 protMatrix[obiettivo.clamp(0, 2)][livello.clamp(0, 4)])
