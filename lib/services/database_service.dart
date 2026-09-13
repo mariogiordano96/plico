@@ -985,13 +985,45 @@ class DatabaseService {
 
   Future<List<ExerciseDefinition>> searchExercises(String query, {String? muscleGroup}) async {
     final all = await getAllExercises();
-    final q = query.trim().toLowerCase();
+    final tokens = query.trim().toLowerCase().split(RegExp(r'\s+')).where((t) => t.isNotEmpty).toList();
     return all.where((e) {
       if (muscleGroup != null && e.muscleGroup != muscleGroup) return false;
-      if (q.isEmpty) return true;
-      return e.name.toLowerCase().contains(q) ||
-          (e.nameIt?.toLowerCase().contains(q) ?? false);
+      if (tokens.isEmpty) return true;
+      final name = e.name.toLowerCase();
+      final nameIt = e.nameIt?.toLowerCase() ?? '';
+      final words = [...name.split(RegExp(r'\s+')), ...nameIt.split(RegExp(r'\s+'))];
+      return tokens.every((t) =>
+          name.contains(t) || nameIt.contains(t) || words.any((w) => _isFuzzyMatch(t, w)));
     }).toList();
+  }
+
+  /// Tollera piccoli refusi di battitura: confronta [token] con una parola
+  /// del nome esercizio tramite distanza di Levenshtein, con soglia crescente
+  /// in base alla lunghezza della parola per non generare troppi falsi positivi.
+  bool _isFuzzyMatch(String token, String word) {
+    if (token.length < 3 || word.length < 3) return false;
+    final maxDistance = token.length > 7 ? 2 : 1;
+    if ((token.length - word.length).abs() > maxDistance) return false;
+    return _levenshtein(token, word) <= maxDistance;
+  }
+
+  int _levenshtein(String a, String b) {
+    final la = a.length, lb = b.length;
+    var prev = List<int>.generate(lb + 1, (j) => j);
+    for (var i = 1; i <= la; i++) {
+      final curr = List<int>.filled(lb + 1, 0);
+      curr[0] = i;
+      for (var j = 1; j <= lb; j++) {
+        final cost = a[i - 1] == b[j - 1] ? 0 : 1;
+        curr[j] = [
+          curr[j - 1] + 1,
+          prev[j] + 1,
+          prev[j - 1] + cost,
+        ].reduce((v, e) => v < e ? v : e);
+      }
+      prev = curr;
+    }
+    return prev[lb];
   }
 
   Future<void> addCustomExercise(ExerciseDefinition exercise) async {
