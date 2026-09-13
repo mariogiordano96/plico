@@ -591,3 +591,41 @@ di cosa fa la tecnica scelta.
 - [x] `flutter analyze` pulito, 184 test verdi (nessun nuovo test: modifica
       di UI/dialog, la logica di materializzazione già coperta dai test di
       Fase 7a non cambia).
+
+### Fase 7i — Redesign: "Piramidale"/"Piramidale inverso" al posto di "Serie personalizzate" ✅
+
+**Feedback dell'utente**: con la tecnica ormai a livello di esercizio (Fase
+7h), "Serie personalizzate" (toggle + lista manuale + pulsante "Genera
+piramide" separato) restava solo per il caso piramide — troppi click e
+sezioni per un risultato che è sempre una progressione aritmetica.
+Richiesta: sostituirla con una sezione "Piramidale"/"Piramidale inverso"
+che genera la progressione in automatico dagli stessi campi Serie/Rip/Kg,
+senza aprire un foglio a parte.
+
+- [x] **Rimossi del tutto** `_custom`, `_rows`, `_PlannedSetState`,
+      `_PlannedSetRow`, `_toggleCustom`/`_addRow`/`_removeRow`,
+      `_generaPiramide` (chiamata a `showGeneraPiramideSheet`) da
+      `target_esercizio_dialog.dart` — nessuna lista di serie modificabile
+      a mano, i campi Serie/Rip/Kg sono sempre gli unici 3 campi visibili.
+- [x] Nuovo enum `_Progressione { normale, piramidale, piramidaleInverso }`
+      con una sezione "Progressione" (stesso stile chip di "Tecnica", con
+      descrizione) sotto Serie/Rip/Kg: se non "Normale", due campi in più
+      (incremento kg, decremento rip, stessi nomi/default di
+      `genera_piramide_dialog.dart`) e la progressione si genera al
+      salvataggio con la stessa formula (`_generaSerieBase`) — non c'è più
+      un foglio separato da aprire per questo, tutto inline.
+      **"Piramidale"** = ascendente (peso su, reps giù), **"Piramidale
+      inverso"** = discendente (peso giù, reps su) — stessa distinzione
+      ascendente/discendente di prima, nomi diversi.
+- [x] `genera_piramide_dialog.dart`/`showGeneraPiramideSheet` **non
+      rimossi**: restano l'unico modo di rigenerare una piramide per il log
+      del **giorno** (menu esercizio in `allenamento_screen.dart`, Fase 1),
+      un caso d'uso distinto e ancora valido ("decido la piramide di oggi
+      in base alla forma", indipendente dalla scheda salvata).
+- [x] `_detectProgressione`: in modifica di un esercizio esistente, se le
+      prime due serie hanno reps/peso diversi si deduce direzione e
+      incremento/decremento dalla differenza — non c'è più uno stato
+      "custom" salvato a parte da rileggere, si ricostruisce dai dati.
+- [x] `flutter analyze` pulito, 184 test verdi (nessun nuovo test: la
+      formula piramide è la stessa già in `genera_piramide_dialog.dart`,
+      non testata prima nemmeno lì).

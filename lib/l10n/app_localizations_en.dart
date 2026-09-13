@@ -1671,13 +1671,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get targetDialogDurataMin => 'Duration (minutes)';
 
   @override
-  String get targetDialogSeriePersonalizzate => 'Custom sets';
-
-  @override
-  String get targetDialogSeriePersonalizzateHint =>
-      'Plan different reps/weight per set (e.g. a pyramid), ready to go in the guided session';
-
-  @override
   String get targetDialogTecnicaLabel => 'Technique';
 
   @override
@@ -1695,6 +1688,26 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get targetDialogTecnicaDescrizioneSuperSlow =>
       'Applied to every set: same set, but performed very slowly.';
+
+  @override
+  String get targetDialogProgressioneLabel => 'Progression';
+
+  @override
+  String get targetDialogProgressioneNormale => 'Normal';
+
+  @override
+  String get targetDialogProgressionePiramidale => 'Pyramid';
+
+  @override
+  String get targetDialogProgressionePiramidaleInverso => 'Reverse pyramid';
+
+  @override
+  String get targetDialogProgressionePiramidaleDescrizione =>
+      'Weight increases and reps decrease set after set, starting from the values above.';
+
+  @override
+  String get targetDialogProgressionePiramidaleInversoDescrizione =>
+      'Weight decreases and reps increase set after set, starting from the values above.';
 
   @override
   String storicoTitle(String nome) {

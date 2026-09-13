@@ -3122,18 +3122,6 @@ abstract class AppLocalizations {
   /// **'Durata (minuti)'**
   String get targetDialogDurataMin;
 
-  /// No description provided for @targetDialogSeriePersonalizzate.
-  ///
-  /// In it, this message translates to:
-  /// **'Serie personalizzate'**
-  String get targetDialogSeriePersonalizzate;
-
-  /// No description provided for @targetDialogSeriePersonalizzateHint.
-  ///
-  /// In it, this message translates to:
-  /// **'Pianifica reps/peso diversi per ogni serie (es. piramide), subito riproposti in sessione guidata'**
-  String get targetDialogSeriePersonalizzateHint;
-
   /// No description provided for @targetDialogTecnicaLabel.
   ///
   /// In it, this message translates to:
@@ -3163,6 +3151,42 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Applicata a ogni serie: stessa serie, ma con esecuzione molto lenta.'**
   String get targetDialogTecnicaDescrizioneSuperSlow;
+
+  /// No description provided for @targetDialogProgressioneLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'Progressione'**
+  String get targetDialogProgressioneLabel;
+
+  /// No description provided for @targetDialogProgressioneNormale.
+  ///
+  /// In it, this message translates to:
+  /// **'Normale'**
+  String get targetDialogProgressioneNormale;
+
+  /// No description provided for @targetDialogProgressionePiramidale.
+  ///
+  /// In it, this message translates to:
+  /// **'Piramidale'**
+  String get targetDialogProgressionePiramidale;
+
+  /// No description provided for @targetDialogProgressionePiramidaleInverso.
+  ///
+  /// In it, this message translates to:
+  /// **'Piramidale inverso'**
+  String get targetDialogProgressionePiramidaleInverso;
+
+  /// No description provided for @targetDialogProgressionePiramidaleDescrizione.
+  ///
+  /// In it, this message translates to:
+  /// **'Peso crescente e ripetizioni calanti serie dopo serie, a partire dai valori sopra.'**
+  String get targetDialogProgressionePiramidaleDescrizione;
+
+  /// No description provided for @targetDialogProgressionePiramidaleInversoDescrizione.
+  ///
+  /// In it, this message translates to:
+  /// **'Peso calante e ripetizioni crescenti serie dopo serie, a partire dai valori sopra.'**
+  String get targetDialogProgressionePiramidaleInversoDescrizione;
 
   /// No description provided for @storicoTitle.
   ///

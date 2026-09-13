@@ -1680,13 +1680,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get targetDialogDurataMin => 'Durata (minuti)';
 
   @override
-  String get targetDialogSeriePersonalizzate => 'Serie personalizzate';
-
-  @override
-  String get targetDialogSeriePersonalizzateHint =>
-      'Pianifica reps/peso diversi per ogni serie (es. piramide), subito riproposti in sessione guidata';
-
-  @override
   String get targetDialogTecnicaLabel => 'Tecnica';
 
   @override
@@ -1704,6 +1697,26 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get targetDialogTecnicaDescrizioneSuperSlow =>
       'Applicata a ogni serie: stessa serie, ma con esecuzione molto lenta.';
+
+  @override
+  String get targetDialogProgressioneLabel => 'Progressione';
+
+  @override
+  String get targetDialogProgressioneNormale => 'Normale';
+
+  @override
+  String get targetDialogProgressionePiramidale => 'Piramidale';
+
+  @override
+  String get targetDialogProgressionePiramidaleInverso => 'Piramidale inverso';
+
+  @override
+  String get targetDialogProgressionePiramidaleDescrizione =>
+      'Peso crescente e ripetizioni calanti serie dopo serie, a partire dai valori sopra.';
+
+  @override
+  String get targetDialogProgressionePiramidaleInversoDescrizione =>
+      'Peso calante e ripetizioni crescenti serie dopo serie, a partire dai valori sopra.';
 
   @override
   String storicoTitle(String nome) {

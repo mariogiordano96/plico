@@ -4,7 +4,6 @@ import '../../models/exercise_definition.dart';
 import '../../models/workout_exercise.dart';
 import '../../models/workout_set.dart';
 import '../../models/workout_template_exercise.dart';
-import 'genera_piramide_dialog.dart';
 import 'widgets/technique_widgets.dart';
 
 /// Dialog per impostare il target (serie/rip/peso o durata) di un esercizio,
@@ -14,12 +13,12 @@ import 'widgets/technique_widgets.dart';
 /// Ritorna il WorkoutTemplateExercise compilato.
 ///
 /// Fase 7 (docs/tecniche_allenamento.md): oltre al target uniforme, permette
-/// di pianificare "Serie personalizzate" — reps/peso diversi per serie (es.
-/// piramide) — e una **Tecnica** (rest-pause, stripping, forzate, super
-/// slow) decisa una sola volta a livello di esercizio, applicata identica a
-/// ogni serie generata (`WorkoutTemplateExercise.plannedSets`, riproposto
-/// via `materializeSets()`). La tecnica non è per-serie: nell'uso reale si
-/// decide "questo esercizio lo faccio a rest-pause", non riga per riga.
+/// di scegliere una **Progressione** (piramide ascendente/discendente,
+/// generata automaticamente da serie/rip/kg + incremento/decremento — Fase
+/// 7i, sostituisce le vecchie "serie personalizzate" a compilazione manuale)
+/// e una **Tecnica** (rest-pause, stripping, forzate, super slow) decise una
+/// sola volta a livello di esercizio, applicate a ogni serie generata
+/// (`WorkoutTemplateExercise.plannedSets`, riproposto via `materializeSets()`).
 Future<WorkoutTemplateExercise?> showTargetEsercizioDialog(
   BuildContext context,
   ExerciseDefinition exercise, {
@@ -30,45 +29,42 @@ Future<WorkoutTemplateExercise?> showTargetEsercizioDialog(
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     // Senza un tetto esplicito, `isScrollControlled` lascia che il foglio
-    // cresca oltre l'altezza schermo con molte "serie personalizzate" (Fase
-    // 7) e finisca sotto la status bar/notch — stesso fix di
-    // genera_piramide_dialog.dart. Il contenuto resta scrollabile
-    // internamente (SingleChildScrollView sotto).
+    // cresca oltre l'altezza schermo e finisca sotto la status bar/notch —
+    // visto su Samsung. Il contenuto resta scrollabile internamente
+    // (SingleChildScrollView sotto).
     constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9),
     builder: (_) => _TargetEsercizioDialog(exercise: exercise, initial: initial),
   );
 }
 
-/// Reps/peso di una singola serie pianificata — solo i numeri, la tecnica
-/// vive a livello di esercizio in `_TargetEsercizioDialogState`, non qui.
-class _PlannedSetState {
-  final TextEditingController repsCtrl;
-  final TextEditingController kgCtrl;
-
-  _PlannedSetState({int? reps, double? weightKg})
-      : repsCtrl = TextEditingController(text: reps?.toString() ?? ''),
-        kgCtrl = TextEditingController(text: weightKg?.toString() ?? '');
-
-  void dispose() {
-    repsCtrl.dispose();
-    kgCtrl.dispose();
-  }
-}
-
-/// Le serie del target materializzato appaiono "personalizzate" (piramide)
-/// quando reps/peso non sono tutti identici — la tecnica non c'entra più
-/// (è tracciata separatamente, vedi `_detectTechnique`).
-bool _looksCustomSets(List<WorkoutSet> sets) {
-  if (sets.length < 2) return false;
-  final first = sets.first;
-  return sets.any((s) => s.reps != first.reps || s.weightKg != first.weightKg);
-}
+enum _Progressione { normale, piramidale, piramidaleInverso }
 
 /// La tecnica di un esercizio esistente è quella (uniforme, per costruzione:
 /// solo questo dialog scrive `plannedSets`, sempre con la stessa tecnica su
 /// ogni serie) della prima serie di lavoro.
 SetTechnique _detectTechnique(List<WorkoutSet> sets) =>
     sets.isNotEmpty ? sets.first.technique : SetTechnique.normale;
+
+/// Deduce la progressione e i suoi parametri da due serie consecutive di un
+/// esercizio esistente (Fase 7i) — non c'è più uno stato "serie
+/// personalizzate" salvato a parte da poter rileggere: se le prime due serie
+/// hanno reps/peso diversi, si assume fossero una piramide e si ricostruisce
+/// incremento/decremento dalla differenza, così riaprire per modificare
+/// un esercizio già pianificato precompila qualcosa di sensato invece di
+/// azzerare la progressione.
+(_Progressione, double incremento, int decremento) _detectProgressione(List<WorkoutSet> sets) {
+  if (sets.length < 2) return (_Progressione.normale, 5, 2);
+  final a = sets[0], b = sets[1];
+  if (a.reps == b.reps && a.weightKg == b.weightKg) return (_Progressione.normale, 5, 2);
+  final deltaKg = (b.weightKg ?? 0) - (a.weightKg ?? 0);
+  final deltaReps = (a.reps ?? 0) - (b.reps ?? 0);
+  final ascendente = deltaKg >= 0;
+  return (
+    ascendente ? _Progressione.piramidale : _Progressione.piramidaleInverso,
+    deltaKg.abs(),
+    deltaReps.abs(),
+  );
+}
 
 class _TargetEsercizioDialog extends StatefulWidget {
   final ExerciseDefinition exercise;
@@ -96,16 +92,17 @@ class _TargetEsercizioDialogState extends State<_TargetEsercizioDialog> {
   // Climbers), non solo quelli taggati cardio.
   late bool _isCardio = widget.initial?.isCardio ?? (widget.exercise.category == 'cardio');
 
-  // Fase 7: pianificazione per-serie (piramide), opt-in — di default il
-  // target resta uniforme come prima, invariato per chi non la usa.
-  late bool _custom = widget.initial != null && _looksCustomSets(widget.initial!.sets);
-  late List<_PlannedSetState> _rows = _custom
-      ? widget.initial!.sets.map((s) => _PlannedSetState(reps: s.reps, weightKg: s.weightKg)).toList()
-      : [];
+  // Fase 7i: progressione piramidale generata automaticamente da serie/rip/kg
+  // + incremento/decremento — sostituisce le vecchie "serie personalizzate"
+  // a compilazione manuale (troppi click per un caso che si riduce sempre
+  // a una progressione aritmetica).
+  late _Progressione _progressione;
+  late final TextEditingController _incrementoCtrl;
+  late final TextEditingController _decrementoCtrl;
 
-  // Fase 7g: tecnica a livello di esercizio (non per-serie) — applicata
-  // identica a ogni serie generata, sia dal target uniforme sia dalle serie
-  // personalizzate.
+  // Fase 7h: tecnica a livello di esercizio (non per-serie) — applicata
+  // identica a ogni serie generata, sia dal target uniforme sia dalla
+  // progressione piramidale.
   late SetTechnique _tecnica =
       widget.initial != null ? _detectTechnique(widget.initial!.sets) : SetTechnique.normale;
   late final TextEditingController _forzateCtrl;
@@ -115,6 +112,12 @@ class _TargetEsercizioDialogState extends State<_TargetEsercizioDialog> {
   @override
   void initState() {
     super.initState();
+    final (progressione, incremento, decremento) =
+        widget.initial != null ? _detectProgressione(widget.initial!.sets) : (_Progressione.normale, 5.0, 2);
+    _progressione = progressione;
+    _incrementoCtrl = TextEditingController(text: incremento == 0 ? '5' : incremento.toString());
+    _decrementoCtrl = TextEditingController(text: decremento == 0 ? '2' : decremento.toString());
+
     final firstSet = _initialSet;
     _forzateCtrl = TextEditingController(text: firstSet?.forcedReps?.toString() ?? '');
     if (firstSet?.restPauseClusters != null && firstSet!.restPauseClusters!.length > 1) {
@@ -138,10 +141,9 @@ class _TargetEsercizioDialogState extends State<_TargetEsercizioDialog> {
     _ripCtrl.dispose();
     _kgCtrl.dispose();
     _durataCtrl.dispose();
+    _incrementoCtrl.dispose();
+    _decrementoCtrl.dispose();
     _forzateCtrl.dispose();
-    for (final r in _rows) {
-      r.dispose();
-    }
     for (final c in _clusterCtrls) {
       c.dispose();
     }
@@ -150,49 +152,6 @@ class _TargetEsercizioDialogState extends State<_TargetEsercizioDialog> {
       k.dispose();
     }
     super.dispose();
-  }
-
-  void _toggleCustom(bool value) {
-    setState(() {
-      if (value && _rows.isEmpty) {
-        final n = int.tryParse(_serieCtrl.text) ?? 3;
-        final reps = int.tryParse(_ripCtrl.text);
-        final kg = double.tryParse(_kgCtrl.text.replaceAll(',', '.'));
-        _rows = List.generate(n.clamp(1, 20), (_) => _PlannedSetState(reps: reps, weightKg: kg));
-      }
-      _custom = value;
-    });
-  }
-
-  void _addRow() {
-    setState(() {
-      final last = _rows.isNotEmpty ? _rows.last : null;
-      _rows.add(_PlannedSetState(
-          reps: int.tryParse(last?.repsCtrl.text ?? ''),
-          weightKg: double.tryParse((last?.kgCtrl.text ?? '').replaceAll(',', '.'))));
-    });
-  }
-
-  void _removeRow(int i) {
-    setState(() {
-      _rows.removeAt(i).dispose();
-    });
-  }
-
-  Future<void> _generaPiramide() async {
-    final generated = await showGeneraPiramideSheet(
-      context,
-      exerciseName:
-          widget.exercise.localizedName(Localizations.localeOf(context).languageCode),
-    );
-    if (generated == null || !mounted) return;
-    setState(() {
-      for (final r in _rows) {
-        r.dispose();
-      }
-      _rows = generated.map((s) => _PlannedSetState(reps: s.reps, weightKg: s.weightKg)).toList();
-      _custom = true;
-    });
   }
 
   /// Applica `_tecnica` (scelta una sola volta per l'esercizio) a ogni serie
@@ -229,6 +188,35 @@ class _TargetEsercizioDialogState extends State<_TargetEsercizioDialog> {
     }
   }
 
+  /// Genera le serie di base secondo `_progressione` — target uniforme, o
+  /// piramide ascendente/discendente da serie/rip/kg + incremento/decremento
+  /// (stessa formula di `genera_piramide_dialog.dart`, ora inline: niente
+  /// più un foglio separato da aprire per questo).
+  List<WorkoutTemplateSet>? _generaSerieBase() {
+    final numeroSerie = int.tryParse(_serieCtrl.text);
+    if (numeroSerie == null || numeroSerie <= 0) return null;
+    final reps = int.tryParse(_ripCtrl.text);
+    final kg = double.tryParse(_kgCtrl.text.replaceAll(',', '.'));
+
+    if (_progressione == _Progressione.normale) {
+      return List.generate(
+          numeroSerie, (_) => WorkoutTemplateSet()
+            ..reps = reps
+            ..weightKg = kg);
+    }
+    final incremento = double.tryParse(_incrementoCtrl.text.replaceAll(',', '.'));
+    final decremento = int.tryParse(_decrementoCtrl.text);
+    if (kg == null || reps == null || incremento == null || decremento == null) return null;
+    final ascendente = _progressione == _Progressione.piramidale;
+    return [
+      for (var i = 0; i < numeroSerie; i++)
+        WorkoutTemplateSet()
+          ..weightKg =
+              ascendente ? kg + i * incremento : (kg - i * incremento).clamp(0, double.infinity)
+          ..reps = ascendente ? (reps - i * decremento).clamp(1, 1000).toInt() : reps + i * decremento,
+    ];
+  }
+
   void _salva() {
     final result = WorkoutTemplateExercise()
       ..exerciseId = widget.exercise.externalId
@@ -243,24 +231,8 @@ class _TargetEsercizioDialogState extends State<_TargetEsercizioDialog> {
       return;
     }
 
-    final List<WorkoutTemplateSet> baseSets;
-    if (_custom) {
-      if (_rows.isEmpty) return;
-      baseSets = _rows
-          .map((r) => WorkoutTemplateSet()
-            ..reps = int.tryParse(r.repsCtrl.text)
-            ..weightKg = double.tryParse(r.kgCtrl.text.replaceAll(',', '.')))
-          .toList();
-    } else {
-      final serie = int.tryParse(_serieCtrl.text);
-      if (serie == null || serie <= 0) return;
-      final reps = int.tryParse(_ripCtrl.text);
-      final kg = double.tryParse(_kgCtrl.text.replaceAll(',', '.'));
-      baseSets = List.generate(
-          serie, (_) => WorkoutTemplateSet()
-            ..reps = reps
-            ..weightKg = kg);
-    }
+    final baseSets = _generaSerieBase();
+    if (baseSets == null || baseSets.isEmpty) return;
     _applyTecnica(baseSets);
 
     result.targetSets = baseSets.length;
@@ -270,7 +242,7 @@ class _TargetEsercizioDialogState extends State<_TargetEsercizioDialog> {
     // uniforme da preservare (piramide e/o tecnica) — altrimenti si lascia
     // il percorso semplice di sempre, invariato per chi non usa nessuna
     // delle due.
-    if (_custom || _tecnica != SetTechnique.normale) {
+    if (_progressione != _Progressione.normale || _tecnica != SetTechnique.normale) {
       result.plannedSets = baseSets;
     }
     Navigator.pop(context, result);
@@ -290,6 +262,18 @@ class _TargetEsercizioDialogState extends State<_TargetEsercizioDialog> {
         SetTechnique.stripping => l10n.targetDialogTecnicaDescrizioneStripping,
         SetTechnique.superSlow => l10n.targetDialogTecnicaDescrizioneSuperSlow,
         SetTechnique.normale => null,
+      };
+
+  String _progressioneLabel(_Progressione p, dynamic l10n) => switch (p) {
+        _Progressione.normale => l10n.targetDialogProgressioneNormale,
+        _Progressione.piramidale => l10n.targetDialogProgressionePiramidale,
+        _Progressione.piramidaleInverso => l10n.targetDialogProgressionePiramidaleInverso,
+      };
+
+  String? _progressioneDescription(_Progressione p, dynamic l10n) => switch (p) {
+        _Progressione.normale => null,
+        _Progressione.piramidale => l10n.targetDialogProgressionePiramidaleDescrizione,
+        _Progressione.piramidaleInverso => l10n.targetDialogProgressionePiramidaleInversoDescrizione,
       };
 
   Widget _buildTecnicaSection(ColorPalette p, dynamic l10n) {
@@ -415,6 +399,49 @@ class _TargetEsercizioDialogState extends State<_TargetEsercizioDialog> {
     );
   }
 
+  Widget _buildProgressioneSection(ColorPalette p, dynamic l10n) {
+    final description = _progressioneDescription(_progressione, l10n);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.targetDialogProgressioneLabel,
+            style: TextStyle(color: p.textMuted, fontSize: 11)),
+        const SizedBox(height: 6),
+        Wrap(
+          spacing: 6,
+          runSpacing: 4,
+          children: [
+            for (final prog in _Progressione.values)
+              TechniqueChip(
+                label: _progressioneLabel(prog, l10n),
+                selected: _progressione == prog,
+                p: p,
+                onTap: () => setState(() => _progressione = prog),
+              ),
+          ],
+        ),
+        if (description != null) ...[
+          const SizedBox(height: 6),
+          Text(description, style: TextStyle(color: p.textMuted, fontSize: 11)),
+        ],
+        if (_progressione != _Progressione.normale) ...[
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                  child: _Field(
+                      label: l10n.piramideDialogIncrementoKg, controller: _incrementoCtrl, p: p)),
+              const SizedBox(width: 10),
+              Expanded(
+                  child: _Field(
+                      label: l10n.piramideDialogDecrementoRip, controller: _decrementoCtrl, p: p)),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
@@ -452,70 +479,25 @@ class _TargetEsercizioDialogState extends State<_TargetEsercizioDialog> {
             if (_isCardio)
               _Field(label: l10n.targetDialogDurataMin, controller: _durataCtrl, p: p)
             else ...[
-              // Fase 7g: la tecnica si decide una volta sola per l'esercizio,
-              // sopra l'elenco delle serie — non riga per riga.
+              // Fase 7h: la tecnica si decide una volta sola per l'esercizio,
+              // sopra i campi serie/rip/kg — non riga per riga.
               _buildTecnicaSection(p, l10n),
               const SizedBox(height: 16),
-              if (!_custom)
-                Row(
-                  children: [
-                    Expanded(child: _Field(label: l10n.targetDialogSerie, controller: _serieCtrl, p: p)),
-                    const SizedBox(width: 10),
-                    Expanded(child: _Field(label: l10n.targetDialogRip, controller: _ripCtrl, p: p)),
-                    const SizedBox(width: 10),
-                    Expanded(child: _Field(label: l10n.targetDialogKg, controller: _kgCtrl, p: p)),
-                  ],
-                )
-              else
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    for (var i = 0; i < _rows.length; i++)
-                      _PlannedSetRow(
-                        label: l10n.serieDialogSerieLabel(i + 1),
-                        state: _rows[i],
-                        p: p,
-                        onRemove: _rows.length > 1 ? () => _removeRow(i) : null,
-                      ),
-                    TextButton.icon(
-                      onPressed: _addRow,
-                      icon: Icon(Icons.add_rounded, size: 16, color: p.accent),
-                      label: Text(l10n.serieDialogAggiungiSerie, style: TextStyle(color: p.accent)),
-                      style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                    ),
-                  ],
-                ),
-              const SizedBox(height: 12),
               Row(
                 children: [
-                  Expanded(
-                    child: SwitchListTile(
-                      value: _custom,
-                      onChanged: _toggleCustom,
-                      dense: true,
-                      contentPadding: EdgeInsets.zero,
-                      activeThumbColor: p.accent,
-                      title: Text(l10n.targetDialogSeriePersonalizzate,
-                          style: TextStyle(color: p.textPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
-                      subtitle: Text(l10n.targetDialogSeriePersonalizzateHint,
-                          style: TextStyle(color: p.textMuted, fontSize: 11)),
-                    ),
-                  ),
+                  Expanded(child: _Field(label: l10n.targetDialogSerie, controller: _serieCtrl, p: p)),
+                  const SizedBox(width: 10),
+                  Expanded(child: _Field(label: l10n.targetDialogRip, controller: _ripCtrl, p: p)),
+                  const SizedBox(width: 10),
+                  Expanded(child: _Field(label: l10n.targetDialogKg, controller: _kgCtrl, p: p)),
                 ],
               ),
-              if (_custom) ...[
-                const SizedBox(height: 4),
-                OutlinedButton.icon(
-                  onPressed: _generaPiramide,
-                  icon: Icon(Icons.stairs_rounded, color: p.accent, size: 18),
-                  label:
-                      Text(l10n.allenamentoGeneraPiramide, style: TextStyle(color: p.accent)),
-                  style: OutlinedButton.styleFrom(side: BorderSide(color: p.cardBorder)),
-                ),
-              ],
+              const SizedBox(height: 16),
+              // Fase 7i: piramide generata automaticamente dai campi sopra +
+              // incremento/decremento, sostituisce le vecchie "serie
+              // personalizzate" a compilazione manuale (meno click, meno
+              // sezioni).
+              _buildProgressioneSection(p, l10n),
             ],
             const SizedBox(height: 20),
             Row(
@@ -541,45 +523,6 @@ class _TargetEsercizioDialogState extends State<_TargetEsercizioDialog> {
           ),
         ),
       ),
-      ),
-    );
-  }
-}
-
-/// Riga di editing di una singola serie pianificata: solo reps/peso — la
-/// tecnica vive a livello di esercizio (`_TargetEsercizioDialogState`, Fase
-/// 7g), non qui.
-class _PlannedSetRow extends StatelessWidget {
-  final String label;
-  final _PlannedSetState state;
-  final ColorPalette p;
-  final VoidCallback? onRemove;
-
-  const _PlannedSetRow({
-    required this.label,
-    required this.state,
-    required this.p,
-    required this.onRemove,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          SizedBox(width: 48, child: Text(label, style: TextStyle(color: p.textMuted, fontSize: 12))),
-          Expanded(child: NumberField(controller: state.repsCtrl, hint: l10n.serieDialogRipHint, p: p)),
-          const SizedBox(width: 8),
-          Expanded(child: NumberField(controller: state.kgCtrl, hint: l10n.serieDialogKgHint, p: p)),
-          if (onRemove != null)
-            IconButton(
-              icon: Icon(Icons.close_rounded, size: 18, color: p.textMuted),
-              visualDensity: VisualDensity.compact,
-              onPressed: onRemove,
-            ),
-        ],
       ),
     );
   }
