@@ -3,6 +3,7 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/app_settings.dart';
+import '../../services/coach_guardrail.dart';
 import '../../services/database_service.dart';
 import '../../services/gemini_quota.dart';
 import '../../services/gemini_service.dart';
@@ -171,6 +172,15 @@ class _CoachScreenState extends State<CoachScreen> {
 
   Future<void> _sendText(String text) async {
     if (_sending || _apiKey == null) return;
+    // Guardrail deterministico (docs/integrazione_flutter_gemma.md, Fase 8):
+    // per le richieste palesemente fuori tema risponde subito in locale,
+    // senza toccare la rete né consumare quota — il system prompt resta la
+    // difesa principale per tutto il resto, più sfumato di una lista fissa.
+    if (CoachGuardrail.isOffTopic(text)) {
+      setState(() => _messages.add(_ChatMessage(isUser: false, text: context.l10n.coachFuoriTema)));
+      _scrollToBottom();
+      return;
+    }
     setState(() => _sending = true);
     _scrollToBottom();
 

@@ -883,5 +883,6 @@
   "coachRiprovo": "Modello occupato, riprovo... ({attempt}/2)",
   "@coachRiprovo": { "placeholders": { "attempt": { "type": "int" } } },
   "coachRiprova": "Riprova",
+  "coachFuoriTema": "Posso aiutarti solo con allenamento, nutrizione e ricette. Prova a chiedermi qualcosa su questi argomenti!",
   "coachErroreGenerico": "Qualcosa è andato storto, riprova."
 }

@@ -4040,6 +4040,12 @@ abstract class AppLocalizations {
   /// **'Riprova'**
   String get coachRiprova;
 
+  /// No description provided for @coachFuoriTema.
+  ///
+  /// In it, this message translates to:
+  /// **'Posso aiutarti solo con allenamento, nutrizione e ricette. Prova a chiedermi qualcosa su questi argomenti!'**
+  String get coachFuoriTema;
+
   /// No description provided for @coachErroreGenerico.
   ///
   /// In it, this message translates to:

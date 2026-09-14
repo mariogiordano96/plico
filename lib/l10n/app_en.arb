@@ -719,5 +719,6 @@
   "coachRiprovo": "Model busy, retrying... ({attempt}/2)",
   "@coachRiprovo": { "placeholders": { "attempt": { "type": "int" } } },
   "coachRiprova": "Retry",
+  "coachFuoriTema": "I can only help with workout, nutrition, and recipes. Try asking me something about those topics!",
   "coachErroreGenerico": "Something went wrong, please retry."
 }

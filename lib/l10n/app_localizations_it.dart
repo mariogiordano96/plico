@@ -2217,5 +2217,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get coachRiprova => 'Riprova';
 
   @override
+  String get coachFuoriTema =>
+      'Posso aiutarti solo con allenamento, nutrizione e ricette. Prova a chiedermi qualcosa su questi argomenti!';
+
+  @override
   String get coachErroreGenerico => 'Qualcosa è andato storto, riprova.';
 }

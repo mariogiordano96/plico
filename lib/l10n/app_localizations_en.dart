@@ -2206,5 +2206,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get coachRiprova => 'Retry';
 
   @override
+  String get coachFuoriTema =>
+      'I can only help with workout, nutrition, and recipes. Try asking me something about those topics!';
+
+  @override
   String get coachErroreGenerico => 'Something went wrong, please retry.';
 }

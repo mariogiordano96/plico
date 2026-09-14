@@ -301,9 +301,24 @@ risponde male a una domanda).
 > **Non ancora implementato in questa fase**: function calling/lettura dati utente
 > (`getMealPlan()`, TDEE, storico) — il Coach oggi risponde senza contesto sui dati
 > dell'utente, una naturale Fase 8 se serve renderlo più utile ("cosa mangio oggi secondo
-> il mio piano?"). Guardrail sui temi sensibili oggi solo nel system prompt (sezione 3.4),
-> nessun filtro deterministico lato app pre-modello — altra Fase 8 se il solo prompt si
-> rivela insufficiente in pratica.
+> il mio piano?").
+>
+> **Guardrail deterministico lato app — aggiunto 2026-09** (`lib/services/coach_guardrail.dart`,
+> `CoachGuardrail.isOffTopic`, testato in `test/coach_guardrail_test.dart`): un controllo
+> locale a pattern regex, eseguito PRIMA di chiamare Gemini, per le richieste palesemente
+> fuori dal dominio allenamento/nutrizione/ricette (aiuto di programmazione, compiti
+> scolastici di altre materie, politica/attualità, trivia generica, scrittura creativa
+> generica, meteo) — rifiuta in locale senza toccare la rete né consumare quota.
+> Deliberatamente permissivo: in caso di dubbio lascia passare al system prompt (sezione
+> 3.4, resta la difesa principale) invece di rifiutare — pattern su frasi/combinazioni
+> specifiche, non singole parole ambigue che collidono col dominio (es. "programma" da
+> solo non basta, potrebbe essere "programma di allenamento"). Nessuna lista/pacchetto
+> pronto trovato per questo (ricerca web 2026-09): i guardrail professionali (LLM Guard,
+> NeMo Guardrails) usano modelli di classificazione zero-shot, non liste — troppo pesanti
+> per un client-only senza backend; lista scritta e mantenuta a mano, come gli altri
+> contenuti curati di Plico. **Limite noto**: non copre i temi sensibili (diagnosi
+> mediche, infortuni, disturbi alimentari) — quelli restano delegati al solo system
+> prompt, che li gestisce con un redirect esplicito, non un rifiuto secco.
 
 **Motivazione — non più solo un'ipotesi, confermata da un test reale**: il test negativo di
 Fase 1 (2026-09, `qwen3.5:2b`) ha mostrato che il modello locale nella classe di taglia
