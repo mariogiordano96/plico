@@ -66,25 +66,24 @@ extension L10nX on BuildContext {
 }
 
 // ──────────────────────────────────────────────
-// Dark theme colors
+// Colori per ThemeData (const, non tramite _dark/_light: il compilatore non
+// accetta l'accesso a una proprietà di un'istanza const in un'espressione
+// costante — vedi ColorPalette sopra, usata invece a runtime via `context.palette`).
 // ──────────────────────────────────────────────
 class AppColors {
-  static const background = _dark.background;
-  static const surface = _dark.surface;
-  static const surfaceVariant = _dark.surfaceVariant;
-  static const accent = _dark.accent;
-  static const accentSecondary = _dark.accentSecondary;
+  static const background = Color(0xFF0B1622);
+  static const surface = Color(0xFF162035);
+  static const surfaceVariant = Color(0xFF1A2840);
+  static const accent = Color(0xFF00FF88);
+  static const accentSecondary = Color(0xFF7FFF00);
   static const accentDim = Color(0xFF00CC6A);
-  static const textPrimary = _dark.textPrimary;
-  static const textSecondary = _dark.textSecondary;
-  static const textMuted = _dark.textMuted;
-  static const cardBorder = _dark.cardBorder;
-  static const error = _dark.error;
+  static const textPrimary = Color(0xFFE8F2FF);
+  static const textSecondary = Color(0xFF7DB8CC);
+  static const textMuted = Color(0xFF4A6B7A);
+  static const cardBorder = Color(0xFF1E3A50);
+  static const error = Color(0xFFFF4D6D);
 }
 
-// ──────────────────────────────────────────────
-// Light theme colors
-// ──────────────────────────────────────────────
 class AppColorsLight {
   static const background = Color(0xFFF2FAF5);
   static const surface = Color(0xFFFFFFFF);
