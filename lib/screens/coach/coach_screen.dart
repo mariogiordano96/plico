@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/app_settings.dart';
@@ -583,6 +584,39 @@ class _ChatView extends StatelessWidget {
   }
 }
 
+/// Stile Markdown allineato alla palette tema-aware dell'app invece del
+/// default (che userebbe i colori del `Theme` Material, non i nostri).
+MarkdownStyleSheet _markdownStyle(BuildContext context, ColorPalette p) {
+  final base = TextStyle(color: p.textPrimary, fontSize: 14, height: 1.35);
+  return MarkdownStyleSheet(
+    p: base,
+    strong: base.copyWith(fontWeight: FontWeight.w700),
+    em: base.copyWith(fontStyle: FontStyle.italic),
+    h1: base.copyWith(fontSize: 18, fontWeight: FontWeight.w700),
+    h2: base.copyWith(fontSize: 16, fontWeight: FontWeight.w700),
+    h3: base.copyWith(fontSize: 15, fontWeight: FontWeight.w700),
+    listBullet: base,
+    blockquote: base.copyWith(color: p.textMuted),
+    blockquoteDecoration: BoxDecoration(
+      border: Border(left: BorderSide(color: p.cardBorder, width: 3)),
+    ),
+    code: base.copyWith(
+      color: p.accent,
+      fontFamily: 'monospace',
+      backgroundColor: p.background,
+    ),
+    codeblockDecoration: BoxDecoration(
+      color: p.background,
+      borderRadius: BorderRadius.circular(8),
+      border: Border.all(color: p.cardBorder),
+    ),
+    a: base.copyWith(color: p.accent, decoration: TextDecoration.underline),
+    horizontalRuleDecoration: BoxDecoration(
+      border: Border(top: BorderSide(color: p.cardBorder)),
+    ),
+  );
+}
+
 class _MessageBubble extends StatelessWidget {
   final _ChatMessage message;
   final ColorPalette p;
@@ -619,14 +653,32 @@ class _MessageBubble extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              message.text,
-              style: TextStyle(
-                color: message.isError ? p.error : p.textPrimary,
-                fontSize: 14,
-                height: 1.35,
+            // Solo le risposte del modello sono Markdown reale (grassetto,
+            // elenchi, titoli...) da renderizzare — i messaggi dell'utente
+            // sono testo digitato (un "*" va mostrato letterale, non
+            // interpretato), gli errori sono stringhe nostre già semplici.
+            if (!isUser && !message.isError)
+              MarkdownBody(
+                data: message.text,
+                styleSheet: _markdownStyle(context, p),
+                onTapLink: (_, href, _) async {
+                  if (href == null) return;
+                  try {
+                    await launchUrl(Uri.parse(href), mode: LaunchMode.externalApplication);
+                  } catch (_) {
+                    // Nessun browser disponibile: il testo del link resta comunque leggibile.
+                  }
+                },
+              )
+            else
+              Text(
+                message.text,
+                style: TextStyle(
+                  color: message.isError ? p.error : p.textPrimary,
+                  fontSize: 14,
+                  height: 1.35,
+                ),
               ),
-            ),
             if (message.isError && message.retryText != null) ...[
               const SizedBox(height: 6),
               InkWell(
