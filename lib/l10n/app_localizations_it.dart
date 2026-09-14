@@ -2214,5 +2214,8 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get coachRiprova => 'Riprova';
+
+  @override
   String get coachErroreGenerico => 'Qualcosa è andato storto, riprova.';
 }

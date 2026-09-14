@@ -718,5 +718,6 @@
   "coachErroreServizioNonDisponibile": "Gemini is temporarily overloaded on Google's end. Try again shortly.",
   "coachRiprovo": "Model busy, retrying... ({attempt}/2)",
   "@coachRiprovo": { "placeholders": { "attempt": { "type": "int" } } },
+  "coachRiprova": "Retry",
   "coachErroreGenerico": "Something went wrong, please retry."
 }

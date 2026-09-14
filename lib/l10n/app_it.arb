@@ -882,5 +882,6 @@
   "coachErroreServizioNonDisponibile": "Il servizio Gemini è momentaneamente sovraccarico lato Google. Riprova tra poco.",
   "coachRiprovo": "Modello occupato, riprovo... ({attempt}/2)",
   "@coachRiprovo": { "placeholders": { "attempt": { "type": "int" } } },
+  "coachRiprova": "Riprova",
   "coachErroreGenerico": "Qualcosa è andato storto, riprova."
 }

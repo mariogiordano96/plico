@@ -4034,6 +4034,12 @@ abstract class AppLocalizations {
   /// **'Modello occupato, riprovo... ({attempt}/2)'**
   String coachRiprovo(int attempt);
 
+  /// No description provided for @coachRiprova.
+  ///
+  /// In it, this message translates to:
+  /// **'Riprova'**
+  String get coachRiprova;
+
   /// No description provided for @coachErroreGenerico.
   ///
   /// In it, this message translates to:

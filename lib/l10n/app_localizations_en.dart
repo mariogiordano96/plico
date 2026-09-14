@@ -2203,5 +2203,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get coachRiprova => 'Retry';
+
+  @override
   String get coachErroreGenerico => 'Something went wrong, please retry.';
 }

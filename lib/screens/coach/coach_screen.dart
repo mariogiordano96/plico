@@ -44,7 +44,15 @@ class _ChatMessage {
   final bool isUser;
   final String text;
   final bool isError;
-  const _ChatMessage({required this.isUser, required this.text, this.isError = false});
+  // Solo sui messaggi di errore: il testo dell'utente che ha causato
+  // l'errore, per poter riprovare senza doverlo ridigitare.
+  final String? retryText;
+  const _ChatMessage({
+    required this.isUser,
+    required this.text,
+    this.isError = false,
+    this.retryText,
+  });
 }
 
 class _CoachScreenState extends State<CoachScreen> {
@@ -151,18 +159,30 @@ class _CoachScreenState extends State<CoachScreen> {
     final text = _inputCtrl.text.trim();
     if (text.isEmpty || _sending || _apiKey == null) return;
     _inputCtrl.clear();
-    setState(() {
-      _messages.add(_ChatMessage(isUser: true, text: text));
-      _sending = true;
-    });
+    setState(() => _messages.add(_ChatMessage(isUser: true, text: text)));
+    await _sendText(text);
+  }
+
+  /// Bottone "Riprova" su un messaggio di errore: rimanda lo stesso testo
+  /// senza doverlo ridigitare — il turno utente originale è già in
+  /// `_messages`, non va aggiunto di nuovo.
+  Future<void> _retry(String text) => _sendText(text);
+
+  Future<void> _sendText(String text) async {
+    if (_sending || _apiKey == null) return;
+    setState(() => _sending = true);
     _scrollToBottom();
 
     try {
       final reply = await GeminiService.sendMessage(
         apiKey: _apiKey!,
         systemInstruction: _systemInstruction(context),
+        // Esclude i bubble di errore dalla storia mandata a Gemini: sono
+        // messaggi nostri (localizzati, per l'utente), non turni reali del
+        // modello — includerli inquinerebbe la conversazione.
         history: [
-          for (final m in _messages) GeminiTurn(isUser: m.isUser, text: m.text),
+          for (final m in _messages.where((m) => !m.isError))
+            GeminiTurn(isUser: m.isUser, text: m.text),
         ],
         onRetrying: (attempt) {
           if (!mounted) return;
@@ -173,8 +193,8 @@ class _CoachScreenState extends State<CoachScreen> {
       setState(() => _messages.add(_ChatMessage(isUser: false, text: reply)));
     } on GeminiException catch (e) {
       if (!mounted) return;
-      setState(() => _messages
-          .add(_ChatMessage(isUser: false, text: _errorMessage(e.type), isError: true)));
+      setState(() => _messages.add(_ChatMessage(
+          isUser: false, text: _errorMessage(e.type), isError: true, retryText: text)));
     } finally {
       final remaining = await GeminiService.remainingToday();
       if (mounted) {
@@ -256,6 +276,7 @@ class _CoachScreenState extends State<CoachScreen> {
                   retryHint: _retryHint,
                   remainingToday: _remainingToday,
                   onSend: _send,
+                  onRetry: _retry,
                 ),
     );
   }
@@ -452,6 +473,7 @@ class _ChatView extends StatelessWidget {
   final String? retryHint;
   final int remainingToday;
   final VoidCallback onSend;
+  final ValueChanged<String> onRetry;
 
   const _ChatView({
     required this.messages,
@@ -461,6 +483,7 @@ class _ChatView extends StatelessWidget {
     required this.retryHint,
     required this.remainingToday,
     required this.onSend,
+    required this.onRetry,
   });
 
   @override
@@ -489,7 +512,8 @@ class _ChatView extends StatelessWidget {
                   child: Text(l10n.coachBenvenuto,
                       style: TextStyle(color: p.textMuted, fontSize: 13, height: 1.4)),
                 ),
-              for (final m in messages) _MessageBubble(message: m, p: p),
+              for (final m in messages)
+                _MessageBubble(message: m, p: p, sending: sending, onRetry: onRetry),
               if (sending)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
@@ -562,10 +586,18 @@ class _ChatView extends StatelessWidget {
 class _MessageBubble extends StatelessWidget {
   final _ChatMessage message;
   final ColorPalette p;
-  const _MessageBubble({required this.message, required this.p});
+  final bool sending;
+  final ValueChanged<String> onRetry;
+  const _MessageBubble({
+    required this.message,
+    required this.p,
+    required this.sending,
+    required this.onRetry,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final isUser = message.isUser;
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -583,13 +615,42 @@ class _MessageBubble extends StatelessWidget {
           border: Border.all(
               color: isUser ? p.accent.withValues(alpha: 0.4) : p.cardBorder),
         ),
-        child: Text(
-          message.text,
-          style: TextStyle(
-            color: message.isError ? p.error : p.textPrimary,
-            fontSize: 14,
-            height: 1.35,
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              message.text,
+              style: TextStyle(
+                color: message.isError ? p.error : p.textPrimary,
+                fontSize: 14,
+                height: 1.35,
+              ),
+            ),
+            if (message.isError && message.retryText != null) ...[
+              const SizedBox(height: 6),
+              InkWell(
+                onTap: sending ? null : () => onRetry(message.retryText!),
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.refresh_rounded,
+                          size: 15, color: sending ? p.textMuted : p.error),
+                      const SizedBox(width: 4),
+                      Text(l10n.coachRiprova,
+                          style: TextStyle(
+                              color: sending ? p.textMuted : p.error,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ],
         ),
       ),
     );
