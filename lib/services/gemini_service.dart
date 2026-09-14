@@ -44,8 +44,11 @@ class GeminiService {
   // a Gemini 3.8 Flash, l'ultimissima release — un modello appena uscito e
   // molto richiesto satura molto più spesso di uno consolidato (503
   // UNAVAILABLE osservati dal vivo, vedi commento su serviceUnavailable
-  // sotto). Gemini 2.5 Flash è più datato ma più stabile in disponibilità.
-  static const _model = 'gemini-2.5-flash';
+  // sotto). `gemini-2.5-flash` (primo tentativo) risulta a sua volta
+  // deprecato per le chiavi nuove — 404 "no longer available to new users"
+  // osservato dal vivo (2026-09), con Google stessa che nel messaggio
+  // d'errore consiglia `gemini-3.6-flash`, usato qui.
+  static const _model = 'gemini-3.6-flash';
   static const _endpoint =
       'https://generativelanguage.googleapis.com/v1beta/models/$_model:generateContent';
 

@@ -342,14 +342,20 @@ offline-first per chi non attiva l'opzione: resta opt-in, mai automatico.
 - **Scelta**: chiamata HTTP diretta alla REST API di Gemini (package `http`, nessuna
   dipendenza nuova pesante, nessun progetto Firebase/Google Cloud lato Plico):
   ```
-  POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=<chiave_utente>
+  POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=<chiave_utente>
   Body: { "contents": [{ "parts": [{ "text": "<prompt costruito>" }] }] }
   ```
-  > **Aggiornamento 2026-09**: modello fisso `gemini-2.5-flash`, non l'alias
-  > `gemini-flash-latest` inizialmente usato — quell'alias punta oggi a Gemini 3.8 Flash,
-  > un modello appena uscito e molto richiesto, che nella pratica ha dato ripetuti `503
-  > UNAVAILABLE` ("modello sovraccarico") durante i primi test reali. Gemini 2.5 Flash è
-  > più datato ma più stabile in disponibilità — ricerca e fonti in sezione "Riferimenti".
+  > **Aggiornamento 2026-09**: modello fisso, non l'alias `gemini-flash-latest`
+  > inizialmente usato — quell'alias punta oggi a Gemini 3.8 Flash, un modello appena
+  > uscito e molto richiesto, che nella pratica ha dato ripetuti `503 UNAVAILABLE`
+  > ("modello sovraccarico") durante i primi test reali. Primo tentativo di fix,
+  > `gemini-2.5-flash` (più datato, atteso più stabile in disponibilità): risultato
+  > `404 NOT_FOUND` dal vivo — *"This model models/gemini-2.5-flash is no longer
+  > available to new users. Please update your code to use models/gemini-3.6-flash"*,
+  > testo del messaggio d'errore di Google stessa. Modello finale: `gemini-3.6-flash`,
+  > raccomandazione diretta di Google nello stesso errore — più recente di 2.5 (quindi
+  > ancora disponibile a nuove chiavi) ma non l'ultimissimo 3.8 (quindi meno esposto ai
+  > picchi di domanda del giorno del lancio). Ricerca e fonti in sezione "Riferimenti".
   Per lo streaming in UI (token per token, come già previsto per il modello locale in
   sezione 4) c'è l'endpoint equivalente `:streamGenerateContent`
 - **Nessun function calling verso Gemini necessario per le ricette**: a differenza del
@@ -421,6 +427,6 @@ sync della quota tra device), da tenere presente se emergono segnalazioni.
 - [Firebase AI Logic — pricing/billing](https://firebase.google.com/docs/ai-logic/pricing) — motivo per cui `firebase_ai` non va usato in Fase 7 (quota sul progetto Firebase di Plico, non dell'utente)
 - [Gemini 503 "The model is overloaded" — retries that work and when to stop, Kunavo](https://kunavo.com/guides/gemini-api-model-overloaded) — un 503 è capacità server condivisa tra tutti gli utenti (free e a pagamento), diverso dal 429 (quota per-progetto): non si risolve passando a pagamento, solo con retry/backoff o un modello meno congestionato
 - [5 Methods to Resolve Gemini API Error High Demand 503, Apiyi.com](https://help.apiyi.com/en/gemini-api-high-demand-503-error-solution-guide-en.html) — un modello appena rilasciato e molto richiesto satura più spesso di uno consolidato
-- [What's new in Gemini 3.8 Flash — Google AI for Developers](https://ai.google.dev/gemini-api/docs/latest-model) — conferma che l'alias `gemini-flash-latest` punta oggi (2026-09) a Gemini 3.8 Flash, motivo del cambio a `gemini-2.5-flash` fisso sopra
+- [What's new in Gemini 3.8 Flash — Google AI for Developers](https://ai.google.dev/gemini-api/docs/latest-model) — conferma che l'alias `gemini-flash-latest` punta oggi (2026-09) a Gemini 3.8 Flash, motivo del cambio a un modello fisso sopra (`gemini-2.5-flash`, poi `gemini-3.6-flash` dopo il 404 — vedi nota inline sulla REST call)
 - [Models — Gemini API, Google AI for Developers](https://ai.google.dev/gemini-api/docs/models) — conferma che Gemini 2.5 Flash è ancora un modello disponibile/stabile
 - [Gemini API Rate Limits 2026 — AI Prompt Generator Hub](https://aipromptshub.co/limits/gemini-rate-limits-2026) — fonte terza (non ufficiale) sui numeri free tier attuali, divergente da altre fonti — vedi nota sopra
