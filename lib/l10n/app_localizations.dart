@@ -4046,6 +4046,24 @@ abstract class AppLocalizations {
   /// **'Posso aiutarti solo con allenamento, nutrizione e ricette. Prova a chiedermi qualcosa su questi argomenti!'**
   String get coachFuoriTema;
 
+  /// No description provided for @coachNuovaConversazioneTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'Nuova conversazione'**
+  String get coachNuovaConversazioneTitolo;
+
+  /// No description provided for @coachNuovaConversazioneSub.
+  ///
+  /// In it, this message translates to:
+  /// **'La cronologia della chat verrà cancellata definitivamente. Continuare?'**
+  String get coachNuovaConversazioneSub;
+
+  /// No description provided for @coachNuovaConversazioneConferma.
+  ///
+  /// In it, this message translates to:
+  /// **'Cancella'**
+  String get coachNuovaConversazioneConferma;
+
   /// No description provided for @coachErroreGenerico.
   ///
   /// In it, this message translates to:

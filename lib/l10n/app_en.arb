@@ -720,5 +720,8 @@
   "@coachRiprovo": { "placeholders": { "attempt": { "type": "int" } } },
   "coachRiprova": "Retry",
   "coachFuoriTema": "I can only help with workout, nutrition, and recipes. Try asking me something about those topics!",
+  "coachNuovaConversazioneTitolo": "New conversation",
+  "coachNuovaConversazioneSub": "The chat history will be permanently deleted. Continue?",
+  "coachNuovaConversazioneConferma": "Delete",
   "coachErroreGenerico": "Something went wrong, please retry."
 }

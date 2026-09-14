@@ -3,6 +3,7 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/app_settings.dart';
+import '../../models/coach_message.dart';
 import '../../services/coach_guardrail.dart';
 import '../../services/database_service.dart';
 import '../../services/gemini_quota.dart';
@@ -84,15 +85,45 @@ class _CoachScreenState extends State<CoachScreen> {
   Future<void> _load() async {
     final settings = await DatabaseService.instance.getAppSettings();
     final remaining = await GeminiService.remainingToday();
+    final persisted = await DatabaseService.instance.getCoachMessages();
     if (!mounted) return;
     setState(() {
       _apiKey = settings.geminiApiKey?.isNotEmpty == true ? settings.geminiApiKey : null;
       _remainingToday = remaining;
+      _messages
+        ..clear()
+        ..addAll(_fromPersisted(persisted));
       _loading = false;
     });
+    _scrollToBottom();
     if (!settings.coachOnboardingSeen) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _showOnboardingBanner(settings));
     }
+  }
+
+  /// Ricostruisce `retryText` per un ultimo messaggio di errore ricaricato da
+  /// disco (non persistito a parte, coincide sempre col messaggio utente
+  /// immediatamente precedente — stesso testo che avremmo mandato di nuovo).
+  List<_ChatMessage> _fromPersisted(List<CoachMessage> messages) {
+    final result = <_ChatMessage>[];
+    for (var i = 0; i < messages.length; i++) {
+      final m = messages[i];
+      final retryText =
+          m.isError && i > 0 && messages[i - 1].isUser ? messages[i - 1].text : null;
+      result.add(_ChatMessage(isUser: m.isUser, text: m.text, isError: m.isError, retryText: retryText));
+    }
+    return result;
+  }
+
+  Future<void> _addMessage(_ChatMessage message) async {
+    setState(() => _messages.add(message));
+    await DatabaseService.instance.addCoachMessage(
+      CoachMessage()
+        ..createdAt = DateTime.now()
+        ..isUser = message.isUser
+        ..text = message.text
+        ..isError = message.isError,
+    );
   }
 
   /// Banner mostrato una sola volta, alla primissima apertura della tab —
@@ -161,7 +192,7 @@ class _CoachScreenState extends State<CoachScreen> {
     final text = _inputCtrl.text.trim();
     if (text.isEmpty || _sending || _apiKey == null) return;
     _inputCtrl.clear();
-    setState(() => _messages.add(_ChatMessage(isUser: true, text: text)));
+    await _addMessage(_ChatMessage(isUser: true, text: text));
     await _sendText(text);
   }
 
@@ -177,7 +208,7 @@ class _CoachScreenState extends State<CoachScreen> {
     // senza toccare la rete né consumare quota — il system prompt resta la
     // difesa principale per tutto il resto, più sfumato di una lista fissa.
     if (CoachGuardrail.isOffTopic(text)) {
-      setState(() => _messages.add(_ChatMessage(isUser: false, text: context.l10n.coachFuoriTema)));
+      await _addMessage(_ChatMessage(isUser: false, text: context.l10n.coachFuoriTema));
       _scrollToBottom();
       return;
     }
@@ -201,11 +232,11 @@ class _CoachScreenState extends State<CoachScreen> {
         },
       );
       if (!mounted) return;
-      setState(() => _messages.add(_ChatMessage(isUser: false, text: reply)));
+      await _addMessage(_ChatMessage(isUser: false, text: reply));
     } on GeminiException catch (e) {
       if (!mounted) return;
-      setState(() => _messages.add(_ChatMessage(
-          isUser: false, text: _errorMessage(e.type), isError: true, retryText: text)));
+      await _addMessage(_ChatMessage(
+          isUser: false, text: _errorMessage(e.type), isError: true, retryText: text));
     } finally {
       final remaining = await GeminiService.remainingToday();
       if (mounted) {
@@ -246,11 +277,42 @@ class _CoachScreenState extends State<CoachScreen> {
     final settings = await DatabaseService.instance.getAppSettings();
     settings.geminiApiKey = null;
     await DatabaseService.instance.saveAppSettings(settings);
+    // Coerente col testo del dialog sopra ("la chat attuale non verrà
+    // salvata"): ora che la cronologia è persistita, azzerarla solo in
+    // memoria non basterebbe più a mantenere quella promessa.
+    await DatabaseService.instance.clearCoachMessages();
     if (!mounted) return;
     setState(() {
       _apiKey = null;
       _messages.clear();
     });
+  }
+
+  Future<void> _nuovaConversazione() async {
+    final l10n = context.l10n;
+    final p = context.palette;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: p.surface,
+        title: Text(l10n.coachNuovaConversazioneTitolo, style: TextStyle(color: p.textPrimary)),
+        content: Text(l10n.coachNuovaConversazioneSub, style: TextStyle(color: p.textSecondary)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.diarioAnnulla, style: TextStyle(color: p.textMuted)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n.coachNuovaConversazioneConferma, style: TextStyle(color: p.error)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await DatabaseService.instance.clearCoachMessages();
+    if (!mounted) return;
+    setState(() => _messages.clear());
   }
 
   @override
@@ -267,6 +329,12 @@ class _CoachScreenState extends State<CoachScreen> {
         elevation: 0,
         centerTitle: true,
         actions: [
+          if (_apiKey != null && _messages.isNotEmpty)
+            IconButton(
+              onPressed: _nuovaConversazione,
+              icon: Icon(Icons.delete_sweep_outlined, color: p.textMuted),
+              tooltip: l10n.coachNuovaConversazioneTitolo,
+            ),
           if (_apiKey != null)
             IconButton(
               onPressed: _cambiaChiave,

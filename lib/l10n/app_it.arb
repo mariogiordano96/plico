@@ -884,5 +884,8 @@
   "@coachRiprovo": { "placeholders": { "attempt": { "type": "int" } } },
   "coachRiprova": "Riprova",
   "coachFuoriTema": "Posso aiutarti solo con allenamento, nutrizione e ricette. Prova a chiedermi qualcosa su questi argomenti!",
+  "coachNuovaConversazioneTitolo": "Nuova conversazione",
+  "coachNuovaConversazioneSub": "La cronologia della chat verrà cancellata definitivamente. Continuare?",
+  "coachNuovaConversazioneConferma": "Cancella",
   "coachErroreGenerico": "Qualcosa è andato storto, riprova."
 }

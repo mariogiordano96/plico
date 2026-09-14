@@ -2221,5 +2221,15 @@ class AppLocalizationsIt extends AppLocalizations {
       'Posso aiutarti solo con allenamento, nutrizione e ricette. Prova a chiedermi qualcosa su questi argomenti!';
 
   @override
+  String get coachNuovaConversazioneTitolo => 'Nuova conversazione';
+
+  @override
+  String get coachNuovaConversazioneSub =>
+      'La cronologia della chat verrà cancellata definitivamente. Continuare?';
+
+  @override
+  String get coachNuovaConversazioneConferma => 'Cancella';
+
+  @override
   String get coachErroreGenerico => 'Qualcosa è andato storto, riprova.';
 }

@@ -184,8 +184,12 @@ conseguenze da tenere esplicite:
 - **Indicatore di stato**: streaming della risposta + eventuale stato "sto consultando i
   tuoi dati" quando è in corso una function call, per non far percepire l'attesa come un
   blocco
-- **Cronologia**: almeno la sessione corrente in memoria; persistenza multi-sessione tra
-  riavvii è una rifinitura successiva, non bloccante per l'MVP
+- **Cronologia**: **implementata 2026-09** — persistita su Isar (`CoachMessage`,
+  `lib/models/coach_message.dart`), una conversazione continua che sopravvive a un
+  riavvio dell'app, non più solo in memoria della sessione corrente. Azzerabile
+  esplicitamente dall'utente ("Nuova conversazione" in AppBar, o implicitamente
+  cambiando la chiave API — coerente col disclaimer "la chat attuale non verrà
+  salvata" mostrato in quel caso).
 
 ---
 

@@ -28,6 +28,7 @@ import '../models/workout_template.dart';
 import '../models/workout_template_exercise.dart';
 import '../models/workout_program.dart';
 import '../models/personal_record.dart';
+import '../models/coach_message.dart';
 import 'calorie_estimation_service.dart';
 import 'exercise_alternatives_service.dart';
 import 'workout_progress_service.dart';
@@ -45,6 +46,7 @@ class DatabaseService {
     AchievementSchema, MealComboSchema, ExerciseDefinitionSchema,
     WorkoutLogSchema, WorkoutExerciseSchema,
     WorkoutTemplateSchema, WorkoutProgramSchema,
+    CoachMessageSchema,
   ];
 
   Future<void> init() async {
@@ -1733,6 +1735,29 @@ class DatabaseService {
       _isar = await Isar.open(_schemas, directory: dirPath);
       rethrow;
     }
+  }
+
+  // ──────────────────────────────────────────────
+  // Coach (chat Gemini — docs/integrazione_flutter_gemma.md, Fase 7)
+  // ──────────────────────────────────────────────
+
+  /// Un'unica conversazione continua (non una per sessione/giorno): ordinata
+  /// per data di creazione, così sopravvive a un riavvio dell'app.
+  Future<List<CoachMessage>> getCoachMessages() async {
+    return _isar.coachMessages.where().sortByCreatedAt().findAll();
+  }
+
+  Future<void> addCoachMessage(CoachMessage message) async {
+    await _isar.writeTxn(() async {
+      await _isar.coachMessages.put(message);
+    });
+  }
+
+  /// "Nuova conversazione": azzera la cronologia persistita.
+  Future<void> clearCoachMessages() async {
+    await _isar.writeTxn(() async {
+      await _isar.coachMessages.clear();
+    });
   }
 
   // ──────────────────────────────────────────────

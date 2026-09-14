@@ -2210,5 +2210,15 @@ class AppLocalizationsEn extends AppLocalizations {
       'I can only help with workout, nutrition, and recipes. Try asking me something about those topics!';
 
   @override
+  String get coachNuovaConversazioneTitolo => 'New conversation';
+
+  @override
+  String get coachNuovaConversazioneSub =>
+      'The chat history will be permanently deleted. Continue?';
+
+  @override
+  String get coachNuovaConversazioneConferma => 'Delete';
+
+  @override
   String get coachErroreGenerico => 'Something went wrong, please retry.';
 }
