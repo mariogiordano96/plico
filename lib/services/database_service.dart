@@ -1617,9 +1617,23 @@ class DatabaseService {
 
   /// Genera il log del giorno a partire dai target della scheda (la pre-compilazione
   /// con il suggerimento di progressive overload è Fase 7/8). Aggiorna `lastUsedAt`.
+  ///
+  /// Se la scheda è già stata avviata quel giorno (stesso `sourceTemplateId`
+  /// già presente nel log), riprende quegli esercizi invece di ricrearli da
+  /// zero: altrimenti premere di nuovo "Inizia" (es. dopo che l'app è stata
+  /// riaperta da background/kill del processo) duplica l'intera scheda con
+  /// tutto non confermato, e la sessione guidata — che lavora su tutti gli
+  /// esercizi del giorno — non risulta mai completabile.
   Future<List<WorkoutExercise>> startWorkoutFromTemplate(
       WorkoutTemplate template, DateTime date) async {
     final day = _logDate(date);
+    final existing = await _isar.workoutExercises
+        .filter()
+        .dateEqualTo(day)
+        .sourceTemplateIdEqualTo(template.id)
+        .findAll();
+    if (existing.isNotEmpty) return existing;
+
     final program =
         template.programId != null ? await _isar.workoutPrograms.get(template.programId!) : null;
     final created = <WorkoutExercise>[];

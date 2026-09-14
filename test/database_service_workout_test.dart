@@ -167,6 +167,39 @@ void main() {
       expect(created.first.sets, isEmpty);
       expect(created.first.durationSeconds, 1800);
     });
+
+    test(
+        'seconda chiamata lo stesso giorno riprende gli esercizi già creati invece di duplicarli',
+        () async {
+      final db = DatabaseService.instance;
+      final template = WorkoutTemplate()
+        ..name = 'Giorno1'
+        ..createdAt = DateTime.now()
+        ..exercises = [
+          _templateExercise(id: 'bench', targetSets: 3, targetReps: 8, targetWeightKg: 80),
+        ];
+      await db.saveWorkoutTemplate(template);
+      final day = DateTime(2026, 1, 10);
+
+      final first = await db.startWorkoutFromTemplate(template, day);
+      // Conferma tutte le serie, come farebbe la sessione guidata prima di
+      // "Termina sessione".
+      for (final s in first.first.sets) {
+        s.confirmed = true;
+      }
+      await db.updateWorkoutExercise(first.first);
+
+      // Premere di nuovo "Inizia" sulla stessa scheda lo stesso giorno (es.
+      // dopo che l'app è stata riaperta da background) non deve creare un
+      // secondo giro di esercizi azzerati.
+      final second = await db.startWorkoutFromTemplate(template, day);
+
+      final logged = await db.getWorkoutExercisesForDay(day);
+      expect(logged, hasLength(1));
+      expect(second, hasLength(1));
+      expect(second.first.id, first.first.id);
+      expect(second.first.sets.every((s) => s.confirmed), isTrue);
+    });
   });
 
   group('addWorkoutExercise / getWorkoutExercisesForDay', () {
