@@ -17,163 +17,168 @@ const AppSettingsSchema = CollectionSchema(
   name: r'AppSettings',
   id: -5633561779022347008,
   properties: {
-    r'creaSeeded': PropertySchema(
+    r'coachOnboardingSeen': PropertySchema(
       id: 0,
+      name: r'coachOnboardingSeen',
+      type: IsarType.bool,
+    ),
+    r'creaSeeded': PropertySchema(
+      id: 1,
       name: r'creaSeeded',
       type: IsarType.bool,
     ),
     r'exerciseNamesItSyncedV1': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'exerciseNamesItSyncedV1',
       type: IsarType.bool,
     ),
     r'exercisesSeeded': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'exercisesSeeded',
       type: IsarType.bool,
     ),
     r'foodNamesNormalizedV2': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'foodNamesNormalizedV2',
       type: IsarType.bool,
     ),
     r'foodNomeIngleseSyncedV1': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'foodNomeIngleseSyncedV1',
       type: IsarType.bool,
     ),
     r'geminiApiKey': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'geminiApiKey',
       type: IsarType.string,
     ),
     r'geminiRequestsResetDate': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'geminiRequestsResetDate',
       type: IsarType.dateTime,
     ),
     r'geminiRequestsToday': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'geminiRequestsToday',
       type: IsarType.long,
     ),
     r'goalSetDate': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'goalSetDate',
       type: IsarType.dateTime,
     ),
     r'isDarkMode': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'isDarkMode',
       type: IsarType.bool,
     ),
     r'livelloAttivita': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'livelloAttivita',
       type: IsarType.long,
     ),
     r'metodoTdee': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'metodoTdee',
       type: IsarType.long,
     ),
     r'notCenaAttiva': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'notCenaAttiva',
       type: IsarType.bool,
     ),
     r'notCenaMin': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'notCenaMin',
       type: IsarType.long,
     ),
     r'notColAttiva': PropertySchema(
-      id: 14,
+      id: 15,
       name: r'notColAttiva',
       type: IsarType.bool,
     ),
     r'notColMin': PropertySchema(
-      id: 15,
+      id: 16,
       name: r'notColMin',
       type: IsarType.long,
     ),
     r'notPostWoAttiva': PropertySchema(
-      id: 16,
+      id: 17,
       name: r'notPostWoAttiva',
       type: IsarType.bool,
     ),
     r'notPostWoMin': PropertySchema(
-      id: 17,
+      id: 18,
       name: r'notPostWoMin',
       type: IsarType.long,
     ),
     r'notPranzoAttiva': PropertySchema(
-      id: 18,
+      id: 19,
       name: r'notPranzoAttiva',
       type: IsarType.bool,
     ),
     r'notPranzoMin': PropertySchema(
-      id: 19,
+      id: 20,
       name: r'notPranzoMin',
       type: IsarType.long,
     ),
     r'notSorAttiva': PropertySchema(
-      id: 20,
+      id: 21,
       name: r'notSorAttiva',
       type: IsarType.bool,
     ),
     r'notSorMin': PropertySchema(
-      id: 21,
+      id: 22,
       name: r'notSorMin',
       type: IsarType.long,
     ),
     r'notSpuntinoAttiva': PropertySchema(
-      id: 22,
+      id: 23,
       name: r'notSpuntinoAttiva',
       type: IsarType.bool,
     ),
     r'notSpuntinoMin': PropertySchema(
-      id: 23,
+      id: 24,
       name: r'notSpuntinoMin',
       type: IsarType.long,
     ),
     r'notWorkoutAttiva': PropertySchema(
-      id: 24,
+      id: 25,
       name: r'notWorkoutAttiva',
       type: IsarType.bool,
     ),
     r'notificheAttive': PropertySchema(
-      id: 25,
+      id: 26,
       name: r'notificheAttive',
       type: IsarType.bool,
     ),
     r'obiettivo': PropertySchema(
-      id: 26,
+      id: 27,
       name: r'obiettivo',
       type: IsarType.long,
     ),
     r'pesoObiettivo': PropertySchema(
-      id: 27,
+      id: 28,
       name: r'pesoObiettivo',
       type: IsarType.double,
     ),
     r'restTimerDefaultSeconds': PropertySchema(
-      id: 28,
+      id: 29,
       name: r'restTimerDefaultSeconds',
       type: IsarType.long,
     ),
     r'smartwatchConnected': PropertySchema(
-      id: 29,
+      id: 30,
       name: r'smartwatchConnected',
       type: IsarType.bool,
     ),
     r'tourCompleted': PropertySchema(
-      id: 30,
+      id: 31,
       name: r'tourCompleted',
       type: IsarType.bool,
     ),
     r'workoutPresetsSeeded': PropertySchema(
-      id: 31,
+      id: 32,
       name: r'workoutPresetsSeeded',
       type: IsarType.bool,
     )
@@ -213,38 +218,39 @@ void _appSettingsSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeBool(offsets[0], object.creaSeeded);
-  writer.writeBool(offsets[1], object.exerciseNamesItSyncedV1);
-  writer.writeBool(offsets[2], object.exercisesSeeded);
-  writer.writeBool(offsets[3], object.foodNamesNormalizedV2);
-  writer.writeBool(offsets[4], object.foodNomeIngleseSyncedV1);
-  writer.writeString(offsets[5], object.geminiApiKey);
-  writer.writeDateTime(offsets[6], object.geminiRequestsResetDate);
-  writer.writeLong(offsets[7], object.geminiRequestsToday);
-  writer.writeDateTime(offsets[8], object.goalSetDate);
-  writer.writeBool(offsets[9], object.isDarkMode);
-  writer.writeLong(offsets[10], object.livelloAttivita);
-  writer.writeLong(offsets[11], object.metodoTdee);
-  writer.writeBool(offsets[12], object.notCenaAttiva);
-  writer.writeLong(offsets[13], object.notCenaMin);
-  writer.writeBool(offsets[14], object.notColAttiva);
-  writer.writeLong(offsets[15], object.notColMin);
-  writer.writeBool(offsets[16], object.notPostWoAttiva);
-  writer.writeLong(offsets[17], object.notPostWoMin);
-  writer.writeBool(offsets[18], object.notPranzoAttiva);
-  writer.writeLong(offsets[19], object.notPranzoMin);
-  writer.writeBool(offsets[20], object.notSorAttiva);
-  writer.writeLong(offsets[21], object.notSorMin);
-  writer.writeBool(offsets[22], object.notSpuntinoAttiva);
-  writer.writeLong(offsets[23], object.notSpuntinoMin);
-  writer.writeBool(offsets[24], object.notWorkoutAttiva);
-  writer.writeBool(offsets[25], object.notificheAttive);
-  writer.writeLong(offsets[26], object.obiettivo);
-  writer.writeDouble(offsets[27], object.pesoObiettivo);
-  writer.writeLong(offsets[28], object.restTimerDefaultSeconds);
-  writer.writeBool(offsets[29], object.smartwatchConnected);
-  writer.writeBool(offsets[30], object.tourCompleted);
-  writer.writeBool(offsets[31], object.workoutPresetsSeeded);
+  writer.writeBool(offsets[0], object.coachOnboardingSeen);
+  writer.writeBool(offsets[1], object.creaSeeded);
+  writer.writeBool(offsets[2], object.exerciseNamesItSyncedV1);
+  writer.writeBool(offsets[3], object.exercisesSeeded);
+  writer.writeBool(offsets[4], object.foodNamesNormalizedV2);
+  writer.writeBool(offsets[5], object.foodNomeIngleseSyncedV1);
+  writer.writeString(offsets[6], object.geminiApiKey);
+  writer.writeDateTime(offsets[7], object.geminiRequestsResetDate);
+  writer.writeLong(offsets[8], object.geminiRequestsToday);
+  writer.writeDateTime(offsets[9], object.goalSetDate);
+  writer.writeBool(offsets[10], object.isDarkMode);
+  writer.writeLong(offsets[11], object.livelloAttivita);
+  writer.writeLong(offsets[12], object.metodoTdee);
+  writer.writeBool(offsets[13], object.notCenaAttiva);
+  writer.writeLong(offsets[14], object.notCenaMin);
+  writer.writeBool(offsets[15], object.notColAttiva);
+  writer.writeLong(offsets[16], object.notColMin);
+  writer.writeBool(offsets[17], object.notPostWoAttiva);
+  writer.writeLong(offsets[18], object.notPostWoMin);
+  writer.writeBool(offsets[19], object.notPranzoAttiva);
+  writer.writeLong(offsets[20], object.notPranzoMin);
+  writer.writeBool(offsets[21], object.notSorAttiva);
+  writer.writeLong(offsets[22], object.notSorMin);
+  writer.writeBool(offsets[23], object.notSpuntinoAttiva);
+  writer.writeLong(offsets[24], object.notSpuntinoMin);
+  writer.writeBool(offsets[25], object.notWorkoutAttiva);
+  writer.writeBool(offsets[26], object.notificheAttive);
+  writer.writeLong(offsets[27], object.obiettivo);
+  writer.writeDouble(offsets[28], object.pesoObiettivo);
+  writer.writeLong(offsets[29], object.restTimerDefaultSeconds);
+  writer.writeBool(offsets[30], object.smartwatchConnected);
+  writer.writeBool(offsets[31], object.tourCompleted);
+  writer.writeBool(offsets[32], object.workoutPresetsSeeded);
 }
 
 AppSettings _appSettingsDeserialize(
@@ -254,39 +260,40 @@ AppSettings _appSettingsDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = AppSettings();
-  object.creaSeeded = reader.readBool(offsets[0]);
-  object.exerciseNamesItSyncedV1 = reader.readBool(offsets[1]);
-  object.exercisesSeeded = reader.readBool(offsets[2]);
-  object.foodNamesNormalizedV2 = reader.readBool(offsets[3]);
-  object.foodNomeIngleseSyncedV1 = reader.readBool(offsets[4]);
-  object.geminiApiKey = reader.readStringOrNull(offsets[5]);
-  object.geminiRequestsResetDate = reader.readDateTimeOrNull(offsets[6]);
-  object.geminiRequestsToday = reader.readLong(offsets[7]);
-  object.goalSetDate = reader.readDateTimeOrNull(offsets[8]);
+  object.coachOnboardingSeen = reader.readBool(offsets[0]);
+  object.creaSeeded = reader.readBool(offsets[1]);
+  object.exerciseNamesItSyncedV1 = reader.readBool(offsets[2]);
+  object.exercisesSeeded = reader.readBool(offsets[3]);
+  object.foodNamesNormalizedV2 = reader.readBool(offsets[4]);
+  object.foodNomeIngleseSyncedV1 = reader.readBool(offsets[5]);
+  object.geminiApiKey = reader.readStringOrNull(offsets[6]);
+  object.geminiRequestsResetDate = reader.readDateTimeOrNull(offsets[7]);
+  object.geminiRequestsToday = reader.readLong(offsets[8]);
+  object.goalSetDate = reader.readDateTimeOrNull(offsets[9]);
   object.id = id;
-  object.isDarkMode = reader.readBool(offsets[9]);
-  object.livelloAttivita = reader.readLong(offsets[10]);
-  object.metodoTdee = reader.readLong(offsets[11]);
-  object.notCenaAttiva = reader.readBool(offsets[12]);
-  object.notCenaMin = reader.readLong(offsets[13]);
-  object.notColAttiva = reader.readBool(offsets[14]);
-  object.notColMin = reader.readLong(offsets[15]);
-  object.notPostWoAttiva = reader.readBool(offsets[16]);
-  object.notPostWoMin = reader.readLong(offsets[17]);
-  object.notPranzoAttiva = reader.readBool(offsets[18]);
-  object.notPranzoMin = reader.readLong(offsets[19]);
-  object.notSorAttiva = reader.readBool(offsets[20]);
-  object.notSorMin = reader.readLong(offsets[21]);
-  object.notSpuntinoAttiva = reader.readBool(offsets[22]);
-  object.notSpuntinoMin = reader.readLong(offsets[23]);
-  object.notWorkoutAttiva = reader.readBool(offsets[24]);
-  object.notificheAttive = reader.readBool(offsets[25]);
-  object.obiettivo = reader.readLong(offsets[26]);
-  object.pesoObiettivo = reader.readDoubleOrNull(offsets[27]);
-  object.restTimerDefaultSeconds = reader.readLong(offsets[28]);
-  object.smartwatchConnected = reader.readBool(offsets[29]);
-  object.tourCompleted = reader.readBool(offsets[30]);
-  object.workoutPresetsSeeded = reader.readBool(offsets[31]);
+  object.isDarkMode = reader.readBool(offsets[10]);
+  object.livelloAttivita = reader.readLong(offsets[11]);
+  object.metodoTdee = reader.readLong(offsets[12]);
+  object.notCenaAttiva = reader.readBool(offsets[13]);
+  object.notCenaMin = reader.readLong(offsets[14]);
+  object.notColAttiva = reader.readBool(offsets[15]);
+  object.notColMin = reader.readLong(offsets[16]);
+  object.notPostWoAttiva = reader.readBool(offsets[17]);
+  object.notPostWoMin = reader.readLong(offsets[18]);
+  object.notPranzoAttiva = reader.readBool(offsets[19]);
+  object.notPranzoMin = reader.readLong(offsets[20]);
+  object.notSorAttiva = reader.readBool(offsets[21]);
+  object.notSorMin = reader.readLong(offsets[22]);
+  object.notSpuntinoAttiva = reader.readBool(offsets[23]);
+  object.notSpuntinoMin = reader.readLong(offsets[24]);
+  object.notWorkoutAttiva = reader.readBool(offsets[25]);
+  object.notificheAttive = reader.readBool(offsets[26]);
+  object.obiettivo = reader.readLong(offsets[27]);
+  object.pesoObiettivo = reader.readDoubleOrNull(offsets[28]);
+  object.restTimerDefaultSeconds = reader.readLong(offsets[29]);
+  object.smartwatchConnected = reader.readBool(offsets[30]);
+  object.tourCompleted = reader.readBool(offsets[31]);
+  object.workoutPresetsSeeded = reader.readBool(offsets[32]);
   return object;
 }
 
@@ -308,58 +315,60 @@ P _appSettingsDeserializeProp<P>(
     case 4:
       return (reader.readBool(offset)) as P;
     case 5:
-      return (reader.readStringOrNull(offset)) as P;
-    case 6:
-      return (reader.readDateTimeOrNull(offset)) as P;
-    case 7:
-      return (reader.readLong(offset)) as P;
-    case 8:
-      return (reader.readDateTimeOrNull(offset)) as P;
-    case 9:
       return (reader.readBool(offset)) as P;
-    case 10:
+    case 6:
+      return (reader.readStringOrNull(offset)) as P;
+    case 7:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 8:
       return (reader.readLong(offset)) as P;
+    case 9:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 10:
+      return (reader.readBool(offset)) as P;
     case 11:
       return (reader.readLong(offset)) as P;
     case 12:
-      return (reader.readBool(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 13:
-      return (reader.readLong(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 14:
-      return (reader.readBool(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 15:
-      return (reader.readLong(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 16:
-      return (reader.readBool(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 17:
-      return (reader.readLong(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 18:
-      return (reader.readBool(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 19:
-      return (reader.readLong(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 20:
-      return (reader.readBool(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 21:
-      return (reader.readLong(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 22:
-      return (reader.readBool(offset)) as P;
-    case 23:
       return (reader.readLong(offset)) as P;
-    case 24:
+    case 23:
       return (reader.readBool(offset)) as P;
+    case 24:
+      return (reader.readLong(offset)) as P;
     case 25:
       return (reader.readBool(offset)) as P;
     case 26:
-      return (reader.readLong(offset)) as P;
-    case 27:
-      return (reader.readDoubleOrNull(offset)) as P;
-    case 28:
-      return (reader.readLong(offset)) as P;
-    case 29:
       return (reader.readBool(offset)) as P;
+    case 27:
+      return (reader.readLong(offset)) as P;
+    case 28:
+      return (reader.readDoubleOrNull(offset)) as P;
+    case 29:
+      return (reader.readLong(offset)) as P;
     case 30:
       return (reader.readBool(offset)) as P;
     case 31:
+      return (reader.readBool(offset)) as P;
+    case 32:
       return (reader.readBool(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -459,6 +468,16 @@ extension AppSettingsQueryWhere
 
 extension AppSettingsQueryFilter
     on QueryBuilder<AppSettings, AppSettings, QFilterCondition> {
+  QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
+      coachOnboardingSeenEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'coachOnboardingSeen',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<AppSettings, AppSettings, QAfterFilterCondition>
       creaSeededEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
@@ -1693,6 +1712,20 @@ extension AppSettingsQueryLinks
 
 extension AppSettingsQuerySortBy
     on QueryBuilder<AppSettings, AppSettings, QSortBy> {
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByCoachOnboardingSeen() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'coachOnboardingSeen', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      sortByCoachOnboardingSeenDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'coachOnboardingSeen', Sort.desc);
+    });
+  }
+
   QueryBuilder<AppSettings, AppSettings, QAfterSortBy> sortByCreaSeeded() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'creaSeeded', Sort.asc);
@@ -2114,6 +2147,20 @@ extension AppSettingsQuerySortBy
 
 extension AppSettingsQuerySortThenBy
     on QueryBuilder<AppSettings, AppSettings, QSortThenBy> {
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByCoachOnboardingSeen() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'coachOnboardingSeen', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettings, AppSettings, QAfterSortBy>
+      thenByCoachOnboardingSeenDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'coachOnboardingSeen', Sort.desc);
+    });
+  }
+
   QueryBuilder<AppSettings, AppSettings, QAfterSortBy> thenByCreaSeeded() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'creaSeeded', Sort.asc);
@@ -2547,6 +2594,13 @@ extension AppSettingsQuerySortThenBy
 
 extension AppSettingsQueryWhereDistinct
     on QueryBuilder<AppSettings, AppSettings, QDistinct> {
+  QueryBuilder<AppSettings, AppSettings, QDistinct>
+      distinctByCoachOnboardingSeen() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'coachOnboardingSeen');
+    });
+  }
+
   QueryBuilder<AppSettings, AppSettings, QDistinct> distinctByCreaSeeded() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'creaSeeded');
@@ -2761,6 +2815,13 @@ extension AppSettingsQueryProperty
   QueryBuilder<AppSettings, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<AppSettings, bool, QQueryOperations>
+      coachOnboardingSeenProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'coachOnboardingSeen');
     });
   }
 

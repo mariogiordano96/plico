@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../models/app_settings.dart';
 import '../../services/database_service.dart';
 import '../../services/gemini_quota.dart';
 import '../../services/gemini_service.dart';
@@ -56,6 +57,39 @@ class _CoachScreenState extends State<CoachScreen> {
       _remainingToday = remaining;
       _loading = false;
     });
+    if (!settings.coachOnboardingSeen) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _showOnboardingBanner(settings));
+    }
+  }
+
+  /// Banner mostrato una sola volta, alla primissima apertura della tab —
+  /// prima ancora delle istruzioni per la chiave (mostrate solo se non è
+  /// ancora salvata): a differenza del resto di Plico, offline-first, qui i
+  /// messaggi escono verso Google, e va detto subito, non solo nel
+  /// disclaimer al salvataggio della chiave.
+  Future<void> _showOnboardingBanner(AppSettings settings) async {
+    final p = context.palette;
+    final l10n = context.l10n;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: p.surface,
+        icon: Icon(Icons.public_rounded, color: p.accent),
+        title: Text(l10n.coachOnboardingTitolo, style: TextStyle(color: p.textPrimary)),
+        content: Text(l10n.coachOnboardingBody, style: TextStyle(color: p.textSecondary)),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx),
+            style: FilledButton.styleFrom(backgroundColor: p.accent),
+            child: Text(l10n.coachOnboardingOk,
+                style: TextStyle(color: p.background, fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
+    settings.coachOnboardingSeen = true;
+    await DatabaseService.instance.saveAppSettings(settings);
   }
 
   void _scrollToBottom() {

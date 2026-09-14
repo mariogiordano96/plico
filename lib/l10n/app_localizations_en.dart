@@ -2109,6 +2109,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get coachTitolo => 'Coach';
 
   @override
+  String get coachOnboardingTitolo => 'Coach uses an external AI';
+
+  @override
+  String get coachOnboardingBody =>
+      'Unlike the rest of Plico — which works offline and keeps your data only on your phone — the Coach section sends your messages to an external AI engine (Google Gemini) to generate replies. This applies only here: no other part of the app shares your data externally.';
+
+  @override
+  String get coachOnboardingOk => 'Got it';
+
+  @override
   String get coachSetupIntro =>
       'Coach is an AI assistant (Google Gemini) for workout and nutrition questions. It uses your own free personal API key: Plico doesn\'t pay or see anything, and you spend nothing as long as you stay on the free plan.';
 

@@ -3878,6 +3878,24 @@ abstract class AppLocalizations {
   /// **'Coach'**
   String get coachTitolo;
 
+  /// No description provided for @coachOnboardingTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'Coach usa un\'IA esterna'**
+  String get coachOnboardingTitolo;
+
+  /// No description provided for @coachOnboardingBody.
+  ///
+  /// In it, this message translates to:
+  /// **'A differenza del resto di Plico — che funziona offline e tiene i tuoi dati solo sul telefono — la sezione Coach invia i tuoi messaggi a un motore di intelligenza artificiale esterno (Google Gemini) per generare le risposte. Questo vale solo qui: nessun\'altra parte dell\'app condivide i tuoi dati con l\'esterno.'**
+  String get coachOnboardingBody;
+
+  /// No description provided for @coachOnboardingOk.
+  ///
+  /// In it, this message translates to:
+  /// **'Ho capito'**
+  String get coachOnboardingOk;
+
   /// No description provided for @coachSetupIntro.
   ///
   /// In it, this message translates to:

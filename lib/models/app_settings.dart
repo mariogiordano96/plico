@@ -71,4 +71,10 @@ class AppSettings {
   String? geminiApiKey;
   int geminiRequestsToday = 0;
   DateTime? geminiRequestsResetDate;
+  // Banner mostrato alla primissima apertura della tab Coach (a prescindere
+  // dal fatto che l'utente abbia già una chiave salvata): a differenza del
+  // resto di Plico, offline-first, qui i messaggi escono verso Google — va
+  // detto prima ancora delle istruzioni per la chiave, non solo nel
+  // disclaimer al salvataggio.
+  bool coachOnboardingSeen = false;
 }

@@ -690,6 +690,9 @@
   "welcomeIndietro": "Back",
 
   "coachTitolo": "Coach",
+  "coachOnboardingTitolo": "Coach uses an external AI",
+  "coachOnboardingBody": "Unlike the rest of Plico — which works offline and keeps your data only on your phone — the Coach section sends your messages to an external AI engine (Google Gemini) to generate replies. This applies only here: no other part of the app shares your data externally.",
+  "coachOnboardingOk": "Got it",
   "coachSetupIntro": "Coach is an AI assistant (Google Gemini) for workout and nutrition questions. It uses your own free personal API key: Plico doesn't pay or see anything, and you spend nothing as long as you stay on the free plan.",
   "coachSetupStep1": "1. Open Google AI Studio and create a free API key (no card required)",
   "coachSetupApriAiStudio": "Open Google AI Studio",
