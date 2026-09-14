@@ -4022,6 +4022,12 @@ abstract class AppLocalizations {
   /// **'Connessione assente o non riuscita. Controlla la rete e riprova.'**
   String get coachErroreRete;
 
+  /// No description provided for @coachErroreServizioNonDisponibile.
+  ///
+  /// In it, this message translates to:
+  /// **'Il servizio Gemini è momentaneamente sovraccarico lato Google. Riprova tra poco.'**
+  String get coachErroreServizioNonDisponibile;
+
   /// No description provided for @coachErroreGenerico.
   ///
   /// In it, this message translates to:

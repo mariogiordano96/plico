@@ -18,6 +18,28 @@ class CoachScreen extends StatefulWidget {
   State<CoachScreen> createState() => _CoachScreenState();
 }
 
+/// Messaggio localizzato per un [GeminiErrorType] — condiviso tra la view di
+/// setup (validazione chiave) e la chat (errore durante l'invio).
+String coachErrorMessage(BuildContext context, GeminiErrorType type) {
+  final l10n = context.l10n;
+  switch (type) {
+    case GeminiErrorType.invalidApiKey:
+      return l10n.coachErroreChiaveNonValida;
+    case GeminiErrorType.quotaExceeded:
+      return l10n.coachErroreQuotaEsaurita;
+    case GeminiErrorType.dailyLimitReached:
+      return l10n.coachErroreLimiteGiornaliero;
+    case GeminiErrorType.rateLimited:
+      return l10n.coachErroreLimiteMinuto;
+    case GeminiErrorType.network:
+      return l10n.coachErroreRete;
+    case GeminiErrorType.serviceUnavailable:
+      return l10n.coachErroreServizioNonDisponibile;
+    case GeminiErrorType.unknown:
+      return l10n.coachErroreGenerico;
+  }
+}
+
 class _ChatMessage {
   final bool isUser;
   final String text;
@@ -160,23 +182,7 @@ class _CoachScreenState extends State<CoachScreen> {
     }
   }
 
-  String _errorMessage(GeminiErrorType type) {
-    final l10n = context.l10n;
-    switch (type) {
-      case GeminiErrorType.invalidApiKey:
-        return l10n.coachErroreChiaveNonValida;
-      case GeminiErrorType.quotaExceeded:
-        return l10n.coachErroreQuotaEsaurita;
-      case GeminiErrorType.dailyLimitReached:
-        return l10n.coachErroreLimiteGiornaliero;
-      case GeminiErrorType.rateLimited:
-        return l10n.coachErroreLimiteMinuto;
-      case GeminiErrorType.network:
-        return l10n.coachErroreRete;
-      case GeminiErrorType.unknown:
-        return l10n.coachErroreGenerico;
-    }
-  }
+  String _errorMessage(GeminiErrorType type) => coachErrorMessage(context, type);
 
   Future<void> _cambiaChiave() async {
     final l10n = context.l10n;
@@ -298,13 +304,7 @@ class _ApiKeySetupViewState extends State<_ApiKeySetupView> {
       widget.onSaved();
     } on GeminiException catch (e) {
       if (!mounted) return;
-      setState(() {
-        _error = e.type == GeminiErrorType.invalidApiKey
-            ? l10n.coachErroreChiaveNonValida
-            : e.type == GeminiErrorType.network
-                ? l10n.coachErroreRete
-                : l10n.coachErroreGenerico;
-      });
+      setState(() => _error = coachErrorMessage(context, e.type));
     } finally {
       if (mounted) setState(() => _saving = false);
     }

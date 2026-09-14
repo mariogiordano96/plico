@@ -26,6 +26,7 @@ enum GeminiErrorType {
   dailyLimitReached,
   rateLimited,
   network,
+  serviceUnavailable,
   unknown,
 }
 
@@ -89,6 +90,22 @@ class GeminiService {
       'contents': history.map((t) => t.toJson()).toList(),
     });
 
+    // Un 503/UNAVAILABLE ("modello sovraccarico") è transitorio lato Google,
+    // non un problema della richiesta o della chiave — osservato dal vivo
+    // (2026-09): un secondo tentativo dopo una breve attesa spesso basta.
+    // Non riconta sulla quota (già incrementata una volta sopra, per questo
+    // singolo "invio" logico dell'utente).
+    for (var attempt = 0; ; attempt++) {
+      try {
+        return await _postOnce(apiKey: apiKey, body: body);
+      } on GeminiException catch (e) {
+        if (e.type != GeminiErrorType.serviceUnavailable || attempt >= 1) rethrow;
+        await Future<void>.delayed(const Duration(seconds: 2));
+      }
+    }
+  }
+
+  static Future<String> _postOnce({required String apiKey, required String body}) async {
     http.Response res;
     try {
       res = await http
@@ -110,7 +127,8 @@ class GeminiService {
       // La chiave non valida arriva come 400 INVALID_ARGUMENT con reason
       // "API_KEY_INVALID" dentro error.details[] (ErrorInfo), non come
       // error.status — verificato live sulla REST API reale (2026-09), non
-      // solo dedotto dalla documentazione.
+      // solo dedotto dalla documentazione. Stessa fonte per UNAVAILABLE/503
+      // ("modello sovraccarico"), osservato dal vivo lo stesso giorno.
       String? status;
       String? reason;
       try {
@@ -133,6 +151,9 @@ class GeminiService {
       }
       if (status == 'RESOURCE_EXHAUSTED' || res.statusCode == 429) {
         throw const GeminiException(GeminiErrorType.quotaExceeded);
+      }
+      if (status == 'UNAVAILABLE' || res.statusCode == 503) {
+        throw const GeminiException(GeminiErrorType.serviceUnavailable);
       }
       throw const GeminiException(GeminiErrorType.unknown);
     }

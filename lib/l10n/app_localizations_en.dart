@@ -2194,5 +2194,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'No connection or request failed. Check your network and retry.';
 
   @override
+  String get coachErroreServizioNonDisponibile =>
+      'Gemini is temporarily overloaded on Google\'s end. Try again shortly.';
+
+  @override
   String get coachErroreGenerico => 'Something went wrong, please retry.';
 }

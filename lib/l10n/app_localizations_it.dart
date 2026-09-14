@@ -2205,5 +2205,9 @@ class AppLocalizationsIt extends AppLocalizations {
       'Connessione assente o non riuscita. Controlla la rete e riprova.';
 
   @override
+  String get coachErroreServizioNonDisponibile =>
+      'Il servizio Gemini è momentaneamente sovraccarico lato Google. Riprova tra poco.';
+
+  @override
   String get coachErroreGenerico => 'Qualcosa è andato storto, riprova.';
 }

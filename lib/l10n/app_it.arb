@@ -879,5 +879,6 @@
   "coachErroreLimiteGiornaliero": "Hai raggiunto il limite di richieste gratuite di oggi. Riprova domani.",
   "coachErroreLimiteMinuto": "Troppe richieste ravvicinate, attendi qualche secondo e riprova.",
   "coachErroreRete": "Connessione assente o non riuscita. Controlla la rete e riprova.",
+  "coachErroreServizioNonDisponibile": "Il servizio Gemini è momentaneamente sovraccarico lato Google. Riprova tra poco.",
   "coachErroreGenerico": "Qualcosa è andato storto, riprova."
 }
