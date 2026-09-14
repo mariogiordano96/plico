@@ -342,9 +342,14 @@ offline-first per chi non attiva l'opzione: resta opt-in, mai automatico.
 - **Scelta**: chiamata HTTP diretta alla REST API di Gemini (package `http`, nessuna
   dipendenza nuova pesante, nessun progetto Firebase/Google Cloud lato Plico):
   ```
-  POST https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=<chiave_utente>
+  POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=<chiave_utente>
   Body: { "contents": [{ "parts": [{ "text": "<prompt costruito>" }] }] }
   ```
+  > **Aggiornamento 2026-09**: modello fisso `gemini-2.5-flash`, non l'alias
+  > `gemini-flash-latest` inizialmente usato — quell'alias punta oggi a Gemini 3.8 Flash,
+  > un modello appena uscito e molto richiesto, che nella pratica ha dato ripetuti `503
+  > UNAVAILABLE` ("modello sovraccarico") durante i primi test reali. Gemini 2.5 Flash è
+  > più datato ma più stabile in disponibilità — ricerca e fonti in sezione "Riferimenti".
   Per lo streaming in UI (token per token, come già previsto per il modello locale in
   sezione 4) c'è l'endpoint equivalente `:streamGenerateContent`
 - **Nessun function calling verso Gemini necessario per le ricette**: a differenza del
@@ -410,7 +415,12 @@ sync della quota tra device), da tenere presente se emergono segnalazioni.
 - [Gemma Terms of Use](https://ai.google.dev/gemma/terms) — Prohibited Use Policy e diritto di revoca, ancora validi per Gemma 3n/Gemma 3
 - [Gemma 4: Expanding the Gemmaverse with Apache 2.0 — Google Open Source Blog](https://opensource.googleblog.com/2026/03/gemma-4-expanding-the-gemmaverse-with-apache-20.html) — rilascio aprile 2026, Apache 2.0, ma taglia minima E2B resta in classe ~2GB
 - `evolutiva_esercizi.md` — pattern seed/contenuto curato a mano già in uso in Plico (preset allenamento)
-- [Gemini API — Rate limits](https://ai.google.dev/gemini-api/docs/rate-limits) — quote free tier per progetto, Fase 7
+- [Gemini API — Rate limits](https://ai.google.dev/gemini-api/docs/rate-limits) — quote free tier per progetto, Fase 7. **Aggiornamento 2026-09**: questa pagina non pubblica più una tabella fissa RPM/RPD per modello, rimanda alla dashboard personale su AI Studio (`aistudio.google.com/rate-limit`) — il numero "1.500/giorno" usato in `GeminiQuota.dailyLimit` (`lib/services/gemini_quota.dart`) **non è più riverificabile con certezza** con una fonte ufficiale unica: fonti terze concordano su un taglio del free tier nel tempo ma divergono sul numero esatto (250/giorno per Gemini 2.5 Flash secondo alcune, tagli fino a ~20/giorno riportati per altri modelli) — vedi fonti sotto. Il vero backstop resta comunque il 429 reale di Google (`GeminiErrorType.quotaExceeded`, gestito), il contatore locale è solo un avviso preventivo, non l'unica protezione.
 - [Google AI Studio](https://aistudio.google.com) — dove l'utente genera la propria API key gratuita per Fase 7
 - [Gemini API — generateContent REST reference](https://ai.google.dev/api/generate-content) — endpoint usato in Fase 7, chiamata diretta senza SDK
 - [Firebase AI Logic — pricing/billing](https://firebase.google.com/docs/ai-logic/pricing) — motivo per cui `firebase_ai` non va usato in Fase 7 (quota sul progetto Firebase di Plico, non dell'utente)
+- [Gemini 503 "The model is overloaded" — retries that work and when to stop, Kunavo](https://kunavo.com/guides/gemini-api-model-overloaded) — un 503 è capacità server condivisa tra tutti gli utenti (free e a pagamento), diverso dal 429 (quota per-progetto): non si risolve passando a pagamento, solo con retry/backoff o un modello meno congestionato
+- [5 Methods to Resolve Gemini API Error High Demand 503, Apiyi.com](https://help.apiyi.com/en/gemini-api-high-demand-503-error-solution-guide-en.html) — un modello appena rilasciato e molto richiesto satura più spesso di uno consolidato
+- [What's new in Gemini 3.8 Flash — Google AI for Developers](https://ai.google.dev/gemini-api/docs/latest-model) — conferma che l'alias `gemini-flash-latest` punta oggi (2026-09) a Gemini 3.8 Flash, motivo del cambio a `gemini-2.5-flash` fisso sopra
+- [Models — Gemini API, Google AI for Developers](https://ai.google.dev/gemini-api/docs/models) — conferma che Gemini 2.5 Flash è ancora un modello disponibile/stabile
+- [Gemini API Rate Limits 2026 — AI Prompt Generator Hub](https://aipromptshub.co/limits/gemini-rate-limits-2026) — fonte terza (non ufficiale) sui numeri free tier attuali, divergente da altre fonti — vedi nota sopra

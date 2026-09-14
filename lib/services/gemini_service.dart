@@ -40,7 +40,12 @@ class GeminiException implements Exception {
 /// Plico, nessuna chiave condivisa, nessuna dipendenza da `firebase_ai` (che
 /// userebbe un progetto Firebase di Plico, non dell'utente).
 class GeminiService {
-  static const _model = 'gemini-flash-latest';
+  // Fisso, non l'alias "gemini-flash-latest": quell'alias punta oggi (2026-09)
+  // a Gemini 3.8 Flash, l'ultimissima release — un modello appena uscito e
+  // molto richiesto satura molto più spesso di uno consolidato (503
+  // UNAVAILABLE osservati dal vivo, vedi commento su serviceUnavailable
+  // sotto). Gemini 2.5 Flash è più datato ma più stabile in disponibilità.
+  static const _model = 'gemini-2.5-flash';
   static const _endpoint =
       'https://generativelanguage.googleapis.com/v1beta/models/$_model:generateContent';
 
