@@ -2534,6 +2534,12 @@ abstract class AppLocalizations {
   /// **'TDEE'**
   String get tabTdee;
 
+  /// No description provided for @tabCoach.
+  ///
+  /// In it, this message translates to:
+  /// **'Coach'**
+  String get tabCoach;
+
   /// No description provided for @allenamentoVuotoTitle.
   ///
   /// In it, this message translates to:
@@ -3865,6 +3871,144 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Indietro'**
   String get welcomeIndietro;
+
+  /// No description provided for @coachTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'Coach'**
+  String get coachTitolo;
+
+  /// No description provided for @coachSetupIntro.
+  ///
+  /// In it, this message translates to:
+  /// **'Il Coach è un assistente AI (Gemini di Google) per domande su allenamento e alimentazione. Usa la tua chiave API personale e gratuita: Plico non paga né vede nulla, e tu non spendi nulla restando nel piano gratuito.'**
+  String get coachSetupIntro;
+
+  /// No description provided for @coachSetupStep1.
+  ///
+  /// In it, this message translates to:
+  /// **'1. Apri Google AI Studio e crea una chiave API gratuita (nessuna carta richiesta)'**
+  String get coachSetupStep1;
+
+  /// No description provided for @coachSetupApriAiStudio.
+  ///
+  /// In it, this message translates to:
+  /// **'Apri Google AI Studio'**
+  String get coachSetupApriAiStudio;
+
+  /// No description provided for @coachSetupStep2.
+  ///
+  /// In it, this message translates to:
+  /// **'2. Incolla qui la chiave'**
+  String get coachSetupStep2;
+
+  /// No description provided for @coachApiKeyHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Incolla la tua API key Gemini'**
+  String get coachApiKeyHint;
+
+  /// No description provided for @coachApiKeyObbligatoria.
+  ///
+  /// In it, this message translates to:
+  /// **'Incolla prima la tua API key'**
+  String get coachApiKeyObbligatoria;
+
+  /// No description provided for @coachDisclaimer.
+  ///
+  /// In it, this message translates to:
+  /// **'Le richieste passano direttamente dal tuo telefono a Google, non da un server Plico. Sul piano gratuito, Google dichiara di poter usare le richieste per migliorare i propri modelli. Se in futuro attivi la fatturazione sulla tua chiave, eventuali costi restano a tuo carico: Plico limita in automatico le richieste per restare nel piano gratuito, ma non può garantirlo se cambi le impostazioni della tua chiave su Google.'**
+  String get coachDisclaimer;
+
+  /// No description provided for @coachSalvaChiave.
+  ///
+  /// In it, this message translates to:
+  /// **'Salva e continua'**
+  String get coachSalvaChiave;
+
+  /// No description provided for @coachVerificaChiave.
+  ///
+  /// In it, this message translates to:
+  /// **'Verifica in corso...'**
+  String get coachVerificaChiave;
+
+  /// No description provided for @coachChiaveSalvata.
+  ///
+  /// In it, this message translates to:
+  /// **'Chiave salvata'**
+  String get coachChiaveSalvata;
+
+  /// No description provided for @coachModificaChiave.
+  ///
+  /// In it, this message translates to:
+  /// **'Cambia API key'**
+  String get coachModificaChiave;
+
+  /// No description provided for @coachRimuoviChiaveTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'Cambiare API key?'**
+  String get coachRimuoviChiaveTitolo;
+
+  /// No description provided for @coachRimuoviChiaveSub.
+  ///
+  /// In it, this message translates to:
+  /// **'La chat attuale non verrà salvata. Potrai incollare una nuova chiave (o la stessa) subito dopo.'**
+  String get coachRimuoviChiaveSub;
+
+  /// No description provided for @coachRichiesteRimaste.
+  ///
+  /// In it, this message translates to:
+  /// **'{count} richieste rimaste oggi'**
+  String coachRichiesteRimaste(int count);
+
+  /// No description provided for @coachScriviMessaggio.
+  ///
+  /// In it, this message translates to:
+  /// **'Scrivi un messaggio...'**
+  String get coachScriviMessaggio;
+
+  /// No description provided for @coachBenvenuto.
+  ///
+  /// In it, this message translates to:
+  /// **'Ciao! Sono il tuo Coach per allenamento e alimentazione — chiedimi pure.'**
+  String get coachBenvenuto;
+
+  /// No description provided for @coachErroreChiaveNonValida.
+  ///
+  /// In it, this message translates to:
+  /// **'API key non valida. Controlla di averla copiata per intero da Google AI Studio.'**
+  String get coachErroreChiaveNonValida;
+
+  /// No description provided for @coachErroreQuotaEsaurita.
+  ///
+  /// In it, this message translates to:
+  /// **'Quota Gemini esaurita per ora (limite di Google). Riprova tra qualche minuto.'**
+  String get coachErroreQuotaEsaurita;
+
+  /// No description provided for @coachErroreLimiteGiornaliero.
+  ///
+  /// In it, this message translates to:
+  /// **'Hai raggiunto il limite di richieste gratuite di oggi. Riprova domani.'**
+  String get coachErroreLimiteGiornaliero;
+
+  /// No description provided for @coachErroreLimiteMinuto.
+  ///
+  /// In it, this message translates to:
+  /// **'Troppe richieste ravvicinate, attendi qualche secondo e riprova.'**
+  String get coachErroreLimiteMinuto;
+
+  /// No description provided for @coachErroreRete.
+  ///
+  /// In it, this message translates to:
+  /// **'Connessione assente o non riuscita. Controlla la rete e riprova.'**
+  String get coachErroreRete;
+
+  /// No description provided for @coachErroreGenerico.
+  ///
+  /// In it, this message translates to:
+  /// **'Qualcosa è andato storto, riprova.'**
+  String get coachErroreGenerico;
 }
 
 class _AppLocalizationsDelegate

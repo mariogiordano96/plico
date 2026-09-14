@@ -7,11 +7,18 @@ import 'diario/diario_screen.dart';
 import 'allenamento/allenamento_screen.dart';
 import 'progressi/progressi_screen.dart';
 import 'tdee/tdee_screen.dart';
+import 'coach/coach_screen.dart';
 
 /// Etichette della bottom navigation bar, nell'ordine delle tab.
 @visibleForTesting
-List<String> mainTabLabels(AppLocalizations l10n) =>
-    [l10n.tabHome, l10n.tabDiario, l10n.tabAllenamento, l10n.tabProgressi, l10n.tabTdee];
+List<String> mainTabLabels(AppLocalizations l10n) => [
+      l10n.tabHome,
+      l10n.tabDiario,
+      l10n.tabAllenamento,
+      l10n.tabProgressi,
+      l10n.tabTdee,
+      l10n.tabCoach,
+    ];
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -40,6 +47,7 @@ class _MainScreenState extends State<MainScreen> {
           const AllenamentoScreen(),
           const ProgressiScreen(),
           const TdeeScreen(),
+          const CoachScreen(),
         ],
       ),
       bottomNavigationBar: SafeArea(
@@ -79,6 +87,10 @@ class _MainScreenState extends State<MainScreen> {
             BottomNavigationBarItem(
               icon: Icon(Icons.local_fire_department_rounded),
               label: labels[4],
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.smart_toy_rounded),
+              label: labels[5],
             ),
           ],
         ),

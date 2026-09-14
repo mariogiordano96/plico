@@ -1350,6 +1350,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tabTdee => 'TDEE';
 
   @override
+  String get tabCoach => 'Coach';
+
+  @override
   String get allenamentoVuotoTitle => 'Nessun esercizio oggi';
 
   @override
@@ -2112,4 +2115,85 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get welcomeIndietro => 'Indietro';
+
+  @override
+  String get coachTitolo => 'Coach';
+
+  @override
+  String get coachSetupIntro =>
+      'Il Coach è un assistente AI (Gemini di Google) per domande su allenamento e alimentazione. Usa la tua chiave API personale e gratuita: Plico non paga né vede nulla, e tu non spendi nulla restando nel piano gratuito.';
+
+  @override
+  String get coachSetupStep1 =>
+      '1. Apri Google AI Studio e crea una chiave API gratuita (nessuna carta richiesta)';
+
+  @override
+  String get coachSetupApriAiStudio => 'Apri Google AI Studio';
+
+  @override
+  String get coachSetupStep2 => '2. Incolla qui la chiave';
+
+  @override
+  String get coachApiKeyHint => 'Incolla la tua API key Gemini';
+
+  @override
+  String get coachApiKeyObbligatoria => 'Incolla prima la tua API key';
+
+  @override
+  String get coachDisclaimer =>
+      'Le richieste passano direttamente dal tuo telefono a Google, non da un server Plico. Sul piano gratuito, Google dichiara di poter usare le richieste per migliorare i propri modelli. Se in futuro attivi la fatturazione sulla tua chiave, eventuali costi restano a tuo carico: Plico limita in automatico le richieste per restare nel piano gratuito, ma non può garantirlo se cambi le impostazioni della tua chiave su Google.';
+
+  @override
+  String get coachSalvaChiave => 'Salva e continua';
+
+  @override
+  String get coachVerificaChiave => 'Verifica in corso...';
+
+  @override
+  String get coachChiaveSalvata => 'Chiave salvata';
+
+  @override
+  String get coachModificaChiave => 'Cambia API key';
+
+  @override
+  String get coachRimuoviChiaveTitolo => 'Cambiare API key?';
+
+  @override
+  String get coachRimuoviChiaveSub =>
+      'La chat attuale non verrà salvata. Potrai incollare una nuova chiave (o la stessa) subito dopo.';
+
+  @override
+  String coachRichiesteRimaste(int count) {
+    return '$count richieste rimaste oggi';
+  }
+
+  @override
+  String get coachScriviMessaggio => 'Scrivi un messaggio...';
+
+  @override
+  String get coachBenvenuto =>
+      'Ciao! Sono il tuo Coach per allenamento e alimentazione — chiedimi pure.';
+
+  @override
+  String get coachErroreChiaveNonValida =>
+      'API key non valida. Controlla di averla copiata per intero da Google AI Studio.';
+
+  @override
+  String get coachErroreQuotaEsaurita =>
+      'Quota Gemini esaurita per ora (limite di Google). Riprova tra qualche minuto.';
+
+  @override
+  String get coachErroreLimiteGiornaliero =>
+      'Hai raggiunto il limite di richieste gratuite di oggi. Riprova domani.';
+
+  @override
+  String get coachErroreLimiteMinuto =>
+      'Troppe richieste ravvicinate, attendi qualche secondo e riprova.';
+
+  @override
+  String get coachErroreRete =>
+      'Connessione assente o non riuscita. Controlla la rete e riprova.';
+
+  @override
+  String get coachErroreGenerico => 'Qualcosa è andato storto, riprova.';
 }

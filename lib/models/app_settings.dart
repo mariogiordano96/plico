@@ -62,4 +62,13 @@ class AppSettings {
   // HealthKit non permette di interrogare lo stato READ per privacy, quindi
   // non c'è altro modo affidabile di sapere se è "connesso".
   bool smartwatchConnected = false;
+
+  // Coach (Gemini, bring-your-own-key — docs/integrazione_flutter_gemma.md,
+  // Fase 7): chiave generata dall'utente su Google AI Studio, mai una chiave
+  // condivisa di Plico. `geminiRequestsToday`/`geminiRequestsResetDate`
+  // tracciano il consumo locale della quota free tier (1.500/giorno) per
+  // bloccare nuove richieste PRIMA che l'utente rischi di sforare e pagare.
+  String? geminiApiKey;
+  int geminiRequestsToday = 0;
+  DateTime? geminiRequestsResetDate;
 }

@@ -171,6 +171,12 @@ conseguenze da tenere esplicite:
 
 ## 4. UX
 
+> **Aggiornamento 2026-09 — decisione presa, supera questo punto**: implementata una 6ª
+> tab dedicata "Coach" (dopo TDEE), non un FAB/icona AppBar come ipotizzato sotto — scelta
+> esplicita dell'utente. La tab unifica setup chiave e chat nella stessa schermata
+> (`CoachScreen`): senza chiave salvata mostra le istruzioni, con chiave salvata mostra la
+> chat — vedi Fase 7 più sotto per il resto dell'implementazione.
+
 - **Punto di ingresso**: le 5 tab esistenti (Home/Diario/Allenamento/Progressi/TDEE) sono
   già piene — niente nuovo tab, un FAB globale o un'icona in AppBar
 - **Onboarding alla prima apertura**: cosa può e non può fare l'assistente, disclaimer "non
@@ -286,7 +292,18 @@ questa fase: richiederebbe conferme utente più stringenti prima di ogni azione 
 separata dei guardrail (un'AI che scrive dati per errore è un rischio diverso da una che
 risponde male a una domanda).
 
-### Fase 7 — *(percorso scelto per le ricette)* Modello cloud bring-your-own-key (pianificata)
+### Fase 7 — Modello cloud bring-your-own-key (implementata, 2026-09)
+
+> **Scope allargato rispetto al piano originale**: la motivazione sotto parla solo di
+> ricette, ma l'implementazione 2026-09 è una chat "Coach" generale (allenamento +
+> nutrizione), non ristretta alle ricette — il modello locale (Fasi 1-6) non è mai stato
+> costruito, quindi Gemini è oggi l'unico motore, non un fallback per un caso specifico.
+> **Non ancora implementato in questa fase**: function calling/lettura dati utente
+> (`getMealPlan()`, TDEE, storico) — il Coach oggi risponde senza contesto sui dati
+> dell'utente, una naturale Fase 8 se serve renderlo più utile ("cosa mangio oggi secondo
+> il mio piano?"). Guardrail sui temi sensibili oggi solo nel system prompt (sezione 3.4),
+> nessun filtro deterministico lato app pre-modello — altra Fase 8 se il solo prompt si
+> rivela insufficiente in pratica.
 
 **Motivazione — non più solo un'ipotesi, confermata da un test reale**: il test negativo di
 Fase 1 (2026-09, `qwen3.5:2b`) ha mostrato che il modello locale nella classe di taglia
@@ -347,18 +364,39 @@ offline-first per chi non attiva l'opzione: resta opt-in, mai automatico.
   per il consenso dati smartwatch (`integrazione_smartwatch.md`, Fase 5) — non un'attivazione
   silenziosa o un fallback automatico quando il modello locale è "abbastanza buono"
 
-- [ ] UI: campo "API key Gemini (opzionale)" nelle Impostazioni, con link diretto a
-      Google AI Studio e spiegazione di cosa succede attivandola
-- [ ] Disclaimer esplicito pre-attivazione: dati inviati a Google, possibile uso per
-      training sul free tier, costi di eventuale sforamento a carico dell'utente
+- [x] **2026-09**: UI campo "API key Gemini" — non nelle Impostazioni come scritto sopra,
+      ma nella nuova tab "Coach" stessa (`lib/screens/coach/coach_screen.dart`,
+      `_ApiKeySetupView`): link diretto a Google AI Studio (`aistudio.google.com/apikey`)
+      e spiegazione bring-your-own-key prima del campo. La chiave viene anche validata con
+      una chiamata di test (`GeminiService.validateApiKey`) prima di salvarla, non solo
+      accettata a occhio.
+- [x] **2026-09**: Disclaimer esplicito pre-salvataggio (dati a Google, possibile uso per
+      training sul free tier, costi di eventuale sforamento a carico dell'utente) —
+      `coachDisclaimer` in `app_it.arb`/`app_en.arb`, mostrato sotto il campo chiave.
 - [ ] Selettore modello locale/cloud in chat, o fallback automatico **solo su errore/timeout
       del modello locale**, mai come sostituzione silenziosa per "qualità percepita bassa"
-      (quella resta una scelta esplicita dell'utente, non euristica automatica)
-- [ ] Gestione errori specifici dell'API cloud: chiave non valida, quota esaurita (10 RPM/
-      1.500 RPD), nessuna connessione — messaggi distinti, non un errore generico
+      (quella resta una scelta esplicita dell'utente, non euristica automatica) — **N/A per
+      ora**: il modello locale (Fasi 1-6) non è mai stato implementato, Coach oggi è
+      solo-cloud, non un fallback di qualcosa che esiste
+- [x] **2026-09**: Gestione errori specifici dell'API cloud — chiave non valida (400/403),
+      quota esaurita (429), nessuna connessione: `GeminiErrorType` in `gemini_service.dart`,
+      messaggi distinti localizzati (`coachErrore*` in arb). **In più, non solo previsto dal
+      piano originale**: due guardrail locali *preventivi*, prima ancora di chiamare l'API,
+      per non fare affidamento solo sul 429 di Google — vedi punto quota sotto.
 - [ ] Verificare se serve gestire il caso "utente ha una chiave con billing attivo oltre il
       free tier" in modo diverso (nessuna azione lato Plico prevista oggi, ma da tenere
       presente se emergono segnalazioni)
+
+**Aggiunta 2026-09, non nel piano originale — protezione quota locale**: dato che la chiave
+è dell'utente, uno sforamento lo pagherebbe lui, non Plico. `GeminiQuota`
+(`lib/services/gemini_quota.dart`, logica pura testata in `test/gemini_quota_test.dart`)
+blocca nuove richieste *prima* di interpellare l'API se si supererebbe il free tier (10
+richieste/minuto, finestra in memoria; 1.500/giorno, contatore persistito su
+`AppSettings.geminiRequestsToday`/`geminiRequestsResetDate`, azzerato al cambio di giorno). La
+UI mostra "N richieste rimaste oggi" e disabilita l'invio a quota locale esaurita. **Limite
+noto**: il contatore giornaliero è locale a questo device — un utente con Plico installato su
+più device supererebbe comunque il free tier di Google senza che Plico se ne accorga (nessun
+sync della quota tra device), da tenere presente se emergono segnalazioni.
 
 ---
 
