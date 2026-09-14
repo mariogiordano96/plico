@@ -4028,6 +4028,12 @@ abstract class AppLocalizations {
   /// **'Il servizio Gemini è momentaneamente sovraccarico lato Google. Riprova tra poco.'**
   String get coachErroreServizioNonDisponibile;
 
+  /// No description provided for @coachRiprovo.
+  ///
+  /// In it, this message translates to:
+  /// **'Modello occupato, riprovo... ({attempt}/2)'**
+  String coachRiprovo(int attempt);
+
   /// No description provided for @coachErroreGenerico.
   ///
   /// In it, this message translates to:

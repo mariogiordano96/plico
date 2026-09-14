@@ -2198,5 +2198,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Gemini is temporarily overloaded on Google\'s end. Try again shortly.';
 
   @override
+  String coachRiprovo(int attempt) {
+    return 'Model busy, retrying... ($attempt/2)';
+  }
+
+  @override
   String get coachErroreGenerico => 'Something went wrong, please retry.';
 }

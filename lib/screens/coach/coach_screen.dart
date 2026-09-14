@@ -56,6 +56,7 @@ class _CoachScreenState extends State<CoachScreen> {
   final _inputCtrl = TextEditingController();
   final _scrollCtrl = ScrollController();
   bool _sending = false;
+  String? _retryHint;
 
   @override
   void initState() {
@@ -163,6 +164,10 @@ class _CoachScreenState extends State<CoachScreen> {
         history: [
           for (final m in _messages) GeminiTurn(isUser: m.isUser, text: m.text),
         ],
+        onRetrying: (attempt) {
+          if (!mounted) return;
+          setState(() => _retryHint = context.l10n.coachRiprovo(attempt));
+        },
       );
       if (!mounted) return;
       setState(() => _messages.add(_ChatMessage(isUser: false, text: reply)));
@@ -175,6 +180,7 @@ class _CoachScreenState extends State<CoachScreen> {
       if (mounted) {
         setState(() {
           _sending = false;
+          _retryHint = null;
           _remainingToday = remaining;
         });
         _scrollToBottom();
@@ -247,6 +253,7 @@ class _CoachScreenState extends State<CoachScreen> {
                   inputCtrl: _inputCtrl,
                   scrollCtrl: _scrollCtrl,
                   sending: _sending,
+                  retryHint: _retryHint,
                   remainingToday: _remainingToday,
                   onSend: _send,
                 ),
@@ -442,6 +449,7 @@ class _ChatView extends StatelessWidget {
   final TextEditingController inputCtrl;
   final ScrollController scrollCtrl;
   final bool sending;
+  final String? retryHint;
   final int remainingToday;
   final VoidCallback onSend;
 
@@ -450,6 +458,7 @@ class _ChatView extends StatelessWidget {
     required this.inputCtrl,
     required this.scrollCtrl,
     required this.sending,
+    required this.retryHint,
     required this.remainingToday,
     required this.onSend,
   });
@@ -486,10 +495,19 @@ class _ChatView extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Align(
                     alignment: Alignment.centerLeft,
-                    child: SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: p.accent),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: p.accent),
+                        ),
+                        if (retryHint != null) ...[
+                          const SizedBox(width: 10),
+                          Text(retryHint!, style: TextStyle(color: p.textMuted, fontSize: 12)),
+                        ],
+                      ],
                     ),
                   ),
                 ),

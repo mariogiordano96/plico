@@ -716,5 +716,7 @@
   "coachErroreLimiteMinuto": "Too many requests in a row, wait a few seconds and retry.",
   "coachErroreRete": "No connection or request failed. Check your network and retry.",
   "coachErroreServizioNonDisponibile": "Gemini is temporarily overloaded on Google's end. Try again shortly.",
+  "coachRiprovo": "Model busy, retrying... ({attempt}/2)",
+  "@coachRiprovo": { "placeholders": { "attempt": { "type": "int" } } },
   "coachErroreGenerico": "Something went wrong, please retry."
 }

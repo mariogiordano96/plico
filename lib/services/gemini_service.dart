@@ -55,10 +55,14 @@ class GeminiService {
     return GeminiQuota.remainingToday(settings, DateTime.now());
   }
 
+  /// [onRetrying] è chiamato prima di ogni retry per 503 (con il numero del
+  /// tentativo, 1-based) — permette alla UI di mostrare "sto riprovando..."
+  /// invece di uno spinner muto durante i secondi di attesa.
   static Future<String> sendMessage({
     required String apiKey,
     required String systemInstruction,
     required List<GeminiTurn> history,
+    void Function(int attempt)? onRetrying,
   }) async {
     final now = DateTime.now();
     final settings = await DatabaseService.instance.getAppSettings();
@@ -92,15 +96,21 @@ class GeminiService {
 
     // Un 503/UNAVAILABLE ("modello sovraccarico") è transitorio lato Google,
     // non un problema della richiesta o della chiave — osservato dal vivo
-    // (2026-09): un secondo tentativo dopo una breve attesa spesso basta.
-    // Non riconta sulla quota (già incrementata una volta sopra, per questo
-    // singolo "invio" logico dell'utente).
+    // (2026-09), anche 2-3 volte di fila nella stessa sessione: il free tier
+    // ha priorità più bassa di un piano a pagamento nei picchi di domanda.
+    // Fino a 2 retry con attesa crescente (2s, poi 4s) prima di arrendersi,
+    // non solo un tentativo. Non riconta sulla quota (già incrementata una
+    // volta sopra, per questo singolo "invio" logico dell'utente).
+    const retryDelays = [Duration(seconds: 2), Duration(seconds: 4)];
     for (var attempt = 0; ; attempt++) {
       try {
         return await _postOnce(apiKey: apiKey, body: body);
       } on GeminiException catch (e) {
-        if (e.type != GeminiErrorType.serviceUnavailable || attempt >= 1) rethrow;
-        await Future<void>.delayed(const Duration(seconds: 2));
+        if (e.type != GeminiErrorType.serviceUnavailable || attempt >= retryDelays.length) {
+          rethrow;
+        }
+        onRetrying?.call(attempt + 1);
+        await Future<void>.delayed(retryDelays[attempt]);
       }
     }
   }

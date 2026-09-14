@@ -2209,5 +2209,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Il servizio Gemini è momentaneamente sovraccarico lato Google. Riprova tra poco.';
 
   @override
+  String coachRiprovo(int attempt) {
+    return 'Modello occupato, riprovo... ($attempt/2)';
+  }
+
+  @override
   String get coachErroreGenerico => 'Qualcosa è andato storto, riprova.';
 }
