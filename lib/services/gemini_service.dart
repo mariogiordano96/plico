@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import 'database_service.dart';
@@ -75,8 +76,12 @@ class GeminiService {
     settings.geminiRequestsToday += 1;
     await DatabaseService.instance.saveAppSettings(settings);
 
+    // Nomi campo camelCase (mapping JSON del protobuf REST di Google, non
+    // snake_case): `systemInstruction`, non `system_instruction` — un nome
+    // sbagliato qui dava un 400 "Unknown name" mascherato da noi come "chiave
+    // non valida", anche con una chiave corretta.
     final body = jsonEncode({
-      'system_instruction': {
+      'systemInstruction': {
         'parts': [
           {'text': systemInstruction}
         ]
@@ -97,13 +102,38 @@ class GeminiService {
       throw const GeminiException(GeminiErrorType.network);
     }
 
-    if (res.statusCode == 400 || res.statusCode == 403) {
-      throw const GeminiException(GeminiErrorType.invalidApiKey);
-    }
-    if (res.statusCode == 429) {
-      throw const GeminiException(GeminiErrorType.quotaExceeded);
-    }
     if (res.statusCode != 200) {
+      // Log diagnostico (solo logcat/console, niente PII oltre al messaggio
+      // d'errore di Google): senza questo, un errore REST inatteso è
+      // invisibile — la UI mostra solo un messaggio generico localizzato.
+      debugPrint('GeminiService: HTTP ${res.statusCode} — ${res.body}');
+      // La chiave non valida arriva come 400 INVALID_ARGUMENT con reason
+      // "API_KEY_INVALID" dentro error.details[] (ErrorInfo), non come
+      // error.status — verificato live sulla REST API reale (2026-09), non
+      // solo dedotto dalla documentazione.
+      String? status;
+      String? reason;
+      try {
+        final error =
+            (jsonDecode(res.body) as Map<String, dynamic>)['error'] as Map<String, dynamic>?;
+        status = error?['status'] as String?;
+        final details = error?['details'] as List?;
+        reason = details
+            ?.map((d) => (d as Map<String, dynamic>)['reason'] as String?)
+            .firstWhere((r) => r != null, orElse: () => null);
+      } catch (_) {
+        // Corpo non-JSON (es. pagina di errore del proxy): status/reason
+        // restano null, ricade sull'euristica per status code sotto.
+      }
+      if (reason == 'API_KEY_INVALID' ||
+          status == 'UNAUTHENTICATED' ||
+          status == 'PERMISSION_DENIED' ||
+          (status == null && reason == null && (res.statusCode == 400 || res.statusCode == 403))) {
+        throw const GeminiException(GeminiErrorType.invalidApiKey);
+      }
+      if (status == 'RESOURCE_EXHAUSTED' || res.statusCode == 429) {
+        throw const GeminiException(GeminiErrorType.quotaExceeded);
+      }
       throw const GeminiException(GeminiErrorType.unknown);
     }
 
