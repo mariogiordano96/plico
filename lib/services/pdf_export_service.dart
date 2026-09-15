@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart' show compute;
 import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -9,6 +11,7 @@ import '../models/daily_log.dart';
 import '../models/meal_entry.dart';
 import '../models/meal_plan.dart';
 import '../models/user_profile.dart';
+import '../models/enums.dart';
 import '../models/body_snapshot.dart';
 import '../models/plicometry_session.dart';
 import '../models/measurement_snapshot.dart';
@@ -29,7 +32,6 @@ class PdfStrings {
   final String diarioTitle;
   final String targetLabel;
   final String kcalGiornoUnit;
-  final String Function(int page, int total) footerPage;
   final String nessunoRegistrato;
   final String pastoFallback;
   final List<String> pastoLabels;
@@ -57,6 +59,13 @@ class PdfStrings {
   final String tecnicaStripping;
   final String tecnicaSuperSlow;
 
+  // Superset in scheda/programma PDF (tabella esercizi): etichetta di
+  // gruppo e ruolo esplosiva/lenta, stesse stringhe usate a schermo in
+  // crea_scheda_screen.dart.
+  final String supersetLabel;
+  final String ruoloEsplosiva;
+  final String ruoloLenta;
+
   // Export "Progressi" (peso/composizione/misurazioni/allenamenti)
   final String progressiPdfTitle;
   final String progressiSezPeso;
@@ -66,12 +75,20 @@ class PdfStrings {
   final String progressiMassaGrassa;
   final String progressiMassaMagra;
   final String progressiNessunDato;
+  final String progressiCirconferenze;
+  final String progressiPliche;
+
+  // Intestazioni colonna per le tabelle del PDF Progressi
+  final String pdfColData;
+  final String pdfColPeso;
+  final String pdfColBf;
+  final String pdfColEsercizio;
+  final String pdfColDettaglio;
 
   const PdfStrings({
     required this.diarioTitle,
     required this.targetLabel,
     required this.kcalGiornoUnit,
-    required this.footerPage,
     required this.nessunoRegistrato,
     required this.pastoFallback,
     required this.pastoLabels,
@@ -94,6 +111,9 @@ class PdfStrings {
     this.tecnicaRestPause = 'RP',
     this.tecnicaStripping = 'stripping',
     this.tecnicaSuperSlow = 'super slow',
+    this.supersetLabel = 'Superset',
+    this.ruoloEsplosiva = 'Esplosiva',
+    this.ruoloLenta = 'Lenta',
     this.progressiPdfTitle = 'Progressi',
     this.progressiSezPeso = 'PESO',
     this.progressiSezComposizione = 'COMPOSIZIONE CORPOREA',
@@ -102,6 +122,81 @@ class PdfStrings {
     this.progressiMassaGrassa = 'Massa Grassa',
     this.progressiMassaMagra = 'Massa Magra',
     this.progressiNessunDato = 'Nessun dato nel periodo selezionato',
+    this.progressiCirconferenze = 'Circonferenze:',
+    this.progressiPliche = 'Pliche:',
+    this.pdfColData = 'Data',
+    this.pdfColPeso = 'Peso',
+    this.pdfColBf = 'BF%',
+    this.pdfColEsercizio = 'Esercizio',
+    this.pdfColDettaglio = 'Dettaglio',
+  });
+}
+
+/// Argomenti per [PdfExportService._buildProgressiPdfBytes], eseguita in un
+/// isolate separato via `compute()`. Solo dati semplici (niente closure: la
+/// generazione di uno storico lungo richiede pw.MultiPage a spannare su
+/// centinaia di pagine con un calcolo sincrono pesante, che sull'isolate
+/// principale blocca la UI abbastanza a lungo da causare un ANR — vedi
+/// `PdfExportService.generateProgressi`).
+class _ProgressiPdfArgs {
+  final String periodLabel;
+  final String userName;
+  final String? anagrafica;
+  final List<BodySnapshot> bodySnapshots;
+  final List<PlicometrySession> plicometrySessions;
+  final List<MeasurementSnapshot> measurementSnapshots;
+  final List<WorkoutExercise> workoutExercises;
+  final Map<String, String> misuraLabels;
+  final String locale;
+  final ByteData fontRegularBytes;
+  final ByteData fontBoldBytes;
+  final String progressiPdfTitle;
+  final String progressiSezPeso;
+  final String progressiSezComposizione;
+  final String progressiSezMisurazioni;
+  final String progressiSezAllenamentiPdf;
+  final String progressiMassaGrassa;
+  final String progressiMassaMagra;
+  final String progressiNessunDato;
+  final String progressiCirconferenze;
+  final String progressiPliche;
+  final String nessunaSessione;
+  final String minutiSuffix;
+  final String pdfColData;
+  final String pdfColPeso;
+  final String pdfColBf;
+  final String pdfColEsercizio;
+  final String pdfColDettaglio;
+
+  const _ProgressiPdfArgs({
+    required this.periodLabel,
+    required this.userName,
+    required this.anagrafica,
+    required this.bodySnapshots,
+    required this.plicometrySessions,
+    required this.measurementSnapshots,
+    required this.workoutExercises,
+    required this.misuraLabels,
+    required this.locale,
+    required this.fontRegularBytes,
+    required this.fontBoldBytes,
+    required this.progressiPdfTitle,
+    required this.progressiSezPeso,
+    required this.progressiSezComposizione,
+    required this.progressiSezMisurazioni,
+    required this.progressiSezAllenamentiPdf,
+    required this.progressiMassaGrassa,
+    required this.progressiMassaMagra,
+    required this.progressiNessunDato,
+    required this.progressiCirconferenze,
+    required this.progressiPliche,
+    required this.nessunaSessione,
+    required this.minutiSuffix,
+    required this.pdfColData,
+    required this.pdfColPeso,
+    required this.pdfColBf,
+    required this.pdfColEsercizio,
+    required this.pdfColDettaglio,
   });
 }
 
@@ -218,7 +313,6 @@ class PdfExportService {
           strings: strings,
           locale: locale,
         ),
-        footer: (ctx) => _buildFooter(ctx, font, strings),
         build: (ctx) => [
           pw.SizedBox(height: 12),
           ...days.map((d) => _buildDaySection(
@@ -298,19 +392,6 @@ class PdfExportService {
         pw.SizedBox(height: 6),
         pw.Divider(thickness: 0.5, color: PdfColors.grey400),
       ],
-    );
-  }
-
-  // ── Footer pagina ──────────────────────────────────────────────
-
-  static pw.Widget _buildFooter(
-      pw.Context ctx, pw.Font font, PdfStrings strings) {
-    return pw.Align(
-      alignment: pw.Alignment.centerRight,
-      child: pw.Text(
-        strings.footerPage(ctx.pageNumber, ctx.pagesCount),
-        style: pw.TextStyle(font: font, fontSize: 8, color: PdfColors.grey500),
-      ),
     );
   }
 
@@ -576,7 +657,6 @@ class PdfExportService {
           bold: bold,
           strings: strings,
         ),
-        footer: (ctx) => _buildFooter(ctx, font, strings),
         build: (_) => [
           pw.SizedBox(height: 12),
           ...plan.pasti.map((meal) => _buildPianoMeal(meal, font, bold, strings)),
@@ -754,7 +834,6 @@ class PdfExportService {
           font: font,
           bold: bold,
         ),
-        footer: (ctx) => _buildFooter(ctx, font, strings),
         build: (_) => [
           pw.SizedBox(height: 12),
           _buildSchedaEsercizi(template.exercises, font, bold, strings),
@@ -787,7 +866,6 @@ class PdfExportService {
           font: font,
           bold: bold,
         ),
-        footer: (ctx) => _buildFooter(ctx, font, strings),
         build: (_) => [
           pw.SizedBox(height: 12),
           for (final giorno in giorni) ...[
@@ -816,36 +894,102 @@ class PdfExportService {
     return doc.save();
   }
 
+  // Etichetta di una serie pianificata in scheda, tecnica inclusa — stessa
+  // idea di `_setLabelPdf` (storico, serie già eseguite) ma su
+  // `WorkoutTemplateSet` e con anche il dettaglio numerico dello stripping
+  // (i pesi di scarico), utile qui perché è quello che si porta in
+  // palestra, a differenza dello storico dove serve solo confermare che la
+  // tecnica è stata usata.
+  static String _plannedSetLabelPdf(WorkoutTemplateSet s, PdfStrings strings) {
+    final base = '${s.reps ?? '-'}×${s.weightKg ?? '-'}kg';
+    return switch (s.technique) {
+      SetTechnique.forzate => '$base (+${s.forcedReps} ${strings.tecnicaForzate})',
+      SetTechnique.superSlow => '$base (${strings.tecnicaSuperSlow})',
+      SetTechnique.restPause =>
+        '$base (${strings.tecnicaRestPause} ${s.restPauseClusters!.join("+")})',
+      SetTechnique.stripping => '$base (${strings.tecnicaStripping} '
+          '${s.dropStages!.map((d) => '${d.reps ?? '-'}×${d.weightKg ?? '-'}kg').join(' → ')})',
+      SetTechnique.normale => base,
+    };
+  }
+
+  // Un esercizio per riga: quando ci sono più serie pianificate o una
+  // tecnica (cluster rest-pause, gradini di stripping...) il dettaglio va
+  // nella stessa riga, impilato su più righe di testo nella cella — la riga
+  // della tabella si allarga di conseguenza (vedi nota su `pw.Table` in
+  // `_buildProgressiTable`), niente riga separata per esercizio/tecnica.
+  static List<pw.Widget> _schedaEsercizioCells(
+    WorkoutTemplateExercise e,
+    pw.Font font,
+    pw.Font bold,
+    PdfStrings strings,
+  ) {
+    final nomeLines = <pw.Widget>[
+      pw.Text(e.exerciseName,
+          style: pw.TextStyle(font: bold, fontSize: 9, color: PdfColors.grey900)),
+    ];
+    if (e.supersetGroupId != null) {
+      final ruolo = switch (e.supersetRole) {
+        'esplosiva' => strings.ruoloEsplosiva,
+        'lenta' => strings.ruoloLenta,
+        _ => null,
+      };
+      nomeLines.add(pw.Text(
+        ruolo != null ? '${strings.supersetLabel} · $ruolo' : strings.supersetLabel,
+        style: pw.TextStyle(
+            font: font, fontSize: 7.5, fontStyle: pw.FontStyle.italic, color: PdfColors.grey500),
+      ));
+    }
+
+    final planned = e.plannedSets;
+    final pw.Widget dettaglio;
+    if (e.isCardio) {
+      dettaglio = pw.Text(strings.durataMin(e.targetDurationSeconds! ~/ 60),
+          style: pw.TextStyle(font: font, fontSize: 8.5, color: PdfColors.grey900));
+    } else if (planned != null && planned.isNotEmpty) {
+      // Le tecniche (Fase 7 di docs/tecniche_allenamento.md) sostituiscono il
+      // target uniforme con `plannedSets`: senza questo branch il target
+      // restava sempre "-×-" (targetSets/targetReps sono null per quegli
+      // esercizi) e la tecnica non compariva affatto.
+      dettaglio = pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: planned
+            .map((s) => pw.Text(_plannedSetLabelPdf(s, strings),
+                style: pw.TextStyle(font: font, fontSize: 8.5, color: PdfColors.grey900)))
+            .toList(),
+      );
+    } else {
+      final target = '${e.targetSets ?? '-'}×${e.targetReps ?? '-'}'
+          '${e.targetWeightKg != null ? ' · ${e.targetWeightKg}kg' : ''}';
+      dettaglio = pw.Text(target,
+          style: pw.TextStyle(font: font, fontSize: 8.5, color: PdfColors.grey900));
+    }
+
+    return [
+      pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: nomeLines),
+      dettaglio,
+    ];
+  }
+
   static pw.Widget _buildSchedaEsercizi(
     List<WorkoutTemplateExercise> esercizi,
     pw.Font font,
     pw.Font bold,
     PdfStrings strings,
   ) {
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: esercizi.map((e) {
-        final target = e.isCardio
-            ? strings.durataMin(e.targetDurationSeconds! ~/ 60)
-            : '${e.targetSets ?? '-'}×${e.targetReps ?? '-'}'
-                '${e.targetWeightKg != null ? ' · ${e.targetWeightKg}kg' : ''}';
-        return pw.Padding(
-          padding: const pw.EdgeInsets.symmetric(vertical: 3),
-          child: pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-            children: [
-              pw.Expanded(
-                child: pw.Text(e.exerciseName,
-                    style: pw.TextStyle(
-                        font: font, fontSize: 9.5, color: PdfColors.grey900)),
-              ),
-              pw.Text(target,
-                  style: pw.TextStyle(
-                      font: bold, fontSize: 9, color: PdfColors.grey700)),
-            ],
-          ),
-        );
-      }).toList(),
+    return pw.TableHelper.fromTextArray(
+      headers: [strings.pdfColEsercizio, strings.pdfColDettaglio],
+      data: esercizi.map((e) => _schedaEsercizioCells(e, font, bold, strings)).toList(),
+      border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.4),
+      headerDecoration: const pw.BoxDecoration(color: PdfColors.grey700),
+      headerStyle: pw.TextStyle(font: bold, fontSize: 8.5, color: PdfColors.white),
+      headerAlignment: pw.Alignment.centerLeft,
+      headerPadding: const pw.EdgeInsets.symmetric(horizontal: 5, vertical: 4),
+      cellAlignment: pw.Alignment.topLeft,
+      cellPadding: const pw.EdgeInsets.symmetric(horizontal: 5, vertical: 4),
+      oddRowDecoration: const pw.BoxDecoration(color: PdfColors.grey100),
+      columnWidths: const {0: pw.FlexColumnWidth(1.2), 1: pw.FlexColumnWidth(1.5)},
+      defaultColumnWidth: const pw.FlexColumnWidth(),
     );
   }
 
@@ -873,7 +1017,6 @@ class PdfExportService {
           font: font,
           bold: bold,
         ),
-        footer: (ctx) => _buildFooter(ctx, font, strings),
         build: (_) => [
           pw.SizedBox(height: 12),
           if (history.isEmpty)
@@ -960,6 +1103,7 @@ class PdfExportService {
   /// filtrate/ordinate dal chiamante (stesso range della UI).
   static Future<Uint8List> generateProgressi({
     required String periodLabel,
+    required UserProfile? profile,
     required List<BodySnapshot> bodySnapshots,
     required List<PlicometrySession> plicometrySessions,
     required List<MeasurementSnapshot> measurementSnapshots,
@@ -968,16 +1112,83 @@ class PdfExportService {
     required PdfStrings strings,
     required String locale,
   }) async {
-    final font = await PdfGoogleFonts.notoSansRegular();
-    final bold = await PdfGoogleFonts.notoSansBold();
-    final dateFmt = DateFormat.yMd(locale);
+    // Font caricati qui (I/O di rete/disco, va bene sull'isolate principale):
+    // dentro l'isolate di calcolo passiamo solo i byte grezzi, ricostruendo
+    // il pw.Font li' — un'istanza pw.Font gia' costruita non attraverserebbe
+    // il confine dell'isolate.
+    final regularFont = await PdfGoogleFonts.notoSansRegular();
+    final boldFont = await PdfGoogleFonts.notoSansBold();
+    final fontRegularBytes = (regularFont as pw.TtfFont).data;
+    final fontBoldBytes = (boldFont as pw.TtfFont).data;
 
-    final peso = [...bodySnapshots]..sort((a, b) => a.data.compareTo(b.data));
-    final composizione = [...plicometrySessions]..sort((a, b) => a.data.compareTo(b.data));
-    final misurazioni = [...measurementSnapshots]..sort((a, b) => a.data.compareTo(b.data));
+    final userName =
+        profile != null ? '${profile.nome} ${profile.cognome}'.trim() : '';
+    final anagrafica = profile == null
+        ? null
+        : '${profile.sesso == Sesso.maschio ? 'Uomo' : 'Donna'} · '
+            '${profile.etaCorrente} anni · ${profile.altezzaCm.round()} cm';
+
+    // Costruire e impaginare centinaia di pagine (uno storico di un anno) e'
+    // un calcolo sincrono pesante: farlo sull'isolate principale blocca la UI
+    // abbastanza a lungo da far scattare un ANR di Android ("Input
+    // dispatching timed out"), verificato con adb logcat. Lo eseguiamo quindi
+    // su un isolate separato con compute() — per questo `PdfStrings` (che
+    // contiene closure legate all'istanza AppLocalizations, non
+    // trasferibili tra isolate) non attraversa il confine: estraiamo solo le
+    // stringhe semplici effettivamente usate in questo export.
+    return compute(
+      _buildProgressiPdfBytes,
+      _ProgressiPdfArgs(
+        periodLabel: periodLabel,
+        userName: userName,
+        anagrafica: anagrafica,
+        bodySnapshots: bodySnapshots,
+        plicometrySessions: plicometrySessions,
+        measurementSnapshots: measurementSnapshots,
+        workoutExercises: workoutExercises,
+        misuraLabels: misuraLabels,
+        locale: locale,
+        fontRegularBytes: fontRegularBytes,
+        fontBoldBytes: fontBoldBytes,
+        progressiPdfTitle: strings.progressiPdfTitle,
+        progressiSezPeso: strings.progressiSezPeso,
+        progressiSezComposizione: strings.progressiSezComposizione,
+        progressiSezMisurazioni: strings.progressiSezMisurazioni,
+        progressiSezAllenamentiPdf: strings.progressiSezAllenamentiPdf,
+        progressiMassaGrassa: strings.progressiMassaGrassa,
+        progressiMassaMagra: strings.progressiMassaMagra,
+        progressiNessunDato: strings.progressiNessunDato,
+        progressiCirconferenze: strings.progressiCirconferenze,
+        progressiPliche: strings.progressiPliche,
+        nessunaSessione: strings.nessunaSessione,
+        // Entrambe le lingue supportate oggi formattano la durata cardio
+        // come "{min} min" (vedi app_it.arb/app_en.arb, allenamentoDurataMin):
+        // evitiamo di passare la closure `strings.durataMin` (non
+        // trasferibile) dato che il risultato e' identico.
+        minutiSuffix: 'min',
+        pdfColData: strings.pdfColData,
+        pdfColPeso: strings.pdfColPeso,
+        pdfColBf: strings.pdfColBf,
+        pdfColEsercizio: strings.pdfColEsercizio,
+        pdfColDettaglio: strings.pdfColDettaglio,
+      ),
+    );
+  }
+
+  static Future<Uint8List> _buildProgressiPdfBytes(_ProgressiPdfArgs args) async {
+    await initializeDateFormatting(args.locale);
+    final font = pw.TtfFont(args.fontRegularBytes);
+    final bold = pw.TtfFont(args.fontBoldBytes);
+    final dateFmt = DateFormat.yMd(args.locale);
+
+    final peso = [...args.bodySnapshots]..sort((a, b) => a.data.compareTo(b.data));
+    final composizione = [...args.plicometrySessions]
+      ..sort((a, b) => a.data.compareTo(b.data));
+    final misurazioni = [...args.measurementSnapshots]
+      ..sort((a, b) => a.data.compareTo(b.data));
 
     final byDay = <DateTime, List<WorkoutExercise>>{};
-    for (final e in workoutExercises) {
+    for (final e in args.workoutExercises) {
       byDay.putIfAbsent(e.date, () => []).add(e);
     }
     final workoutDays = byDay.keys.toList()..sort();
@@ -987,124 +1198,167 @@ class PdfExportService {
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+        // Con uno storico di più anni il documento intero può legittimamente
+        // superare le 20 pagine (default della libreria, pensato per
+        // intercettare widget bloccati, non documenti genuinamente lunghi)
+        // — alzato per non far scattare `TooManyPagesException` su un export
+        // corretto ma voluminoso (vedi `_buildProgressiTable`).
+        maxPages: 1000,
         header: (_) => _buildDocHeader(
-          docTitle: strings.progressiPdfTitle,
-          subtitle: periodLabel,
-          detail: null,
+          docTitle: args.progressiPdfTitle,
+          subtitle: args.periodLabel,
+          detail: args.anagrafica,
+          name: args.userName,
           font: font,
           bold: bold,
         ),
-        footer: (ctx) => _buildFooter(ctx, font, strings),
         build: (_) => [
           pw.SizedBox(height: 12),
-          _buildProgressiSection(
-            title: strings.progressiSezPeso,
+          ..._buildProgressiTable(
+            title: args.progressiSezPeso,
+            headers: [args.pdfColData, args.pdfColPeso],
             rows: peso.isEmpty
                 ? null
-                : peso.map((s) => _buildDateValueRow(
-                    dateFmt.format(s.data), '${s.pesoKg.toStringAsFixed(1)} kg', font)),
-            emptyLabel: strings.progressiNessunDato,
+                : peso
+                    .map((s) => [dateFmt.format(s.data), '${s.pesoKg.toStringAsFixed(1)} kg'])
+                    .toList(),
+            emptyLabel: args.progressiNessunDato,
             font: font,
             bold: bold,
+            columnWidths: const {0: pw.FixedColumnWidth(70)},
           ),
-          _buildProgressiSection(
-            title: strings.progressiSezComposizione,
+          ..._buildProgressiTable(
+            title: args.progressiSezComposizione,
+            headers: [args.pdfColData, args.pdfColBf, args.progressiMassaGrassa, args.progressiMassaMagra],
             rows: composizione.isEmpty
                 ? null
-                : composizione.map((s) => _buildDateValueRow(
-                    dateFmt.format(s.data),
-                    'BF% ${s.risultati.bodyFatPercent.toStringAsFixed(1)} · '
-                        '${strings.progressiMassaGrassa} ${s.risultati.massaGrassaKg.toStringAsFixed(1)}kg · '
-                        '${strings.progressiMassaMagra} ${s.risultati.massaMagraKg.toStringAsFixed(1)}kg',
-                    font)),
-            emptyLabel: strings.progressiNessunDato,
+                : composizione
+                    .map((s) => [
+                          dateFmt.format(s.data),
+                          s.risultati.bodyFatPercent.toStringAsFixed(1),
+                          '${s.risultati.massaGrassaKg.toStringAsFixed(1)} kg',
+                          '${s.risultati.massaMagraKg.toStringAsFixed(1)} kg',
+                        ])
+                    .toList(),
+            emptyLabel: args.progressiNessunDato,
             font: font,
             bold: bold,
+            columnWidths: const {0: pw.FixedColumnWidth(70)},
           ),
-          _buildProgressiSection(
-            title: strings.progressiSezMisurazioni,
+          ..._buildProgressiTable(
+            title: args.progressiSezMisurazioni,
+            headers: [args.pdfColData, args.progressiCirconferenze, args.progressiPliche],
             rows: misurazioni.isEmpty
                 ? null
-                : misurazioni.map((s) => _buildDateValueRow(
-                    dateFmt.format(s.data), _misurazioneDetail(s, misuraLabels), font)),
-            emptyLabel: strings.progressiNessunDato,
+                : misurazioni
+                    .map((s) => _misurazioneRowCells(dateFmt.format(s.data), s, args.misuraLabels))
+                    .toList(),
+            emptyLabel: args.progressiNessunDato,
             font: font,
             bold: bold,
+            columnWidths: const {0: pw.FixedColumnWidth(60)},
           ),
-          _buildProgressiSection(
-            title: strings.progressiSezAllenamentiPdf,
+          ..._buildProgressiTable(
+            title: args.progressiSezAllenamentiPdf,
+            headers: [args.pdfColData, args.pdfColEsercizio, args.pdfColDettaglio],
             rows: workoutDays.isEmpty
                 ? null
-                : workoutDays.map((d) =>
-                    _buildWorkoutDayBlock(d, byDay[d]!, dateFmt, font, bold, strings)),
-            emptyLabel: strings.nessunaSessione,
+                : [
+                    for (final d in workoutDays)
+                      for (final e in byDay[d]!)
+                        [dateFmt.format(d), e.exerciseName, _workoutExerciseDetail(e, args.minutiSuffix)]
+                  ],
+            emptyLabel: args.nessunaSessione,
             font: font,
             bold: bold,
+            columnWidths: const {0: pw.FixedColumnWidth(58), 1: pw.FlexColumnWidth(1.3), 2: pw.FlexColumnWidth(2)},
           ),
         ],
       ),
     );
-    return doc.save();
+    return doc.save(enableEventLoopBalancing: true);
   }
 
-  static pw.Widget _buildProgressiSection({
+  // Ogni sezione va spread (`...`) direttamente nei figli di primo livello di
+  // `pw.MultiPage.build`, MAI avvolta in un `pw.Padding`: `pw.Table` (come
+  // ogni `SpanningWidget`) si spezza tra più pagine se non ci sta in una
+  // sola, ma `pw.Padding` no.
+  //
+  // A differenza di `pw.Column`/`Flex` (che nel package `pdf` 3.x prova a far
+  // stare TUTTI i figli in un colpo solo e, se non ci riescono, rimane
+  // "bloccata" a riprovare sulla pagina successiva — da cui il vecchio
+  // workaround di spezzare le righe in Column-chunk da 10), `pw.Table`
+  // spezza le righe una alla volta internamente (vedi `Table.layout` nel
+  // package `pdf`): può quindi ricevere l'intera lista di righe di una
+  // sezione in un solo widget, senza bisogno di chunking manuale.
+  static List<pw.Widget> _buildProgressiTable({
     required String title,
-    required Iterable<pw.Widget>? rows,
+    required List<String> headers,
+    required List<List<String>>? rows,
     required String emptyLabel,
     required pw.Font font,
     required pw.Font bold,
+    Map<int, pw.TableColumnWidth>? columnWidths,
   }) {
-    return pw.Padding(
-      padding: const pw.EdgeInsets.only(bottom: 14),
-      child: pw.Column(
-        crossAxisAlignment: pw.CrossAxisAlignment.start,
-        children: [
-          pw.Text(title,
-              style: pw.TextStyle(
-                  font: bold, fontSize: 10, color: PdfColors.grey700, letterSpacing: 1.2)),
-          pw.SizedBox(height: 4),
-          if (rows == null)
-            pw.Text(emptyLabel,
-                style: pw.TextStyle(
-                    font: font,
-                    fontSize: 9,
-                    fontStyle: pw.FontStyle.italic,
-                    color: PdfColors.grey500))
-          else
-            ...rows,
-        ],
-      ),
-    );
+    final widgets = <pw.Widget>[
+      pw.Text(title,
+          style: pw.TextStyle(
+              font: bold, fontSize: 10, color: PdfColors.grey700, letterSpacing: 1.2)),
+      pw.SizedBox(height: 6),
+    ];
+
+    if (rows == null || rows.isEmpty) {
+      widgets.add(pw.Text(emptyLabel,
+          style: pw.TextStyle(
+              font: font,
+              fontSize: 9,
+              fontStyle: pw.FontStyle.italic,
+              color: PdfColors.grey500)));
+    } else {
+      widgets.add(pw.TableHelper.fromTextArray(
+        headers: headers,
+        data: rows,
+        border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.4),
+        headerDecoration: const pw.BoxDecoration(color: PdfColors.grey700),
+        headerStyle: pw.TextStyle(font: bold, fontSize: 8.5, color: PdfColors.white),
+        headerAlignment: pw.Alignment.centerLeft,
+        headerPadding: const pw.EdgeInsets.symmetric(horizontal: 5, vertical: 4),
+        cellStyle: pw.TextStyle(font: font, fontSize: 8.5, color: PdfColors.grey900),
+        cellAlignment: pw.Alignment.centerLeft,
+        cellPadding: const pw.EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+        oddRowDecoration: const pw.BoxDecoration(color: PdfColors.grey100),
+        columnWidths: columnWidths,
+        defaultColumnWidth: const pw.FlexColumnWidth(),
+      ));
+    }
+
+    widgets.add(pw.SizedBox(height: 14));
+    return widgets;
   }
 
-  static pw.Widget _buildDateValueRow(String date, String value, pw.Font font) {
-    return pw.Padding(
-      padding: const pw.EdgeInsets.symmetric(vertical: 2),
-      child: pw.Row(
-        children: [
-          pw.SizedBox(
-            width: 64,
-            child: pw.Text(date,
-                style: pw.TextStyle(font: font, fontSize: 8.5, color: PdfColors.grey600)),
-          ),
-          pw.Expanded(
-            child: pw.Text(value,
-                style: pw.TextStyle(font: font, fontSize: 9, color: PdfColors.grey900)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  static String _misurazioneDetail(MeasurementSnapshot s, Map<String, String> labels) {
-    final parts = <String>[];
+  // Circonferenze (cm) e pliche (mm) sono grandezze diverse — mai nella
+  // stessa cella: senza questa separazione una "Coscia" a 58cm (circonferenza)
+  // e una "Coscia" a 10mm (plica) finivano nella stessa stringa concatenata,
+  // distinguibili solo dall'unità di misura in coda.
+  static List<String> _misurazioneRowCells(
+    String date,
+    MeasurementSnapshot s,
+    Map<String, String> labels,
+  ) {
+    final circonferenze = <String>[];
+    final pliche = <String>[];
     for (final entry in labels.entries) {
       final v = _misurazioneValue(s, entry.key);
       if (v == null) continue;
-      final unit = entry.key.endsWith('Mm') ? 'mm' : 'cm';
-      parts.add('${entry.value} ${v.toStringAsFixed(1)}$unit');
+      final isMm = entry.key.endsWith('Mm');
+      final text = '${entry.value} ${v.toStringAsFixed(1)}${isMm ? 'mm' : 'cm'}';
+      (isMm ? pliche : circonferenze).add(text);
     }
-    return parts.isEmpty ? '-' : parts.join(' · ');
+    return [
+      date,
+      circonferenze.isEmpty ? '-' : circonferenze.join(' · '),
+      pliche.isEmpty ? '-' : pliche.join(' · '),
+    ];
   }
 
   static double? _misurazioneValue(MeasurementSnapshot s, String key) {
@@ -1127,31 +1381,11 @@ class PdfExportService {
     }
   }
 
-  static pw.Widget _buildWorkoutDayBlock(DateTime day, List<WorkoutExercise> exercises,
-      DateFormat dateFmt, pw.Font font, pw.Font bold, PdfStrings strings) {
-    return pw.Padding(
-      padding: const pw.EdgeInsets.only(bottom: 5),
-      child: pw.Column(
-        crossAxisAlignment: pw.CrossAxisAlignment.start,
-        children: [
-          pw.Text(dateFmt.format(day),
-              style: pw.TextStyle(font: bold, fontSize: 9, color: PdfColors.grey800)),
-          for (final e in exercises)
-            pw.Padding(
-              padding: const pw.EdgeInsets.only(left: 8, top: 1),
-              child: pw.Text(
-                '${e.exerciseName}: ${_workoutExerciseDetail(e, strings)}',
-                style: pw.TextStyle(font: font, fontSize: 8.5, color: PdfColors.grey700),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  static String _workoutExerciseDetail(WorkoutExercise e, PdfStrings strings) {
+  static String _workoutExerciseDetail(WorkoutExercise e, String minutiSuffix) {
     if (e.isCardio) {
-      return e.durationSeconds != null ? strings.durataMin(e.durationSeconds! ~/ 60) : '-';
+      return e.durationSeconds != null
+          ? '${e.durationSeconds! ~/ 60} $minutiSuffix'
+          : '-';
     }
     return e.sets.map((s) => '${s.reps ?? '-'}×${s.weightKg ?? '-'}kg').join(', ');
   }
@@ -1164,6 +1398,7 @@ class PdfExportService {
     required String? detail,
     required pw.Font font,
     required pw.Font bold,
+    String? name,
   }) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -1177,6 +1412,11 @@ class PdfExportService {
                 style: pw.TextStyle(font: font, fontSize: 11, color: PdfColors.grey600)),
           ],
         ),
+        if (name != null && name.isNotEmpty) ...[
+          pw.SizedBox(height: 4),
+          pw.Text(name,
+              style: pw.TextStyle(font: bold, fontSize: 13, color: PdfColors.black)),
+        ],
         pw.SizedBox(height: 2),
         pw.Text(subtitle,
             style: pw.TextStyle(font: bold, fontSize: 11, color: PdfColors.grey800)),

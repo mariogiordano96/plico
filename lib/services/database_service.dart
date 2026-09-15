@@ -30,6 +30,7 @@ import '../models/workout_program.dart';
 import '../models/personal_record.dart';
 import '../models/coach_message.dart';
 import 'calorie_estimation_service.dart';
+import 'plicometry_calculator.dart';
 import 'exercise_alternatives_service.dart';
 import 'workout_progress_service.dart';
 
@@ -1486,6 +1487,216 @@ class DatabaseService {
           ..targetDurationSeconds = 1200,
       ];
     await saveWorkoutTemplate(template);
+  }
+
+  double _seedPesoKgAt(DateTime date, DateTime start, DateTime end) {
+    final totalDays = end.difference(start).inDays.clamp(1, 1 << 30);
+    final elapsed = date.difference(start).inDays.clamp(0, totalDays);
+    return 84.0 - 8.0 * (elapsed / totalDays);
+  }
+
+  double _seedScaled(double base, double progress) =>
+      double.parse((base * progress).toStringAsFixed(1));
+
+  DateTime _seedNextWeekday(DateTime from, int weekday) {
+    var d = DateTime(from.year, from.month, from.day);
+    while (d.weekday != weekday) {
+      d = d.add(const Duration(days: 1));
+    }
+    return d;
+  }
+
+  /// Solo per test manuali in debug (richiesta esplicita per verificare
+  /// grafici/PDF con dati realistici): popola un anno di storico per il
+  /// profilo corrente — pesate, plicometrie e misurazioni mensili con un
+  /// trend di ricomposizione corporea coerente tra loro, più il log
+  /// allenamenti della scheda "TEST — Tecniche" (creata da
+  /// [seedTestTemplateTecniche]) due volte a settimana con progressione di
+  /// carico dal 75% al 100% dei pesi target del template. Non tocca dati
+  /// esistenti in altri giorni (usa gli stessi metodi di scrittura del resto
+  /// dell'app, idempotenti per data). Chiamata solo da un bottone in
+  /// `kDebugMode`, mai in release.
+  Future<String> seedTestYearlyHistory() async {
+    final profile = await getUserProfile();
+    if (profile == null) {
+      return 'Nessun profilo utente: completa prima l\'onboarding.';
+    }
+
+    final now = DateTime.now();
+    final start = DateTime(now.year - 1, now.month, now.day);
+
+    // Pulizia di eventuali pesate/plicometrie da un run precedente di questo
+    // seed: a differenza di `upsertMeasurementSnapshot` (dedup per giorno),
+    // `addBodySnapshot`/`addPlicometrySession` inseriscono sempre un nuovo
+    // record, quindi senza questa pulizia ogni tap del bottone duplicherebbe
+    // i 12 punti mensili invece di sostituirli.
+    final oldSnapshots =
+        await _isar.bodySnapshots.filter().noteEqualTo('Seed test').findAll();
+    final oldSessions = await _isar.plicometrySessions
+        .filter()
+        .noteEqualTo('Seed test')
+        .findAll();
+    await _isar.writeTxn(() async {
+      for (final s in oldSnapshots) {
+        await _isar.bodySnapshots.delete(s.id);
+      }
+      for (final s in oldSessions) {
+        await _isar.plicometrySessions.delete(s.id);
+      }
+    });
+
+    // ── Pesate / Plicometrie / Misurazioni, un punto al mese ──
+    var pesateCount = 0, plicoCount = 0, misureCount = 0;
+    for (var i = 0; i < 12; i++) {
+      final monthsAgo = 11 - i;
+      final date = DateTime(now.year, now.month - monthsAgo, 5);
+      final t = i / 11; // 0.0 (11 mesi fa) → 1.0 (oggi)
+
+      final pesoKg = _seedScaled(84.0 - 8.0 * t, 1);
+      await addBodySnapshot(BodySnapshot()
+        ..data = date
+        ..pesoKg = pesoKg
+        ..note = 'Seed test');
+      pesateCount++;
+
+      final pliche = {
+        'pettorale': _seedScaled(18.0 - 8.0 * t, 1),
+        'addome': _seedScaled(24.0 - 12.0 * t, 1),
+        'coscia': _seedScaled(17.0 - 7.0 * t, 1),
+      };
+      final result = PlicometryCalculator.calculate(
+        metodo: MetodoPlicometria.jacksonPollock3,
+        sesso: profile.sesso,
+        eta: profile.etaCorrente,
+        pesoKg: pesoKg,
+        pliche: pliche,
+      );
+      await addPlicometrySession(PlicometrySession()
+        ..data = date
+        ..metodo = MetodoPlicometria.jacksonPollock3
+        ..etaAnni = profile.etaCorrente
+        ..pesoKg = pesoKg
+        ..altezzaCm = profile.altezzaCm
+        ..pliche = (Pliche()
+          ..pettoralleMm = pliche['pettorale']
+          ..addomineMm = pliche['addome']
+          ..cosciaMm = pliche['coscia'])
+        ..risultati = (RisultatiPlico()
+          ..bodyFatPercent = result.bodyFatPercent
+          ..massaGrassaKg = result.massaGrassaKg
+          ..massaMagraKg = result.massaMagraKg
+          ..sommaPlicheMm = result.sommaPlicheMm
+          ..densitaCorporea = result.densitaCorporea)
+        ..note = 'Seed test');
+      plicoCount++;
+
+      await upsertMeasurementSnapshot(
+        data: date,
+        fonte: 'seed_test',
+        colloCm: 40.0,
+        vitaCm: _seedScaled(92.0 - 8.0 * t, 1),
+        fianchiCm: _seedScaled(104.0 - 4.0 * t, 1),
+        braccioCm: _seedScaled(34.0 + 2.0 * t, 1),
+        cosciaCm: _seedScaled(58.0 - 2.0 * t, 1),
+        polpaccioCm: _seedScaled(38.0 + 1.0 * t, 1),
+        toraceCm: _seedScaled(100.0 + 4.0 * t, 1),
+        // Pliche: le stesse pettorale/addome/coscia usate per la
+        // plicometria sopra, più le altre 4 non coinvolte nel calcolo
+        // Jackson-Pollock 3 ma comunque selezionabili nel grafico
+        // "Misurazioni" (chip in mm).
+        pettoraleMm: pliche['pettorale'],
+        addomineMm: pliche['addome'],
+        cosciaMm: pliche['coscia'],
+        tricipiteMm: _seedScaled(14.0 - 6.0 * t, 1),
+        bicipiteMm: _seedScaled(8.0 - 3.0 * t, 1),
+        sottoscapolareMm: _seedScaled(16.0 - 7.0 * t, 1),
+        sovrailiachMm: _seedScaled(15.0 - 6.0 * t, 1),
+      );
+      misureCount++;
+    }
+
+    // ── Log allenamenti: scheda "TEST — Tecniche", lun+gio per un anno ──
+    final templates = await getStandaloneTemplates();
+    var template = WorkoutTemplate();
+    var hasTemplate = false;
+    for (final tmpl in templates) {
+      if (tmpl.name == 'TEST — Tecniche') {
+        template = tmpl;
+        hasTemplate = true;
+        break;
+      }
+    }
+
+    var sessionCount = 0;
+    if (hasTemplate) {
+      final sessionDays = <DateTime>[];
+      var cursor = _seedNextWeekday(start, DateTime.monday);
+      var nextIsThursday = true;
+      while (!cursor.isAfter(now)) {
+        sessionDays.add(cursor);
+        cursor = _seedNextWeekday(
+          cursor.add(const Duration(days: 1)),
+          nextIsThursday ? DateTime.thursday : DateTime.monday,
+        );
+        nextIsThursday = !nextIsThursday;
+      }
+
+      for (var i = 0; i < sessionDays.length; i++) {
+        final date = sessionDays[i];
+
+        // Idempotenza: `startWorkoutFromTemplate` restituisce gli esercizi
+        // già loggati se presenti, senza ricrearli — se lo facessimo anche
+        // qui, ogni tap successivo del bottone scalerebbe di nuovo i pesi
+        // già scalati da un run precedente, componendo la progressione.
+        final alreadyLogged = await getWorkoutExercisesForDay(date);
+        if (alreadyLogged.any((e) => e.sourceTemplateId == template.id)) {
+          sessionCount++;
+          continue;
+        }
+
+        final progress = sessionDays.length <= 1
+            ? 1.0
+            : 0.75 + 0.25 * (i / (sessionDays.length - 1));
+        final bodyWeight = _seedPesoKgAt(date, start, now);
+
+        final created = await startWorkoutFromTemplate(template, date);
+        for (final we in created) {
+          if (we.isCardio) {
+            we.cardioConfirmed = true;
+            we.estimatedKcal = CalorieEstimationService.estimateCardioKcal(
+              exerciseId: we.exerciseId,
+              durationSeconds: we.durationSeconds ?? 0,
+              bodyWeightKg: bodyWeight,
+            );
+          } else {
+            for (final s in we.sets) {
+              if (s.weightKg != null) {
+                s.weightKg = _seedScaled(s.weightKg!, progress);
+              }
+              s.confirmed = true;
+              final drops = s.dropStages;
+              if (drops != null) {
+                for (final d in drops) {
+                  if (d.weightKg != null) {
+                    d.weightKg = _seedScaled(d.weightKg!, progress);
+                  }
+                }
+              }
+            }
+            we.estimatedKcal = CalorieEstimationService.estimateStrengthKcal(
+              workingSetCount: we.sets.where((s) => !s.isWarmup).length,
+              bodyWeightKg: bodyWeight,
+            );
+          }
+          await updateWorkoutExercise(we);
+        }
+        await addSessionDuration(date, 2700 + (i % 6) * 180);
+        sessionCount++;
+      }
+    }
+
+    return '$pesateCount pesate, $plicoCount plicometrie, $misureCount misurazioni'
+        '${hasTemplate ? ', $sessionCount sessioni allenamento' : ' — scheda "TEST — Tecniche" non trovata, nessuna sessione creata'}.';
   }
 
   WorkoutTemplate _presetTemplateFromJson(Map<String, dynamic> j) {

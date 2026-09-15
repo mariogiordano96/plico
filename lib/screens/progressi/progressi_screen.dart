@@ -189,16 +189,31 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
         ? await db.getWorkoutExercisesRange(from, to)
         : await db.getAllWorkoutExercises();
 
+    final profile = await db.getUserProfile();
+
     final dateFmt = DateFormat.yMd(locale);
-    final periodLabel = from != null
-        ? '${dateFmt.format(from)} – ${dateFmt.format(to)}'
-        : l10n.progressiRangeTutto;
+    String periodLabel;
+    if (from != null) {
+      periodLabel = '${dateFmt.format(from)} – ${dateFmt.format(to)}';
+    } else {
+      // "Tutto" da solo non basta a capire il periodo coperto: lo ancoro
+      // alla data più vecchia trovata tra i dati effettivamente esportati.
+      final allDates = [
+        ...allBody.map((s) => s.data),
+        ...allComposizione.map((s) => s.data),
+        ...allMisurazioni.map((s) => s.data),
+      ];
+      periodLabel = allDates.isEmpty
+          ? l10n.progressiRangeTutto
+          : '${l10n.progressiRangeTutto} · '
+              '${dateFmt.format(allDates.reduce((a, b) => a.isBefore(b) ? a : b))} '
+              '– ${dateFmt.format(to)}';
+    }
 
     final strings = PdfStrings(
       diarioTitle: l10n.pdfDiarioTitle,
       targetLabel: l10n.pdfTargetLabel,
       kcalGiornoUnit: l10n.tdeeKcalGiornoUnit,
-      footerPage: l10n.pdfPagina,
       nessunoRegistrato: l10n.pdfNessunDato,
       pastoFallback: l10n.pdfPastoFallback,
       pastoLabels: [
@@ -231,6 +246,13 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
       progressiMassaGrassa: l10n.progressiMassaGrassa,
       progressiMassaMagra: l10n.progressiMassaMagra,
       progressiNessunDato: l10n.progressiNessunDato,
+      progressiCirconferenze: l10n.misurazioneTabCirconferenze,
+      progressiPliche: l10n.misurazioneTabPliche,
+      pdfColData: l10n.pdfColData,
+      pdfColPeso: l10n.pdfColPeso,
+      pdfColBf: l10n.pdfColBf,
+      pdfColEsercizio: l10n.pdfColEsercizio,
+      pdfColDettaglio: l10n.pdfColDettaglio,
     );
 
     if (!mounted) return;
@@ -243,6 +265,7 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
     try {
       final bytes = await PdfExportService.generateProgressi(
         periodLabel: periodLabel,
+        profile: profile,
         bodySnapshots: body,
         plicometrySessions: composizione,
         measurementSnapshots: misurazioni,

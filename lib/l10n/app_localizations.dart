@@ -1454,6 +1454,36 @@ abstract class AppLocalizations {
   /// **'Massa Magra'**
   String get progressiMassaMagra;
 
+  /// No description provided for @pdfColData.
+  ///
+  /// In it, this message translates to:
+  /// **'Data'**
+  String get pdfColData;
+
+  /// No description provided for @pdfColPeso.
+  ///
+  /// In it, this message translates to:
+  /// **'Peso'**
+  String get pdfColPeso;
+
+  /// No description provided for @pdfColBf.
+  ///
+  /// In it, this message translates to:
+  /// **'BF%'**
+  String get pdfColBf;
+
+  /// No description provided for @pdfColEsercizio.
+  ///
+  /// In it, this message translates to:
+  /// **'Esercizio'**
+  String get pdfColEsercizio;
+
+  /// No description provided for @pdfColDettaglio.
+  ///
+  /// In it, this message translates to:
+  /// **'Dettaglio'**
+  String get pdfColDettaglio;
+
   /// No description provided for @progressiProteine.
   ///
   /// In it, this message translates to:
@@ -2227,12 +2257,6 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'target'**
   String get pdfTargetLabel;
-
-  /// No description provided for @pdfPagina.
-  ///
-  /// In it, this message translates to:
-  /// **'pagina {page} di {total}'**
-  String pdfPagina(int page, int total);
 
   /// No description provided for @pdfNessunDato.
   ///

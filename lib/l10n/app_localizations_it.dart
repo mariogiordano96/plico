@@ -742,6 +742,21 @@ class AppLocalizationsIt extends AppLocalizations {
   String get progressiMassaMagra => 'Massa Magra';
 
   @override
+  String get pdfColData => 'Data';
+
+  @override
+  String get pdfColPeso => 'Peso';
+
+  @override
+  String get pdfColBf => 'BF%';
+
+  @override
+  String get pdfColEsercizio => 'Esercizio';
+
+  @override
+  String get pdfColDettaglio => 'Dettaglio';
+
+  @override
   String get progressiProteine => 'Proteine';
 
   @override
@@ -1180,11 +1195,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get pdfTargetLabel => 'target';
-
-  @override
-  String pdfPagina(int page, int total) {
-    return 'pagina $page di $total';
-  }
 
   @override
   String get pdfNessunDato => 'Nessun dato registrato';

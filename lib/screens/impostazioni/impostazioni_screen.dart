@@ -1,64 +1,121 @@
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 
 import '../../theme/app_theme.dart';
+import '../../services/database_service.dart';
 import 'backup_screen.dart';
 import 'notifiche_screen.dart';
 import 'smartwatch_screen.dart';
 
-class ImpostazioniScreen extends StatelessWidget {
+class ImpostazioniScreen extends StatefulWidget {
   const ImpostazioniScreen({super.key});
+
+  @override
+  State<ImpostazioniScreen> createState() => _ImpostazioniScreenState();
+}
+
+class _ImpostazioniScreenState extends State<ImpostazioniScreen> {
+  bool _seeding = false;
+
+  Future<void> _seedTestData() async {
+    if (_seeding) return;
+    setState(() => _seeding = true);
+    final messenger = ScaffoldMessenger.of(context);
+    final p = context.palette;
+    try {
+      final result = await DatabaseService.instance.seedTestYearlyHistory();
+      if (!mounted) return;
+      messenger.showSnackBar(SnackBar(
+        content: Text(result),
+        backgroundColor: p.surface,
+        duration: const Duration(seconds: 6),
+      ));
+    } finally {
+      if (mounted) setState(() => _seeding = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
     final l10n = context.l10n;
-    return Scaffold(
-      backgroundColor: p.background,
-      appBar: AppBar(
-        title: Text(l10n.impostazioniTitolo,
-            style: TextStyle(
-                color: p.textPrimary, fontSize: 17, fontWeight: FontWeight.w600)),
+    return PopScope(
+      canPop: !_seeding,
+      child: Scaffold(
         backgroundColor: p.background,
-        elevation: 0,
-        iconTheme: IconThemeData(color: p.accent),
-      ),
-      body: SafeArea(
-        top: false,
-        child: ListView(
-          padding: const EdgeInsets.all(20),
+        appBar: AppBar(
+          title: Text(l10n.impostazioniTitolo,
+              style: TextStyle(
+                  color: p.textPrimary, fontSize: 17, fontWeight: FontWeight.w600)),
+          backgroundColor: p.background,
+          elevation: 0,
+          iconTheme: IconThemeData(color: p.accent),
+        ),
+        body: Stack(
           children: [
-            _MenuTile(
-              icon: Icons.notifications_outlined,
-              title: l10n.impostazioniNotifiche,
-              subtitle: l10n.impostazioniNotificheSub,
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const NotificheScreen()),
+            SafeArea(
+              top: false,
+              child: ListView(
+                padding: const EdgeInsets.all(20),
+                children: [
+                  _MenuTile(
+                    icon: Icons.notifications_outlined,
+                    title: l10n.impostazioniNotifiche,
+                    subtitle: l10n.impostazioniNotificheSub,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const NotificheScreen()),
+                    ),
+                    p: p,
+                  ),
+                  const SizedBox(height: 10),
+                  _MenuTile(
+                    icon: Icons.backup_outlined,
+                    title: l10n.impostazioniBackup,
+                    subtitle: l10n.impostazioniBackupSub,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const BackupScreen()),
+                    ),
+                    p: p,
+                  ),
+                  const SizedBox(height: 10),
+                  _MenuTile(
+                    icon: Icons.watch_rounded,
+                    title: l10n.impostazioniSalute,
+                    subtitle: l10n.impostazioniSaluteSub,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const SmartwatchScreen()),
+                    ),
+                    p: p,
+                  ),
+                  if (kDebugMode) ...[
+                    const SizedBox(height: 10),
+                    _MenuTile(
+                      icon: Icons.data_object_rounded,
+                      title: 'DEBUG — Popola dati di test',
+                      subtitle: _seeding
+                          ? 'Generazione in corso…'
+                          : 'Un anno di pesate, plicometrie, misurazioni e allenamenti',
+                      onTap: _seedTestData,
+                      p: p,
+                    ),
+                  ],
+                ],
               ),
-              p: p,
             ),
-            const SizedBox(height: 10),
-            _MenuTile(
-              icon: Icons.backup_outlined,
-              title: l10n.impostazioniBackup,
-              subtitle: l10n.impostazioniBackupSub,
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const BackupScreen()),
+            if (_seeding)
+              Positioned.fill(
+                child: AbsorbPointer(
+                  child: Container(
+                    color: Colors.black.withValues(alpha: 0.45),
+                    child: Center(
+                      child: CircularProgressIndicator(color: p.accent),
+                    ),
+                  ),
+                ),
               ),
-              p: p,
-            ),
-            const SizedBox(height: 10),
-            _MenuTile(
-              icon: Icons.watch_rounded,
-              title: l10n.impostazioniSalute,
-              subtitle: l10n.impostazioniSaluteSub,
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SmartwatchScreen()),
-              ),
-              p: p,
-            ),
           ],
         ),
       ),

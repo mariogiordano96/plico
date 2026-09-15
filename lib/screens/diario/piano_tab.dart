@@ -99,7 +99,6 @@ class _PianoTabState extends State<PianoTab> {
       diarioTitle: l10n.pdfDiarioTitle,
       targetLabel: l10n.pdfTargetLabel,
       kcalGiornoUnit: l10n.tdeeKcalGiornoUnit,
-      footerPage: l10n.pdfPagina,
       nessunoRegistrato: l10n.pdfNessunDato,
       pastoFallback: l10n.pdfPastoFallback,
       pastoLabels: [
@@ -227,7 +226,7 @@ class _PianoTabState extends State<PianoTab> {
               style: TextStyle(color: p.textMuted, fontSize: 14, height: 1.5),
             ),
             const SizedBox(height: 32),
-            _AccentButton(label: context.l10n.pianoIniziaQuestionario, onTap: _openQuestionario, p: p),
+            _AccentButton(label: context.l10n.pianoIniziaQuestionario, onTap: _openQuestionario),
           ],
         ),
       ),
@@ -251,7 +250,7 @@ class _PianoTabState extends State<PianoTab> {
             Text(context.l10n.pianoProntoGenerare,
                 style: TextStyle(color: p.textMuted, fontSize: 13)),
             const SizedBox(height: 32),
-            _AccentButton(label: context.l10n.pianoGeneraPiano, onTap: _generaPiano, p: p),
+            _AccentButton(label: context.l10n.pianoGeneraPiano, onTap: _generaPiano),
             const SizedBox(height: 12),
             TextButton(
               onPressed: _openQuestionario,
@@ -377,34 +376,19 @@ class _PianoTabState extends State<PianoTab> {
 
 // ── Widgets ───────────────────────────────────────────────────
 
+// Delega al tema `ElevatedButton` globale (app_theme.dart) invece di uno
+// stile hardcoded: prima aveva radius/font/letterSpacing diversi dal resto
+// dei CTA dell'app e un colore testo fisso che non seguiva il tema chiaro.
 class _AccentButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
-  final ColorPalette p;
-  const _AccentButton({required this.label, required this.onTap, required this.p});
+  const _AccentButton({required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: Material(
-        color: p.accent,
-        borderRadius: BorderRadius.circular(12),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            child: Text(label,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    color: Color(0xFF0A1A0F),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.2)),
-          ),
-        ),
-      ),
+    return ElevatedButton(
+      onPressed: onTap,
+      child: Text(label),
     );
   }
 }

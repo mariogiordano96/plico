@@ -188,7 +188,6 @@ class _ProgrammaDetailScreenState extends State<ProgrammaDetailScreen> {
           diarioTitle: l10n.pdfDiarioTitle,
           targetLabel: l10n.pdfTargetLabel,
           kcalGiornoUnit: l10n.tdeeKcalGiornoUnit,
-          footerPage: l10n.pdfPagina,
           nessunoRegistrato: l10n.pdfNessunDato,
           pastoFallback: l10n.pdfPastoFallback,
           pastoLabels: [
@@ -213,6 +212,15 @@ class _ProgrammaDetailScreenState extends State<ProgrammaDetailScreen> {
           nessunaSessione: l10n.storicoNessunaSessione,
           prBadge: l10n.storicoPrBadge,
           durataMin: l10n.allenamentoDurataMin,
+          tecnicaForzate: l10n.pdfTecnicaForzate,
+          tecnicaRestPause: l10n.pdfTecnicaRestPause,
+          tecnicaStripping: l10n.pdfTecnicaStripping,
+          tecnicaSuperSlow: l10n.pdfTecnicaSuperSlow,
+          pdfColEsercizio: l10n.pdfColEsercizio,
+          pdfColDettaglio: l10n.pdfColDettaglio,
+          supersetLabel: l10n.creaSchedaSupersetUnito,
+          ruoloEsplosiva: l10n.creaSchedaRuoloEsplosiva,
+          ruoloLenta: l10n.creaSchedaRuoloLenta,
         ),
         locale: locale,
       );

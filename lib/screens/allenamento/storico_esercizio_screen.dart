@@ -52,7 +52,6 @@ class _StoricoEsercizioScreenState extends State<StoricoEsercizioScreen> {
           diarioTitle: l10n.pdfDiarioTitle,
           targetLabel: l10n.pdfTargetLabel,
           kcalGiornoUnit: l10n.tdeeKcalGiornoUnit,
-          footerPage: l10n.pdfPagina,
           nessunoRegistrato: l10n.pdfNessunDato,
           pastoFallback: l10n.pdfPastoFallback,
           pastoLabels: [

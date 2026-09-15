@@ -313,6 +313,11 @@
   "progressiRangeTutto": "Tutto",
   "progressiMassaGrassa": "Massa Grassa",
   "progressiMassaMagra": "Massa Magra",
+  "pdfColData": "Data",
+  "pdfColPeso": "Peso",
+  "pdfColBf": "BF%",
+  "pdfColEsercizio": "Esercizio",
+  "pdfColDettaglio": "Dettaglio",
   "progressiProteine": "Proteine",
   "progressiGrassi": "Grassi",
   "progressiCarboidrati": "Carboidrati",
@@ -485,10 +490,6 @@
 
   "pdfDiarioTitle": "Diario Alimentare",
   "pdfTargetLabel": "target",
-  "pdfPagina": "pagina {page} di {total}",
-  "@pdfPagina": {
-    "placeholders": { "page": { "type": "int" }, "total": { "type": "int" } }
-  },
   "pdfNessunDato": "Nessun dato registrato",
   "pdfPastoFallback": "Pasto",
   "pdfRiepilogo": "RIEPILOGO",
