@@ -39,6 +39,8 @@ class DatabaseService {
 
   late Isar _isar;
 
+  static const _coachMessageLimit = 500;
+
   static const _schemas = [
     UserProfileSchema, BodySnapshotSchema, PlicometrySessionSchema,
     AppSettingsSchema, MeasurementSnapshotSchema, FoodItemSchema,
@@ -1742,9 +1744,18 @@ class DatabaseService {
   // ──────────────────────────────────────────────
 
   /// Un'unica conversazione continua (non una per sessione/giorno): ordinata
-  /// per data di creazione, così sopravvive a un riavvio dell'app.
+  /// per data di creazione, così sopravvive a un riavvio dell'app. Limitata
+  /// ai più recenti [_coachMessageLimit] per non far crescere senza limiti
+  /// né la query né la history tenuta in memoria dalla UI — un uso normale
+  /// non arriva mai a toccare il limite, entra in gioco solo su una
+  /// conversazione mai azzerata per mesi.
   Future<List<CoachMessage>> getCoachMessages() async {
-    return _isar.coachMessages.where().sortByCreatedAt().findAll();
+    final recent = await _isar.coachMessages
+        .where()
+        .sortByCreatedAtDesc()
+        .limit(_coachMessageLimit)
+        .findAll();
+    return recent.reversed.toList();
   }
 
   Future<void> addCoachMessage(CoachMessage message) async {

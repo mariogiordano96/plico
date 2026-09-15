@@ -20,4 +20,8 @@ class CoachMessage {
   // rendering Markdown, stesso trattamento di prima quando viveva solo in
   // memoria (vedi coach_screen.dart).
   bool isError = false;
+  // Sottoinsieme di isError: rifiuto locale del guardrail (non un errore
+  // Gemini) — non ha mai un bottone "Riprova" in sessione, e non deve
+  // riapparire ricostruito al reload da disco (vedi _fromPersisted).
+  bool isGuardrail = false;
 }

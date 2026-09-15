@@ -27,13 +27,18 @@ const CoachMessageSchema = CollectionSchema(
       name: r'isError',
       type: IsarType.bool,
     ),
-    r'isUser': PropertySchema(
+    r'isGuardrail': PropertySchema(
       id: 2,
+      name: r'isGuardrail',
+      type: IsarType.bool,
+    ),
+    r'isUser': PropertySchema(
+      id: 3,
       name: r'isUser',
       type: IsarType.bool,
     ),
     r'text': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'text',
       type: IsarType.string,
     )
@@ -84,8 +89,9 @@ void _coachMessageSerialize(
 ) {
   writer.writeDateTime(offsets[0], object.createdAt);
   writer.writeBool(offsets[1], object.isError);
-  writer.writeBool(offsets[2], object.isUser);
-  writer.writeString(offsets[3], object.text);
+  writer.writeBool(offsets[2], object.isGuardrail);
+  writer.writeBool(offsets[3], object.isUser);
+  writer.writeString(offsets[4], object.text);
 }
 
 CoachMessage _coachMessageDeserialize(
@@ -98,8 +104,9 @@ CoachMessage _coachMessageDeserialize(
   object.createdAt = reader.readDateTime(offsets[0]);
   object.id = id;
   object.isError = reader.readBool(offsets[1]);
-  object.isUser = reader.readBool(offsets[2]);
-  object.text = reader.readString(offsets[3]);
+  object.isGuardrail = reader.readBool(offsets[2]);
+  object.isUser = reader.readBool(offsets[3]);
+  object.text = reader.readString(offsets[4]);
   return object;
 }
 
@@ -117,6 +124,8 @@ P _coachMessageDeserializeProp<P>(
     case 2:
       return (reader.readBool(offset)) as P;
     case 3:
+      return (reader.readBool(offset)) as P;
+    case 4:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -435,6 +444,16 @@ extension CoachMessageQueryFilter
     });
   }
 
+  QueryBuilder<CoachMessage, CoachMessage, QAfterFilterCondition>
+      isGuardrailEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isGuardrail',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<CoachMessage, CoachMessage, QAfterFilterCondition> isUserEqualTo(
       bool value) {
     return QueryBuilder.apply(this, (query) {
@@ -612,6 +631,19 @@ extension CoachMessageQuerySortBy
     });
   }
 
+  QueryBuilder<CoachMessage, CoachMessage, QAfterSortBy> sortByIsGuardrail() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isGuardrail', Sort.asc);
+    });
+  }
+
+  QueryBuilder<CoachMessage, CoachMessage, QAfterSortBy>
+      sortByIsGuardrailDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isGuardrail', Sort.desc);
+    });
+  }
+
   QueryBuilder<CoachMessage, CoachMessage, QAfterSortBy> sortByIsUser() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isUser', Sort.asc);
@@ -675,6 +707,19 @@ extension CoachMessageQuerySortThenBy
     });
   }
 
+  QueryBuilder<CoachMessage, CoachMessage, QAfterSortBy> thenByIsGuardrail() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isGuardrail', Sort.asc);
+    });
+  }
+
+  QueryBuilder<CoachMessage, CoachMessage, QAfterSortBy>
+      thenByIsGuardrailDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isGuardrail', Sort.desc);
+    });
+  }
+
   QueryBuilder<CoachMessage, CoachMessage, QAfterSortBy> thenByIsUser() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isUser', Sort.asc);
@@ -714,6 +759,12 @@ extension CoachMessageQueryWhereDistinct
     });
   }
 
+  QueryBuilder<CoachMessage, CoachMessage, QDistinct> distinctByIsGuardrail() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isGuardrail');
+    });
+  }
+
   QueryBuilder<CoachMessage, CoachMessage, QDistinct> distinctByIsUser() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'isUser');
@@ -745,6 +796,12 @@ extension CoachMessageQueryProperty
   QueryBuilder<CoachMessage, bool, QQueryOperations> isErrorProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'isError');
+    });
+  }
+
+  QueryBuilder<CoachMessage, bool, QQueryOperations> isGuardrailProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isGuardrail');
     });
   }
 

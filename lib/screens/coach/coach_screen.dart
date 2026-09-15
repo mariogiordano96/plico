@@ -47,13 +47,17 @@ class _ChatMessage {
   final bool isUser;
   final String text;
   final bool isError;
-  // Solo sui messaggi di errore: il testo dell'utente che ha causato
-  // l'errore, per poter riprovare senza doverlo ridigitare.
+  // Sottoinsieme di isError: rifiuto locale del guardrail, non un errore
+  // Gemini — mai un bottone "Riprova", né in sessione né al reload.
+  final bool isGuardrail;
+  // Solo sui messaggi di errore (non guardrail): il testo dell'utente che ha
+  // causato l'errore, per poter riprovare senza doverlo ridigitare.
   final String? retryText;
   const _ChatMessage({
     required this.isUser,
     required this.text,
     this.isError = false,
+    this.isGuardrail = false,
     this.retryText,
   });
 }
@@ -107,31 +111,40 @@ class _CoachScreenState extends State<CoachScreen> {
     }
   }
 
-  /// Ricostruisce `retryText` per i messaggi di errore ricaricati da disco
-  /// (non persistito a parte): risale oltre eventuali errori consecutivi
-  /// (retry falliti più volte di fila) fino al messaggio utente che li ha
-  /// originati — stesso testo che avremmo mandato di nuovo.
+  /// Ricostruisce `retryText` per i messaggi di errore Gemini (non i rifiuti
+  /// del guardrail, che non l'hanno mai avuto) ricaricati da disco: risale
+  /// oltre eventuali errori consecutivi (retry falliti più volte di fila)
+  /// fino al messaggio utente che li ha originati — stesso testo che
+  /// avremmo mandato di nuovo.
   List<_ChatMessage> _fromPersisted(List<CoachMessage> messages) {
     final result = <_ChatMessage>[];
     for (var i = 0; i < messages.length; i++) {
       final m = messages[i];
       String? retryText;
-      if (m.isError) {
+      if (m.isError && !m.isGuardrail) {
         var j = i - 1;
         while (j >= 0 && messages[j].isError) {
           j--;
         }
         if (j >= 0 && messages[j].isUser) retryText = messages[j].text;
       }
-      result.add(_ChatMessage(isUser: m.isUser, text: m.text, isError: m.isError, retryText: retryText));
+      result.add(_ChatMessage(
+        isUser: m.isUser,
+        text: m.text,
+        isError: m.isError,
+        isGuardrail: m.isGuardrail,
+        retryText: retryText,
+      ));
     }
     return result;
   }
 
   /// Aggiunge il messaggio in UI e lo persiste; se la scrittura su disco
   /// fallisce annulla l'aggiunta in UI invece di lasciare un bubble che
-  /// sparirebbe silenziosamente al prossimo riavvio.
-  Future<void> _addMessage(_ChatMessage message) async {
+  /// sparirebbe silenziosamente al prossimo riavvio. Il chiamante deve
+  /// controllare l'esito prima di proseguire (es. non chiamare Gemini se il
+  /// turno utente non è stato salvato).
+  Future<bool> _addMessage(_ChatMessage message) async {
     setState(() => _messages.add(message));
     try {
       await DatabaseService.instance.addCoachMessage(
@@ -139,14 +152,17 @@ class _CoachScreenState extends State<CoachScreen> {
           ..createdAt = DateTime.now()
           ..isUser = message.isUser
           ..text = message.text
-          ..isError = message.isError,
+          ..isError = message.isError
+          ..isGuardrail = message.isGuardrail,
       );
+      return true;
     } catch (_) {
-      if (!mounted) return;
+      if (!mounted) return false;
       setState(() => _messages.remove(message));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.l10n.coachErroreGenerico)),
       );
+      return false;
     }
   }
 
@@ -216,7 +232,12 @@ class _CoachScreenState extends State<CoachScreen> {
     final text = _inputCtrl.text.trim();
     if (text.isEmpty || _sending || _apiKey == null) return;
     _inputCtrl.clear();
-    await _addMessage(_ChatMessage(isUser: true, text: text));
+    // Se il turno utente non viene persistito (bubble già rimosso da
+    // _addMessage) non ha senso interpellare Gemini per un messaggio che la
+    // UI ha appena ritirato: niente spesa di quota per una richiesta che non
+    // resterà in conversazione.
+    final persisted = await _addMessage(_ChatMessage(isUser: true, text: text));
+    if (!persisted) return;
     await _sendText(text);
   }
 
@@ -234,9 +255,10 @@ class _CoachScreenState extends State<CoachScreen> {
     if (CoachGuardrail.isOffTopic(text)) {
       // isError: true anche se non è un errore Gemini — vedi il commento su
       // CoachMessage.isError: qui serve solo a escludere il rifiuto dalla
-      // history rimandata a Gemini (e dal rendering Markdown).
-      await _addMessage(
-          _ChatMessage(isUser: false, text: context.l10n.coachFuoriTema, isError: true));
+      // history rimandata a Gemini (e dal rendering Markdown). isGuardrail
+      // distingue questo caso da un vero errore Gemini per _fromPersisted.
+      await _addMessage(_ChatMessage(
+          isUser: false, text: context.l10n.coachFuoriTema, isError: true, isGuardrail: true));
       _scrollToBottom();
       return;
     }
@@ -280,10 +302,19 @@ class _CoachScreenState extends State<CoachScreen> {
     }
   }
 
-  List<_ChatMessage> _boundedHistory(List<_ChatMessage> messages) =>
-      messages.length > _maxHistoryTurns
-          ? messages.sublist(messages.length - _maxHistoryTurns)
-          : messages;
+  /// Tronca ai turni più recenti, ma solo a partire dal primo turno utente:
+  /// l'API Gemini richiede che `contents` cominci con role "user", e un
+  /// taglio a indice fisso potrebbe altrimenti atterrare su un turno modello
+  /// (la history filtrata non è garantita alternata, vedi i commenti sopra
+  /// su guardrail ed errori esclusi).
+  List<_ChatMessage> _boundedHistory(List<_ChatMessage> messages) {
+    if (messages.length <= _maxHistoryTurns) return messages;
+    var start = messages.length - _maxHistoryTurns;
+    while (start < messages.length && !messages[start].isUser) {
+      start++;
+    }
+    return messages.sublist(start);
+  }
 
   String _errorMessage(GeminiErrorType type) => coachErrorMessage(context, type);
 
