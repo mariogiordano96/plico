@@ -143,6 +143,14 @@ coerente con l'impostazione privacy-first del progetto.
 - [ ] **Fase 2 — Primitive di movimento**: creare `lib/theme/motion.dart` con
       durate/curve standard; transizioni di pagina custom; entrata a cascata per le
       liste principali (esercizi, alimenti, storico)
+      — ⚠️ **tentata e annullata** (commit `a418e9c`, revert `ee34dd1`): l'utente ha
+      percepito le animazioni come un rallentamento dell'app durante l'uso reale su
+      device, nonostante durate contenute (150-450ms) e stagger limitato ai primi 12
+      elementi di lista. Prima di ritentare: verificare su device reale (non solo
+      analizzare il codice) se il rallentamento percepito viene dalle animazioni stesse
+      o da altro (es. jank sottostante che le animazioni rendono più visibile), e
+      valutare durate ancora più corte o un'opt-in esplicito invece di applicarle
+      di default a tutta l'app
 - [ ] **Fase 3 — Feedback aptico**: estendere `HapticFeedback` ai momenti chiave
       (fine serie, salvataggio pasto, unlock achievement, swipe-to-delete)
 - [ ] **Fase 4 — Stati di caricamento**: skeleton screen per le liste principali,
