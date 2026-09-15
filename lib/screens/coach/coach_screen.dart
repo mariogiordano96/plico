@@ -69,6 +69,12 @@ class _CoachScreenState extends State<CoachScreen> {
   bool _sending = false;
   String? _retryHint;
 
+  // Limite ai turni inviati a Gemini come history: la conversazione persiste
+  // per sempre (nessun reset per giorno/sessione), ma il payload di ogni
+  // richiesta deve restare limitato — la UI mostra comunque tutta la
+  // cronologia salvata, solo il contesto mandato al modello è troncato.
+  static const _maxHistoryTurns = 30;
+
   @override
   void initState() {
     super.initState();
@@ -101,29 +107,47 @@ class _CoachScreenState extends State<CoachScreen> {
     }
   }
 
-  /// Ricostruisce `retryText` per un ultimo messaggio di errore ricaricato da
-  /// disco (non persistito a parte, coincide sempre col messaggio utente
-  /// immediatamente precedente — stesso testo che avremmo mandato di nuovo).
+  /// Ricostruisce `retryText` per i messaggi di errore ricaricati da disco
+  /// (non persistito a parte): risale oltre eventuali errori consecutivi
+  /// (retry falliti più volte di fila) fino al messaggio utente che li ha
+  /// originati — stesso testo che avremmo mandato di nuovo.
   List<_ChatMessage> _fromPersisted(List<CoachMessage> messages) {
     final result = <_ChatMessage>[];
     for (var i = 0; i < messages.length; i++) {
       final m = messages[i];
-      final retryText =
-          m.isError && i > 0 && messages[i - 1].isUser ? messages[i - 1].text : null;
+      String? retryText;
+      if (m.isError) {
+        var j = i - 1;
+        while (j >= 0 && messages[j].isError) {
+          j--;
+        }
+        if (j >= 0 && messages[j].isUser) retryText = messages[j].text;
+      }
       result.add(_ChatMessage(isUser: m.isUser, text: m.text, isError: m.isError, retryText: retryText));
     }
     return result;
   }
 
+  /// Aggiunge il messaggio in UI e lo persiste; se la scrittura su disco
+  /// fallisce annulla l'aggiunta in UI invece di lasciare un bubble che
+  /// sparirebbe silenziosamente al prossimo riavvio.
   Future<void> _addMessage(_ChatMessage message) async {
     setState(() => _messages.add(message));
-    await DatabaseService.instance.addCoachMessage(
-      CoachMessage()
-        ..createdAt = DateTime.now()
-        ..isUser = message.isUser
-        ..text = message.text
-        ..isError = message.isError,
-    );
+    try {
+      await DatabaseService.instance.addCoachMessage(
+        CoachMessage()
+          ..createdAt = DateTime.now()
+          ..isUser = message.isUser
+          ..text = message.text
+          ..isError = message.isError,
+      );
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _messages.remove(message));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.coachErroreGenerico)),
+      );
+    }
   }
 
   /// Banner mostrato una sola volta, alla primissima apertura della tab —
@@ -208,7 +232,11 @@ class _CoachScreenState extends State<CoachScreen> {
     // senza toccare la rete né consumare quota — il system prompt resta la
     // difesa principale per tutto il resto, più sfumato di una lista fissa.
     if (CoachGuardrail.isOffTopic(text)) {
-      await _addMessage(_ChatMessage(isUser: false, text: context.l10n.coachFuoriTema));
+      // isError: true anche se non è un errore Gemini — vedi il commento su
+      // CoachMessage.isError: qui serve solo a escludere il rifiuto dalla
+      // history rimandata a Gemini (e dal rendering Markdown).
+      await _addMessage(
+          _ChatMessage(isUser: false, text: context.l10n.coachFuoriTema, isError: true));
       _scrollToBottom();
       return;
     }
@@ -221,9 +249,11 @@ class _CoachScreenState extends State<CoachScreen> {
         systemInstruction: _systemInstruction(context),
         // Esclude i bubble di errore dalla storia mandata a Gemini: sono
         // messaggi nostri (localizzati, per l'utente), non turni reali del
-        // modello — includerli inquinerebbe la conversazione.
+        // modello — includerli inquinerebbe la conversazione. Tronca poi ai
+        // turni più recenti: la conversazione persiste senza limiti, ma il
+        // payload per richiesta deve restare limitato.
         history: [
-          for (final m in _messages.where((m) => !m.isError))
+          for (final m in _boundedHistory(_messages.where((m) => !m.isError).toList()))
             GeminiTurn(isUser: m.isUser, text: m.text),
         ],
         onRetrying: (attempt) {
@@ -249,6 +279,11 @@ class _CoachScreenState extends State<CoachScreen> {
       }
     }
   }
+
+  List<_ChatMessage> _boundedHistory(List<_ChatMessage> messages) =>
+      messages.length > _maxHistoryTurns
+          ? messages.sublist(messages.length - _maxHistoryTurns)
+          : messages;
 
   String _errorMessage(GeminiErrorType type) => coachErrorMessage(context, type);
 
