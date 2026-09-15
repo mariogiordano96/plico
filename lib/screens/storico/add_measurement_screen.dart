@@ -60,11 +60,26 @@ class _AddMeasurementScreenState extends State<AddMeasurementScreen>
   void dispose() {
     _tabController.dispose();
     for (final c in [
-      _tricipiteCtrl, _bicipiteCtrl, _pettoralCtrl, _ascellareCtrl,
-      _sottoscapCtrl, _sovrailiacacCtrl, _addomeCtrl, _cosciaPlCtrl, _polpaccioPlCtrl,
-      _colloCtrl, _vitaCtrl, _fianchiCtrl, _braccioCtrl, _cosciaCircCtrl,
-      _polpaccioCircCtrl, _toraceCtrl, _spalleCtrl,
-    ]) { c.dispose(); }
+      _tricipiteCtrl,
+      _bicipiteCtrl,
+      _pettoralCtrl,
+      _ascellareCtrl,
+      _sottoscapCtrl,
+      _sovrailiacacCtrl,
+      _addomeCtrl,
+      _cosciaPlCtrl,
+      _polpaccioPlCtrl,
+      _colloCtrl,
+      _vitaCtrl,
+      _fianchiCtrl,
+      _braccioCtrl,
+      _cosciaCircCtrl,
+      _polpaccioCircCtrl,
+      _toraceCtrl,
+      _spalleCtrl,
+    ]) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -72,11 +87,24 @@ class _AddMeasurementScreenState extends State<AddMeasurementScreen>
       c.text.trim().isEmpty ? null : double.tryParse(c.text.trim());
 
   bool get _hasAnyValue => [
-        _tricipiteCtrl, _bicipiteCtrl, _pettoralCtrl, _ascellareCtrl,
-        _sottoscapCtrl, _sovrailiacacCtrl, _addomeCtrl, _cosciaPlCtrl, _polpaccioPlCtrl,
-        _colloCtrl, _vitaCtrl, _fianchiCtrl, _braccioCtrl, _cosciaCircCtrl,
-        _polpaccioCircCtrl, _toraceCtrl, _spalleCtrl,
-      ].any((c) => c.text.trim().isNotEmpty);
+    _tricipiteCtrl,
+    _bicipiteCtrl,
+    _pettoralCtrl,
+    _ascellareCtrl,
+    _sottoscapCtrl,
+    _sovrailiacacCtrl,
+    _addomeCtrl,
+    _cosciaPlCtrl,
+    _polpaccioPlCtrl,
+    _colloCtrl,
+    _vitaCtrl,
+    _fianchiCtrl,
+    _braccioCtrl,
+    _cosciaCircCtrl,
+    _polpaccioCircCtrl,
+    _toraceCtrl,
+    _spalleCtrl,
+  ].any((c) => c.text.trim().isNotEmpty);
 
   Future<void> _pickDate() async {
     final p = context.palette;
@@ -87,7 +115,12 @@ class _AddMeasurementScreenState extends State<AddMeasurementScreen>
       lastDate: DateTime.now(),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: ColorScheme.dark(primary: p.accent, onPrimary: p.background, surface: p.surface, onSurface: p.textPrimary),
+          colorScheme: ColorScheme.dark(
+            primary: p.accent,
+            onPrimary: p.background,
+            surface: p.surface,
+            onSurface: p.textPrimary,
+          ),
           dialogTheme: DialogThemeData(backgroundColor: p.surface),
         ),
         child: child!,
@@ -98,10 +131,12 @@ class _AddMeasurementScreenState extends State<AddMeasurementScreen>
 
   Future<void> _save() async {
     if (!_hasAnyValue) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(context.l10n.misurazioneInserisciValore),
-        backgroundColor: context.palette.surface,
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.misurazioneInserisciValore),
+          backgroundColor: context.palette.surface,
+        ),
+      );
       return;
     }
     setState(() => _saving = true);
@@ -135,11 +170,20 @@ class _AddMeasurementScreenState extends State<AddMeasurementScreen>
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    final dataStr = '${_data.day.toString().padLeft(2, '0')}/${_data.month.toString().padLeft(2, '0')}/${_data.year}';
+    final dataStr =
+        '${_data.day.toString().padLeft(2, '0')}/${_data.month.toString().padLeft(2, '0')}/${_data.year}';
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.l10n.misurazioneNuova, style: TextStyle(color: p.accent, fontSize: 17, fontWeight: FontWeight.w600, letterSpacing: 1.5)),
+        title: Text(
+          context.l10n.misurazioneNuova,
+          style: TextStyle(
+            color: p.accent,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1.5,
+          ),
+        ),
         backgroundColor: p.background,
         elevation: 0,
         centerTitle: true,
@@ -149,7 +193,10 @@ class _AddMeasurementScreenState extends State<AddMeasurementScreen>
             IconButton(
               icon: Icon(Icons.tune_rounded, color: p.accent),
               tooltip: context.l10n.misurazioneCalibrazione,
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CalibrationScreen())),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const CalibrationScreen()),
+              ),
             ),
         ],
       ),
@@ -161,34 +208,67 @@ class _AddMeasurementScreenState extends State<AddMeasurementScreen>
             child: GestureDetector(
               onTap: _pickDate,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                decoration: BoxDecoration(color: p.surfaceVariant, borderRadius: BorderRadius.circular(12), border: Border.all(color: p.cardBorder)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: p.surfaceVariant,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: p.cardBorder),
+                ),
                 child: Row(
                   children: [
-                    Icon(Icons.calendar_today_rounded, color: p.accent, size: 18),
-                    const SizedBox(width: 12),
-                    Text(dataStr, style: TextStyle(color: p.textPrimary, fontSize: 15, fontWeight: FontWeight.w500)),
+                    Icon(
+                      Icons.calendar_today_rounded,
+                      color: p.accent,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      dataStr,
+                      style: TextStyle(
+                        color: p.textPrimary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                     const Spacer(),
-                    Text(context.l10n.misurazioneModifica, style: TextStyle(color: p.accent, fontSize: 13)),
+                    Text(
+                      context.l10n.misurazioneModifica,
+                      style: TextStyle(color: p.accent, fontSize: 12),
+                    ),
                   ],
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
-          // TabBar
+          // TabBar (compatta)
           Container(
+            height: 34,
             margin: const EdgeInsets.symmetric(horizontal: 20),
-            decoration: BoxDecoration(color: p.surfaceVariant, borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(
+              color: p.surfaceVariant,
+              borderRadius: BorderRadius.circular(10),
+            ),
             child: TabBar(
               controller: _tabController,
-              indicator: BoxDecoration(color: p.accent, borderRadius: BorderRadius.circular(10)),
+              indicator: BoxDecoration(
+                color: p.accent,
+                borderRadius: BorderRadius.circular(8),
+              ),
               indicatorSize: TabBarIndicatorSize.tab,
               dividerColor: Colors.transparent,
               labelColor: p.background,
               unselectedLabelColor: p.textMuted,
-              labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, letterSpacing: 1),
+              labelPadding: EdgeInsets.zero,
+              labelStyle: const TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 11,
+                letterSpacing: 0.5,
+              ),
               tabs: [
                 Tab(text: context.l10n.misurazioneTabPliche),
                 Tab(text: context.l10n.misurazioneTabCirconferenze),
@@ -204,17 +284,26 @@ class _AddMeasurementScreenState extends State<AddMeasurementScreen>
               children: [
                 _PlicheTab(
                   sesso: _sesso,
-                  tricipite: _tricipiteCtrl, bicipite: _bicipiteCtrl,
-                  pettorale: _pettoralCtrl, ascellare: _ascellareCtrl,
-                  sottoscapolare: _sottoscapCtrl, sovrailica: _sovrailiacacCtrl,
-                  addome: _addomeCtrl, coscia: _cosciaPlCtrl, polpaccio: _polpaccioPlCtrl,
+                  tricipite: _tricipiteCtrl,
+                  bicipite: _bicipiteCtrl,
+                  pettorale: _pettoralCtrl,
+                  ascellare: _ascellareCtrl,
+                  sottoscapolare: _sottoscapCtrl,
+                  sovrailica: _sovrailiacacCtrl,
+                  addome: _addomeCtrl,
+                  coscia: _cosciaPlCtrl,
+                  polpaccio: _polpaccioPlCtrl,
                 ),
                 _CirconferenzeTab(
                   sesso: _sesso,
                   collo: _colloCtrl,
-                  vita: _vitaCtrl, fianchi: _fianchiCtrl, braccio: _braccioCtrl,
-                  coscia: _cosciaCircCtrl, polpaccio: _polpaccioCircCtrl,
-                  torace: _toraceCtrl, spalle: _spalleCtrl,
+                  vita: _vitaCtrl,
+                  fianchi: _fianchiCtrl,
+                  braccio: _braccioCtrl,
+                  coscia: _cosciaCircCtrl,
+                  polpaccio: _polpaccioCircCtrl,
+                  torace: _toraceCtrl,
+                  spalle: _spalleCtrl,
                 ),
               ],
             ),
@@ -222,11 +311,23 @@ class _AddMeasurementScreenState extends State<AddMeasurementScreen>
 
           // Save button
           Padding(
-            padding: EdgeInsets.fromLTRB(20, 8, 20, MediaQuery.of(context).padding.bottom + 16),
+            padding: EdgeInsets.fromLTRB(
+              20,
+              8,
+              20,
+              MediaQuery.of(context).padding.bottom + 16,
+            ),
             child: ElevatedButton(
               onPressed: _saving ? null : _save,
               child: _saving
-                  ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: p.background))
+                  ? SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: p.background,
+                      ),
+                    )
                   : Text(context.l10n.misurazioneSalva),
             ),
           ),
@@ -243,13 +344,23 @@ class _AddMeasurementScreenState extends State<AddMeasurementScreen>
 class _PlicheTab extends StatelessWidget {
   final Sesso sesso;
   final TextEditingController tricipite, bicipite, pettorale, ascellare;
-  final TextEditingController sottoscapolare, sovrailica, addome, coscia, polpaccio;
+  final TextEditingController sottoscapolare,
+      sovrailica,
+      addome,
+      coscia,
+      polpaccio;
 
   const _PlicheTab({
     required this.sesso,
-    required this.tricipite, required this.bicipite, required this.pettorale,
-    required this.ascellare, required this.sottoscapolare, required this.sovrailica,
-    required this.addome, required this.coscia, required this.polpaccio,
+    required this.tricipite,
+    required this.bicipite,
+    required this.pettorale,
+    required this.ascellare,
+    required this.sottoscapolare,
+    required this.sovrailica,
+    required this.addome,
+    required this.coscia,
+    required this.polpaccio,
   });
 
   @override
@@ -257,15 +368,69 @@ class _PlicheTab extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
       children: [
-        _MeasureField(label: context.l10n.misuraTricipite, unit: 'mm', controller: tricipite, siteKey: 'tricipite', sesso: sesso),
-        _MeasureField(label: context.l10n.misuraBicipite, unit: 'mm', controller: bicipite, siteKey: 'bicipite', sesso: sesso),
-        _MeasureField(label: context.l10n.misuraPettorale, unit: 'mm', controller: pettorale, siteKey: 'pettorale', sesso: sesso),
-        _MeasureField(label: context.l10n.misuraAscellare, unit: 'mm', controller: ascellare, siteKey: 'ascellare', sesso: sesso),
-        _MeasureField(label: context.l10n.misuraSottoscapolare, unit: 'mm', controller: sottoscapolare, siteKey: 'sottoscapolare', sesso: sesso),
-        _MeasureField(label: context.l10n.misuraSovrailiaca, unit: 'mm', controller: sovrailica, siteKey: 'sovrailiaca', sesso: sesso),
-        _MeasureField(label: context.l10n.misuraAddome, unit: 'mm', controller: addome, siteKey: 'addome', sesso: sesso),
-        _MeasureField(label: context.l10n.misuraCosciaPlica, unit: 'mm', controller: coscia, siteKey: 'coscia_plica', sesso: sesso),
-        _MeasureField(label: context.l10n.misuraPolpaccio, unit: 'mm', controller: polpaccio, siteKey: 'polpaccio_plica', sesso: sesso),
+        _MeasureField(
+          label: context.l10n.misuraTricipite,
+          unit: 'mm',
+          controller: tricipite,
+          siteKey: 'tricipite',
+          sesso: sesso,
+        ),
+        _MeasureField(
+          label: context.l10n.misuraBicipite,
+          unit: 'mm',
+          controller: bicipite,
+          siteKey: 'bicipite',
+          sesso: sesso,
+        ),
+        _MeasureField(
+          label: context.l10n.misuraPettorale,
+          unit: 'mm',
+          controller: pettorale,
+          siteKey: 'pettorale',
+          sesso: sesso,
+        ),
+        _MeasureField(
+          label: context.l10n.misuraAscellare,
+          unit: 'mm',
+          controller: ascellare,
+          siteKey: 'ascellare',
+          sesso: sesso,
+        ),
+        _MeasureField(
+          label: context.l10n.misuraSottoscapolare,
+          unit: 'mm',
+          controller: sottoscapolare,
+          siteKey: 'sottoscapolare',
+          sesso: sesso,
+        ),
+        _MeasureField(
+          label: context.l10n.misuraSovrailiaca,
+          unit: 'mm',
+          controller: sovrailica,
+          siteKey: 'sovrailiaca',
+          sesso: sesso,
+        ),
+        _MeasureField(
+          label: context.l10n.misuraAddome,
+          unit: 'mm',
+          controller: addome,
+          siteKey: 'addome',
+          sesso: sesso,
+        ),
+        _MeasureField(
+          label: context.l10n.misuraCosciaPlica,
+          unit: 'mm',
+          controller: coscia,
+          siteKey: 'coscia_plica',
+          sesso: sesso,
+        ),
+        _MeasureField(
+          label: context.l10n.misuraPolpaccio,
+          unit: 'mm',
+          controller: polpaccio,
+          siteKey: 'polpaccio_plica',
+          sesso: sesso,
+        ),
       ],
     );
   }
@@ -277,13 +442,25 @@ class _PlicheTab extends StatelessWidget {
 
 class _CirconferenzeTab extends StatelessWidget {
   final Sesso sesso;
-  final TextEditingController collo, vita, fianchi, braccio, coscia, polpaccio, torace, spalle;
+  final TextEditingController collo,
+      vita,
+      fianchi,
+      braccio,
+      coscia,
+      polpaccio,
+      torace,
+      spalle;
 
   const _CirconferenzeTab({
     required this.sesso,
     required this.collo,
-    required this.vita, required this.fianchi, required this.braccio,
-    required this.coscia, required this.polpaccio, required this.torace, required this.spalle,
+    required this.vita,
+    required this.fianchi,
+    required this.braccio,
+    required this.coscia,
+    required this.polpaccio,
+    required this.torace,
+    required this.spalle,
   });
 
   @override
@@ -291,14 +468,62 @@ class _CirconferenzeTab extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
       children: [
-        _MeasureField(label: context.l10n.misuraCollo, unit: 'cm', controller: collo, siteKey: 'collo', sesso: sesso),
-        _MeasureField(label: context.l10n.misuraVita, unit: 'cm', controller: vita, siteKey: 'vita', sesso: sesso),
-        _MeasureField(label: context.l10n.misuraFianchi, unit: 'cm', controller: fianchi, siteKey: 'fianchi', sesso: sesso),
-        _MeasureField(label: context.l10n.misuraBraccio, unit: 'cm', controller: braccio, siteKey: 'braccio', sesso: sesso),
-        _MeasureField(label: context.l10n.misuraCoscia, unit: 'cm', controller: coscia, siteKey: 'coscia_circ', sesso: sesso),
-        _MeasureField(label: context.l10n.misuraPolpaccio, unit: 'cm', controller: polpaccio, siteKey: 'polpaccio_circ', sesso: sesso),
-        _MeasureField(label: context.l10n.misuraTorace, unit: 'cm', controller: torace, siteKey: 'torace', sesso: sesso),
-        _MeasureField(label: context.l10n.misuraSpalle, unit: 'cm', controller: spalle, siteKey: 'spalle', sesso: sesso),
+        _MeasureField(
+          label: context.l10n.misuraCollo,
+          unit: 'cm',
+          controller: collo,
+          siteKey: 'collo',
+          sesso: sesso,
+        ),
+        _MeasureField(
+          label: context.l10n.misuraVita,
+          unit: 'cm',
+          controller: vita,
+          siteKey: 'vita',
+          sesso: sesso,
+        ),
+        _MeasureField(
+          label: context.l10n.misuraFianchi,
+          unit: 'cm',
+          controller: fianchi,
+          siteKey: 'fianchi',
+          sesso: sesso,
+        ),
+        _MeasureField(
+          label: context.l10n.misuraBraccio,
+          unit: 'cm',
+          controller: braccio,
+          siteKey: 'braccio',
+          sesso: sesso,
+        ),
+        _MeasureField(
+          label: context.l10n.misuraCoscia,
+          unit: 'cm',
+          controller: coscia,
+          siteKey: 'coscia_circ',
+          sesso: sesso,
+        ),
+        _MeasureField(
+          label: context.l10n.misuraPolpaccio,
+          unit: 'cm',
+          controller: polpaccio,
+          siteKey: 'polpaccio_circ',
+          sesso: sesso,
+        ),
+        _MeasureField(
+          label: context.l10n.misuraTorace,
+          unit: 'cm',
+          controller: torace,
+          siteKey: 'torace',
+          sesso: sesso,
+        ),
+        _MeasureField(
+          label: context.l10n.misuraSpalle,
+          unit: 'cm',
+          controller: spalle,
+          siteKey: 'spalle',
+          sesso: sesso,
+        ),
       ],
     );
   }
@@ -336,11 +561,19 @@ class _MeasureField extends StatelessWidget {
             child: Row(
               children: [
                 Flexible(
-                  child: Text(label, style: TextStyle(color: p.textSecondary, fontSize: 14, fontWeight: FontWeight.w500)),
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: p.textSecondary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 4),
                 GestureDetector(
-                  onTap: () => showMeasurementGuide(context, siteKey, sesso: sesso),
+                  onTap: () =>
+                      showMeasurementGuide(context, siteKey, sesso: sesso),
                   child: Icon(
                     Icons.info_outline_rounded,
                     color: p.accent.withValues(alpha: 0.7),
@@ -356,10 +589,18 @@ class _MeasureField extends StatelessWidget {
             flex: 4,
             child: TextFormField(
               controller: controller,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+              ],
               textAlign: TextAlign.right,
-              style: TextStyle(color: p.textPrimary, fontSize: 15, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                color: p.textPrimary,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
               decoration: InputDecoration(
                 hintText: '—',
                 hintStyle: TextStyle(color: p.textMuted),
@@ -367,10 +608,22 @@ class _MeasureField extends StatelessWidget {
                 suffixStyle: TextStyle(color: p.textMuted, fontSize: 13),
                 filled: true,
                 fillColor: p.surfaceVariant,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: p.cardBorder)),
-                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: p.cardBorder)),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: p.accent, width: 1.5)),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: p.cardBorder),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: p.cardBorder),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: p.accent, width: 1.5),
+                ),
               ),
             ),
           ),
