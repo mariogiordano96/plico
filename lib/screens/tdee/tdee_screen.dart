@@ -664,6 +664,21 @@ class _TdeeTabState extends State<TdeeTab> {
                       context.l10n.tdeeAttivatoDal(_formatDate(_goalSetDate!)),
                       style: TextStyle(color: p.textMuted, fontSize: 12),
                     ),
+                    if (!scaduto) ...[
+                      const SizedBox(width: 4),
+                      Tooltip(
+                        message: context.l10n.tdeeRicalcolaObiettivo,
+                        child: InkWell(
+                          onTap: _ricalcola,
+                          borderRadius: BorderRadius.circular(20),
+                          child: Padding(
+                            padding: const EdgeInsets.all(4),
+                            child: Icon(Icons.refresh_rounded,
+                                color: p.textMuted, size: 18),
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -772,21 +787,6 @@ class _TdeeTabState extends State<TdeeTab> {
             ),
             const SizedBox(height: 28),
           ],
-
-          // Ricalcola (solo se < 30 giorni, secondario)
-          if (!scaduto)
-            Center(
-              child: TextButton(
-                onPressed: _ricalcola,
-                child: Text(
-                  context.l10n.tdeeRicalcolaObiettivo,
-                  style: TextStyle(
-                      color: p.textMuted,
-                      fontSize: 13,
-                      decoration: TextDecoration.underline),
-                ),
-              ),
-            ),
         ],
       ),
     );
