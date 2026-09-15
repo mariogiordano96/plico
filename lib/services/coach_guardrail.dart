@@ -68,6 +68,50 @@ class CoachGuardrail {
     // Meteo / cronaca varia, richieste spesso usate per "testare" un assistente
     RegExp(r'\bprevisioni del tempo\b|\bche tempo fa\b', caseSensitive: false),
     RegExp(r"\bweather forecast\b|\bwhat'?s the weather\b", caseSensitive: false),
+    // Assistenza tecnica generica su altre app / dispositivi (non i wearable/app fitness)
+    RegExp(
+      r'\b(password|account) di (instagram|facebook|whatsapp|gmail|netflix|spotify|tiktok)\b',
+      caseSensitive: false,
+    ),
+    RegExp(
+      r'\bil (wifi|wi-fi)\b.{0,20}\b(non si connette|non funziona)\b|\b(aggiornare|aggiorno) (android|ios|windows) (sul|del) (telefono|pc)\b|\bcancell(are|o) la cache\b',
+      caseSensitive: false,
+    ),
+    RegExp(
+      r'\b(password|account) (for|on) (instagram|facebook|whatsapp|gmail|netflix|spotify|tiktok)\b',
+      caseSensitive: false,
+    ),
+    RegExp(
+      r"\b(wifi|wi-fi) (won'?t connect|is not working)\b|\bupdate (android|ios|windows) on my (phone|pc)\b|\bclear (the )?cache\b",
+      caseSensitive: false,
+    ),
+    // Intrattenimento / gossip
+    RegExp(
+      r'\bchi è (il fidanzato|la fidanzata|il marito|la moglie) di\b|\b(trama|recensione) del film\b|\bultimo episodio di\b|\bconsigliami una serie tv\b|\bche film guardo stasera\b',
+      caseSensitive: false,
+    ),
+    RegExp(
+      r"\bwho is (dating|her boyfriend|his girlfriend)\b|\b(plot|review) of the movie\b|\blatest episode of\b|\bwhat (tv series|movie) should I watch\b|\bcelebrity gossip\b",
+      caseSensitive: false,
+    ),
+    // Consigli legali / finanziari non di fitness
+    RegExp(
+      r'\bconviene investire in (bitcoin|azioni|criptovalute|borsa)\b|\b(dichiarazione dei redditi|730|modello unico)\b|\bcome (faccio|posso) a separarmi (da|dal|dalla) (mio marito|mia moglie)\b|\bconsulenza legale su\b|\bcome faccio causa a\b',
+      caseSensitive: false,
+    ),
+    RegExp(
+      r'\bshould I invest in (bitcoin|stocks|crypto|the stock market)\b|\b(tax return|file my taxes)\b|\bhow do I (get a )?divorce\b|\blegal advice (on|about)\b|\bcan I sue\b',
+      caseSensitive: false,
+    ),
+    // Richieste di traduzione generica (non contenuti del dominio come ricette/piani)
+    RegExp(
+      r'\btraduci(mi)? (questa frase|questo testo|la seguente frase|il seguente testo)\b',
+      caseSensitive: false,
+    ),
+    RegExp(
+      r'\btranslate (this sentence|this text|the following sentence|the following text)\b',
+      caseSensitive: false,
+    ),
   ];
 
   static bool isOffTopic(String text) {

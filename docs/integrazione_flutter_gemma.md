@@ -313,6 +313,15 @@ risponde male a una domanda).
 > fuori dal dominio allenamento/nutrizione/ricette (aiuto di programmazione, compiti
 > scolastici di altre materie, politica/attualità, trivia generica, scrittura creativa
 > generica, meteo) — rifiuta in locale senza toccare la rete né consumare quota.
+> **Categorie aggiunte 2026-09**: assistenza tecnica generica su altre app/dispositivi
+> (password/account di app terze, wifi, aggiornamento OS, cache — non i wearable/app
+> fitness, che restano in dominio), intrattenimento/gossip (celebrità, trama/recensioni
+> di film e serie tv), consigli legali/finanziari non di fitness (investimenti, fisco,
+> separazioni/divorzio, consulenza legale) e richieste di traduzione generica (frasi/testi
+> generici, non contenuti del dominio come ricette o piani). Stesso criterio delle
+> categorie originali: pattern su frasi specifiche in entrambe le lingue dell'app, mai
+> parole singole che potrebbero comparire in una domanda di fitness/nutrizione (es. "il
+> mio garmin non si sincronizza" resta in dominio, non collide col pattern wifi/app).
 > Deliberatamente permissivo: in caso di dubbio lascia passare al system prompt (sezione
 > 3.4, resta la difesa principale) invece di rifiutare — pattern su frasi/combinazioni
 > specifiche, non singole parole ambigue che collidono col dominio (es. "programma" da
