@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 
+const _fontFamily = 'Space Grotesk';
+
 // ──────────────────────────────────────────────
 // ColorPalette — accesso ai colori tema-aware
 // ──────────────────────────────────────────────
@@ -117,6 +119,7 @@ final darkTheme = ThemeData(
     elevation: 0,
     centerTitle: true,
     titleTextStyle: TextStyle(
+      fontFamily: _fontFamily,
       color: AppColors.accent,
       fontSize: 18,
       fontWeight: FontWeight.w600,
@@ -156,7 +159,8 @@ final darkTheme = ThemeData(
       foregroundColor: AppColors.background,
       minimumSize: const Size(double.infinity, 52),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      textStyle: const TextStyle(
+      textStyle: TextStyle(
+        fontFamily: _fontFamily,
         fontSize: 15,
         fontWeight: FontWeight.w700,
         letterSpacing: 1.5,
@@ -174,7 +178,7 @@ final darkTheme = ThemeData(
     bodyLarge: TextStyle(color: AppColors.textPrimary),
     bodyMedium: TextStyle(color: AppColors.textSecondary),
     bodySmall: TextStyle(color: AppColors.textMuted),
-  ),
+  ).apply(fontFamily: _fontFamily),
 );
 
 // ──────────────────────────────────────────────
@@ -197,6 +201,7 @@ final lightTheme = ThemeData(
     elevation: 0,
     centerTitle: true,
     titleTextStyle: TextStyle(
+      fontFamily: _fontFamily,
       color: AppColorsLight.accent,
       fontSize: 18,
       fontWeight: FontWeight.w600,
@@ -236,7 +241,8 @@ final lightTheme = ThemeData(
       foregroundColor: Colors.white,
       minimumSize: const Size(double.infinity, 52),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      textStyle: const TextStyle(
+      textStyle: TextStyle(
+        fontFamily: _fontFamily,
         fontSize: 15,
         fontWeight: FontWeight.w700,
         letterSpacing: 1.5,
@@ -254,7 +260,7 @@ final lightTheme = ThemeData(
     bodyLarge: TextStyle(color: AppColorsLight.textPrimary),
     bodyMedium: TextStyle(color: AppColorsLight.textSecondary),
     bodySmall: TextStyle(color: AppColorsLight.textMuted),
-  ),
+  ).apply(fontFamily: _fontFamily),
 );
 
 // Kept for backward compatibility
