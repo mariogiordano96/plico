@@ -13,6 +13,7 @@ import '../../services/widget_service.dart';
 import '../../services/piano_service.dart';
 import 'aggiunta_alimento_screen.dart';
 import 'piano_tab.dart';
+import '../tdee/tdee_screen.dart' show TdeeTab;
 const _pastoIcons = [
   Icons.free_breakfast_rounded,
   Icons.lunch_dining_rounded,
@@ -245,7 +246,7 @@ class _DiarioScreenState extends State<DiarioScreen> {
     final p = context.palette;
 
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         backgroundColor: p.background,
         appBar: AppBar(
@@ -268,6 +269,7 @@ class _DiarioScreenState extends State<DiarioScreen> {
             tabs: [
               Tab(text: context.l10n.diarioTabPiano),
               Tab(text: context.l10n.diarioTabDiario),
+              Tab(text: context.l10n.diarioTabTdee),
             ],
           ),
         ),
@@ -275,6 +277,7 @@ class _DiarioScreenState extends State<DiarioScreen> {
           children: [
             PianoTab(currentDate: _date, onEntryAdded: _load),
             _buildDiarioTab(p),
+            const TdeeTab(),
           ],
         ),
       ),

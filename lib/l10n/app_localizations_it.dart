@@ -76,13 +76,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Monitora il tuo peso nel tempo, guarda i badge guadagnati e il riepilogo settimanale.';
 
   @override
-  String get tourTdeeTitle => 'TDEE';
-
-  @override
-  String get tourTdeeDesc =>
-      'Il tuo fabbisogno calorico personalizzato, calcolato e aggiornato sui tuoi dati reali.';
-
-  @override
   String get tourSkip => 'Salta';
 
   @override
@@ -408,6 +401,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get diarioTabDiario => 'DIARIO';
+
+  @override
+  String get diarioTabTdee => 'TDEE';
 
   @override
   String get diarioSalvaComePref => 'Salva come preferito';
@@ -949,9 +945,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get misuraAscellare => 'Ascellare';
 
   @override
-  String get tdeeTitolo => 'IL MIO PIANO';
-
-  @override
   String get tdeeIntroTesto =>
       'Configura il tuo piano nutrizionale. Una volta attivato, i valori verranno usati nel diario alimentare.';
 
@@ -1341,9 +1334,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get tabProgressi => 'Progressi';
-
-  @override
-  String get tabTdee => 'TDEE';
 
   @override
   String get tabCoach => 'Coach';

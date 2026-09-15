@@ -224,18 +224,6 @@ abstract class AppLocalizations {
   /// **'Monitora il tuo peso nel tempo, guarda i badge guadagnati e il riepilogo settimanale.'**
   String get tourProgressiDesc;
 
-  /// Tour: titolo tab TDEE
-  ///
-  /// In it, this message translates to:
-  /// **'TDEE'**
-  String get tourTdeeTitle;
-
-  /// Tour: descrizione tab TDEE
-  ///
-  /// In it, this message translates to:
-  /// **'Il tuo fabbisogno calorico personalizzato, calcolato e aggiornato sui tuoi dati reali.'**
-  String get tourTdeeDesc;
-
   /// Tour: pulsante per saltare il tutorial
   ///
   /// In it, this message translates to:
@@ -847,6 +835,12 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'DIARIO'**
   String get diarioTabDiario;
+
+  /// No description provided for @diarioTabTdee.
+  ///
+  /// In it, this message translates to:
+  /// **'TDEE'**
+  String get diarioTabTdee;
 
   /// No description provided for @diarioSalvaComePref.
   ///
@@ -1838,12 +1832,6 @@ abstract class AppLocalizations {
   /// **'Ascellare'**
   String get misuraAscellare;
 
-  /// No description provided for @tdeeTitolo.
-  ///
-  /// In it, this message translates to:
-  /// **'IL MIO PIANO'**
-  String get tdeeTitolo;
-
   /// No description provided for @tdeeIntroTesto.
   ///
   /// In it, this message translates to:
@@ -2521,12 +2509,6 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Progressi'**
   String get tabProgressi;
-
-  /// No description provided for @tabTdee.
-  ///
-  /// In it, this message translates to:
-  /// **'TDEE'**
-  String get tabTdee;
 
   /// No description provided for @tabCoach.
   ///

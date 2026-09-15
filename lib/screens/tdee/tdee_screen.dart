@@ -176,16 +176,16 @@ int _goalKcal(int tdee, int g) => switch (g) {
       _ => tdee,
     };
 
-// ── Screen ──────────────────────────────────────────────────────
+// ── Tab (incorporata nella tab TDEE dentro DiarioScreen) ─────────
 
-class TdeeScreen extends StatefulWidget {
-  const TdeeScreen({super.key});
+class TdeeTab extends StatefulWidget {
+  const TdeeTab({super.key});
 
   @override
-  State<TdeeScreen> createState() => _TdeeScreenState();
+  State<TdeeTab> createState() => _TdeeTabState();
 }
 
-class _TdeeScreenState extends State<TdeeScreen> {
+class _TdeeTabState extends State<TdeeTab> {
   UserProfile? _profile;
   BodySnapshot? _snapshot;
   PlicometrySession? _session;
@@ -320,26 +320,11 @@ class _TdeeScreenState extends State<TdeeScreen> {
   Widget build(BuildContext context) {
     final p = context.palette;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(context.l10n.tdeeTitolo,
-            style: TextStyle(
-                color: p.accent,
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 1.5)),
-        backgroundColor: p.background,
-        elevation: 0,
-        centerTitle: true,
-        iconTheme: IconThemeData(color: p.accent),
-      ),
-      backgroundColor: p.background,
-      body: _loading
-          ? Center(child: CircularProgressIndicator(color: p.accent))
-          : _pianAttivo
-              ? _buildPianoAttivo(p)
-              : _buildWizard(p),
-    );
+    return _loading
+        ? Center(child: CircularProgressIndicator(color: p.accent))
+        : _pianAttivo
+            ? _buildPianoAttivo(p)
+            : _buildWizard(p);
   }
 
   // ── Stato A: wizard ────────────────────────────────────────────

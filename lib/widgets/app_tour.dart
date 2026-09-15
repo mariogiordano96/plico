@@ -10,8 +10,8 @@ class _TourStep {
 }
 
 // Tab indices used for navigation — not localizable
-const _kTourTabIndices = [0, 1, 2, 3, 4];
-const _kTotalTabs = 5; // Home, Diario, Allenamento, Progressi, TDEE
+const _kTourTabIndices = [0, 1, 2, 3];
+const _kTotalTabs = 5; // Home, Diario, Allenamento, Progressi, Coach
 
 class AppTour extends StatefulWidget {
   final Widget child;
@@ -108,7 +108,6 @@ class _TourUI extends StatelessWidget {
       _TourStep(1, l10n.tourDiarioTitle, l10n.tourDiarioDesc),
       _TourStep(2, l10n.tourAllenamentoTitle, l10n.tourAllenamentoDesc),
       _TourStep(3, l10n.tourProgressiTitle, l10n.tourProgressiDesc),
-      _TourStep(4, l10n.tourTdeeTitle, l10n.tourTdeeDesc),
     ];
 
     final mq = MediaQuery.of(context);

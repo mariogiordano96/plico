@@ -8,12 +8,12 @@ void main() {
     test('bug: le etichette della bottom nav bar seguono la lingua'
         ' inglese, non restano hardcoded in italiano', () {
       final labels = mainTabLabels(AppLocalizationsEn());
-      expect(labels, ['Home', 'Diary', 'Workout', 'Progress', 'TDEE', 'Coach']);
+      expect(labels, ['Home', 'Diary', 'Workout', 'Progress', 'Coach']);
     });
 
     test('in italiano restano le etichette italiane', () {
       final labels = mainTabLabels(AppLocalizationsIt());
-      expect(labels, ['Home', 'Diario', 'Allenamento', 'Progressi', 'TDEE', 'Coach']);
+      expect(labels, ['Home', 'Diario', 'Allenamento', 'Progressi', 'Coach']);
     });
   });
 }

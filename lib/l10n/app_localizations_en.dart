@@ -76,13 +76,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Track your weight over time, view earned badges and your weekly summary.';
 
   @override
-  String get tourTdeeTitle => 'TDEE';
-
-  @override
-  String get tourTdeeDesc =>
-      'Your personalised caloric needs, calculated and updated based on your real data.';
-
-  @override
   String get tourSkip => 'Skip';
 
   @override
@@ -405,6 +398,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diarioTabDiario => 'DIARY';
+
+  @override
+  String get diarioTabTdee => 'TDEE';
 
   @override
   String get diarioSalvaComePref => 'Save as favourite';
@@ -945,9 +941,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get misuraAscellare => 'Axillary';
 
   @override
-  String get tdeeTitolo => 'MY PLAN';
-
-  @override
   String get tdeeIntroTesto =>
       'Configure your nutrition plan. Once activated, these values will be used in the food diary.';
 
@@ -1335,9 +1328,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tabProgressi => 'Progress';
-
-  @override
-  String get tabTdee => 'TDEE';
 
   @override
   String get tabCoach => 'Coach';
