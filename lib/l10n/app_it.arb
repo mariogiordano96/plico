@@ -153,7 +153,6 @@
   "homeDiarioDiOggi": "DIARIO DI OGGI",
   "homeTdeeKcalGiorno": "{kcal} kcal/giorno",
   "@homeTdeeKcalGiorno": { "placeholders": { "kcal": { "type": "String" } } },
-  "homeTdeeCalcola": "Calcola il tuo fabbisogno",
   "homePesoLabel": "PESO",
   "homeNessunaPesata": "Nessuna pesata registrata",
   "homeBmiSottopeso": "Sottopeso",

@@ -269,9 +269,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get homeTdeeCalcola => 'Calculate your caloric needs';
-
-  @override
   String get homePesoLabel => 'WEIGHT';
 
   @override

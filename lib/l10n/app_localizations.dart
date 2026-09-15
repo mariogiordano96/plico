@@ -590,12 +590,6 @@ abstract class AppLocalizations {
   /// **'{kcal} kcal/giorno'**
   String homeTdeeKcalGiorno(String kcal);
 
-  /// No description provided for @homeTdeeCalcola.
-  ///
-  /// In it, this message translates to:
-  /// **'Calcola il tuo fabbisogno'**
-  String get homeTdeeCalcola;
-
   /// No description provided for @homePesoLabel.
   ///
   /// In it, this message translates to:

@@ -107,8 +107,6 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 16),
             const _InsightsCard(),
             const SizedBox(height: 16),
-            _TdeeCard(onSwitchTab: onSwitchTab),
-            const SizedBox(height: 16),
             const _PesateCard(),
             const SizedBox(height: 16),
             const _PlicometriaCard(),
@@ -555,115 +553,6 @@ class _MacroChip extends StatelessWidget {
               Text('/ ${target}g',
                   style:
                       TextStyle(color: p.textMuted, fontSize: 10)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── TDEE ──────────────────────────────────────────────────────────
-
-class _TdeeCard extends StatefulWidget {
-  final void Function(int)? onSwitchTab;
-  const _TdeeCard({this.onSwitchTab});
-
-  @override
-  State<_TdeeCard> createState() => _TdeeCardState();
-}
-
-class _TdeeCardState extends State<_TdeeCard> {
-  int? _tdee;
-  StreamSubscription? _settingsSub;
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-    _settingsSub = DatabaseService.instance
-        .watchAppSettings()
-        .listen((_) => _load());
-  }
-
-  @override
-  void dispose() {
-    _settingsSub?.cancel();
-    super.dispose();
-  }
-
-  Future<void> _load() async {
-    final profile = await DatabaseService.instance.getUserProfile();
-    final snapshot =
-        await DatabaseService.instance.getLatestBodySnapshot();
-    final session =
-        await DatabaseService.instance.getLatestPlicometrySession();
-    final livello =
-        await DatabaseService.instance.getLivelloAttivita();
-    final metodo = await DatabaseService.instance.getMetodoTdee();
-    if (!mounted || profile == null || snapshot == null) return;
-    final result = calcolaTdee(
-      sesso: profile.sesso,
-      eta: profile.etaCorrente,
-      altezzaCm: profile.altezzaCm,
-      pesoKg: snapshot.pesoKg,
-      livello: livello,
-      metodo: metodo,
-      massaMagraKg: session?.risultati.massaMagraKg,
-    );
-    if (mounted) setState(() => _tdee = result?.tdee);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final p = context.palette;
-    return GestureDetector(
-      onTap: () => widget.onSwitchTab?.call(3),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-            color: p.surface,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: p.cardBorder)),
-        child: Row(
-          children: [
-            Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                  color:
-                      const Color(0xFFFF6B35).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                      color: const Color(0xFFFF6B35)
-                          .withValues(alpha: 0.3))),
-              child: const Icon(Icons.local_fire_department_rounded,
-                  color: Color(0xFFFF6B35), size: 20),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('TDEE',
-                      style: TextStyle(
-                          color: p.textMuted,
-                          fontSize: 11,
-                          letterSpacing: 2)),
-                  const SizedBox(height: 2),
-                  Text(
-                    _tdee != null
-                        ? context.l10n.homeTdeeKcalGiorno('$_tdee')
-                        : context.l10n.homeTdeeCalcola,
-                    style: TextStyle(
-                        color: p.textPrimary,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600),
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right_rounded,
-                color: p.textMuted, size: 20),
           ],
         ),
       ),
