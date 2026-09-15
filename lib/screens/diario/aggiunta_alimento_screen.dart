@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/motion.dart';
 import '../../models/food_item.dart';
 import '../../models/meal_combo.dart';
 import '../../models/meal_entry.dart';
@@ -363,26 +364,30 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
                   ),
                   const SizedBox(height: 8),
                   _FoodListBox(
-                    children: _localResults.map((item) {
-                      return _FoodTile(
-                        nome: item.localizedName(
-                          Localizations.localeOf(context).languageCode,
+                    children: _localResults.indexed.map((entry) {
+                      final (i, item) = entry;
+                      return StaggeredListItem(
+                        index: i,
+                        child: _FoodTile(
+                          nome: item.localizedName(
+                            Localizations.localeOf(context).languageCode,
+                          ),
+                          brand: item.brand,
+                          kcal: item.kcalPer100g,
+                          protein: item.proteinPer100g,
+                          fat: item.fatPer100g,
+                          carbs: item.carbsPer100g,
+                          isFavorite: item.isFavorite,
+                          isLast: item == _localResults.last,
+                          onTap: () => _selectLocal(item),
+                          onFavorite: () async {
+                            await DatabaseService.instance.toggleFavorite(
+                              item.id,
+                            );
+                            await _loadLocal(_searchCtrl.text);
+                          },
+                          p: p,
                         ),
-                        brand: item.brand,
-                        kcal: item.kcalPer100g,
-                        protein: item.proteinPer100g,
-                        fat: item.fatPer100g,
-                        carbs: item.carbsPer100g,
-                        isFavorite: item.isFavorite,
-                        isLast: item == _localResults.last,
-                        onTap: () => _selectLocal(item),
-                        onFavorite: () async {
-                          await DatabaseService.instance.toggleFavorite(
-                            item.id,
-                          );
-                          await _loadLocal(_searchCtrl.text);
-                        },
-                        p: p,
                       );
                     }).toList(),
                   ),
@@ -410,17 +415,21 @@ class _AggiuntaAlimentoScreenState extends State<AggiuntaAlimentoScreen> {
                   _SectionLabel(context.l10n.aggiuntiRisultatiOFF, p),
                   const SizedBox(height: 8),
                   _FoodListBox(
-                    children: _offResults.map((food) {
-                      return _FoodTile(
-                        nome: food.nome,
-                        brand: food.brand,
-                        kcal: food.kcalPer100g,
-                        protein: food.proteinPer100g,
-                        fat: food.fatPer100g,
-                        carbs: food.carbsPer100g,
-                        isLast: food == _offResults.last,
-                        onTap: () => _selectOFF(food),
-                        p: p,
+                    children: _offResults.indexed.map((entry) {
+                      final (i, food) = entry;
+                      return StaggeredListItem(
+                        index: i,
+                        child: _FoodTile(
+                          nome: food.nome,
+                          brand: food.brand,
+                          kcal: food.kcalPer100g,
+                          protein: food.proteinPer100g,
+                          fat: food.fatPer100g,
+                          carbs: food.carbsPer100g,
+                          isLast: food == _offResults.last,
+                          onTap: () => _selectOFF(food),
+                          p: p,
+                        ),
                       );
                     }).toList(),
                   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/motion.dart';
 import '../../models/measurement_snapshot.dart';
 import '../../services/database_service.dart';
 import 'add_measurement_screen.dart';
@@ -28,9 +29,12 @@ class StoricoMisurazioniScreen extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             itemCount: items.length,
             separatorBuilder: (_, _) => const SizedBox(height: 10),
-            itemBuilder: (context, i) => _SnapshotCard(
-              snapshot: items[i],
-              onDelete: () => _confirmDelete(context, items[i].id),
+            itemBuilder: (context, i) => StaggeredListItem(
+              index: i,
+              child: _SnapshotCard(
+                snapshot: items[i],
+                onDelete: () => _confirmDelete(context, items[i].id),
+              ),
             ),
           );
         },

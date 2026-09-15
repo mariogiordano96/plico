@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/motion.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/exercise_definition.dart';
 import '../../services/database_service.dart';
@@ -176,11 +177,14 @@ class _CatalogoEserciziSheetState extends State<_CatalogoEserciziSheet> {
                         itemCount: _risultati.length,
                         itemBuilder: (context, i) {
                           final e = _risultati[i];
-                          return _ExerciseTile(
-                            exercise: e,
-                            p: p,
-                            l10n: l10n,
-                            onTap: () => Navigator.pop(context, e),
+                          return StaggeredListItem(
+                            index: i,
+                            child: _ExerciseTile(
+                              exercise: e,
+                              p: p,
+                              l10n: l10n,
+                              onTap: () => Navigator.pop(context, e),
+                            ),
                           );
                         },
                       ),
