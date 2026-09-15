@@ -584,18 +584,6 @@ abstract class AppLocalizations {
   /// **'DIARIO DI OGGI'**
   String get homeDiarioDiOggi;
 
-  /// No description provided for @homePianoLabel.
-  ///
-  /// In it, this message translates to:
-  /// **'PIANO ALIMENTARE'**
-  String get homePianoLabel;
-
-  /// No description provided for @homePianoSubtitle.
-  ///
-  /// In it, this message translates to:
-  /// **'Visualizza e genera il piano'**
-  String get homePianoSubtitle;
-
   /// No description provided for @homeTdeeKcalGiorno.
   ///
   /// In it, this message translates to:
@@ -758,29 +746,41 @@ abstract class AppLocalizations {
   /// **'ultimi 7 giorni'**
   String get homeUltimiSetteGiorni;
 
+  /// No description provided for @homeStreakTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Streak'**
+  String get homeStreakTitle;
+
+  /// No description provided for @homeStreakAlimentazione.
+  ///
+  /// In it, this message translates to:
+  /// **'Alimentazione'**
+  String get homeStreakAlimentazione;
+
+  /// No description provided for @homeStreakAllenamentoLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'Allenamento'**
+  String get homeStreakAllenamentoLabel;
+
+  /// No description provided for @homeStreakNonAttiva.
+  ///
+  /// In it, this message translates to:
+  /// **'Non attiva'**
+  String get homeStreakNonAttiva;
+
   /// No description provided for @homeStreakGiorni.
   ///
   /// In it, this message translates to:
   /// **'{count} giorni di fila'**
   String homeStreakGiorni(String count);
 
-  /// No description provided for @homeStreakInizia.
-  ///
-  /// In it, this message translates to:
-  /// **'Inizia oggi la tua streak'**
-  String get homeStreakInizia;
-
   /// No description provided for @homeStreakAllenamentoGiorni.
   ///
   /// In it, this message translates to:
   /// **'{count} giorni di fila'**
   String homeStreakAllenamentoGiorni(String count);
-
-  /// No description provided for @homeStreakAllenamentoInizia.
-  ///
-  /// In it, this message translates to:
-  /// **'Inizia oggi la tua streak allenamento'**
-  String get homeStreakAllenamentoInizia;
 
   /// No description provided for @homeBadge1KgPerso.
   ///

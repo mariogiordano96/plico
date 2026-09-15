@@ -41,6 +41,11 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: p.background,
         elevation: 0,
         centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.emoji_events_rounded, color: p.accent),
+          tooltip: context.l10n.homeStreakTitle,
+          onPressed: () => _showStreakSheet(context),
+        ),
         actions: [
           if (kDebugMode)
             ValueListenableBuilder<Locale?>(
@@ -100,10 +105,7 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 16),
             _AderenzaCard(onSwitchTab: onSwitchTab),
             const SizedBox(height: 16),
-            const _StreakCard(),
             const _InsightsCard(),
-            const SizedBox(height: 16),
-            _PianoCard(onSwitchTab: onSwitchTab),
             const SizedBox(height: 16),
             _TdeeCard(onSwitchTab: onSwitchTab),
             const SizedBox(height: 16),
@@ -553,65 +555,6 @@ class _MacroChip extends StatelessWidget {
               Text('/ ${target}g',
                   style:
                       TextStyle(color: p.textMuted, fontSize: 10)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── Piano alimentare ──────────────────────────────────────────────
-
-class _PianoCard extends StatelessWidget {
-  final void Function(int)? onSwitchTab;
-  const _PianoCard({this.onSwitchTab});
-
-  @override
-  Widget build(BuildContext context) {
-    final p = context.palette;
-    return GestureDetector(
-      onTap: () => onSwitchTab?.call(1),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: p.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: p.cardBorder),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                color: p.accent.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
-                border:
-                    Border.all(color: p.accent.withValues(alpha: 0.3)),
-              ),
-              child: Icon(Icons.today_rounded, color: p.accent, size: 20),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(context.l10n.homePianoLabel,
-                      style: TextStyle(
-                          color: p.textMuted,
-                          fontSize: 11,
-                          letterSpacing: 2)),
-                  const SizedBox(height: 2),
-                  Text(context.l10n.homePianoSubtitle,
-                      style: TextStyle(
-                          color: p.textPrimary,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600)),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right_rounded,
-                color: p.textMuted, size: 20),
           ],
         ),
       ),
@@ -1491,8 +1434,17 @@ List<(AchievementType, IconData, String)> _buildBadgeInfo(BuildContext context) 
   (AchievementType.workoutSessions50, Icons.military_tech_rounded, context.l10n.homeBadge50Sessioni),
 ];
 
-class _StreakCard extends StatelessWidget {
-  const _StreakCard();
+void _showStreakSheet(BuildContext context) {
+  showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => const _StreakSheet(),
+  );
+}
+
+class _StreakSheet extends StatelessWidget {
+  const _StreakSheet();
 
   static const _flame = Color(0xFFFF6B35);
 
@@ -1515,113 +1467,83 @@ class _StreakCard extends StatelessWidget {
               stream: DatabaseService.instance.watchUnlockedTypes(),
               builder: (context, badgeSnap) {
                 final unlocked = badgeSnap.data ?? const <AchievementType>{};
-                return Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: p.surface,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                        color: active ? _flame.withValues(alpha: 0.35) : p.cardBorder),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 42,
-                            height: 42,
+                return SafeArea(
+                  top: false,
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+                    decoration: BoxDecoration(
+                      color: p.background,
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Container(
+                            width: 40,
+                            height: 4,
+                            margin: const EdgeInsets.only(bottom: 16),
                             decoration: BoxDecoration(
-                              color: _flame.withValues(alpha: active ? 0.12 : 0.06),
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                  color: _flame.withValues(
-                                      alpha: active ? 0.35 : 0.15)),
-                            ),
-                            child: Icon(Icons.local_fire_department_rounded,
-                                color: active ? _flame : p.textMuted, size: 20),
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('STREAK',
-                                    style: TextStyle(
-                                        color: p.textMuted,
-                                        fontSize: 11,
-                                        letterSpacing: 2)),
-                                const SizedBox(height: 2),
-                                Text(
-                                  active
-                                      ? context.l10n.homeStreakGiorni('$streak')
-                                      : context.l10n.homeStreakInizia,
-                                  style: TextStyle(
-                                      color: p.textPrimary,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                              ],
+                              color: p.cardBorder,
+                              borderRadius: BorderRadius.circular(2),
                             ),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Container(
-                            width: 42,
-                            height: 42,
-                            decoration: BoxDecoration(
-                              color: _bolt.withValues(alpha: workoutActive ? 0.12 : 0.06),
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                  color: _bolt.withValues(
-                                      alpha: workoutActive ? 0.35 : 0.15)),
+                        ),
+                        Row(
+                          children: [
+                            Icon(Icons.emoji_events_rounded,
+                                color: p.accent, size: 22),
+                            const SizedBox(width: 8),
+                            Text(
+                              context.l10n.homeStreakTitle,
+                              style: TextStyle(
+                                  color: p.textPrimary,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700),
                             ),
-                            child: Icon(Icons.fitness_center_rounded,
-                                color: workoutActive ? _bolt : p.textMuted, size: 20),
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('ALLENAMENTO',
-                                    style: TextStyle(
-                                        color: p.textMuted,
-                                        fontSize: 11,
-                                        letterSpacing: 2)),
-                                const SizedBox(height: 2),
-                                Text(
-                                  workoutActive
-                                      ? context.l10n.homeStreakAllenamentoGiorni('$workoutStreak')
-                                      : context.l10n.homeStreakAllenamentoInizia,
-                                  style: TextStyle(
-                                      color: p.textPrimary,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 14),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 10,
-                        children: _buildBadgeInfo(context).map((entry) {
-                          final (type, icon, label) = entry;
-                          return _BadgeIcon(
-                            icon: icon,
-                            label: label,
-                            unlocked: unlocked.contains(type),
-                            p: p,
-                          );
-                        }).toList(),
-                      ),
-                    ],
+                          ],
+                        ),
+                        const SizedBox(height: 18),
+                        _StreakRow(
+                          icon: Icons.local_fire_department_rounded,
+                          color: _flame,
+                          label: context.l10n.homeStreakAlimentazione,
+                          value: active
+                              ? context.l10n.homeStreakGiorni('$streak')
+                              : context.l10n.homeStreakNonAttiva,
+                          active: active,
+                          p: p,
+                        ),
+                        const SizedBox(height: 10),
+                        _StreakRow(
+                          icon: Icons.fitness_center_rounded,
+                          color: _bolt,
+                          label: context.l10n.homeStreakAllenamentoLabel,
+                          value: workoutActive
+                              ? context.l10n
+                                  .homeStreakAllenamentoGiorni('$workoutStreak')
+                              : context.l10n.homeStreakNonAttiva,
+                          active: workoutActive,
+                          p: p,
+                        ),
+                        const SizedBox(height: 20),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 10,
+                          children: _buildBadgeInfo(context).map((entry) {
+                            final (type, icon, label) = entry;
+                            return _BadgeIcon(
+                              icon: icon,
+                              label: label,
+                              unlocked: unlocked.contains(type),
+                              p: p,
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -1629,6 +1551,61 @@ class _StreakCard extends StatelessWidget {
           },
         );
       },
+    );
+  }
+}
+
+class _StreakRow extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String label;
+  final String value;
+  final bool active;
+  final ColorPalette p;
+
+  const _StreakRow({
+    required this.icon,
+    required this.color,
+    required this.label,
+    required this.value,
+    required this.active,
+    required this.p,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: active ? 0.12 : 0.06),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: color.withValues(alpha: active ? 0.35 : 0.15)),
+          ),
+          child: Icon(icon, color: active ? color : p.textMuted, size: 20),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label,
+                  style: TextStyle(
+                      color: p.textMuted, fontSize: 11, letterSpacing: 1)),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: TextStyle(
+                    color: p.textPrimary,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -1705,7 +1682,7 @@ class _BadgeIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = unlocked ? const Color(0xFFFFB800) : p.textMuted;
     return SizedBox(
-      width: 60,
+      width: 70,
       child: Column(
         children: [
           Container(

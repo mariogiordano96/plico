@@ -268,12 +268,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get homeDiarioDiOggi => 'DIARIO DI OGGI';
 
   @override
-  String get homePianoLabel => 'PIANO ALIMENTARE';
-
-  @override
-  String get homePianoSubtitle => 'Visualizza e genera il piano';
-
-  @override
   String homeTdeeKcalGiorno(String kcal) {
     return '$kcal kcal/giorno';
   }
@@ -361,21 +355,26 @@ class AppLocalizationsIt extends AppLocalizations {
   String get homeUltimiSetteGiorni => 'ultimi 7 giorni';
 
   @override
+  String get homeStreakTitle => 'Streak';
+
+  @override
+  String get homeStreakAlimentazione => 'Alimentazione';
+
+  @override
+  String get homeStreakAllenamentoLabel => 'Allenamento';
+
+  @override
+  String get homeStreakNonAttiva => 'Non attiva';
+
+  @override
   String homeStreakGiorni(String count) {
     return '$count giorni di fila';
   }
 
   @override
-  String get homeStreakInizia => 'Inizia oggi la tua streak';
-
-  @override
   String homeStreakAllenamentoGiorni(String count) {
     return '$count giorni di fila';
   }
-
-  @override
-  String get homeStreakAllenamentoInizia =>
-      'Inizia oggi la tua streak allenamento';
 
   @override
   String get homeBadge1KgPerso => '1° kg perso';
