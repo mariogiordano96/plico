@@ -12,6 +12,10 @@ enum AchievementType {
   newWorkoutPr,
   workoutSessions10,
   workoutSessions50,
+  streak30,
+  streak100,
+  workoutStreak30,
+  workoutStreak100,
 }
 
 @collection

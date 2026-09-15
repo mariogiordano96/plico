@@ -59,6 +59,12 @@ class AchievementService {
     if (streak >= 7) {
       await DatabaseService.instance.unlockAchievement(AchievementType.streak7);
     }
+    if (streak >= 30) {
+      await DatabaseService.instance.unlockAchievement(AchievementType.streak30);
+    }
+    if (streak >= 100) {
+      await DatabaseService.instance.unlockAchievement(AchievementType.streak100);
+    }
   }
 
   Future<void> _checkDays30Logged() async {
@@ -99,6 +105,12 @@ class AchievementService {
     final streak = await StreakService.instance.currentWorkoutStreak();
     if (streak >= 7) {
       await DatabaseService.instance.unlockAchievement(AchievementType.workoutStreak7);
+    }
+    if (streak >= 30) {
+      await DatabaseService.instance.unlockAchievement(AchievementType.workoutStreak30);
+    }
+    if (streak >= 100) {
+      await DatabaseService.instance.unlockAchievement(AchievementType.workoutStreak100);
     }
   }
 

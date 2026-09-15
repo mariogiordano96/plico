@@ -310,12 +310,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get homePlicoNuovaMisurazione => 'Nuova misurazione';
 
   @override
-  String get homeProgressiLabel => 'PROGRESSI';
-
-  @override
-  String get homeProgressiSubtitle => 'Composizione e misurazioni nel tempo';
-
-  @override
   String get homeRiepilogoSettimanale => 'RIEPILOGO SETTIMANALE';
 
   @override
@@ -348,29 +342,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get homeStreakTitle => 'Streak';
 
   @override
-  String get homeStreakAlimentazione => 'Alimentazione';
-
-  @override
-  String get homeStreakAllenamentoLabel => 'Allenamento';
-
-  @override
-  String get homeStreakNonAttiva => 'Non attiva';
-
-  @override
-  String homeStreakGiorni(String count) {
-    return '$count giorni di fila';
-  }
-
-  @override
-  String homeStreakAllenamentoGiorni(String count) {
-    return '$count giorni di fila';
-  }
-
-  @override
   String get homeBadge1KgPerso => '1° kg perso';
 
   @override
   String get homeBadgeStreak7 => 'Streak 7gg';
+
+  @override
+  String get homeBadgeStreak30 => 'Streak 30gg';
+
+  @override
+  String get homeBadgeStreak100 => 'Streak 100gg';
 
   @override
   String get homeBadge30Giorni => '30 giorni';
@@ -383,6 +364,12 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get homeBadgeStreak7Allenamento => '7gg allenamento';
+
+  @override
+  String get homeBadgeStreak30Allenamento => '30gg allenamento';
+
+  @override
+  String get homeBadgeStreak100Allenamento => '100gg allenamento';
 
   @override
   String get homeBadgeNuovoPr => 'Nuovo PR';

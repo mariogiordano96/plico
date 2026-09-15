@@ -14,7 +14,6 @@ import '../models/achievement.dart';
 import '../models/workout_exercise.dart';
 import '../services/calorie_estimation_service.dart';
 import '../services/database_service.dart';
-import '../services/streak_service.dart';
 import '../services/insights_service.dart';
 import '../main.dart';
 import 'impostazioni/impostazioni_screen.dart';
@@ -42,7 +41,7 @@ class HomeScreen extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.emoji_events_rounded, color: p.accent),
+          icon: Icon(Icons.star_rounded, color: p.accent),
           tooltip: context.l10n.homeStreakTitle,
           onPressed: () => _showStreakSheet(context),
         ),
@@ -110,8 +109,6 @@ class HomeScreen extends StatelessWidget {
             const _PesateCard(),
             const SizedBox(height: 16),
             const _PlicometriaCard(),
-            const SizedBox(height: 16),
-            _ProgressiCard(onSwitchTab: onSwitchTab),
           ],
         ),
       ),
@@ -833,64 +830,6 @@ class _PlicometriaCard extends StatelessWidget {
   }
 }
 
-// ── Progressi ─────────────────────────────────────────────────────
-
-class _ProgressiCard extends StatelessWidget {
-  final void Function(int)? onSwitchTab;
-  const _ProgressiCard({this.onSwitchTab});
-
-  @override
-  Widget build(BuildContext context) {
-    final p = context.palette;
-    return GestureDetector(
-      onTap: () => onSwitchTab?.call(3),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-            color: p.surface,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: p.cardBorder)),
-        child: Row(
-          children: [
-            Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                  color: p.accent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                      color: p.accent.withValues(alpha: 0.3))),
-              child: Icon(Icons.trending_up_rounded,
-                  color: p.accent, size: 20),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(context.l10n.homeProgressiLabel,
-                      style: TextStyle(
-                          color: p.textMuted,
-                          fontSize: 11,
-                          letterSpacing: 2)),
-                  const SizedBox(height: 2),
-                  Text(context.l10n.homeProgressiSubtitle,
-                      style: TextStyle(
-                          color: p.textPrimary,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600)),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right_rounded,
-                color: p.textMuted, size: 20),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 // ── Riepilogo settimanale (solo lunedì) ────────────────────────────
 
 class _WeeklyRecapCard extends StatefulWidget {
@@ -1314,10 +1253,14 @@ class _AderenzaCardState extends State<_AderenzaCard> {
 List<(AchievementType, IconData, String)> _buildBadgeInfo(BuildContext context) => [
   (AchievementType.firstKgLost, Icons.scale_rounded, context.l10n.homeBadge1KgPerso),
   (AchievementType.streak7, Icons.local_fire_department_rounded, context.l10n.homeBadgeStreak7),
+  (AchievementType.streak30, Icons.local_fire_department_rounded, context.l10n.homeBadgeStreak30),
+  (AchievementType.streak100, Icons.local_fire_department_rounded, context.l10n.homeBadgeStreak100),
   (AchievementType.days30Logged, Icons.calendar_month_rounded, context.l10n.homeBadge30Giorni),
   (AchievementType.weekOnTarget, Icons.flag_rounded, context.l10n.homeBadgeSettimanaTarget),
   (AchievementType.firstWorkout, Icons.fitness_center_rounded, context.l10n.homeBadgePrimaScheda),
   (AchievementType.workoutStreak7, Icons.bolt_rounded, context.l10n.homeBadgeStreak7Allenamento),
+  (AchievementType.workoutStreak30, Icons.bolt_rounded, context.l10n.homeBadgeStreak30Allenamento),
+  (AchievementType.workoutStreak100, Icons.bolt_rounded, context.l10n.homeBadgeStreak100Allenamento),
   (AchievementType.newWorkoutPr, Icons.emoji_events_rounded, context.l10n.homeBadgeNuovoPr),
   (AchievementType.workoutSessions10, Icons.looks_one_rounded, context.l10n.homeBadge10Sessioni),
   (AchievementType.workoutSessions50, Icons.military_tech_rounded, context.l10n.homeBadge50Sessioni),
@@ -1335,166 +1278,69 @@ void _showStreakSheet(BuildContext context) {
 class _StreakSheet extends StatelessWidget {
   const _StreakSheet();
 
-  static const _flame = Color(0xFFFF6B35);
-
-  static const _bolt = Color(0xFF4C8DFF);
-
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    return StreamBuilder<int>(
-      stream: StreakService.instance.watchCurrentStreak(),
-      builder: (context, streakSnap) {
-        final streak = streakSnap.data ?? 0;
-        final active = streak > 0;
-        return StreamBuilder<int>(
-          stream: StreakService.instance.watchCurrentWorkoutStreak(),
-          builder: (context, workoutStreakSnap) {
-            final workoutStreak = workoutStreakSnap.data ?? 0;
-            final workoutActive = workoutStreak > 0;
-            return StreamBuilder<Set<AchievementType>>(
-              stream: DatabaseService.instance.watchUnlockedTypes(),
-              builder: (context, badgeSnap) {
-                final unlocked = badgeSnap.data ?? const <AchievementType>{};
-                return SafeArea(
-                  top: false,
+    return StreamBuilder<Set<AchievementType>>(
+      stream: DatabaseService.instance.watchUnlockedTypes(),
+      builder: (context, badgeSnap) {
+        final unlocked = badgeSnap.data ?? const <AchievementType>{};
+        return SafeArea(
+          top: false,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+            decoration: BoxDecoration(
+              color: p.background,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
                   child: Container(
-                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
-                      color: p.background,
-                      borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(20)),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Center(
-                          child: Container(
-                            width: 40,
-                            height: 4,
-                            margin: const EdgeInsets.only(bottom: 16),
-                            decoration: BoxDecoration(
-                              color: p.cardBorder,
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Icon(Icons.emoji_events_rounded,
-                                color: p.accent, size: 22),
-                            const SizedBox(width: 8),
-                            Text(
-                              context.l10n.homeStreakTitle,
-                              style: TextStyle(
-                                  color: p.textPrimary,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 18),
-                        _StreakRow(
-                          icon: Icons.local_fire_department_rounded,
-                          color: _flame,
-                          label: context.l10n.homeStreakAlimentazione,
-                          value: active
-                              ? context.l10n.homeStreakGiorni('$streak')
-                              : context.l10n.homeStreakNonAttiva,
-                          active: active,
-                          p: p,
-                        ),
-                        const SizedBox(height: 10),
-                        _StreakRow(
-                          icon: Icons.fitness_center_rounded,
-                          color: _bolt,
-                          label: context.l10n.homeStreakAllenamentoLabel,
-                          value: workoutActive
-                              ? context.l10n
-                                  .homeStreakAllenamentoGiorni('$workoutStreak')
-                              : context.l10n.homeStreakNonAttiva,
-                          active: workoutActive,
-                          p: p,
-                        ),
-                        const SizedBox(height: 20),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 10,
-                          children: _buildBadgeInfo(context).map((entry) {
-                            final (type, icon, label) = entry;
-                            return _BadgeIcon(
-                              icon: icon,
-                              label: label,
-                              unlocked: unlocked.contains(type),
-                              p: p,
-                            );
-                          }).toList(),
-                        ),
-                      ],
+                      color: p.cardBorder,
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                );
-              },
-            );
-          },
+                ),
+                Row(
+                  children: [
+                    Icon(Icons.star_rounded, color: p.accent, size: 22),
+                    const SizedBox(width: 8),
+                    Text(
+                      context.l10n.homeStreakTitle,
+                      style: TextStyle(
+                          color: p.textPrimary,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 10,
+                  children: _buildBadgeInfo(context).map((entry) {
+                    final (type, icon, label) = entry;
+                    return _BadgeIcon(
+                      icon: icon,
+                      label: label,
+                      unlocked: unlocked.contains(type),
+                      p: p,
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+          ),
         );
       },
-    );
-  }
-}
-
-class _StreakRow extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final String label;
-  final String value;
-  final bool active;
-  final ColorPalette p;
-
-  const _StreakRow({
-    required this.icon,
-    required this.color,
-    required this.label,
-    required this.value,
-    required this.active,
-    required this.p,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 42,
-          height: 42,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: active ? 0.12 : 0.06),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: color.withValues(alpha: active ? 0.35 : 0.15)),
-          ),
-          child: Icon(icon, color: active ? color : p.textMuted, size: 20),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label,
-                  style: TextStyle(
-                      color: p.textMuted, fontSize: 11, letterSpacing: 1)),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: TextStyle(
-                    color: p.textPrimary,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

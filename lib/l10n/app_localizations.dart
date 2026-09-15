@@ -662,18 +662,6 @@ abstract class AppLocalizations {
   /// **'Nuova misurazione'**
   String get homePlicoNuovaMisurazione;
 
-  /// No description provided for @homeProgressiLabel.
-  ///
-  /// In it, this message translates to:
-  /// **'PROGRESSI'**
-  String get homeProgressiLabel;
-
-  /// No description provided for @homeProgressiSubtitle.
-  ///
-  /// In it, this message translates to:
-  /// **'Composizione e misurazioni nel tempo'**
-  String get homeProgressiSubtitle;
-
   /// No description provided for @homeRiepilogoSettimanale.
   ///
   /// In it, this message translates to:
@@ -734,36 +722,6 @@ abstract class AppLocalizations {
   /// **'Streak'**
   String get homeStreakTitle;
 
-  /// No description provided for @homeStreakAlimentazione.
-  ///
-  /// In it, this message translates to:
-  /// **'Alimentazione'**
-  String get homeStreakAlimentazione;
-
-  /// No description provided for @homeStreakAllenamentoLabel.
-  ///
-  /// In it, this message translates to:
-  /// **'Allenamento'**
-  String get homeStreakAllenamentoLabel;
-
-  /// No description provided for @homeStreakNonAttiva.
-  ///
-  /// In it, this message translates to:
-  /// **'Non attiva'**
-  String get homeStreakNonAttiva;
-
-  /// No description provided for @homeStreakGiorni.
-  ///
-  /// In it, this message translates to:
-  /// **'{count} giorni di fila'**
-  String homeStreakGiorni(String count);
-
-  /// No description provided for @homeStreakAllenamentoGiorni.
-  ///
-  /// In it, this message translates to:
-  /// **'{count} giorni di fila'**
-  String homeStreakAllenamentoGiorni(String count);
-
   /// No description provided for @homeBadge1KgPerso.
   ///
   /// In it, this message translates to:
@@ -775,6 +733,18 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Streak 7gg'**
   String get homeBadgeStreak7;
+
+  /// No description provided for @homeBadgeStreak30.
+  ///
+  /// In it, this message translates to:
+  /// **'Streak 30gg'**
+  String get homeBadgeStreak30;
+
+  /// No description provided for @homeBadgeStreak100.
+  ///
+  /// In it, this message translates to:
+  /// **'Streak 100gg'**
+  String get homeBadgeStreak100;
 
   /// No description provided for @homeBadge30Giorni.
   ///
@@ -799,6 +769,18 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'7gg allenamento'**
   String get homeBadgeStreak7Allenamento;
+
+  /// No description provided for @homeBadgeStreak30Allenamento.
+  ///
+  /// In it, this message translates to:
+  /// **'30gg allenamento'**
+  String get homeBadgeStreak30Allenamento;
+
+  /// No description provided for @homeBadgeStreak100Allenamento.
+  ///
+  /// In it, this message translates to:
+  /// **'100gg allenamento'**
+  String get homeBadgeStreak100Allenamento;
 
   /// No description provided for @homeBadgeNuovoPr.
   ///
