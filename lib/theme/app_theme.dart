@@ -1,19 +1,7 @@
-import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
-import 'motion.dart';
 
 const _fontFamily = 'Space Grotesk';
-
-const _pageTransitionsTheme = PageTransitionsTheme(
-  builders: {
-    TargetPlatform.android: AppPageTransitionsBuilder(),
-    TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-    TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
-    TargetPlatform.linux: AppPageTransitionsBuilder(),
-    TargetPlatform.windows: AppPageTransitionsBuilder(),
-  },
-);
 
 // ──────────────────────────────────────────────
 // ColorPalette — accesso ai colori tema-aware
@@ -116,7 +104,6 @@ class AppColorsLight {
 // ──────────────────────────────────────────────
 final darkTheme = ThemeData(
   brightness: Brightness.dark,
-  pageTransitionsTheme: _pageTransitionsTheme,
   scaffoldBackgroundColor: const Color(0xFF0B1622),
   colorScheme: const ColorScheme.dark(
     primary: Color(0xFF00FF88),
@@ -199,7 +186,6 @@ final darkTheme = ThemeData(
 // ──────────────────────────────────────────────
 final lightTheme = ThemeData(
   brightness: Brightness.light,
-  pageTransitionsTheme: _pageTransitionsTheme,
   scaffoldBackgroundColor: AppColorsLight.background,
   colorScheme: const ColorScheme.light(
     primary: AppColorsLight.accent,

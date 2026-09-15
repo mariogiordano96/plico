@@ -140,15 +140,9 @@ coerente con l'impostazione privacy-first del progetto.
       `assets/fonts/space_grotesk/`, dichiarato in `pubspec.yaml`, applicato in
       `TextTheme` + `appBarTheme` + `elevatedButtonTheme` in `app_theme.dart` — nessuna
       modifica per-widget, effetto su tutte le schermate via tema
-- [x] **Fase 2 — Primitive di movimento**: creato `lib/theme/motion.dart` con
-      durate/curve standard (`AppMotion`), transizione di pagina custom
-      (`AppPageTransitionsBuilder`, fade+slide) applicata via `pageTransitionsTheme`
-      in `app_theme.dart` su Android/desktop (iOS/macOS restano su
-      `CupertinoPageTransitionsBuilder` per lo swipe-back nativo), ed entrata a
-      cascata (`StaggeredListItem`) nelle 3 liste indicate nel piano: catalogo
-      esercizi (`catalogo_esercizi_screen.dart`), risultati alimenti
-      (`aggiunta_alimento_screen.dart`), storico misurazioni
-      (`storico_misurazioni_screen.dart`)
+- [ ] **Fase 2 — Primitive di movimento**: creare `lib/theme/motion.dart` con
+      durate/curve standard; transizioni di pagina custom; entrata a cascata per le
+      liste principali (esercizi, alimenti, storico)
 - [ ] **Fase 3 — Feedback aptico**: estendere `HapticFeedback` ai momenti chiave
       (fine serie, salvataggio pasto, unlock achievement, swipe-to-delete)
 - [ ] **Fase 4 — Stati di caricamento**: skeleton screen per le liste principali,
