@@ -843,7 +843,7 @@ class _ProgressiCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = context.palette;
     return GestureDetector(
-      onTap: () => onSwitchTab?.call(2),
+      onTap: () => onSwitchTab?.call(3),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
