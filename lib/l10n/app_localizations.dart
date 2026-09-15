@@ -1424,23 +1424,11 @@ abstract class AppLocalizations {
   /// **'MISURAZIONI'**
   String get progressiSezMisurazioni;
 
-  /// No description provided for @progressiSezAllenamenti.
-  ///
-  /// In it, this message translates to:
-  /// **'ALLENAMENTI RECENTI'**
-  String get progressiSezAllenamenti;
-
   /// No description provided for @progressiSezAllenamentiPdf.
   ///
   /// In it, this message translates to:
   /// **'ALLENAMENTI'**
   String get progressiSezAllenamentiPdf;
-
-  /// No description provided for @progressiNessunAllenamento.
-  ///
-  /// In it, this message translates to:
-  /// **'Nessun allenamento'**
-  String get progressiNessunAllenamento;
 
   /// No description provided for @progressiRange1A.
   ///

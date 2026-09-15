@@ -727,13 +727,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get progressiSezMisurazioni => 'MISURAZIONI';
 
   @override
-  String get progressiSezAllenamenti => 'ALLENAMENTI RECENTI';
-
-  @override
   String get progressiSezAllenamentiPdf => 'ALLENAMENTI';
-
-  @override
-  String get progressiNessunAllenamento => 'Nessun allenamento';
 
   @override
   String get progressiRange1A => '1A';

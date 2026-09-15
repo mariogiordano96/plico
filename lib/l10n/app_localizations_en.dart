@@ -722,13 +722,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get progressiSezMisurazioni => 'MEASUREMENTS';
 
   @override
-  String get progressiSezAllenamenti => 'RECENT WORKOUTS';
-
-  @override
   String get progressiSezAllenamentiPdf => 'WORKOUTS';
-
-  @override
-  String get progressiNessunAllenamento => 'No workout';
 
   @override
   String get progressiRange1A => '1Y';
