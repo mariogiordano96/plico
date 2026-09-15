@@ -303,7 +303,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeNessunaSessionePlico => 'No session recorded';
 
   @override
-  String get homePlicoNuovaMisurazione => 'New measurement';
+  String get homePlicoCalcolaBtn => 'Calculate Plicometry';
+
+  @override
+  String get homeCirconferenzeLabel => 'CIRCUMFERENCES';
+
+  @override
+  String get homeCirconferenzeNessuna => 'No measurement recorded';
+
+  @override
+  String get homeCirconferenzeNuovaBtn => 'New Measurement';
 
   @override
   String get homeRiepilogoSettimanale => 'WEEKLY SUMMARY';

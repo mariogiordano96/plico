@@ -12,7 +12,6 @@ import '../../models/workout_exercise.dart';
 import '../../services/database_service.dart';
 import '../../services/pdf_export_service.dart';
 import '../../services/smartwatch_wellness_service.dart';
-import '../storico/storico_misurazioni_screen.dart';
 import 'record_personali_screen.dart';
 import 'volume_settimanale_screen.dart';
 
@@ -292,13 +291,6 @@ class _ProgressiScreenState extends State<ProgressiScreen> {
             icon: Icon(Icons.download_rounded, color: p.accent),
             tooltip: context.l10n.progressiTooltipEsporta,
             onPressed: _exportPdf,
-          ),
-          IconButton(
-            icon: Icon(Icons.straighten_rounded, color: p.accent),
-            tooltip: context.l10n.progressiTooltipStorico,
-            onPressed: () => Navigator.push(context,
-                MaterialPageRoute(
-                    builder: (_) => const StoricoMisurazioniScreen())),
           ),
           IconButton(
             icon: Icon(Icons.emoji_events_rounded, color: p.accent),

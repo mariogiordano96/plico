@@ -656,11 +656,29 @@ abstract class AppLocalizations {
   /// **'Nessuna sessione registrata'**
   String get homeNessunaSessionePlico;
 
-  /// No description provided for @homePlicoNuovaMisurazione.
+  /// No description provided for @homePlicoCalcolaBtn.
   ///
   /// In it, this message translates to:
-  /// **'Nuova misurazione'**
-  String get homePlicoNuovaMisurazione;
+  /// **'Calcola Plicometria'**
+  String get homePlicoCalcolaBtn;
+
+  /// No description provided for @homeCirconferenzeLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'CIRCONFERENZE'**
+  String get homeCirconferenzeLabel;
+
+  /// No description provided for @homeCirconferenzeNessuna.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessuna misurazione registrata'**
+  String get homeCirconferenzeNessuna;
+
+  /// No description provided for @homeCirconferenzeNuovaBtn.
+  ///
+  /// In it, this message translates to:
+  /// **'Nuova Misurazione'**
+  String get homeCirconferenzeNuovaBtn;
 
   /// No description provided for @homeRiepilogoSettimanale.
   ///

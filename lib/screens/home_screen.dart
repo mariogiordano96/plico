@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../theme/app_theme.dart';
 import '../models/app_settings.dart';
 import '../models/body_snapshot.dart';
+import '../models/measurement_snapshot.dart';
 import '../models/plicometry_session.dart';
 import '../models/user_profile.dart';
 import '../models/daily_log.dart';
@@ -19,6 +20,8 @@ import '../main.dart';
 import 'impostazioni/impostazioni_screen.dart';
 import 'pesate/pesate_screen.dart';
 import 'plicometry/method_selection_screen.dart';
+import 'storico/add_measurement_screen.dart';
+import 'storico/storico_misurazioni_screen.dart';
 import 'tdee/tdee_screen.dart' show calcolaTdee;
 
 class HomeScreen extends StatelessWidget {
@@ -109,6 +112,8 @@ class HomeScreen extends StatelessWidget {
             const _PesateCard(),
             const SizedBox(height: 16),
             const _PlicometriaCard(),
+            const SizedBox(height: 16),
+            const _CirconferenzeCard(),
           ],
         ),
       ),
@@ -808,7 +813,107 @@ class _PlicometriaCard extends StatelessWidget {
                               const MethodSelectionScreen())),
                   icon: Icon(Icons.add_rounded,
                       size: 16, color: p.accent),
-                  label: Text(context.l10n.homePlicoNuovaMisurazione,
+                  label: Text(context.l10n.homePlicoCalcolaBtn,
+                      style: TextStyle(
+                          color: p.accent,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600)),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(
+                        color: p.accent.withValues(alpha: 0.4)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _CirconferenzeCard extends StatelessWidget {
+  const _CirconferenzeCard();
+
+  String _formatDate(DateTime d, BuildContext context) =>
+      DateFormat.yMd(Localizations.localeOf(context).toString()).format(d);
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return StreamBuilder<List<MeasurementSnapshot>>(
+      stream: DatabaseService.instance.watchMeasurementSnapshots(),
+      builder: (context, snapshot) {
+        final last = snapshot.data?.isNotEmpty == true
+            ? snapshot.data!.first
+            : null;
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: p.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: p.cardBorder),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(context.l10n.homeCirconferenzeLabel,
+                      style: TextStyle(
+                          color: p.textMuted,
+                          fontSize: 11,
+                          letterSpacing: 2.5,
+                          fontWeight: FontWeight.w600)),
+                  Row(
+                    children: [
+                      if (last != null) ...[
+                        Text(_formatDate(last.data, context),
+                            style: TextStyle(
+                                color: p.textMuted, fontSize: 12)),
+                        const SizedBox(width: 6),
+                      ],
+                      Tooltip(
+                        message: context.l10n.progressiTooltipStorico,
+                        child: InkWell(
+                          onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) =>
+                                      const StoricoMisurazioniScreen())),
+                          borderRadius: BorderRadius.circular(20),
+                          child: Padding(
+                            padding: const EdgeInsets.all(2),
+                            child: Icon(Icons.straighten_rounded,
+                                color: p.textMuted, size: 18),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              if (last == null) ...[
+                Text(context.l10n.homeCirconferenzeNessuna,
+                    style:
+                        TextStyle(color: p.textMuted, fontSize: 13)),
+                const SizedBox(height: 14),
+              ],
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const AddMeasurementScreen())),
+                  icon: Icon(Icons.add_rounded,
+                      size: 16, color: p.accent),
+                  label: Text(context.l10n.homeCirconferenzeNuovaBtn,
                       style: TextStyle(
                           color: p.accent,
                           fontSize: 13,
