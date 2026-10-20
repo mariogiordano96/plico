@@ -488,7 +488,16 @@ chat in Markdown con la nuova scheda/alimentazione/ricette e l'utente le aggiung
       numero di giorni dichiarato. La UI riceve `CoachGateReason` (codici), i testi
       localizzati arrivano con i bottoni (8b-8d). Avviso fisso sotto le risposte: verificare
       gli ingredienti rispetto alle proprie allergie.
-- [ ] 8b: bottone "Genera ricette dal piano" (input: piano attivo, output di sola lettura)
+- [x] **2026-10** 8b: bottone "Ricette dal piano" (`CoachAction.recipes`,
+      `lib/services/coach_actions.dart`; chip sopra il campo di testo in `coach_screen.dart`).
+      Flusso: gate (dialog con cosa manca) → anteprima del testo esatto che parte verso
+      Google → messaggio utente in chat → richiesta con istruzioni+contesto accodati al
+      system prompt (sostituiscono lo snapshot generico, non dipendono dal toggle) → risposta
+      con avviso fisso sulle allergie. Il guardrail off-topic non si applica (testo scritto
+      dall'app); niente "Riprova" sugli errori delle azioni (si tocca di nuovo il bottone).
+      Il contesto non è persistito: le domande di follow-up vedono solo la risposta nella
+      cronologia. **Da provare su device con chiave reale**: le grammature delle ricette
+      coincidono col piano?
 - [ ] 8c: bottone "Genera nuova alimentazione" (variante del piano esistente, kcal/macro
       calcolati dall'app, `piano_service`)
 - [ ] 8d: bottone "Genera nuova scheda" (storico 3 mesi, livello, obiettivo)

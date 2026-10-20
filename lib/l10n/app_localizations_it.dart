@@ -2245,4 +2245,45 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get coachCondividiDatiOff => 'Il Coach non vede più i tuoi dati.';
+
+  @override
+  String get coachAzioneRicette => 'Ricette dal piano';
+
+  @override
+  String get coachAzioneRicetteMsg =>
+      'Genera le ricette del mio piano alimentare';
+
+  @override
+  String get coachAzioneAnteprimaTitolo => 'Cosa invierò a Google';
+
+  @override
+  String get coachAzioneAnteprimaSub =>
+      'Questi dati lasciano il telefono insieme alla richiesta. Nulla viene salvato nell\'app: la risposta compare qui in chat.';
+
+  @override
+  String get coachAzioneInvia => 'Invia';
+
+  @override
+  String get coachAzioneNonDisponibile => 'Non ancora disponibile';
+
+  @override
+  String get coachGateNoProfile => 'Completa il tuo profilo.';
+
+  @override
+  String get coachGateNoWeight => 'Registra almeno una misurazione di peso.';
+
+  @override
+  String get coachGateNoQuestionnaire => 'Compila le preferenze alimentari.';
+
+  @override
+  String coachGateFewSessions(int needed, int have) {
+    return 'Servono almeno $needed allenamenti svolti negli ultimi 90 giorni (ne hai $have). In alternativa, scrivi qui in chat il tuo livello attuale e cosa vuoi ottenere.';
+  }
+
+  @override
+  String get coachGateNoPlan => 'Genera prima un piano alimentare.';
+
+  @override
+  String get coachAvvisoAllergie =>
+      'Verifica sempre gli ingredienti rispetto alle tue allergie e intolleranze.';
 }

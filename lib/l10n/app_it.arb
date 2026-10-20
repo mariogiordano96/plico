@@ -887,5 +887,18 @@
   "@overloadScaricoConNormale": { "placeholders": { "kg": { "type": "String" }, "normalKg": { "type": "String" } } },
   "coachCondividiDatiTooltip": "Condividi i miei dati con il Coach",
   "coachCondividiDatiOn": "Il Coach ora vede i tuoi dati (peso, pasti di oggi, piano, allenamenti): vengono inviati a Google insieme alla domanda.",
-  "coachCondividiDatiOff": "Il Coach non vede più i tuoi dati."
+  "coachCondividiDatiOff": "Il Coach non vede più i tuoi dati.",
+  "coachAzioneRicette": "Ricette dal piano",
+  "coachAzioneRicetteMsg": "Genera le ricette del mio piano alimentare",
+  "coachAzioneAnteprimaTitolo": "Cosa invierò a Google",
+  "coachAzioneAnteprimaSub": "Questi dati lasciano il telefono insieme alla richiesta. Nulla viene salvato nell'app: la risposta compare qui in chat.",
+  "coachAzioneInvia": "Invia",
+  "coachAzioneNonDisponibile": "Non ancora disponibile",
+  "coachGateNoProfile": "Completa il tuo profilo.",
+  "coachGateNoWeight": "Registra almeno una misurazione di peso.",
+  "coachGateNoQuestionnaire": "Compila le preferenze alimentari.",
+  "coachGateFewSessions": "Servono almeno {needed} allenamenti svolti negli ultimi 90 giorni (ne hai {have}). In alternativa, scrivi qui in chat il tuo livello attuale e cosa vuoi ottenere.",
+  "@coachGateFewSessions": {"placeholders": {"needed": {"type": "int"}, "have": {"type": "int"}}},
+  "coachGateNoPlan": "Genera prima un piano alimentare.",
+  "coachAvvisoAllergie": "Verifica sempre gli ingredienti rispetto alle tue allergie e intolleranze."
 }

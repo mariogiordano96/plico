@@ -4,7 +4,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/app_settings.dart';
 import '../../models/coach_message.dart';
+import '../../services/coach_actions.dart';
 import '../../services/coach_context.dart';
+import '../../services/coach_history.dart';
 import '../../services/coach_guardrail.dart';
 import '../../services/database_service.dart';
 import '../../services/gemini_quota.dart';
@@ -210,8 +212,11 @@ class _CoachScreenState extends State<CoachScreen> {
     });
   }
 
-  Future<String> _systemInstruction(BuildContext context) async {
+  Future<String> _systemInstruction(BuildContext context, {String? actionSuffix}) async {
     final base = _baseInstruction(context);
+    // Azione a bottone: il consenso è il tocco (con anteprima), contesto e
+    // istruzioni li decide l'app e sostituiscono lo snapshot generico.
+    if (actionSuffix != null) return '$base\n\n$actionSuffix';
     if (!_shareData) return base;
     try {
       final isItalian = Localizations.localeOf(context).languageCode == 'it';
@@ -257,6 +262,102 @@ class _CoachScreenState extends State<CoachScreen> {
         'dietitian) instead of answering directly.';
   }
 
+  String _gateText(CoachGate gate) {
+    final l10n = context.l10n;
+    return gate.missing
+        .map((r) => switch (r) {
+              CoachGateReason.noProfile => l10n.coachGateNoProfile,
+              CoachGateReason.noWeight => l10n.coachGateNoWeight,
+              CoachGateReason.noQuestionnaire => l10n.coachGateNoQuestionnaire,
+              CoachGateReason.fewSessions =>
+                l10n.coachGateFewSessions(CoachHistory.minWorkoutSessions, gate.sessions ?? 0),
+              CoachGateReason.noPlan => l10n.coachGateNoPlan,
+            })
+        .join('\n');
+  }
+
+  String _actionLabel(CoachAction a) => switch (a) {
+        CoachAction.recipes => context.l10n.coachAzioneRicetteMsg,
+      };
+
+  Future<void> _runAction(CoachAction action) async {
+    if (_sending || _apiKey == null) return;
+    final p = context.palette;
+    final l10n = context.l10n;
+    final isItalian = Localizations.localeOf(context).languageCode == 'it';
+
+    final gate = await CoachActions.gate(action);
+    if (!mounted) return;
+    if (!gate.enabled) {
+      await showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: p.surface,
+          title: Text(l10n.coachAzioneNonDisponibile, style: TextStyle(color: p.textPrimary)),
+          content: Text(_gateText(gate), style: TextStyle(color: p.textSecondary)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(l10n.coachOnboardingOk, style: TextStyle(color: p.accent)),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    final request = await CoachActions.load(action, isItalian: isItalian);
+    if (!mounted || request == null) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: p.surface,
+        icon: Icon(Icons.public_rounded, color: p.accent),
+        title: Text(l10n.coachAzioneAnteprimaTitolo, style: TextStyle(color: p.textPrimary)),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.coachAzioneAnteprimaSub, style: TextStyle(color: p.textSecondary)),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: p.background,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: p.cardBorder),
+                  ),
+                  child: Text(request.context,
+                      style: TextStyle(
+                          color: p.textMuted, fontSize: 11, fontFamily: 'monospace', height: 1.3)),
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.diarioAnnulla, style: TextStyle(color: p.textMuted)),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: FilledButton.styleFrom(backgroundColor: p.accent),
+            child: Text(l10n.coachAzioneInvia,
+                style: TextStyle(color: p.background, fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final label = _actionLabel(action);
+    if (!await _addMessage(_ChatMessage(isUser: true, text: label))) return;
+    await _sendText(label, actionSuffix: request.systemSuffix);
+  }
+
   Future<void> _send() async {
     final text = _inputCtrl.text.trim();
     if (text.isEmpty || _sending || _apiKey == null) return;
@@ -275,13 +376,13 @@ class _CoachScreenState extends State<CoachScreen> {
   /// `_messages`, non va aggiunto di nuovo.
   Future<void> _retry(String text) => _sendText(text);
 
-  Future<void> _sendText(String text) async {
+  Future<void> _sendText(String text, {String? actionSuffix}) async {
     if (_sending || _apiKey == null) return;
     // Guardrail deterministico (docs/integrazione_flutter_gemma.md, Fase 8):
     // per le richieste palesemente fuori tema risponde subito in locale,
     // senza toccare la rete né consumare quota — il system prompt resta la
     // difesa principale per tutto il resto, più sfumato di una lista fissa.
-    if (CoachGuardrail.isOffTopic(text)) {
+    if (actionSuffix == null && CoachGuardrail.isOffTopic(text)) {
       // isError: true anche se non è un errore Gemini — vedi il commento su
       // CoachMessage.isError: qui serve solo a escludere il rifiuto dalla
       // history rimandata a Gemini (e dal rendering Markdown). isGuardrail
@@ -297,7 +398,7 @@ class _CoachScreenState extends State<CoachScreen> {
     try {
       final reply = await GeminiService.sendMessage(
         apiKey: _apiKey!,
-        systemInstruction: await _systemInstruction(context),
+        systemInstruction: await _systemInstruction(context, actionSuffix: actionSuffix),
         // Esclude i bubble di errore dalla storia mandata a Gemini: sono
         // messaggi nostri (localizzati, per l'utente), non turni reali del
         // modello — includerli inquinerebbe la conversazione. Tronca poi ai
@@ -313,11 +414,22 @@ class _CoachScreenState extends State<CoachScreen> {
         },
       );
       if (!mounted) return;
-      await _addMessage(_ChatMessage(isUser: false, text: reply));
+      // Le azioni producono ricette/piani: l'avviso sulle allergie è fisso,
+      // scritto dall'app, non delegato al modello.
+      await _addMessage(_ChatMessage(
+          isUser: false,
+          text: actionSuffix == null
+              ? reply
+              : '$reply\n\n_${context.l10n.coachAvvisoAllergie}_'));
     } on GeminiException catch (e) {
       if (!mounted) return;
+      // Nessun "Riprova" per le azioni: il contesto non è nel testo utente,
+      // basta toccare di nuovo il bottone.
       await _addMessage(_ChatMessage(
-          isUser: false, text: _errorMessage(e.type), isError: true, retryText: text));
+          isUser: false,
+          text: _errorMessage(e.type),
+          isError: true,
+          retryText: actionSuffix == null ? text : null));
     } finally {
       final remaining = await GeminiService.remainingToday();
       if (mounted) {
@@ -457,6 +569,7 @@ class _CoachScreenState extends State<CoachScreen> {
                   retryHint: _retryHint,
                   remainingToday: _remainingToday,
                   onSend: _send,
+                  onAction: _runAction,
                   onRetry: _retry,
                 ),
     );
@@ -654,6 +767,7 @@ class _ChatView extends StatelessWidget {
   final String? retryHint;
   final int remainingToday;
   final VoidCallback onSend;
+  final ValueChanged<CoachAction> onAction;
   final ValueChanged<String> onRetry;
 
   const _ChatView({
@@ -664,6 +778,7 @@ class _ChatView extends StatelessWidget {
     required this.retryHint,
     required this.remainingToday,
     required this.onSend,
+    required this.onAction,
     required this.onRetry,
   });
 
@@ -717,6 +832,28 @@ class _ChatView extends StatelessWidget {
                   ),
                 ),
               const SizedBox(height: 8),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 40,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: ActionChip(
+                  avatar: Icon(Icons.restaurant_menu_rounded, size: 16, color: p.accent),
+                  label: Text(l10n.coachAzioneRicette,
+                      style: TextStyle(color: p.textPrimary, fontSize: 12)),
+                  backgroundColor: p.surfaceVariant,
+                  side: BorderSide(color: p.cardBorder),
+                  onPressed: sending || remainingToday <= 0
+                      ? null
+                      : () => onAction(CoachAction.recipes),
+                ),
+              ),
             ],
           ),
         ),

@@ -728,5 +728,18 @@
   "overloadScaricoConNormale": "Deload: {kg} kg (normal: {normalKg} kg)",
   "coachCondividiDatiTooltip": "Share my data with the Coach",
   "coachCondividiDatiOn": "The Coach now sees your data (weight, today's meals, plan, workouts): it is sent to Google along with your question.",
-  "coachCondividiDatiOff": "The Coach no longer sees your data."
+  "coachCondividiDatiOff": "The Coach no longer sees your data.",
+  "coachAzioneRicette": "Recipes from my plan",
+  "coachAzioneRicetteMsg": "Generate recipes for my meal plan",
+  "coachAzioneAnteprimaTitolo": "What I will send to Google",
+  "coachAzioneAnteprimaSub": "This data leaves your phone along with the request. Nothing is saved in the app: the answer appears here in the chat.",
+  "coachAzioneInvia": "Send",
+  "coachAzioneNonDisponibile": "Not available yet",
+  "coachGateNoProfile": "Complete your profile.",
+  "coachGateNoWeight": "Log at least one weight measurement.",
+  "coachGateNoQuestionnaire": "Fill in your food preferences.",
+  "coachGateFewSessions": "You need at least {needed} completed workouts in the last 90 days (you have {have}). Alternatively, write your current level and goal here in the chat.",
+  "@coachGateFewSessions": {"placeholders": {"needed": {"type": "int"}, "have": {"type": "int"}}},
+  "coachGateNoPlan": "Generate a meal plan first.",
+  "coachAvvisoAllergie": "Always check the ingredients against your allergies and intolerances."
 }

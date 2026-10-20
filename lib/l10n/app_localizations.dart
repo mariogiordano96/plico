@@ -4099,6 +4099,78 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Il Coach non vede più i tuoi dati.'**
   String get coachCondividiDatiOff;
+
+  /// No description provided for @coachAzioneRicette.
+  ///
+  /// In it, this message translates to:
+  /// **'Ricette dal piano'**
+  String get coachAzioneRicette;
+
+  /// No description provided for @coachAzioneRicetteMsg.
+  ///
+  /// In it, this message translates to:
+  /// **'Genera le ricette del mio piano alimentare'**
+  String get coachAzioneRicetteMsg;
+
+  /// No description provided for @coachAzioneAnteprimaTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'Cosa invierò a Google'**
+  String get coachAzioneAnteprimaTitolo;
+
+  /// No description provided for @coachAzioneAnteprimaSub.
+  ///
+  /// In it, this message translates to:
+  /// **'Questi dati lasciano il telefono insieme alla richiesta. Nulla viene salvato nell\'app: la risposta compare qui in chat.'**
+  String get coachAzioneAnteprimaSub;
+
+  /// No description provided for @coachAzioneInvia.
+  ///
+  /// In it, this message translates to:
+  /// **'Invia'**
+  String get coachAzioneInvia;
+
+  /// No description provided for @coachAzioneNonDisponibile.
+  ///
+  /// In it, this message translates to:
+  /// **'Non ancora disponibile'**
+  String get coachAzioneNonDisponibile;
+
+  /// No description provided for @coachGateNoProfile.
+  ///
+  /// In it, this message translates to:
+  /// **'Completa il tuo profilo.'**
+  String get coachGateNoProfile;
+
+  /// No description provided for @coachGateNoWeight.
+  ///
+  /// In it, this message translates to:
+  /// **'Registra almeno una misurazione di peso.'**
+  String get coachGateNoWeight;
+
+  /// No description provided for @coachGateNoQuestionnaire.
+  ///
+  /// In it, this message translates to:
+  /// **'Compila le preferenze alimentari.'**
+  String get coachGateNoQuestionnaire;
+
+  /// No description provided for @coachGateFewSessions.
+  ///
+  /// In it, this message translates to:
+  /// **'Servono almeno {needed} allenamenti svolti negli ultimi 90 giorni (ne hai {have}). In alternativa, scrivi qui in chat il tuo livello attuale e cosa vuoi ottenere.'**
+  String coachGateFewSessions(int needed, int have);
+
+  /// No description provided for @coachGateNoPlan.
+  ///
+  /// In it, this message translates to:
+  /// **'Genera prima un piano alimentare.'**
+  String get coachGateNoPlan;
+
+  /// No description provided for @coachAvvisoAllergie.
+  ///
+  /// In it, this message translates to:
+  /// **'Verifica sempre gli ingredienti rispetto alle tue allergie e intolleranze.'**
+  String get coachAvvisoAllergie;
 }
 
 class _AppLocalizationsDelegate
