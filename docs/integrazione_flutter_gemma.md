@@ -498,10 +498,13 @@ chat in Markdown con la nuova scheda/alimentazione/ricette e l'utente le aggiung
       Il contesto non è persistito: le domande di follow-up vedono solo la risposta nella
       cronologia. **Da provare su device con chiave reale**: le grammature delle ricette
       coincidono col piano?
-- [ ] 8c: bottone "Genera nuova alimentazione" (variante del piano esistente, kcal/macro
-      calcolati dall'app, `piano_service`)
-- [ ] 8d: bottone "Genera nuova scheda" (storico 3 mesi, livello, obiettivo)
-- [ ] Rivedere il ruolo del toggle `coachShareData`: resta solo per la chat libera
+- [x] **2026-10** 8c: chip "Nuova alimentazione" (`CoachAction.nutrition`): variante del piano
+      esistente, target kcal/macro FISSI dell'app, divieti assoluti, preferenze; avviso allergie.
+- [x] **2026-10** 8d: chip "Nuova scheda" (`CoachAction.workout`): storico 90 giorni, nomi degli
+      esercizi realmente usati, carichi reali dell'utente; senza avviso allergie.
+- [x] Il toggle `coachShareData` resta solo per la chat libera (snapshot leggero); le azioni a
+      bottone hanno il proprio consenso (anteprima) e non dipendono dal toggle.
+- [ ] Provare 8b-8d su device con chiave reale (qualità delle risposte, grammature)
 
 ---
 

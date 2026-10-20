@@ -2286,4 +2286,16 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get coachAvvisoAllergie =>
       'Verifica sempre gli ingredienti rispetto alle tue allergie e intolleranze.';
+
+  @override
+  String get coachAzioneAlimentazione => 'Nuova alimentazione';
+
+  @override
+  String get coachAzioneAlimentazioneMsg => 'Genera una nuova alimentazione';
+
+  @override
+  String get coachAzioneScheda => 'Nuova scheda';
+
+  @override
+  String get coachAzioneSchedaMsg => 'Genera una nuova scheda di allenamento';
 }

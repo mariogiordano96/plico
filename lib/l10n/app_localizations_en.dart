@@ -2274,4 +2274,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get coachAvvisoAllergie =>
       'Always check the ingredients against your allergies and intolerances.';
+
+  @override
+  String get coachAzioneAlimentazione => 'New eating plan';
+
+  @override
+  String get coachAzioneAlimentazioneMsg => 'Generate a new eating plan';
+
+  @override
+  String get coachAzioneScheda => 'New workout plan';
+
+  @override
+  String get coachAzioneSchedaMsg => 'Generate a new workout plan';
 }

@@ -900,5 +900,9 @@
   "coachGateFewSessions": "Servono almeno {needed} allenamenti svolti negli ultimi 90 giorni (ne hai {have}). In alternativa, scrivi qui in chat il tuo livello attuale e cosa vuoi ottenere.",
   "@coachGateFewSessions": {"placeholders": {"needed": {"type": "int"}, "have": {"type": "int"}}},
   "coachGateNoPlan": "Genera prima un piano alimentare.",
-  "coachAvvisoAllergie": "Verifica sempre gli ingredienti rispetto alle tue allergie e intolleranze."
+  "coachAvvisoAllergie": "Verifica sempre gli ingredienti rispetto alle tue allergie e intolleranze.",
+  "coachAzioneAlimentazione": "Nuova alimentazione",
+  "coachAzioneAlimentazioneMsg": "Genera una nuova alimentazione",
+  "coachAzioneScheda": "Nuova scheda",
+  "coachAzioneSchedaMsg": "Genera una nuova scheda di allenamento"
 }

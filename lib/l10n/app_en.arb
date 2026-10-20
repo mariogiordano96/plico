@@ -741,5 +741,9 @@
   "coachGateFewSessions": "You need at least {needed} completed workouts in the last 90 days (you have {have}). Alternatively, write your current level and goal here in the chat.",
   "@coachGateFewSessions": {"placeholders": {"needed": {"type": "int"}, "have": {"type": "int"}}},
   "coachGateNoPlan": "Generate a meal plan first.",
-  "coachAvvisoAllergie": "Always check the ingredients against your allergies and intolerances."
+  "coachAvvisoAllergie": "Always check the ingredients against your allergies and intolerances.",
+  "coachAzioneAlimentazione": "New eating plan",
+  "coachAzioneAlimentazioneMsg": "Generate a new eating plan",
+  "coachAzioneScheda": "New workout plan",
+  "coachAzioneSchedaMsg": "Generate a new workout plan"
 }

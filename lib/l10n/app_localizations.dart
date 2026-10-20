@@ -4171,6 +4171,30 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Verifica sempre gli ingredienti rispetto alle tue allergie e intolleranze.'**
   String get coachAvvisoAllergie;
+
+  /// No description provided for @coachAzioneAlimentazione.
+  ///
+  /// In it, this message translates to:
+  /// **'Nuova alimentazione'**
+  String get coachAzioneAlimentazione;
+
+  /// No description provided for @coachAzioneAlimentazioneMsg.
+  ///
+  /// In it, this message translates to:
+  /// **'Genera una nuova alimentazione'**
+  String get coachAzioneAlimentazioneMsg;
+
+  /// No description provided for @coachAzioneScheda.
+  ///
+  /// In it, this message translates to:
+  /// **'Nuova scheda'**
+  String get coachAzioneScheda;
+
+  /// No description provided for @coachAzioneSchedaMsg.
+  ///
+  /// In it, this message translates to:
+  /// **'Genera una nuova scheda di allenamento'**
+  String get coachAzioneSchedaMsg;
 }
 
 class _AppLocalizationsDelegate

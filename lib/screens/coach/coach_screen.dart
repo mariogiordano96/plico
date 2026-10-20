@@ -278,6 +278,8 @@ class _CoachScreenState extends State<CoachScreen> {
 
   String _actionLabel(CoachAction a) => switch (a) {
         CoachAction.recipes => context.l10n.coachAzioneRicetteMsg,
+        CoachAction.nutrition => context.l10n.coachAzioneAlimentazioneMsg,
+        CoachAction.workout => context.l10n.coachAzioneSchedaMsg,
       };
 
   Future<void> _runAction(CoachAction action) async {
@@ -355,7 +357,8 @@ class _CoachScreenState extends State<CoachScreen> {
 
     final label = _actionLabel(action);
     if (!await _addMessage(_ChatMessage(isUser: true, text: label))) return;
-    await _sendText(label, actionSuffix: request.systemSuffix);
+    await _sendText(label,
+        actionSuffix: request.systemSuffix, allergyNote: action != CoachAction.workout);
   }
 
   Future<void> _send() async {
@@ -376,7 +379,7 @@ class _CoachScreenState extends State<CoachScreen> {
   /// `_messages`, non va aggiunto di nuovo.
   Future<void> _retry(String text) => _sendText(text);
 
-  Future<void> _sendText(String text, {String? actionSuffix}) async {
+  Future<void> _sendText(String text, {String? actionSuffix, bool allergyNote = false}) async {
     if (_sending || _apiKey == null) return;
     // Guardrail deterministico (docs/integrazione_flutter_gemma.md, Fase 8):
     // per le richieste palesemente fuori tema risponde subito in locale,
@@ -418,9 +421,7 @@ class _CoachScreenState extends State<CoachScreen> {
       // scritto dall'app, non delegato al modello.
       await _addMessage(_ChatMessage(
           isUser: false,
-          text: actionSuffix == null
-              ? reply
-              : '$reply\n\n_${context.l10n.coachAvvisoAllergie}_'));
+          text: allergyNote ? '$reply\n\n_${context.l10n.coachAvvisoAllergie}_' : reply));
     } on GeminiException catch (e) {
       if (!mounted) return;
       // Nessun "Riprova" per le azioni: il contesto non è nel testo utente,
@@ -841,19 +842,21 @@ class _ChatView extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: ActionChip(
-                  avatar: Icon(Icons.restaurant_menu_rounded, size: 16, color: p.accent),
-                  label: Text(l10n.coachAzioneRicette,
-                      style: TextStyle(color: p.textPrimary, fontSize: 12)),
-                  backgroundColor: p.surfaceVariant,
-                  side: BorderSide(color: p.cardBorder),
-                  onPressed: sending || remainingToday <= 0
-                      ? null
-                      : () => onAction(CoachAction.recipes),
+              for (final (action, icon, label) in [
+                (CoachAction.recipes, Icons.restaurant_menu_rounded, l10n.coachAzioneRicette),
+                (CoachAction.nutrition, Icons.set_meal_rounded, l10n.coachAzioneAlimentazione),
+                (CoachAction.workout, Icons.fitness_center_rounded, l10n.coachAzioneScheda),
+              ])
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: ActionChip(
+                    avatar: Icon(icon, size: 16, color: p.accent),
+                    label: Text(label, style: TextStyle(color: p.textPrimary, fontSize: 12)),
+                    backgroundColor: p.surfaceVariant,
+                    side: BorderSide(color: p.cardBorder),
+                    onPressed: sending || remainingToday <= 0 ? null : () => onAction(action),
+                  ),
                 ),
-              ),
             ],
           ),
         ),
