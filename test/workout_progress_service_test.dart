@@ -28,6 +28,7 @@ WorkoutSet _set({
     ..weightKg = weightKg
     ..rpe = rpe
     ..isWarmup = isWarmup
+    ..confirmed = true
     ..restPauseClusters = restPauseClusters
     ..dropStages = dropStages;
 }
@@ -209,6 +210,13 @@ void main() {
   });
 
   group('suggestNextSession', () {
+    test('serie non confermate ignorate: nessun suggerimento da 0 kg', () {
+      final last = _exercise(sets: [WorkoutSet()..reps = 10]);
+      expect(WorkoutProgressService.hasConfirmedWork(last), isFalse);
+      final s = WorkoutProgressService.suggestNextSession(last);
+      expect(s.suggestedWeightKg, isNull);
+    });
+
     test('nessuna serie di lavoro → maintain senza valori suggeriti', () {
       final last = _exercise(sets: []);
       final s = WorkoutProgressService.suggestNextSession(last);
@@ -315,3 +323,4 @@ void main() {
     });
   });
 }
+

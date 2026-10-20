@@ -28,6 +28,16 @@ class WorkoutProgressService {
   static List<WorkoutSet> _workSets(WorkoutExercise e) =>
       e.sets.where((s) => !s.isWarmup).toList();
 
+  /// true se la sessione ha almeno una serie di lavoro realmente confermata.
+  /// Le sessioni create all'avvio ma mai svolte (serie senza peso/non
+  /// confermate) non devono finire nello storico usato per i suggerimenti:
+  /// altrimenti `weightKg ?? 0` produce un suggerimento di 0 kg.
+  static bool hasConfirmedWork(WorkoutExercise e) =>
+      _workSets(e).any((s) => s.confirmed);
+
+  static List<WorkoutSet> _confirmedWorkSets(WorkoutExercise e) =>
+      _workSets(e).where((s) => s.confirmed).toList();
+
   /// Volume (kg sollevati) di una singola serie, tecniche incluse
   /// (docs/tecniche_allenamento.md, Fase 5, sezione 5):
   /// - stripping: somma anche i gradini in `dropStages` (peso diverso a ogni
@@ -142,7 +152,7 @@ class WorkoutProgressService {
   /// per lo stesso esercizio. Usa la prima serie come riferimento del "target"
   /// (i preset prescrivono rip uniformi tra le serie, es. "3×8").
   static OverloadSuggestion suggestNextSession(WorkoutExercise lastSession) {
-    final sets = _workSets(lastSession);
+    final sets = _confirmedWorkSets(lastSession);
     if (sets.isEmpty) {
       return const OverloadSuggestion(direction: OverloadDirection.maintain);
     }
@@ -215,7 +225,7 @@ class WorkoutProgressService {
 
   /// Suggerimento di scarico: -40% sul carico massimo recente.
   static OverloadSuggestion deloadSuggestion(WorkoutExercise lastSession) {
-    final sets = _workSets(lastSession);
+    final sets = _confirmedWorkSets(lastSession);
     final maxWeight =
         sets.isEmpty ? null : sets.map((s) => s.weightKg ?? 0).reduce((a, b) => a > b ? a : b);
     return OverloadSuggestion(

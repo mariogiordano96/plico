@@ -158,7 +158,9 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
       // dallo storico, altrimenti il suggerimento si baserebbe sui valori appena
       // creati invece che sull'ultima sessione realmente svolta.
       final history =
-          (await db.getHistoryForExercise(e.exerciseId)).where((h) => h.id != e.id).toList();
+          (await db.getHistoryForExercise(e.exerciseId))
+              .where((h) => h.id != e.id && WorkoutProgressService.hasConfirmedWork(h))
+              .toList();
       _priorHistoryByExerciseId[e.exerciseId] = history;
       // Se la prima serie è già confermata (esercizio rivisto con "Avvia
       // allenamento" dopo essere stato davvero completato), non sovrascriverla
@@ -362,7 +364,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     }
 
     final history = (await DatabaseService.instance.getHistoryForExercise(e.exerciseId))
-        .where((h) => h.id != e.id)
+        .where((h) => h.id != e.id && WorkoutProgressService.hasConfirmedWork(h))
         .toList();
     _priorHistoryByExerciseId[e.exerciseId] = history;
     OverloadSuggestion? suggestion;
