@@ -17,6 +17,10 @@ class WorkoutTemplate {
   DateTime? lastUsedAt;
   bool isPreset = false; // true per le schede precaricate dall'app (read-only)
 
+  // Quando l'utente ha disattivato lo scarico proposto in sessione guidata:
+  // non viene riproposto per `WorkoutProgressService.deloadCycleWeeks` settimane.
+  DateTime? deloadDismissedAt;
+
   @Index(type: IndexType.value)
   int? programId; // WorkoutProgram.id, null se la scheda è autonoma
   int order = 0; // posizione nella rotazione/visualizzazione del programma

@@ -2218,4 +2218,21 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get coachErroreGenerico => 'Qualcosa è andato storto, riprova.';
+
+  @override
+  String get sessioneGuidataScaricoTitolo => 'Settimana di scarico consigliata';
+
+  @override
+  String get sessioneGuidataScaricoSottotitolo =>
+      '3 settimane di progressione: carichi ridotti del 40%. Disattiva per tornare ai pesi normali (non verrà riproposto per 3 settimane).';
+
+  @override
+  String overloadScarico(String kg) {
+    return 'Scarico: $kg kg';
+  }
+
+  @override
+  String overloadScaricoConNormale(String kg, String normalKg) {
+    return 'Scarico: $kg kg (normale: $normalKg kg)';
+  }
 }

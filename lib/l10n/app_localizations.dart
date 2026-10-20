@@ -4057,6 +4057,30 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Qualcosa è andato storto, riprova.'**
   String get coachErroreGenerico;
+
+  /// No description provided for @sessioneGuidataScaricoTitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'Settimana di scarico consigliata'**
+  String get sessioneGuidataScaricoTitolo;
+
+  /// No description provided for @sessioneGuidataScaricoSottotitolo.
+  ///
+  /// In it, this message translates to:
+  /// **'3 settimane di progressione: carichi ridotti del 40%. Disattiva per tornare ai pesi normali (non verrà riproposto per 3 settimane).'**
+  String get sessioneGuidataScaricoSottotitolo;
+
+  /// No description provided for @overloadScarico.
+  ///
+  /// In it, this message translates to:
+  /// **'Scarico: {kg} kg'**
+  String overloadScarico(String kg);
+
+  /// No description provided for @overloadScaricoConNormale.
+  ///
+  /// In it, this message translates to:
+  /// **'Scarico: {kg} kg (normale: {normalKg} kg)'**
+  String overloadScaricoConNormale(String kg, String normalKg);
 }
 
 class _AppLocalizationsDelegate

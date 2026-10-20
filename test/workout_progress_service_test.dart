@@ -225,15 +225,15 @@ void main() {
       expect(s.suggestedReps, isNull);
     });
 
-    test('2+ serie sotto il target di rip → decrease (-7.5% arrotondato)', () {
+    test('2+ serie sotto il target di rip → maintain, mai una riduzione', () {
       final last = _exercise(sets: [
         _set(reps: 10, weightKg: 100),
         _set(reps: 8, weightKg: 100),
         _set(reps: 7, weightKg: 100),
       ]);
       final s = WorkoutProgressService.suggestNextSession(last);
-      expect(s.direction, OverloadDirection.decrease);
-      expect(s.suggestedWeightKg, 92.5);
+      expect(s.direction, OverloadDirection.maintain);
+      expect(s.suggestedWeightKg, 100);
       expect(s.suggestedReps, 10);
     });
 
@@ -298,6 +298,40 @@ void main() {
         _exercise(date: DateTime(2026, 1, 22), sets: [_set(reps: 5, weightKg: 100)]),
       ];
       expect(WorkoutProgressService.needsDeload(history), isFalse);
+    });
+  });
+
+  group('shouldOfferDeload', () {
+    final history = [
+      _exercise(date: DateTime(2026, 1, 8), sets: [_set(reps: 5, weightKg: 100)]),
+      _exercise(date: DateTime(2026, 1, 15), sets: [_set(reps: 5, weightKg: 105)]),
+      _exercise(date: DateTime(2026, 1, 22), sets: [_set(reps: 5, weightKg: 110)]),
+    ];
+
+    test('3 settimane di progressione consecutive → proposto', () {
+      expect(WorkoutProgressService.shouldOfferDeload(history), isTrue);
+    });
+
+    test('disattivato meno di 3 settimane fa → non riproposto', () {
+      expect(
+        WorkoutProgressService.shouldOfferDeload(
+          history,
+          dismissedAt: DateTime(2026, 1, 25),
+          now: DateTime(2026, 2, 10),
+        ),
+        isFalse,
+      );
+    });
+
+    test('disattivato 3+ settimane fa → riproposto', () {
+      expect(
+        WorkoutProgressService.shouldOfferDeload(
+          history,
+          dismissedAt: DateTime(2026, 1, 25),
+          now: DateTime(2026, 2, 15),
+        ),
+        isTrue,
+      );
     });
   });
 

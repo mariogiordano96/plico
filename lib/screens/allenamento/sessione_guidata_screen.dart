@@ -42,6 +42,15 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
   double? _bodyWeightKg;
 
   final Map<int, OverloadSuggestion?> _suggestionById = {};
+  // Suggerimento "normale" (progressione) e di scarico per esercizio: lo scarico
+  // è opzionale e per scheda, non per esercizio — si passa dall'uno all'altro
+  // con il flag sul primo esercizio (`_deloadAnchor`), senza perdere il peso
+  // originale. Vedi `_setDeload`.
+  final Map<int, OverloadSuggestion> _normalById = {};
+  final Map<int, OverloadSuggestion> _deloadById = {};
+  WorkoutExercise? _deloadAnchor;
+  bool _deloadOffered = false;
+  bool _deloadActive = false;
   final Map<int, List<TextEditingController>> _repsCtrls = {};
   final Map<int, List<TextEditingController>> _kgCtrls = {};
   final Map<int, TextEditingController> _durataCtrls = {};
@@ -145,6 +154,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
       for (final ex in await db.getAllExercises()) ex.externalId: ex.muscleGroup,
     };
     final steps = GuidedSessionService.groupSteps(widget.exercises);
+    _deloadAnchor = widget.exercises.where((x) => !x.isCardio).firstOrNull;
     final warmupIds = GuidedSessionService.warmupExerciseIds(steps, muscleGroupById);
 
     for (final e in widget.exercises) {
@@ -177,16 +187,16 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
       final firstConfirmed = e.sets.isNotEmpty && e.sets.first.confirmed;
       if (history.isNotEmpty) {
         final lastSession = history.first;
-        final suggestion = WorkoutProgressService.needsDeload(history)
-            ? WorkoutProgressService.deloadSuggestion(lastSession)
-            : WorkoutProgressService.suggestNextSession(lastSession);
-        _suggestionById[e.id] = suggestion;
-        if (e.sets.isNotEmpty && !firstConfirmed) {
-          if (suggestion.suggestedReps != null) e.sets.first.reps = suggestion.suggestedReps;
-          if (suggestion.suggestedWeightKg != null) {
-            e.sets.first.weightKg = suggestion.suggestedWeightKg;
-          }
+        _normalById[e.id] = WorkoutProgressService.suggestNextSession(lastSession);
+        _deloadById[e.id] = WorkoutProgressService.deloadSuggestion(lastSession);
+        if (identical(e, _deloadAnchor)) {
+          _deloadOffered = WorkoutProgressService.shouldOfferDeload(
+            history,
+            dismissedAt: widget.template.deloadDismissedAt,
+          );
+          _deloadActive = _deloadOffered;
         }
+        _applySuggestion(e);
       }
 
       final targetWeightKg = e.sets.isNotEmpty ? e.sets.first.weightKg : null;
@@ -221,6 +231,42 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
       _steps = steps;
       _stepIndex = firstPending == -1 ? (steps.isEmpty ? 0 : steps.length - 1) : firstPending;
       _loading = false;
+    });
+  }
+
+  /// Imposta il suggerimento di [e] (normale o di scarico, secondo
+  /// `_deloadActive`) e precompila la prima serie di lavoro se non è già
+  /// confermata (altrimenti mostrerebbe un valore diverso da quello salvato).
+  void _applySuggestion(WorkoutExercise e) {
+    final normal = _normalById[e.id];
+    final s = _deloadActive ? (_deloadById[e.id] ?? normal) : normal;
+    _suggestionById[e.id] = s;
+    if (s == null) return;
+    final i = e.sets.indexWhere((x) => !x.isWarmup);
+    if (i == -1 || e.sets[i].confirmed) return;
+    if (s.suggestedReps != null) {
+      e.sets[i].reps = s.suggestedReps;
+      _repsCtrls[e.id]?[i].text = s.suggestedReps.toString();
+    }
+    if (s.suggestedWeightKg != null) {
+      e.sets[i].weightKg = s.suggestedWeightKg;
+      _kgCtrls[e.id]?[i].text = s.suggestedWeightKg.toString();
+    }
+  }
+
+  /// Attiva/disattiva lo scarico per tutta la scheda. Disattivarlo è una
+  /// scelta dell'utente: viene ricordata sulla scheda e lo scarico non si
+  /// ripresenta prima di `WorkoutProgressService.deloadCycleWeeks` settimane.
+  Future<void> _setDeload(bool on) async {
+    final template = widget.template;
+    template.deloadDismissedAt = on ? null : DateTime.now();
+    await DatabaseService.instance.saveWorkoutTemplate(template);
+    if (!mounted) return;
+    setState(() {
+      _deloadActive = on;
+      for (final e in widget.exercises) {
+        if (!e.isCardio) _applySuggestion(e);
+      }
     });
   }
 
@@ -381,12 +427,12 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
         .where((h) => h.id != e.id && WorkoutProgressService.hasConfirmedWork(h))
         .toList();
     _priorHistoryByExerciseId[e.exerciseId] = history;
-    OverloadSuggestion? suggestion;
     if (history.isNotEmpty) {
-      final lastSession = history.first;
-      suggestion = WorkoutProgressService.needsDeload(history)
-          ? WorkoutProgressService.deloadSuggestion(lastSession)
-          : WorkoutProgressService.suggestNextSession(lastSession);
+      _normalById[e.id] = WorkoutProgressService.suggestNextSession(history.first);
+      _deloadById[e.id] = WorkoutProgressService.deloadSuggestion(history.first);
+    } else {
+      _normalById.remove(e.id);
+      _deloadById.remove(e.id);
     }
 
     e.estimatedKcal = CalorieEstimationService.estimateStrengthKcal(
@@ -395,7 +441,10 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     );
     await DatabaseService.instance.updateWorkoutExercise(e);
     if (!mounted) return;
-    setState(() => _suggestionById[e.id] = suggestion);
+    setState(() {
+      final normal = _normalById[e.id];
+      _suggestionById[e.id] = _deloadActive ? (_deloadById[e.id] ?? normal) : normal;
+    });
   }
 
   void _prev() {
@@ -521,6 +570,10 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
             for (final e in step) _ExerciseStepCard(
               exercise: e,
               suggestion: _suggestionById[e.id],
+              normalWeightKg: _deloadActive ? _normalById[e.id]?.suggestedWeightKg : null,
+              deloadBanner: _deloadOffered && identical(e, _deloadAnchor)
+                  ? _DeloadBanner(active: _deloadActive, onChanged: _setDeload, p: p, l10n: l10n)
+                  : null,
               repsCtrls: _repsCtrls[e.id],
               kgCtrls: _kgCtrls[e.id],
               durataCtrl: _durataCtrls[e.id],
@@ -579,6 +632,8 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
 class _ExerciseStepCard extends StatelessWidget {
   final WorkoutExercise exercise;
   final OverloadSuggestion? suggestion;
+  final double? normalWeightKg;
+  final Widget? deloadBanner;
   final List<TextEditingController>? repsCtrls;
   final List<TextEditingController>? kgCtrls;
   final TextEditingController? durataCtrl;
@@ -599,6 +654,8 @@ class _ExerciseStepCard extends StatelessWidget {
   const _ExerciseStepCard({
     required this.exercise,
     required this.suggestion,
+    required this.normalWeightKg,
+    required this.deloadBanner,
     required this.repsCtrls,
     required this.kgCtrls,
     required this.durataCtrl,
@@ -701,9 +758,14 @@ class _ExerciseStepCard extends StatelessWidget {
               style: TextStyle(color: p.accent, fontSize: 12, fontWeight: FontWeight.w600),
             ),
           ],
+          if (deloadBanner != null) ...[
+            const SizedBox(height: 8),
+            deloadBanner!,
+          ],
           if (suggestion != null) ...[
             const SizedBox(height: 6),
-            _SuggestionLine(suggestion: suggestion!, p: p, l10n: l10n),
+            _SuggestionLine(
+                suggestion: suggestion!, normalWeightKg: normalWeightKg, p: p, l10n: l10n),
           ],
           const SizedBox(height: 14),
           if (_isCardio)
@@ -803,11 +865,52 @@ class _ExerciseStepCard extends StatelessWidget {
   }
 }
 
-class _SuggestionLine extends StatelessWidget {
-  final OverloadSuggestion suggestion;
+class _DeloadBanner extends StatelessWidget {
+  final bool active;
+  final ValueChanged<bool> onChanged;
   final ColorPalette p;
   final dynamic l10n;
-  const _SuggestionLine({required this.suggestion, required this.p, required this.l10n});
+  const _DeloadBanner(
+      {required this.active, required this.onChanged, required this.p, required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
+      decoration: BoxDecoration(
+        color: p.background,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: p.accent.withValues(alpha: 0.5)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('💡 ${l10n.sessioneGuidataScaricoTitolo}',
+                    style: TextStyle(
+                        color: p.accent, fontSize: 13, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 2),
+                Text(l10n.sessioneGuidataScaricoSottotitolo,
+                    style: TextStyle(color: p.textMuted, fontSize: 12)),
+              ],
+            ),
+          ),
+          Switch(value: active, onChanged: onChanged, activeThumbColor: p.accent),
+        ],
+      ),
+    );
+  }
+}
+
+class _SuggestionLine extends StatelessWidget {
+  final OverloadSuggestion suggestion;
+  final double? normalWeightKg;
+  final ColorPalette p;
+  final dynamic l10n;
+  const _SuggestionLine(
+      {required this.suggestion, required this.normalWeightKg, required this.p, required this.l10n});
 
   @override
   Widget build(BuildContext context) {
@@ -817,7 +920,11 @@ class _SuggestionLine extends StatelessWidget {
     String text;
     String icon;
     if (suggestion.isDeload) {
-      text = l10n.overloadDeload(4, kgLabel);
+      final normal = normalWeightKg;
+      text = normal == null
+          ? l10n.overloadScarico(kgLabel)
+          : l10n.overloadScaricoConNormale(
+              kgLabel, normal.toStringAsFixed(normal % 1 == 0 ? 0 : 1));
       icon = '💡';
     } else {
       switch (suggestion.direction) {

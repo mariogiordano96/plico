@@ -22,34 +22,39 @@ const WorkoutTemplateSchema = CollectionSchema(
       name: r'createdAt',
       type: IsarType.dateTime,
     ),
-    r'exercises': PropertySchema(
+    r'deloadDismissedAt': PropertySchema(
       id: 1,
+      name: r'deloadDismissedAt',
+      type: IsarType.dateTime,
+    ),
+    r'exercises': PropertySchema(
+      id: 2,
       name: r'exercises',
       type: IsarType.objectList,
       target: r'WorkoutTemplateExercise',
     ),
     r'isPreset': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'isPreset',
       type: IsarType.bool,
     ),
     r'lastUsedAt': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'lastUsedAt',
       type: IsarType.dateTime,
     ),
     r'name': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'name',
       type: IsarType.string,
     ),
     r'order': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'order',
       type: IsarType.long,
     ),
     r'programId': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'programId',
       type: IsarType.long,
     )
@@ -112,17 +117,18 @@ void _workoutTemplateSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeDateTime(offsets[0], object.createdAt);
+  writer.writeDateTime(offsets[1], object.deloadDismissedAt);
   writer.writeObjectList<WorkoutTemplateExercise>(
-    offsets[1],
+    offsets[2],
     allOffsets,
     WorkoutTemplateExerciseSchema.serialize,
     object.exercises,
   );
-  writer.writeBool(offsets[2], object.isPreset);
-  writer.writeDateTime(offsets[3], object.lastUsedAt);
-  writer.writeString(offsets[4], object.name);
-  writer.writeLong(offsets[5], object.order);
-  writer.writeLong(offsets[6], object.programId);
+  writer.writeBool(offsets[3], object.isPreset);
+  writer.writeDateTime(offsets[4], object.lastUsedAt);
+  writer.writeString(offsets[5], object.name);
+  writer.writeLong(offsets[6], object.order);
+  writer.writeLong(offsets[7], object.programId);
 }
 
 WorkoutTemplate _workoutTemplateDeserialize(
@@ -133,19 +139,20 @@ WorkoutTemplate _workoutTemplateDeserialize(
 ) {
   final object = WorkoutTemplate();
   object.createdAt = reader.readDateTime(offsets[0]);
+  object.deloadDismissedAt = reader.readDateTimeOrNull(offsets[1]);
   object.exercises = reader.readObjectList<WorkoutTemplateExercise>(
-        offsets[1],
+        offsets[2],
         WorkoutTemplateExerciseSchema.deserialize,
         allOffsets,
         WorkoutTemplateExercise(),
       ) ??
       [];
   object.id = id;
-  object.isPreset = reader.readBool(offsets[2]);
-  object.lastUsedAt = reader.readDateTimeOrNull(offsets[3]);
-  object.name = reader.readString(offsets[4]);
-  object.order = reader.readLong(offsets[5]);
-  object.programId = reader.readLongOrNull(offsets[6]);
+  object.isPreset = reader.readBool(offsets[3]);
+  object.lastUsedAt = reader.readDateTimeOrNull(offsets[4]);
+  object.name = reader.readString(offsets[5]);
+  object.order = reader.readLong(offsets[6]);
+  object.programId = reader.readLongOrNull(offsets[7]);
   return object;
 }
 
@@ -159,6 +166,8 @@ P _workoutTemplateDeserializeProp<P>(
     case 0:
       return (reader.readDateTime(offset)) as P;
     case 1:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 2:
       return (reader.readObjectList<WorkoutTemplateExercise>(
             offset,
             WorkoutTemplateExerciseSchema.deserialize,
@@ -166,15 +175,15 @@ P _workoutTemplateDeserializeProp<P>(
             WorkoutTemplateExercise(),
           ) ??
           []) as P;
-    case 2:
-      return (reader.readBool(offset)) as P;
     case 3:
-      return (reader.readDateTimeOrNull(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 4:
-      return (reader.readString(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 5:
-      return (reader.readLong(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 6:
+      return (reader.readLong(offset)) as P;
+    case 7:
       return (reader.readLongOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -447,6 +456,80 @@ extension WorkoutTemplateQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
         property: r'createdAt',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutTemplate, WorkoutTemplate, QAfterFilterCondition>
+      deloadDismissedAtIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'deloadDismissedAt',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutTemplate, WorkoutTemplate, QAfterFilterCondition>
+      deloadDismissedAtIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'deloadDismissedAt',
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutTemplate, WorkoutTemplate, QAfterFilterCondition>
+      deloadDismissedAtEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'deloadDismissedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutTemplate, WorkoutTemplate, QAfterFilterCondition>
+      deloadDismissedAtGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'deloadDismissedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutTemplate, WorkoutTemplate, QAfterFilterCondition>
+      deloadDismissedAtLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'deloadDismissedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WorkoutTemplate, WorkoutTemplate, QAfterFilterCondition>
+      deloadDismissedAtBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'deloadDismissedAt',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -981,6 +1064,20 @@ extension WorkoutTemplateQuerySortBy
   }
 
   QueryBuilder<WorkoutTemplate, WorkoutTemplate, QAfterSortBy>
+      sortByDeloadDismissedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'deloadDismissedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutTemplate, WorkoutTemplate, QAfterSortBy>
+      sortByDeloadDismissedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'deloadDismissedAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<WorkoutTemplate, WorkoutTemplate, QAfterSortBy>
       sortByIsPreset() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isPreset', Sort.asc);
@@ -1062,6 +1159,20 @@ extension WorkoutTemplateQuerySortThenBy
       thenByCreatedAtDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<WorkoutTemplate, WorkoutTemplate, QAfterSortBy>
+      thenByDeloadDismissedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'deloadDismissedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutTemplate, WorkoutTemplate, QAfterSortBy>
+      thenByDeloadDismissedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'deloadDismissedAt', Sort.desc);
     });
   }
 
@@ -1156,6 +1267,13 @@ extension WorkoutTemplateQueryWhereDistinct
   }
 
   QueryBuilder<WorkoutTemplate, WorkoutTemplate, QDistinct>
+      distinctByDeloadDismissedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'deloadDismissedAt');
+    });
+  }
+
+  QueryBuilder<WorkoutTemplate, WorkoutTemplate, QDistinct>
       distinctByIsPreset() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'isPreset');
@@ -1202,6 +1320,13 @@ extension WorkoutTemplateQueryProperty
       createdAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'createdAt');
+    });
+  }
+
+  QueryBuilder<WorkoutTemplate, DateTime?, QQueryOperations>
+      deloadDismissedAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'deloadDismissedAt');
     });
   }
 

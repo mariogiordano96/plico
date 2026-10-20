@@ -721,5 +721,9 @@
   "coachNuovaConversazioneTitolo": "New conversation",
   "coachNuovaConversazioneSub": "The chat history will be permanently deleted. Continue?",
   "coachNuovaConversazioneConferma": "Delete",
-  "coachErroreGenerico": "Something went wrong, please retry."
+  "coachErroreGenerico": "Something went wrong, please retry.",
+  "sessioneGuidataScaricoTitolo": "Deload week suggested",
+  "sessioneGuidataScaricoSottotitolo": "3 weeks of progression: loads reduced by 40%. Turn off to go back to your normal weights (it won't be suggested again for 3 weeks).",
+  "overloadScarico": "Deload: {kg} kg",
+  "overloadScaricoConNormale": "Deload: {kg} kg (normal: {normalKg} kg)"
 }

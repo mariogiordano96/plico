@@ -2207,4 +2207,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get coachErroreGenerico => 'Something went wrong, please retry.';
+
+  @override
+  String get sessioneGuidataScaricoTitolo => 'Deload week suggested';
+
+  @override
+  String get sessioneGuidataScaricoSottotitolo =>
+      '3 weeks of progression: loads reduced by 40%. Turn off to go back to your normal weights (it won\'t be suggested again for 3 weeks).';
+
+  @override
+  String overloadScarico(String kg) {
+    return 'Deload: $kg kg';
+  }
+
+  @override
+  String overloadScaricoConNormale(String kg, String normalKg) {
+    return 'Deload: $kg kg (normal: $normalKg kg)';
+  }
 }

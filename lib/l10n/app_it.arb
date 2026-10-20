@@ -878,5 +878,11 @@
   "coachNuovaConversazioneTitolo": "Nuova conversazione",
   "coachNuovaConversazioneSub": "La cronologia della chat verrà cancellata definitivamente. Continuare?",
   "coachNuovaConversazioneConferma": "Cancella",
-  "coachErroreGenerico": "Qualcosa è andato storto, riprova."
+  "coachErroreGenerico": "Qualcosa è andato storto, riprova.",
+  "sessioneGuidataScaricoTitolo": "Settimana di scarico consigliata",
+  "sessioneGuidataScaricoSottotitolo": "3 settimane di progressione: carichi ridotti del 40%. Disattiva per tornare ai pesi normali (non verrà riproposto per 3 settimane).",
+  "overloadScarico": "Scarico: {kg} kg",
+  "@overloadScarico": { "placeholders": { "kg": { "type": "String" } } },
+  "overloadScaricoConNormale": "Scarico: {kg} kg (normale: {normalKg} kg)",
+  "@overloadScaricoConNormale": { "placeholders": { "kg": { "type": "String" }, "normalKg": { "type": "String" } } }
 }

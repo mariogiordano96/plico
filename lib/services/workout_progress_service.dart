@@ -166,14 +166,7 @@ class WorkoutProgressService {
     final avgRpe =
         rpeValues.isEmpty ? null : rpeValues.reduce((a, b) => a + b) / rpeValues.length;
 
-    if (underperforming >= 2) {
-      return OverloadSuggestion(
-        direction: OverloadDirection.decrease,
-        suggestedWeightKg: _roundToNearest(maxWeight * 0.925, 2.5),
-        suggestedReps: baselineReps,
-      );
-    }
-    if (underperforming == 1) {
+    if (underperforming >= 1) {
       return OverloadSuggestion(
         direction: OverloadDirection.maintain,
         suggestedWeightKg: maxWeight,
@@ -199,12 +192,30 @@ class WorkoutProgressService {
     return d.subtract(Duration(days: d.weekday - 1));
   }
 
-  /// true se nelle ultime [weeks] settimane CONSECUTIVE (default 4) il carico
+  /// Settimane di progressione dopo le quali viene proposto lo scarico, e
+  /// durata del "silenzio" dopo che l'utente lo ha disattivato.
+  static const int deloadCycleWeeks = 3;
+
+  /// true se lo scarico va proposto: condizioni di [needsDeload] soddisfatte e
+  /// non disattivato dall'utente nelle ultime [deloadCycleWeeks] settimane.
+  static bool shouldOfferDeload(
+    List<WorkoutExercise> history, {
+    DateTime? dismissedAt,
+    DateTime? now,
+  }) {
+    if (dismissedAt != null &&
+        (now ?? DateTime.now()).difference(dismissedAt).inDays < deloadCycleWeeks * 7) {
+      return false;
+    }
+    return needsDeload(history);
+  }
+
+  /// true se nelle ultime [weeks] settimane CONSECUTIVE (default 3) il carico
   /// massimo per settimana non è mai diminuito — segnale che potrebbe servire
   /// una settimana di scarico prima di continuare a progredire. Settimane
   /// senza nessuna sessione registrata interrompono la sequenza: non basta
   /// che esistano N settimane con dati, devono susseguirsi senza salti.
-  static bool needsDeload(List<WorkoutExercise> history, {int weeks = 4}) {
+  static bool needsDeload(List<WorkoutExercise> history, {int weeks = deloadCycleWeeks}) {
     final byWeek = <DateTime, double>{};
     for (final e in history) {
       final maxW = sessionMaxWeight(e);
