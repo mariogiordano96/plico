@@ -437,6 +437,29 @@ noto**: il contatore giornaliero è locale a questo device — un utente con Pli
 più device supererebbe comunque il free tier di Google senza che Plico se ne accorga (nessun
 sync della quota tra device), da tenere presente se emergono segnalazioni.
 
+
+### Fase 8 — Contesto sui dati utente nel Coach (implementata, 2026-10)
+
+Il Coach ora può rispondere su dati reali ("cosa mangio a pranzo secondo il mio piano?",
+"sto allenando abbastanza le gambe?"). **Scelta: contesto nel system prompt, non function
+calling** — ogni tool call verso Gemini sarebbe una richiesta in più sulla quota free tier
+della chiave dell'utente (vedi `GeminiQuota`), mentre i dati si leggono in locale prima
+della richiesta, come già indicato nella Fase 7 per il piano alimentare.
+
+- [x] `CoachContext` (`lib/services/coach_context.dart`): `load()` legge da
+      `DatabaseService` (obiettivo, target giornalieri, ultimi 5 pesi, pasti di oggi, kcal
+      allenamento, piano attivo con grammature, volume settimanale per gruppo, 8 PR) e
+      `build()` (pura, IT/EN) lo trasforma in testo compatto accodato al system prompt.
+- [x] **Opt-in esplicito**: `AppSettings.coachShareData`, default `false`, toggle in AppBar
+      della tab Coach (icona persona) con snackbar che dice che i dati vanno a Google. Il
+      disclaimer della Fase 7 copriva le "richieste", non dati personali.
+- [x] Fallimento della lettura contesto → il Coach risponde come prima, senza contesto.
+- [x] Test: `test/coach_context_test.dart`.
+- [ ] Verifica su device con chiave reale (le grammature citate nelle ricette coincidono
+      con quelle del piano? vedi nota sezione 3.2).
+- [ ] Eventuale tool per storico di un singolo esercizio (`getHistoryForExercise`): non
+      incluso, il contesto resta piccolo; da valutare se emergono domande che lo richiedono.
+
 ---
 
 ## Riferimenti

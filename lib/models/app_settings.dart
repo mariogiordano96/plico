@@ -77,4 +77,9 @@ class AppSettings {
   // detto prima ancora delle istruzioni per la chiave, non solo nel
   // disclaimer al salvataggio.
   bool coachOnboardingSeen = false;
+  // Fase 8: opt-in esplicito a mandare a Google, insieme alla domanda, uno
+  // snapshot dei propri dati (peso, pasti di oggi, piano, allenamenti). Off
+  // di default: il disclaimer già accettato parlava di "richieste", non di
+  // dati personali.
+  bool coachShareData = false;
 }

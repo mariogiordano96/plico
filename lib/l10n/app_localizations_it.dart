@@ -2235,4 +2235,14 @@ class AppLocalizationsIt extends AppLocalizations {
   String overloadScaricoConNormale(String kg, String normalKg) {
     return 'Scarico: $kg kg (normale: $normalKg kg)';
   }
+
+  @override
+  String get coachCondividiDatiTooltip => 'Condividi i miei dati con il Coach';
+
+  @override
+  String get coachCondividiDatiOn =>
+      'Il Coach ora vede i tuoi dati (peso, pasti di oggi, piano, allenamenti): vengono inviati a Google insieme alla domanda.';
+
+  @override
+  String get coachCondividiDatiOff => 'Il Coach non vede più i tuoi dati.';
 }

@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/app_settings.dart';
 import '../../models/coach_message.dart';
+import '../../services/coach_context.dart';
 import '../../services/coach_guardrail.dart';
 import '../../services/database_service.dart';
 import '../../services/gemini_quota.dart';
@@ -71,6 +72,7 @@ class _CoachScreenState extends State<CoachScreen> {
   final _inputCtrl = TextEditingController();
   final _scrollCtrl = ScrollController();
   bool _sending = false;
+  bool _shareData = false;
   String? _retryHint;
 
   // Limite ai turni inviati a Gemini come history: la conversazione persiste
@@ -100,6 +102,7 @@ class _CoachScreenState extends State<CoachScreen> {
     setState(() {
       _apiKey = settings.geminiApiKey?.isNotEmpty == true ? settings.geminiApiKey : null;
       _remainingToday = remaining;
+      _shareData = settings.coachShareData;
       _messages
         ..clear()
         ..addAll(_fromPersisted(persisted));
@@ -207,7 +210,33 @@ class _CoachScreenState extends State<CoachScreen> {
     });
   }
 
-  String _systemInstruction(BuildContext context) {
+  Future<String> _systemInstruction(BuildContext context) async {
+    final base = _baseInstruction(context);
+    if (!_shareData) return base;
+    try {
+      final isItalian = Localizations.localeOf(context).languageCode == 'it';
+      final data = CoachContext.build(await CoachContext.load(), isItalian: isItalian);
+      return data.isEmpty ? base : '$base\n\n$data';
+    } catch (_) {
+      // Il contesto è un di più: se la lettura fallisce il Coach risponde
+      // comunque, come prima della Fase 8.
+      return base;
+    }
+  }
+
+  Future<void> _toggleShareData() async {
+    final settings = await DatabaseService.instance.getAppSettings();
+    settings.coachShareData = !settings.coachShareData;
+    await DatabaseService.instance.saveAppSettings(settings);
+    if (!mounted) return;
+    setState(() => _shareData = settings.coachShareData);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(settings.coachShareData
+            ? context.l10n.coachCondividiDatiOn
+            : context.l10n.coachCondividiDatiOff)));
+  }
+
+  String _baseInstruction(BuildContext context) {
     final isItalian = Localizations.localeOf(context).languageCode == 'it';
     if (isItalian) {
       return 'Sei il "Coach" dell\'app Plico, un assistente su allenamento e '
@@ -268,7 +297,7 @@ class _CoachScreenState extends State<CoachScreen> {
     try {
       final reply = await GeminiService.sendMessage(
         apiKey: _apiKey!,
-        systemInstruction: _systemInstruction(context),
+        systemInstruction: await _systemInstruction(context),
         // Esclude i bubble di errore dalla storia mandata a Gemini: sono
         // messaggi nostri (localizzati, per l'utente), non turni reali del
         // modello — includerli inquinerebbe la conversazione. Tronca poi ai
@@ -395,6 +424,13 @@ class _CoachScreenState extends State<CoachScreen> {
         elevation: 0,
         centerTitle: true,
         actions: [
+          if (_apiKey != null)
+            IconButton(
+              onPressed: _toggleShareData,
+              icon: Icon(_shareData ? Icons.person_rounded : Icons.person_off_outlined,
+                  color: _shareData ? p.accent : p.textMuted),
+              tooltip: l10n.coachCondividiDatiTooltip,
+            ),
           if (_apiKey != null && _messages.isNotEmpty)
             IconButton(
               onPressed: _nuovaConversazione,

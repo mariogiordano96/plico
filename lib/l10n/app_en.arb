@@ -725,5 +725,8 @@
   "sessioneGuidataScaricoTitolo": "Deload week suggested",
   "sessioneGuidataScaricoSottotitolo": "3 weeks of progression: loads reduced by 40%. Turn off to go back to your normal weights (it won't be suggested again for 3 weeks).",
   "overloadScarico": "Deload: {kg} kg",
-  "overloadScaricoConNormale": "Deload: {kg} kg (normal: {normalKg} kg)"
+  "overloadScaricoConNormale": "Deload: {kg} kg (normal: {normalKg} kg)",
+  "coachCondividiDatiTooltip": "Share my data with the Coach",
+  "coachCondividiDatiOn": "The Coach now sees your data (weight, today's meals, plan, workouts): it is sent to Google along with your question.",
+  "coachCondividiDatiOff": "The Coach no longer sees your data."
 }

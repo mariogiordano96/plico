@@ -884,5 +884,8 @@
   "overloadScarico": "Scarico: {kg} kg",
   "@overloadScarico": { "placeholders": { "kg": { "type": "String" } } },
   "overloadScaricoConNormale": "Scarico: {kg} kg (normale: {normalKg} kg)",
-  "@overloadScaricoConNormale": { "placeholders": { "kg": { "type": "String" }, "normalKg": { "type": "String" } } }
+  "@overloadScaricoConNormale": { "placeholders": { "kg": { "type": "String" }, "normalKg": { "type": "String" } } },
+  "coachCondividiDatiTooltip": "Condividi i miei dati con il Coach",
+  "coachCondividiDatiOn": "Il Coach ora vede i tuoi dati (peso, pasti di oggi, piano, allenamenti): vengono inviati a Google insieme alla domanda.",
+  "coachCondividiDatiOff": "Il Coach non vede più i tuoi dati."
 }

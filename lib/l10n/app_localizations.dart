@@ -4081,6 +4081,24 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Scarico: {kg} kg (normale: {normalKg} kg)'**
   String overloadScaricoConNormale(String kg, String normalKg);
+
+  /// No description provided for @coachCondividiDatiTooltip.
+  ///
+  /// In it, this message translates to:
+  /// **'Condividi i miei dati con il Coach'**
+  String get coachCondividiDatiTooltip;
+
+  /// No description provided for @coachCondividiDatiOn.
+  ///
+  /// In it, this message translates to:
+  /// **'Il Coach ora vede i tuoi dati (peso, pasti di oggi, piano, allenamenti): vengono inviati a Google insieme alla domanda.'**
+  String get coachCondividiDatiOn;
+
+  /// No description provided for @coachCondividiDatiOff.
+  ///
+  /// In it, this message translates to:
+  /// **'Il Coach non vede più i tuoi dati.'**
+  String get coachCondividiDatiOff;
 }
 
 class _AppLocalizationsDelegate
