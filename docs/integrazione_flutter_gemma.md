@@ -460,6 +460,31 @@ della richiesta, come già indicato nella Fase 7 per il piano alimentare.
 - [ ] Eventuale tool per storico di un singolo esercizio (`getHistoryForExercise`): non
       incluso, il contesto resta piccolo; da valutare se emergono domande che lo richiedono.
 
+#### Revisione 2026-10 — azioni a bottone con contesto deterministico (da implementare)
+
+Decisione presa con l'utente: la **chat libera non fa mai function calling** e usa solo il
+contesto leggero già implementato (obiettivo, target, oggi, piano). Lo storico lungo passa
+solo da **bottoni fissi in chat**, ognuno con un costruttore di contesto dalla finestra e dal
+formato fissi: è l'app a decidere quali dati escono, non il modello. Una richiesta Gemini per
+azione (nessun costo extra di quota). **Nessuna scrittura nel database**: il Coach risponde in
+chat in Markdown con la nuova scheda/alimentazione/ricette e l'utente le aggiunge a mano.
+
+- Il tocco del bottone è il consenso per quell'azione, con anteprima di cosa viene inviato.
+- Soglia minima di dati per abilitare il bottone; sotto soglia il bottone è disabilitato e
+  spiega cosa manca, proponendo di descrivere a mano a Gemini livello e obiettivo in chat.
+- Aggregazione a tabelle compatte (CSV con legenda), medie solo sui giorni con diario
+  registrato e numero di giorni registrati dichiarato nel testo.
+- Nella scheda si passano i nomi degli esercizi realmente usati, con l'istruzione di restare
+  su quelli, così l'utente li ritrova nel catalogo.
+
+- [ ] 8a: costruttori di contesto per finestra (3 mesi) + soglie di abilitazione, puro Dart
+      testato
+- [ ] 8b: bottone "Genera ricette dal piano" (input: piano attivo, output di sola lettura)
+- [ ] 8c: bottone "Genera nuova alimentazione" (variante del piano esistente, kcal/macro
+      calcolati dall'app, `piano_service`)
+- [ ] 8d: bottone "Genera nuova scheda" (storico 3 mesi, livello, obiettivo)
+- [ ] Rivedere il ruolo del toggle `coachShareData`: resta solo per la chat libera
+
 ---
 
 ## Riferimenti
