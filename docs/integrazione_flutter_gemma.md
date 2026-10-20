@@ -477,8 +477,17 @@ chat in Markdown con la nuova scheda/alimentazione/ricette e l'utente le aggiung
 - Nella scheda si passano i nomi degli esercizi realmente usati, con l'istruzione di restare
   su quelli, così l'utente li ritrova nel catalogo.
 
-- [ ] 8a: costruttori di contesto per finestra (3 mesi) + soglie di abilitazione, puro Dart
-      testato
+- [x] **2026-10** 8a: `CoachHistory` (`lib/services/coach_history.dart`, test in
+      `test/coach_history_test.dart`): finestra 90 giorni, funzioni pure `gate*`/`build*` +
+      `load*`/`*Gate` da DB. Soglie: scheda ≥ 6 giorni con lavoro *confermato* (non
+      conta le sessioni create e mai svolte); alimentazione = profilo + peso +
+      `questionarioCompletato` (il diario non blocca: se ≥ 14 giorni registrati si
+      aggiungono aderenza e peso, altrimenti il testo dice che è scarso e di non usarlo);
+      ricette = piano con almeno un pasto. Restrizioni alimentari scritte come DIVIETI
+      ASSOLUTI, target kcal/macro come valori FISSI. Medie solo sui giorni registrati, con il
+      numero di giorni dichiarato. La UI riceve `CoachGateReason` (codici), i testi
+      localizzati arrivano con i bottoni (8b-8d). Avviso fisso sotto le risposte: verificare
+      gli ingredienti rispetto alle proprie allergie.
 - [ ] 8b: bottone "Genera ricette dal piano" (input: piano attivo, output di sola lettura)
 - [ ] 8c: bottone "Genera nuova alimentazione" (variante del piano esistente, kcal/macro
       calcolati dall'app, `piano_service`)

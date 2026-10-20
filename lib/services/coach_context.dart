@@ -119,21 +119,7 @@ class CoachContext {
 
     final plan = d.plan;
     if (plan != null && plan.pasti.isNotEmpty) {
-      lines.add(t(
-          'Piano alimentare attivo (${plan.kcalTotali.round()} kcal/giorno'
-              '${plan.obsoleto ? ', segnato come obsoleto' : ''}):',
-          'Active meal plan (${plan.kcalTotali.round()} kcal/day'
-              '${plan.obsoleto ? ', flagged as outdated' : ''}):'));
-      for (final meal in plan.pasti) {
-        final name = _pasti[meal.tipo];
-        final foods = [
-          for (final s in meal.slots)
-            if (s.principale != null)
-              '${s.principale!.nome} ${s.principale!.quantitaG.round()}g',
-        ];
-        if (foods.isEmpty) continue;
-        lines.add('- ${name == null ? '?' : t(name.$1, name.$2)}: ${foods.join(', ')}');
-      }
+      lines.addAll(planLines(plan, isItalian: isItalian));
     }
 
     if (d.weeklyVolume.isNotEmpty) {
@@ -160,6 +146,29 @@ class CoachContext {
             'inventing data that is not listed here; if something is missing, say so. '
             'When quoting plan quantities, keep the grams given.');
     return '$header\n${lines.join('\n')}';
+  }
+
+  /// Piano alimentare attivo come righe di testo (intestazione + un pasto per
+  /// riga con le grammature). Condiviso con le azioni a bottone (Fase 8).
+  static List<String> planLines(MealPlan plan, {required bool isItalian}) {
+    String t(String it, String en) => isItalian ? it : en;
+    final lines = <String>[
+      t(
+          'Piano alimentare attivo (${plan.kcalTotali.round()} kcal/giorno'
+              '${plan.obsoleto ? ', segnato come obsoleto' : ''}):',
+          'Active meal plan (${plan.kcalTotali.round()} kcal/day'
+              '${plan.obsoleto ? ', flagged as outdated' : ''}):'),
+    ];
+    for (final meal in plan.pasti) {
+      final name = _pasti[meal.tipo];
+      final foods = [
+        for (final s in meal.slots)
+          if (s.principale != null) '${s.principale!.nome} ${s.principale!.quantitaG.round()}g',
+      ];
+      if (foods.isEmpty) continue;
+      lines.add('- ${name == null ? '?' : t(name.$1, name.$2)}: ${foods.join(', ')}');
+    }
+    return lines;
   }
 
   static String _n(double v) => v == v.roundToDouble() ? v.round().toString() : v.toStringAsFixed(1);

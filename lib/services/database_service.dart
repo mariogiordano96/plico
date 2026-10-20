@@ -431,6 +431,8 @@ class DatabaseService {
     return a.nome.compareTo(b.nome);
   }
 
+  Future<FoodItem?> getFoodItemById(Id id) => _isar.foodItems.get(id);
+
   Future<void> markFoodUsed(Id foodId) async {
     await _isar.writeTxn(() async {
       final item = await _isar.foodItems.get(foodId);
