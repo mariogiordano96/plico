@@ -66,7 +66,7 @@ class AppSettings {
   // Coach (Gemini, bring-your-own-key — docs/integrazione_flutter_gemma.md,
   // Fase 7): chiave generata dall'utente su Google AI Studio, mai una chiave
   // condivisa di Plico. `geminiRequestsToday`/`geminiRequestsResetDate`
-  // tracciano il consumo locale della quota free tier (1.500/giorno) per
+  // tracciano il consumo locale della quota free tier (20/giorno per modello) per
   // bloccare nuove richieste PRIMA che l'utente rischi di sforare e pagare.
   String? geminiApiKey;
   int geminiRequestsToday = 0;

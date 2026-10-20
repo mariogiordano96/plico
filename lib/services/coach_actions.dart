@@ -11,9 +11,18 @@ class CoachActionRequest {
   final String instruction;
 
   /// Dati dell'utente nel formato di `CoachHistory`: è esattamente ciò che
-  /// parte verso Google, mostrato così com'è nell'anteprima.
+  /// parte verso Google, consultabile nella modale di conferma.
   final String context;
-  const CoachActionRequest({required this.instruction, required this.context});
+
+  /// Elenco in linguaggio semplice di cosa parte verso Google, per la modale
+  /// di conferma: il testo tecnico in [context] resta consultabile ma non è
+  /// la prima cosa che l'utente legge.
+  final List<String> summary;
+  const CoachActionRequest({
+    required this.instruction,
+    required this.context,
+    required this.summary,
+  });
 
   String get systemSuffix => '$instruction\n\n$context';
 }
@@ -31,19 +40,55 @@ class CoachActions {
       case CoachAction.recipes:
         final context = await CoachHistory.loadRecipesContext(isItalian: isItalian);
         if (context == null) return null;
-        return CoachActionRequest(instruction: instruction(action, isItalian), context: context);
+        return CoachActionRequest(
+          instruction: instruction(action, isItalian),
+          context: context,
+          summary: summary(action, isItalian),
+        );
       case CoachAction.nutrition:
         return CoachActionRequest(
           instruction: instruction(action, isItalian),
           context: await CoachHistory.loadNutritionContext(isItalian: isItalian),
+          summary: summary(action, isItalian),
         );
       case CoachAction.workout:
         return CoachActionRequest(
           instruction: instruction(action, isItalian),
           context: await CoachHistory.loadWorkoutContext(isItalian: isItalian),
+          summary: summary(action, isItalian),
         );
     }
   }
+
+  static List<String> summary(CoachAction action, bool isItalian) => switch (action) {
+        CoachAction.recipes => isItalian
+            ? ['Il tuo piano alimentare attuale', 'Le tue restrizioni alimentari']
+            : ['Your current meal plan', 'Your dietary restrictions'],
+        CoachAction.nutrition => isItalian
+            ? [
+                'Obiettivo, livello di attività e target calorici',
+                'Restrizioni, alimenti graditi e numero di pasti',
+                'Il tuo piano alimentare attuale',
+                'Diario alimentare e peso degli ultimi 3 mesi (solo se compilato abbastanza)',
+              ]
+            : [
+                'Goal, activity level and calorie targets',
+                'Restrictions, preferred foods and meals per day',
+                'Your current meal plan',
+                'Food diary and weight of the last 3 months (only if filled in enough)',
+              ],
+        CoachAction.workout => isItalian
+            ? [
+                'Obiettivo e livello di attività',
+                'Allenamenti degli ultimi 3 mesi (esercizi, carichi, volume)',
+                'Peso degli ultimi 3 mesi',
+              ]
+            : [
+                'Goal and activity level',
+                'Workouts of the last 3 months (exercises, loads, volume)',
+                'Weight of the last 3 months',
+              ],
+      };
 
   static String instruction(CoachAction action, bool isItalian) => switch (action) {
         CoachAction.recipes => isItalian

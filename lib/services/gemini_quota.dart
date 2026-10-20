@@ -1,12 +1,15 @@
 import '../models/app_settings.dart';
 
 /// Logica pura (no DB, no rete) per proteggere l'utente dal free tier Gemini
-/// (docs/integrazione_flutter_gemma.md, Fase 7): 10 richieste/minuto, 1.500/
-/// giorno. La chiave è dell'utente (bring-your-own-key, mai una chiave
+/// (docs/integrazione_flutter_gemma.md, Fase 7): 10 richieste/minuto, 20/giorno
+/// per modello (limite letto dal 429 reale di Google, 2026-10: "limit: 20,
+/// model: gemini-3.6-flash"; i 1.500/giorno ipotizzati in origine non
+/// valgono più). Il contatore conta le richieste HTTP reali, retry inclusi.
+/// La chiave è dell'utente (bring-your-own-key, mai una chiave
 /// condivisa Plico), quindi uno sforamento lo pagherebbe lui — questa classe
 /// blocca nuove richieste PRIMA di interpellare l'API, non dopo un 429.
 class GeminiQuota {
-  static const dailyLimit = 1500;
+  static const dailyLimit = 20;
   static const perMinuteLimit = 10;
 
   /// Azzera il contatore giornaliero in [settings] se [now] cade in un
@@ -19,6 +22,14 @@ class GeminiQuota {
       settings.geminiRequestsResetDate = today;
       settings.geminiRequestsToday = 0;
     }
+  }
+
+  /// Google ha risposto 429 sulla quota giornaliera: il contatore locale era in
+  /// ritardo (altri device, retry non contati) — si allinea al limite così la
+  /// UI mostra 0 e blocca l'invio invece di insistere.
+  static void markExhausted(AppSettings settings, DateTime now) {
+    rolloverIfNewDay(settings, now);
+    settings.geminiRequestsToday = dailyLimit;
   }
 
   /// Richieste ancora disponibili oggi, dopo l'eventuale rollover. Non muta

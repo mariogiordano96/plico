@@ -324,16 +324,44 @@ class _CoachScreenState extends State<CoachScreen> {
               children: [
                 Text(l10n.coachAzioneAnteprimaSub, style: TextStyle(color: p.textSecondary)),
                 const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: p.background,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: p.cardBorder),
+                for (final item in request.summary)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.check_rounded, size: 16, color: p.accent),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(item, style: TextStyle(color: p.textPrimary, fontSize: 14)),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Text(request.context,
-                      style: TextStyle(
-                          color: p.textMuted, fontSize: 11, fontFamily: 'monospace', height: 1.3)),
+                Theme(
+                  data: Theme.of(ctx).copyWith(dividerColor: Colors.transparent),
+                  child: ExpansionTile(
+                    tilePadding: EdgeInsets.zero,
+                    title: Text(l10n.coachAzioneDettagli,
+                        style: TextStyle(color: p.textMuted, fontSize: 12)),
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: p.background,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: p.cardBorder),
+                        ),
+                        child: Text(request.context,
+                            style: TextStyle(
+                                color: p.textMuted,
+                                fontSize: 11,
+                                fontFamily: 'monospace',
+                                height: 1.3)),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

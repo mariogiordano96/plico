@@ -2258,7 +2258,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get coachAzioneAnteprimaSub =>
-      'Questi dati lasciano il telefono insieme alla richiesta. Nulla viene salvato nell\'app: la risposta compare qui in chat.';
+      'Questi dati lasciano il telefono insieme alla richiesta. Nome e dati anagrafici non vengono inviati e nulla viene salvato nell\'app: la risposta compare qui in chat.';
 
   @override
   String get coachAzioneInvia => 'Invia';
@@ -2298,4 +2298,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get coachAzioneSchedaMsg => 'Genera una nuova scheda di allenamento';
+
+  @override
+  String get coachAzioneDettagli => 'Mostra i dati esatti';
 }

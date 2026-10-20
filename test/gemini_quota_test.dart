@@ -53,6 +53,25 @@ void main() {
     });
   });
 
+  group('GeminiQuota.markExhausted', () {
+    test('allinea il contatore al limite dopo un 429 di Google', () {
+      final settings = AppSettings()
+        ..geminiRequestsToday = 3
+        ..geminiRequestsResetDate = DateTime(2026, 1, 1);
+      GeminiQuota.markExhausted(settings, DateTime(2026, 1, 1, 12));
+      expect(GeminiQuota.remainingToday(settings, DateTime(2026, 1, 1, 12)), 0);
+    });
+
+    test('se il giorno è cambiato riparte dal giorno nuovo, non dal vecchio', () {
+      final settings = AppSettings()
+        ..geminiRequestsToday = 3
+        ..geminiRequestsResetDate = DateTime(2026, 1, 1);
+      GeminiQuota.markExhausted(settings, DateTime(2026, 1, 2));
+      expect(settings.geminiRequestsResetDate, DateTime(2026, 1, 2));
+      expect(settings.geminiRequestsToday, GeminiQuota.dailyLimit);
+    });
+  });
+
   group('GeminiQuota.perMinuteLimitReached', () {
     test('meno di 10 richieste nell\'ultimo minuto: non raggiunto', () {
       final now = DateTime(2026, 1, 1, 12, 0, 0);

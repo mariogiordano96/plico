@@ -72,22 +72,10 @@ class GeminiService {
     required List<GeminiTurn> history,
     void Function(int attempt)? onRetrying,
   }) async {
-    final now = DateTime.now();
-    final settings = await DatabaseService.instance.getAppSettings();
-    GeminiQuota.rolloverIfNewDay(settings, now);
-    if (GeminiQuota.dailyLimitReached(settings, now)) {
-      throw const GeminiException(GeminiErrorType.dailyLimitReached);
-    }
-    if (GeminiQuota.perMinuteLimitReached(_recentRequestTimes, now)) {
-      throw const GeminiException(GeminiErrorType.rateLimited);
-    }
-
-    // Il conteggio scatta sul tentativo di invio, non solo su una risposta
-    // 200: protegge comunque l'utente anche se la richiesta fallisce a metà
-    // (es. errore di rete dopo che il pacchetto è partito).
-    _recentRequestTimes.add(now);
-    settings.geminiRequestsToday += 1;
-    await DatabaseService.instance.saveAppSettings(settings);
+    // Ogni richiesta HTTP reale conta (retry per 503 inclusi): sono quelle che
+    // Google addebita sulla quota, osservato dal vivo (2026-10) — tre retry
+    // su un 503 bruciavano tre delle 20 richieste giornaliere.
+    await _reserveRequest();
 
     // Nomi campo camelCase (mapping JSON del protobuf REST di Google, non
     // snake_case): `systemInstruction`, non `system_instruction` — un nome
@@ -107,20 +95,55 @@ class GeminiService {
     // (2026-09), anche 2-3 volte di fila nella stessa sessione: il free tier
     // ha priorità più bassa di un piano a pagamento nei picchi di domanda.
     // Fino a 2 retry con attesa crescente (2s, poi 4s) prima di arrendersi,
-    // non solo un tentativo. Non riconta sulla quota (già incrementata una
-    // volta sopra, per questo singolo "invio" logico dell'utente).
+    // non solo un tentativo. Ogni retry è una richiesta reale e viene
+    // contata sulla quota locale (vedi `_reserveRequest`).
     const retryDelays = [Duration(seconds: 2), Duration(seconds: 4)];
     for (var attempt = 0; ; attempt++) {
       try {
         return await _postOnce(apiKey: apiKey, body: body);
       } on GeminiException catch (e) {
+        if (e.type == GeminiErrorType.quotaExceeded) {
+          await _markQuotaExhausted();
+        }
         if (e.type != GeminiErrorType.serviceUnavailable || attempt >= retryDelays.length) {
           rethrow;
+        }
+        // Un retry è una richiesta in più: se i limiti locali lo impediscono ci
+        // si ferma con il 503 originale invece di sforare la quota.
+        try {
+          await _reserveRequest();
+        } on GeminiException {
+          throw e;
         }
         onRetrying?.call(attempt + 1);
         await Future<void>.delayed(retryDelays[attempt]);
       }
     }
+  }
+
+  /// Controlla i limiti locali e registra una richiesta HTTP in partenza.
+  /// Il conteggio scatta sul tentativo di invio, non solo su una risposta
+  /// 200: protegge comunque l'utente anche se la richiesta fallisce a metà
+  /// (es. errore di rete dopo che il pacchetto è partito).
+  static Future<void> _reserveRequest() async {
+    final now = DateTime.now();
+    final settings = await DatabaseService.instance.getAppSettings();
+    GeminiQuota.rolloverIfNewDay(settings, now);
+    if (GeminiQuota.dailyLimitReached(settings, now)) {
+      throw const GeminiException(GeminiErrorType.dailyLimitReached);
+    }
+    if (GeminiQuota.perMinuteLimitReached(_recentRequestTimes, now)) {
+      throw const GeminiException(GeminiErrorType.rateLimited);
+    }
+    _recentRequestTimes.add(now);
+    settings.geminiRequestsToday += 1;
+    await DatabaseService.instance.saveAppSettings(settings);
+  }
+
+  static Future<void> _markQuotaExhausted() async {
+    final settings = await DatabaseService.instance.getAppSettings();
+    GeminiQuota.markExhausted(settings, DateTime.now());
+    await DatabaseService.instance.saveAppSettings(settings);
   }
 
   static Future<String> _postOnce({required String apiKey, required String body}) async {

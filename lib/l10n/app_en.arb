@@ -732,7 +732,7 @@
   "coachAzioneRicette": "Recipes from my plan",
   "coachAzioneRicetteMsg": "Generate recipes for my meal plan",
   "coachAzioneAnteprimaTitolo": "What I will send to Google",
-  "coachAzioneAnteprimaSub": "This data leaves your phone along with the request. Nothing is saved in the app: the answer appears here in the chat.",
+  "coachAzioneAnteprimaSub": "This data leaves your phone along with the request. Your name and personal details are not sent and nothing is saved in the app: the answer appears here in the chat.",
   "coachAzioneInvia": "Send",
   "coachAzioneNonDisponibile": "Not available yet",
   "coachGateNoProfile": "Complete your profile.",
@@ -745,5 +745,6 @@
   "coachAzioneAlimentazione": "New eating plan",
   "coachAzioneAlimentazioneMsg": "Generate a new eating plan",
   "coachAzioneScheda": "New workout plan",
-  "coachAzioneSchedaMsg": "Generate a new workout plan"
+  "coachAzioneSchedaMsg": "Generate a new workout plan",
+  "coachAzioneDettagli": "Show exact data"
 }

@@ -4121,7 +4121,7 @@ abstract class AppLocalizations {
   /// No description provided for @coachAzioneAnteprimaSub.
   ///
   /// In it, this message translates to:
-  /// **'Questi dati lasciano il telefono insieme alla richiesta. Nulla viene salvato nell\'app: la risposta compare qui in chat.'**
+  /// **'Questi dati lasciano il telefono insieme alla richiesta. Nome e dati anagrafici non vengono inviati e nulla viene salvato nell\'app: la risposta compare qui in chat.'**
   String get coachAzioneAnteprimaSub;
 
   /// No description provided for @coachAzioneInvia.
@@ -4195,6 +4195,12 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Genera una nuova scheda di allenamento'**
   String get coachAzioneSchedaMsg;
+
+  /// No description provided for @coachAzioneDettagli.
+  ///
+  /// In it, this message translates to:
+  /// **'Mostra i dati esatti'**
+  String get coachAzioneDettagli;
 }
 
 class _AppLocalizationsDelegate

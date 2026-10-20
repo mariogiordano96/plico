@@ -891,7 +891,7 @@
   "coachAzioneRicette": "Ricette dal piano",
   "coachAzioneRicetteMsg": "Genera le ricette del mio piano alimentare",
   "coachAzioneAnteprimaTitolo": "Cosa invierò a Google",
-  "coachAzioneAnteprimaSub": "Questi dati lasciano il telefono insieme alla richiesta. Nulla viene salvato nell'app: la risposta compare qui in chat.",
+  "coachAzioneAnteprimaSub": "Questi dati lasciano il telefono insieme alla richiesta. Nome e dati anagrafici non vengono inviati e nulla viene salvato nell'app: la risposta compare qui in chat.",
   "coachAzioneInvia": "Invia",
   "coachAzioneNonDisponibile": "Non ancora disponibile",
   "coachGateNoProfile": "Completa il tuo profilo.",
@@ -904,5 +904,6 @@
   "coachAzioneAlimentazione": "Nuova alimentazione",
   "coachAzioneAlimentazioneMsg": "Genera una nuova alimentazione",
   "coachAzioneScheda": "Nuova scheda",
-  "coachAzioneSchedaMsg": "Genera una nuova scheda di allenamento"
+  "coachAzioneSchedaMsg": "Genera una nuova scheda di allenamento",
+  "coachAzioneDettagli": "Mostra i dati esatti"
 }

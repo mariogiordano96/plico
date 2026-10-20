@@ -2246,7 +2246,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get coachAzioneAnteprimaSub =>
-      'This data leaves your phone along with the request. Nothing is saved in the app: the answer appears here in the chat.';
+      'This data leaves your phone along with the request. Your name and personal details are not sent and nothing is saved in the app: the answer appears here in the chat.';
 
   @override
   String get coachAzioneInvia => 'Send';
@@ -2286,4 +2286,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get coachAzioneSchedaMsg => 'Generate a new workout plan';
+
+  @override
+  String get coachAzioneDettagli => 'Show exact data';
 }

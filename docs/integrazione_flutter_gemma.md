@@ -504,6 +504,14 @@ chat in Markdown con la nuova scheda/alimentazione/ricette e l'utente le aggiung
       esercizi realmente usati, carichi reali dell'utente; senza avviso allergie.
 - [x] Il toggle `coachShareData` resta solo per la chat libera (snapshot leggero); le azioni a
       bottone hanno il proprio consenso (anteprima) e non dipendono dal toggle.
+- [x] **2026-10** Contatore quota onesto: il 429 reale di Google ha mostrato `limit: 20,
+      model: gemini-3.6-flash` al giorno (non 1.500). `GeminiQuota.dailyLimit` = 20; ogni
+      richiesta HTTP reale conta, retry per 503 inclusi (tre retry = tre richieste); al 429 il
+      contatore locale si allinea al limite (`markExhausted`) così la UI mostra 0. Se la quota
+      locale impedisce un retry ci si ferma col 503 originale.
+- [ ] Modelli di riserva sul 503/429 (quota per modello, separata): servono i nomi reali
+      visibili alla chiave (ListModels), non indovinati. Mostrare nel messaggio di errore il
+      tempo di attesa letto dal 429 ("riprova tra N ore").
 - [ ] Provare 8b-8d su device con chiave reale (qualità delle risposte, grammature)
 
 ---
