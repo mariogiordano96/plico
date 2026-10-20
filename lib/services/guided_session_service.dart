@@ -23,6 +23,27 @@ class GuidedSessionService {
     return steps;
   }
 
+  /// Id degli esercizi di forza che devono avere il riscaldamento: il primo
+  /// esercizio di ogni gruppo muscolare incontrato nella sessione (petto e
+  /// dorso → uno per ciascuno). Nei blocchi superset la regola vale per ogni
+  /// esercizio che li compone. Il cardio è ignorato. Gruppo muscolare
+  /// sconosciuto → riscaldamento, per prudenza.
+  static Set<int> warmupExerciseIds(
+    List<List<WorkoutExercise>> steps,
+    Map<String, String> muscleGroupByExerciseId,
+  ) {
+    final ids = <int>{};
+    final seenGroups = <String>{};
+    for (final step in steps) {
+      for (final e in step) {
+        if (e.isCardio) continue;
+        final group = muscleGroupByExerciseId[e.exerciseId];
+        if (group == null || seenGroups.add(group)) ids.add(e.id);
+      }
+    }
+    return ids;
+  }
+
   /// Esercizio con il turno nel blocco superset: quello, tra i non ancora
   /// completati, con meno unità (serie/cardio) confermate — a parità il primo
   /// del blocco. Deriva il turno solo da `confirmed`/`cardioConfirmed`

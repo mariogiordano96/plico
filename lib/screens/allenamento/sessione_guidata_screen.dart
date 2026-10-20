@@ -139,6 +139,14 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     final settings = await db.getAppSettings();
     final bodySnapshot = await db.getLatestBodySnapshot();
 
+    // Riscaldamento solo sul primo esercizio e a ogni cambio di gruppo
+    // muscolare tra step consecutivi (vedi GuidedSessionService.warmupExerciseIds).
+    final muscleGroupById = {
+      for (final ex in await db.getAllExercises()) ex.externalId: ex.muscleGroup,
+    };
+    final steps = GuidedSessionService.groupSteps(widget.exercises);
+    final warmupIds = GuidedSessionService.warmupExerciseIds(steps, muscleGroupById);
+
     for (final e in widget.exercises) {
       // Gli esercizi passati qui possono arrivare da Isar (log già popolato,
       // "Avvia allenamento") invece che da un oggetto appena creato in memoria
@@ -182,7 +190,10 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
       }
 
       final targetWeightKg = e.sets.isNotEmpty ? e.sets.first.weightKg : null;
-      if (targetWeightKg != null && !firstConfirmed && !e.sets.any((s) => s.isWarmup)) {
+      if (warmupIds.contains(e.id) &&
+          targetWeightKg != null &&
+          !firstConfirmed &&
+          !e.sets.any((s) => s.isWarmup)) {
         final warmup = WorkoutProgressService.suggestWarmupSets(targetWeightKg);
         if (warmup.isNotEmpty) e.sets.insertAll(0, warmup);
       }
@@ -196,7 +207,6 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     }
 
     if (!mounted) return;
-    final steps = GuidedSessionService.groupSteps(widget.exercises);
     // Riaprendo una sessione parzialmente (o del tutto) già confermata —
     // "Avvia allenamento" può ripartire da esercizi già fatti in una sessione
     // precedente lo stesso giorno — si parte dal primo step non ancora
@@ -222,30 +232,34 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
     });
   }
 
-  /// Rimuove tutte le serie di riscaldamento suggerite per [e] (step
-  /// preliminare saltabile, Fase 15): non persistito, dato che il
-  /// riscaldamento non viene mai scritto su DB finché non si conferma
+  /// Rimuove tutte le serie di riscaldamento suggerite per lo step corrente
+  /// (step preliminare saltabile, Fase 15): in un blocco superset saltarlo su
+  /// un esercizio lo salta su tutti quelli del blocco. Non persistito, dato
+  /// che il riscaldamento non viene mai scritto su DB finché non si conferma
   /// almeno una serie.
-  void _skipWarmup(WorkoutExercise e) {
+  void _skipWarmup() {
     setState(() {
-      final reps = _repsCtrls[e.id]!;
-      final kg = _kgCtrls[e.id]!;
-      final keptSets = <WorkoutSet>[];
-      final keptReps = <TextEditingController>[];
-      final keptKg = <TextEditingController>[];
-      for (var i = 0; i < e.sets.length; i++) {
-        if (e.sets[i].isWarmup) {
-          reps[i].dispose();
-          kg[i].dispose();
-        } else {
-          keptSets.add(e.sets[i]);
-          keptReps.add(reps[i]);
-          keptKg.add(kg[i]);
+      for (final e in _steps[_stepIndex]) {
+        if (e.isCardio) continue;
+        final reps = _repsCtrls[e.id]!;
+        final kg = _kgCtrls[e.id]!;
+        final keptSets = <WorkoutSet>[];
+        final keptReps = <TextEditingController>[];
+        final keptKg = <TextEditingController>[];
+        for (var i = 0; i < e.sets.length; i++) {
+          if (e.sets[i].isWarmup) {
+            reps[i].dispose();
+            kg[i].dispose();
+          } else {
+            keptSets.add(e.sets[i]);
+            keptReps.add(reps[i]);
+            keptKg.add(kg[i]);
+          }
         }
+        e.sets = keptSets;
+        _repsCtrls[e.id] = keptReps;
+        _kgCtrls[e.id] = keptKg;
       }
-      e.sets = keptSets;
-      _repsCtrls[e.id] = keptReps;
-      _kgCtrls[e.id] = keptKg;
     });
   }
 
@@ -514,7 +528,7 @@ class _SessioneGuidataScreenState extends State<SessioneGuidataScreen> {
               onConfirmSerie: (i) => _confirmSerie(e, i),
               onConfirmCardio: () => _confirmCardio(e),
               onSostituisci: () => _sostituisci(e),
-              onSkipWarmup: () => _skipWarmup(e),
+              onSkipWarmup: _skipWarmup,
               locked: step.length > 1 && !identical(e, turn),
               highlighted: step.length > 1 && identical(e, turn),
               p: p,

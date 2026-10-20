@@ -208,4 +208,42 @@ void main() {
       expect(result, isEmpty);
     });
   });
+
+  group('warmupExerciseIds', () {
+    WorkoutExercise ex(int id, String exerciseId, {int? superset}) =>
+        _exercise(id: exerciseId, supersetGroupId: superset, sets: [_set(reps: 8, weightKg: 50)])
+          ..id = id;
+
+    const groups = {
+      'panca': 'chest',
+      'croci': 'chest',
+      'rematore': 'back',
+      'squat': 'legs',
+    };
+
+    test('solo il primo esercizio di ogni gruppo muscolare', () {
+      final steps = GuidedSessionService.groupSteps([
+        ex(1, 'panca'),
+        ex(2, 'croci'),
+        ex(3, 'rematore'),
+        ex(4, 'squat'),
+        ex(5, 'panca'),
+      ]);
+      expect(GuidedSessionService.warmupExerciseIds(steps, groups), {1, 3, 4});
+    });
+
+    test('superset: ogni esercizio del blocco è il primo del proprio gruppo', () {
+      final steps = GuidedSessionService.groupSteps([
+        ex(1, 'panca', superset: 1),
+        ex(2, 'rematore', superset: 1),
+        ex(3, 'croci'),
+      ]);
+      expect(GuidedSessionService.warmupExerciseIds(steps, groups), {1, 2});
+    });
+
+    test('gruppo sconosciuto → riscaldamento', () {
+      final steps = GuidedSessionService.groupSteps([ex(1, 'panca'), ex(2, 'ignoto')]);
+      expect(GuidedSessionService.warmupExerciseIds(steps, groups), {1, 2});
+    });
+  });
 }
