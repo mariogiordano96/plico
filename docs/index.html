@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plico — open source workout &amp; nutrition tracker for Android</title>
+<meta name="description" content="Plico is a free, open source Android app for gym training, meal planning and nutrition tracking. Italian CREA food data, guided workouts, optional AI coach. No account, no ads, no analytics.">
+<link rel="canonical" href="https://mariogiordano96.github.io/plico/">
+<meta name="theme-color" content="#09131d">
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Plico — open source workout &amp; nutrition tracker for Android">
+<meta property="og:description" content="Guided workouts, meal plans, calorie and macro tracking and an optional AI coach. Free, GPL-3.0, offline-first.">
+<meta property="og:url" content="https://mariogiordano96.github.io/plico/">
+<meta property="og:image" content="https://mariogiordano96.github.io/plico/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="assets/fonts/SpaceGrotesk-Medium.ttf" as="font" type="font/ttf" crossorigin>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="stylesheet" href="assets/style.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Plico","applicationCategory":"HealthApplication","operatingSystem":"Android 5.0+","description":"Open source Android app for workout tracking, meal planning and nutrition.","license":"https://www.gnu.org/licenses/gpl-3.0.html","url":"https://mariogiordano96.github.io/plico/","codeRepository":"https://github.com/mariogiordano96/plico","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"author":{"@type":"Person","name":"Mario Giordano","url":"https://github.com/mariogiordano96"}}
+</script>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<symbol id="i-utensils" viewBox="0 0 24 24"><path d="M4 3v7a2 2 0 0 0 2 2 2 2 0 0 0 2-2V3M6 3v18M17 3c-2 1.5-3 4-3 7 0 1.7 1 3 3 3v8"/></symbol>
+<symbol id="i-dumbbell" viewBox="0 0 24 24"><path d="M2 9v6M5 6v12M19 6v12M22 9v6M5 12h14"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18M7 15l4-5 3 3 5-7"/></symbol>
+<symbol id="i-calc" viewBox="0 0 24 24"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></symbol>
+<symbol id="i-barcode" viewBox="0 0 24 24"><path d="M3 5v14M7 5v14M11 5v14M15 5v9M15 17v2M19 5v14M21 5v14"/></symbol>
+<symbol id="i-bot" viewBox="0 0 24 24"><path d="M12 8V4M8 4h8M5 8h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2zM9 13h.01M15 13h.01M9 17h6"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3zM9 12l2 2 4-4"/></symbol>
+<symbol id="i-watch" viewBox="0 0 24 24"><path d="M9 2h6l1 4H8l1-4zM8 18h8l-1 4H9l-1-4zM6 6h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zM12 10v3l2 1"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM3 12h18M12 3c2.5 2.5 3.5 5.5 3.5 9S14.5 18.5 12 21c-2.5-2.5-3.5-5.5-3.5-9S9.5 5.5 12 3"/></symbol>
+<symbol id="i-ruler" viewBox="0 0 24 24"><path d="M3 17L17 3l4 4L7 21l-4-4zM7 13l2 2M10 10l2 2M13 7l2 2"/></symbol>
+<symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/></symbol>
+<symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5M3 17.5l9 5 9-5"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7L8 5z"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5 9-11"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zM12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+<symbol id="i-gh" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.42-2.7 5.4-5.27 5.68.41.36.78 1.06.78 2.13v3.16c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></symbol>
+</defs></svg>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav"><div class="wrap">
+  <a class="brand" href="#top" aria-label="Plico, back to top"><img src="assets/logo.svg" alt="" width="30" height="30">PLICO</a>
+  <ul>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#screens">Screens</a></li>
+    <li><a href="#coach">Coach</a></li>
+    <li><a href="#build">Build</a></li>
+    <li><a href="https://github.com/mariogiordano96/plico">GitHub</a></li>
+  </ul>
+  <button class="iconbtn" id="theme" type="button" aria-label="Toggle theme">
+    <svg class="only-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-moon"/></svg>
+    <svg class="only-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-sun"/></svg>
+  </button>
+</div></header>
+
+<main id="main">
+<div id="top" class="hero"><div class="wrap">
+  <div>
+    <span class="eyebrow"><span class="dot"></span><b>Open source</b> · GPL-3.0 · Android</span>
+    <h1>Train smarter.<br>Eat better.<br><span class="hl">Keep your data.</span></h1>
+    <p class="lead">Plico is a free Android app for workout tracking, meal planning and nutrition. It ships with the Italian CREA food database, guided workouts with load suggestions, and an optional AI coach. No account, no ads, no analytics.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="https://github.com/mariogiordano96/plico/releases/latest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-download"/></svg>Get the APK</a>
+      <a class="btn btn-ghost" href="https://github.com/mariogiordano96/plico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-gh"/></svg>View on GitHub</a>
+    </div>
+    <ul class="badges">
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-shield"/></svg>Offline-first</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg>Android 5.0+</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg>Built with Flutter</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg>Not on the Play Store: build it or grab the APK</li>
+    </ul>
+  </div>
+  <div class="stage" aria-hidden="false">
+    <div class="phone p1"><img class="only-light " src="screenshots/08-progress-light.webp" alt="Progress screen with a weight chart (light theme)" width="540" height="1200" loading="lazy" ><img class="only-dark " src="screenshots/08-progress-dark.webp" alt="Progress screen with a weight chart (dark theme)" width="540" height="1200" loading="lazy" ></div>
+    <div class="phone p2"><img class="only-light " src="screenshots/04-tdee-light.webp" alt="TDEE and macro breakdown screen (light theme)" width="540" height="1200" loading="lazy" ><img class="only-dark " src="screenshots/04-tdee-dark.webp" alt="TDEE and macro breakdown screen (dark theme)" width="540" height="1200" loading="lazy" ></div>
+    <div class="phone p3"><img class="only-light " src="screenshots/07-workout-interactive-light.webp" alt="Guided workout screen with set targets (light theme)" width="540" height="1200" loading="lazy" ><img class="only-dark " src="screenshots/07-workout-interactive-dark.webp" alt="Guided workout screen with set targets (dark theme)" width="540" height="1200" loading="lazy" ></div>
+  </div>
+</div></div>
+
+<div class="wrap">
+  <div class="stats rv">
+    <div class="stat"><b>875</b><span>exercises with images</span></div>
+    <div class="stat"><b>645</b><span>Italian CREA foods</span></div>
+    <div class="stat"><b>3</b><span>TDEE formulas</span></div>
+    <div class="stat"><b>0</b><span>accounts, ads or trackers</span></div>
+  </div>
+</div>
+
+<section id="features"><div class="wrap">
+  <span class="kicker">Features</span>
+  <h2>Everything for the gym and the kitchen, in one app</h2>
+  <p class="sub">Plico covers the two halves of getting results: what you eat and how you train. Everything below works on your phone, with your data on your phone.</p>
+  <div class="grid">
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-utensils"/></svg></div><h3>Food diary</h3><p>Log meals by search, barcode scan or your own custom foods. See calories and macros against your daily goal, with a nudge when you land on target.</p><div class="tags"><span class="tag">Open Food Facts</span><span class="tag">Barcode</span><span class="tag">Custom foods</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-list"/></svg></div><h3>Meal-plan generator</h3><p>Builds a day of meals from your calorie and macro targets and your food preferences, with alternatives for every slot. Quantities are weighed raw and rounded to 5 g.</p><div class="tags"><span class="tag">Preferences quiz</span><span class="tag">Alternatives</span><span class="tag">PDF export</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-calc"/></svg></div><h3>TDEE &amp; macros</h3><p>BMR and TDEE with Katch-McArdle, Mifflin-St Jeor or Harris-Benedict, your activity level and goal, and a macro split based on ISSN/ACSM guidelines.</p><div class="tags"><span class="tag">Deficit</span><span class="tag">Maintenance</span><span class="tag">Surplus</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-dumbbell"/></svg></div><h3>Workouts that fit your week</h3><p>Templates, multi-day programs, a calendar and a free-exercise logger. Export any template to PDF.</p><div class="tags"><span class="tag">Templates</span><span class="tag">Programs</span><span class="tag">Calendar</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-play"/></svg></div><h3>Guided mode</h3><p>Step through each exercise with set targets, a rest timer and a suggested load based on your history, so progression is never guesswork.</p><div class="tags"><span class="tag">Rest timer</span><span class="tag">Load suggestions</span><span class="tag">Swap exercise</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-layers"/></svg></div><h3>Advanced techniques</h3><p>Pick a technique per exercise: superset, cluster, pyramid, rest-pause, stripping or super slow, and plan it into the template.</p><div class="tags"><span class="tag">Superset</span><span class="tag">Rest-pause</span><span class="tag">Pyramid</span><span class="tag">Stripping</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-list"/></svg></div><h3>875-exercise catalog</h3><p>A bundled, offline catalog with images, filterable by muscle group. Add your own custom exercises.</p><div class="tags"><span class="tag">Offline</span><span class="tag">Images</span><span class="tag">Custom</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-chart"/></svg></div><h3>Progress &amp; records</h3><p>Weight, calories, macros and training charts from 1 month to all time, plus personal records and weekly volume per muscle group.</p><div class="tags"><span class="tag">Charts</span><span class="tag">Records</span><span class="tag">Weekly volume</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-trophy"/></svg></div><h3>Streaks &amp; achievements</h3><p>A weekly summary, insights from your own data, streaks and achievements to keep you consistent without nagging.</p></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-ruler"/></svg></div><h3>Body composition</h3><p>Skinfold and circumference measurements: US Navy method plus four skinfold protocols, with body-fat %, fat and lean mass and BMI.</p><div class="tags"><span class="tag">Skinfold</span><span class="tag">US Navy</span><span class="tag">BMI</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-watch"/></svg></div><h3>Smartwatch data</h3><p>Import workouts and wellness data (heart rate, sleep, HRV, steps) through Android Health Connect.</p><div class="tags"><span class="tag">Health Connect</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-bot"/></svg></div><h3>AI Coach (optional)</h3><p>Ask workout and nutrition questions to a Gemini-powered assistant that knows your plan. It uses your own API key, so there is no Plico server and no subscription.</p><div class="tags"><span class="tag">Bring your own key</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-shield"/></svg></div><h3>Private by design</h3><p>No account, no ads, no analytics. Your data lives in a local database. Export and import backups, or move everything to a new phone over Wi-Fi.</p><div class="tags"><span class="tag">Local database</span><span class="tag">Backup</span><span class="tag">Wi-Fi transfer</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-bell"/></svg></div><h3>Reminders &amp; widget</h3><p>Configurable meal reminders and a home-screen widget so the next meal or workout is one glance away.</p></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-globe"/></svg></div><h3>Italian &amp; English</h3><p>The whole interface in two languages, with Italian CREA food names and English translations.</p><div class="tags"><span class="tag">IT</span><span class="tag">EN</span></div></article>
+  </div>
+</div></section>
+
+<section id="screens"><div class="wrap">
+  <div class="gal-head">
+    <div>
+      <span class="kicker">Screens</span>
+      <h2>See it in light and dark</h2>
+      <p class="sub" style="margin-bottom:0">Real screenshots from the app. Tap a screen to enlarge it.</p>
+    </div>
+    <div class="seg" role="group" aria-label="Screenshot theme">
+      <button type="button" data-theme="light" aria-pressed="false">Light</button>
+      <button type="button" data-theme="dark" aria-pressed="false">Dark</button>
+    </div>
+  </div>
+  <div class="rail" role="region" aria-label="App screenshots" tabindex="0">
+<figure class="shot rv" tabindex="0" aria-label="Home: open larger">
+  <div class="phone"><img class="only-light " src="screenshots/01-home-light.webp" alt="Home (light theme)" width="540" height="1200" loading="lazy" ><img class="only-dark " src="screenshots/01-home-dark.webp" alt="Home (dark theme)" width="540" height="1200" loading="lazy" ></div>
+  <figcaption><b>Home</b>Today at a glance: calories, macros, plan adherence, weight and BMI.</figcaption>
+</figure>
+<figure class="shot rv" tabindex="0" aria-label="Meal plan: open larger">
+  <div class="phone"><img class="only-light " src="screenshots/02-meal-plan-light.webp" alt="Meal plan (light theme)" width="540" height="1200" loading="lazy" ><img class="only-dark " src="screenshots/02-meal-plan-dark.webp" alt="Meal plan (dark theme)" width="540" height="1200" loading="lazy" ></div>
+  <figcaption><b>Meal plan</b>A day of meals built from your macro targets, with alternatives for every slot.</figcaption>
+</figure>
+<figure class="shot rv" tabindex="0" aria-label="Food diary: open larger">
+  <div class="phone"><img class="only-light " src="screenshots/03-diary-light.webp" alt="Food diary (light theme)" width="540" height="1200" loading="lazy" ><img class="only-dark " src="screenshots/03-diary-dark.webp" alt="Food diary (dark theme)" width="540" height="1200" loading="lazy" ></div>
+  <figcaption><b>Food diary</b>Log meals by search, barcode or custom food, against your daily goal.</figcaption>
+</figure>
+<figure class="shot rv" tabindex="0" aria-label="TDEE and macros: open larger">
+  <div class="phone"><img class="only-light " src="screenshots/04-tdee-light.webp" alt="TDEE & macros (light theme)" width="540" height="1200" loading="lazy" ><img class="only-dark " src="screenshots/04-tdee-dark.webp" alt="TDEE & macros (dark theme)" width="540" height="1200" loading="lazy" ></div>
+  <figcaption><b>TDEE &amp; macros</b>BMR, TDEE and macro targets, with the formula shown.</figcaption>
+</figure>
+<figure class="shot rv" tabindex="0" aria-label="Workout: open larger">
+  <div class="phone"><img class="only-light " src="screenshots/05-workout-empty-light.webp" alt="Workout (light theme)" width="540" height="1200" loading="lazy" ><img class="only-dark " src="screenshots/05-workout-empty-dark.webp" alt="Workout (dark theme)" width="540" height="1200" loading="lazy" ></div>
+  <figcaption><b>Workout</b>Start from a template or log a free exercise.</figcaption>
+</figure>
+<figure class="shot rv" tabindex="0" aria-label="Templates: open larger">
+  <div class="phone"><img class="only-light " src="screenshots/06-workout-template-light.webp" alt="Templates (light theme)" width="540" height="1200" loading="lazy" ><img class="only-dark " src="screenshots/06-workout-template-dark.webp" alt="Templates (dark theme)" width="540" height="1200" loading="lazy" ></div>
+  <figcaption><b>Templates</b>Your templates and programs, one tap to start, exportable to PDF.</figcaption>
+</figure>
+<figure class="shot rv" tabindex="0" aria-label="Guided workout: open larger">
+  <div class="phone"><img class="only-light " src="screenshots/07-workout-interactive-light.webp" alt="Guided workout (light theme)" width="540" height="1200" loading="lazy" ><img class="only-dark " src="screenshots/07-workout-interactive-dark.webp" alt="Guided workout (dark theme)" width="540" height="1200" loading="lazy" ></div>
+  <figcaption><b>Guided workout</b>Step through each exercise with set targets and a suggested load.</figcaption>
+</figure>
+<figure class="shot rv" tabindex="0" aria-label="Progress: open larger">
+  <div class="phone"><img class="only-light " src="screenshots/08-progress-light.webp" alt="Progress (light theme)" width="540" height="1200" loading="lazy" ><img class="only-dark " src="screenshots/08-progress-dark.webp" alt="Progress (dark theme)" width="540" height="1200" loading="lazy" ></div>
+  <figcaption><b>Progress</b>Weight, health data and training trends over time.</figcaption>
+</figure>
+<figure class="shot rv" tabindex="0" aria-label="AI Coach: open larger">
+  <div class="phone"><img class="only-light " src="screenshots/09-coach-setup-light.webp" alt="AI Coach (light theme)" width="540" height="1200" loading="lazy" ><img class="only-dark " src="screenshots/09-coach-setup-dark.webp" alt="AI Coach (dark theme)" width="540" height="1200" loading="lazy" ></div>
+  <figcaption><b>AI Coach</b>Bring your own Gemini key. Requests go straight to Google.</figcaption>
+</figure>
+  </div>
+  <p class="hint">Swipe or scroll sideways for more. Sample data only.</p>
+</div></section>
+
+<section id="coach"><div class="wrap split">
+  <div class="phone rv"><img class="only-light " src="screenshots/09-coach-setup-light.webp" alt="Coach setup screen asking for a Gemini API key (light theme)" width="540" height="1200" loading="lazy" ><img class="only-dark " src="screenshots/09-coach-setup-dark.webp" alt="Coach setup screen asking for a Gemini API key (dark theme)" width="540" height="1200" loading="lazy" ></div>
+  <div class="rv">
+    <span class="kicker">AI Coach</span>
+    <h2>An assistant that works for you, not for a server</h2>
+    <p class="sub">Coach is optional. It answers workout and nutrition questions using your plan and recent data as context, and can draft recipes, a new meal plan or a new workout from buttons.</p>
+    <ul class="checks">
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg><span><b>Bring your own key.</b> Create a free Google AI Studio key (no card required) and paste it in the app.</span></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg><span><b>No Plico server.</b> Requests go straight from your phone to Google's Gemini API.</span></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg><span><b>Quota-aware.</b> Plico limits requests to stay on the free plan and shows an honest usage counter.</span></li>
+    </ul>
+    <p class="note">On the free plan Google states it may use requests to improve its models. If you enable billing on your key, any costs are yours. Skip Coach entirely and everything else works the same.</p>
+  </div>
+</div></section>
+
+<section id="privacy"><div class="wrap">
+  <span class="kicker">Privacy</span>
+  <h2>Your body data is nobody's business</h2>
+  <p class="sub">Plico has no accounts and no backend. The only network calls are the ones you trigger: searching Open Food Facts, scanning a barcode, or asking the Coach.</p>
+  <div class="grid">
+    <article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-shield"/></svg></div><h3>Local by default</h3><p>Meals, workouts, measurements and settings live in an on-device database.</p></article>
+    <article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-download"/></svg></div><h3>Yours to move</h3><p>Export a backup file, import it elsewhere, or send everything to another phone over your Wi-Fi.</p></article>
+    <article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg></div><h3>Auditable</h3><p>The whole app is on GitHub under the GPL-3.0. Read it, build it, change it.</p></article>
+  </div>
+</div></section>
+
+<section id="build"><div class="wrap split" style="grid-template-columns:1fr 1fr">
+  <div class="rv">
+    <span class="kicker">Build it</span>
+    <h2>From clone to APK in four commands</h2>
+    <p class="sub">There is no store listing, so you build it yourself or download the APK from the releases page. No signing keys or accounts needed.</p>
+    <ol class="steps">
+      <li><span>Install <b>Flutter 3.44.1</b> (stable) and the Android SDK.</span></li>
+      <li><span>Clone the repo and run the commands on the right.</span></li>
+      <li><span>Install <b>app-release.apk</b> on your Android 5.0+ device.</span></li>
+      <li><span>Optional: paste a Gemini key in the Coach tab.</span></li>
+    </ol>
+  </div>
+  <div class="rv">
+    <div class="code"><button id="copy" type="button">Copy</button>
+<pre id="build-cmd">git clone https://github.com/mariogiordano96/plico.git
+cd plico
+flutter pub get
+flutter build apk --release
+<span class="c"># build/app/outputs/flutter-apk/app-release.apk</span></pre></div>
+    <p class="hint" style="margin-top:14px">The release build is signed with the debug key unless you add your own <code>key.properties</code>. iOS is not supported.</p>
+  </div>
+</div></section>
+
+<section id="credits"><div class="wrap">
+  <span class="kicker">License &amp; credits</span>
+  <h2>Free software, with credit where it is due</h2>
+  <p class="sub">Plico is released under the <a href="https://github.com/mariogiordano96/plico/blob/main/LICENSE">GNU GPL v3.0</a>. Copyright © 2026 maxio96 (Mario Giordano). The name and logo are not covered by the license.</p>
+  <div class="credits">
+    <article class="card"><h3>CREA food data</h3><p>Food composition tables by CREA – Centro di ricerca Alimenti e Nutrizione. Source cited as requested; the data keeps its own terms.</p></article>
+    <article class="card"><h3>Exercise data</h3><p>Exercise catalog derived from <a href="https://github.com/yuhonas/free-exercise-db">free-exercise-db</a>, released into the public domain.</p></article>
+    <article class="card"><h3>Open Food Facts &amp; fonts</h3><p>Packaged-food search via <a href="https://world.openfoodfacts.org">Open Food Facts</a> (ODbL). Typeface Space Grotesk under the SIL Open Font License.</p></article>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <span>© 2026 maxio96 (Mario Giordano) · GPL-3.0</span>
+  <nav aria-label="Footer"><a href="https://github.com/mariogiordano96/plico">Source</a><a href="https://github.com/mariogiordano96/plico/issues">Issues</a><a href="https://github.com/mariogiordano96/plico/blob/main/NOTICE.md">Notices</a><a href="https://github.com/mariogiordano96/plico/blob/main/SECURITY.md">Security</a></nav>
+</div></footer>
+
+<dialog id="lightbox" aria-label="Screenshot preview">
+  <button class="iconbtn" type="button" aria-label="Close">✕</button>
+  <div class="phone"><img class="only-light" alt="" src="" width="540" height="1200"><img class="only-dark" alt="" src="" width="540" height="1200"></div>
+</dialog>
+
+<script src="assets/app.js" defer></script>
+</body>
+</html>
