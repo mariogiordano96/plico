@@ -1,5 +1,5 @@
 name: plico
-description: "A new Flutter project."
+description: "Plico: nutrition and training app (Android)."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -74,10 +74,9 @@ dev_dependencies:
 
 flutter_launcher_icons:
   android: true
-  ios: true
+  ios: false
   image_path: "assets/logo/logo.png"
   min_sdk_android: 21
-  remove_alpha_ios: true
   web:
     generate: false
 
