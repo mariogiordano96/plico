@@ -12,7 +12,7 @@
     root.setAttribute("data-theme", t);
     store(false, t);
     var b = document.getElementById("theme");
-    if (b) b.setAttribute("aria-label", t === "dark" ? "Switch to light theme" : "Switch to dark theme");
+    if (b) b.setAttribute("aria-label", t === "dark" ? b.dataset.toLight : b.dataset.toDark);
     syncSeg(t);
   }
 
@@ -22,7 +22,7 @@
   var themeBtn = document.getElementById("theme");
   if (themeBtn) {
     themeBtn.addEventListener("click", function () { setTheme(current() === "dark" ? "light" : "dark"); });
-    themeBtn.setAttribute("aria-label", current() === "dark" ? "Switch to light theme" : "Switch to dark theme");
+    themeBtn.setAttribute("aria-label", current() === "dark" ? themeBtn.dataset.toLight : themeBtn.dataset.toDark);
   }
 
   /* gallery segmented control follows the theme */
@@ -65,7 +65,8 @@
   if (copy) {
     copy.addEventListener("click", function () {
       var text = document.getElementById("build-cmd").innerText;
-      var done = function () { copy.textContent = "Copied"; setTimeout(function () { copy.textContent = "Copy"; }, 1800); };
+      var label = copy.textContent;
+      var done = function () { copy.textContent = copy.dataset.copied; setTimeout(function () { copy.textContent = label; }, 1800); };
       if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, function () {});
     });
   }

@@ -113,6 +113,10 @@ The `docs/` folder also contains the project's design notes (in Italian) and the
 
 </details>
 
+## In italiano
+
+**Plico** è un'app Android gratuita e open source (GPL-3.0) per **allenamento e alimentazione**: diario alimentare con scansione dei codici a barre, database alimentare italiano **CREA**, generatore di piano alimentare, calcolo di TDEE e macro, schede di allenamento con **modalità guidata** e suggerimento del carico, tecniche avanzate (superserie, rest-pause, piramidale), 875 esercizi con immagini, grafici dei progressi e un coach AI opzionale con la tua chiave Gemini. Nessun account, nessuna pubblicità, nessuna analisi: i dati restano sul telefono. Solo Android. [Sito in italiano](https://mariogiordano96.github.io/plico/it/) · [Scarica l'APK](https://github.com/mariogiordano96/plico/releases/latest)
+
 ## Contributing
 
 Plico is a personal project maintained on a best-effort basis. Bug reports and ideas are welcome as issues; pull requests are not accepted for now. See [CONTRIBUTING.md](CONTRIBUTING.md). For security reports see [SECURITY.md](SECURITY.md).

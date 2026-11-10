@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plico — app Android open source per allenamento e alimentazione</title>
+<meta name="description" content="Plico è un'app Android gratuita e open source per allenarsi, pianificare i pasti e tracciare l'alimentazione. Database alimentare CREA, allenamenti guidati, coach AI opzionale. Nessun account, nessuna pubblicità.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://mariogiordano96.github.io/plico/it/">
+<link rel="alternate" hreflang="en" href="https://mariogiordano96.github.io/plico/">
+<link rel="alternate" hreflang="it" href="https://mariogiordano96.github.io/plico/it/">
+<link rel="alternate" hreflang="x-default" href="https://mariogiordano96.github.io/plico/">
+<meta name="theme-color" content="#09131d">
+<link rel="icon" href="../assets/logo.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Plico">
+<meta property="og:locale" content="it_IT">
+<meta property="og:title" content="Plico — app Android open source per allenamento e alimentazione">
+<meta property="og:description" content="Allenamenti guidati, piani alimentari, calorie e macro e un coach AI opzionale. Gratuita, GPL-3.0, dati sul telefono.">
+<meta property="og:url" content="https://mariogiordano96.github.io/plico/it/">
+<meta property="og:image" content="https://mariogiordano96.github.io/plico/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="../assets/fonts/SpaceGrotesk-Bold.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="../assets/fonts/SpaceGrotesk-Regular.ttf" as="font" type="font/ttf" crossorigin>
+<script>document.documentElement.classList.add("js")</script>
+<link rel="stylesheet" href="../assets/style.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Plico", "applicationCategory": "HealthApplication", "operatingSystem": "Android 5.0+", "description": "Plico è un'app Android gratuita e open source per allenarsi, pianificare i pasti e tracciare l'alimentazione. Database alimentare CREA, allenamenti guidati, coach AI opzionale. Nessun account, nessuna pubblicità.", "inLanguage": "it", "softwareVersion": "1.0.5", "license": "https://www.gnu.org/licenses/gpl-3.0.html", "url": "https://mariogiordano96.github.io/plico/it/", "codeRepository": "https://github.com/mariogiordano96/plico", "downloadUrl": "https://github.com/mariogiordano96/plico/releases/latest", "isAccessibleForFree": true, "screenshot": ["https://mariogiordano96.github.io/plico/screenshots/04-tdee-dark.webp", "https://mariogiordano96.github.io/plico/screenshots/07-workout-interactive-dark.webp", "https://mariogiordano96.github.io/plico/screenshots/08-progress-dark.webp"], "featureList": ["Food diary", "Meal-plan generator", "TDEE & macros", "Workouts that fit your week", "Guided mode", "Advanced techniques", "875-exercise catalog", "Progress & records", "Streaks & achievements", "Body composition", "Smartwatch data", "AI Coach (optional)", "Private by design", "Reminders & widget", "Italian & English"], "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "author": {"@type": "Person", "name": "Mario Giordano", "url": "https://github.com/mariogiordano96"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "inLanguage": "it", "mainEntity": [{"@type": "Question", "name": "Esiste un'app open source per allenamento e dieta insieme?", "acceptedAnswer": {"@type": "Answer", "text": "Sì. Plico unisce il tracciamento degli allenamenti (sessioni guidate, programmi, un catalogo da 875 esercizi) e l'alimentazione (diario, piani alimentari, TDEE e macro) in un'unica app Android gratuita con licenza GPL-3.0."}}, {"@type": "Question", "name": "Serve un account?", "acceptedAnswer": {"@type": "Answer", "text": "No. Non c'è nessun account e nessun server Plico. I tuoi dati restano in un database locale sul telefono."}}, {"@type": "Question", "name": "Plico funziona offline?", "acceptedAnswer": {"@type": "Answer", "text": "In gran parte sì. Il catalogo esercizi, il database alimentare CREA, gli allenamenti, il diario e i grafici funzionano offline. La ricerca su Open Food Facts, la consultazione dei prodotti scansionati e il Coach AI richiedono una connessione a internet."}}, {"@type": "Question", "name": "Plico è sul Google Play Store?", "acceptedAnswer": {"@type": "Answer", "text": "Al momento no. Scarica l'APK dalle Release di GitHub oppure compilalo dal sorgente con quattro comandi."}}, {"@type": "Question", "name": "Funziona su iPhone?", "acceptedAnswer": {"@type": "Answer", "text": "No. Plico è solo per Android (Android 5.0 e successivi)."}}, {"@type": "Question", "name": "Che cos'è il Coach AI e costa qualcosa?", "acceptedAnswer": {"@type": "Answer", "text": "È un assistente opzionale basato su Google Gemini. Incolli la tua chiave API gratuita, le richieste vanno direttamente dal tuo telefono a Google e Plico non ha un server. Nel piano gratuito di Google non costa nulla; se attivi la fatturazione sulla tua chiave, i costi sono tuoi."}}, {"@type": "Question", "name": "Quale database alimentare usa Plico?", "acceptedAnswer": {"@type": "Answer", "text": "Le tabelle di composizione degli alimenti CREA italiane (645 alimenti), più Open Food Facts per i prodotti confezionati."}}, {"@type": "Question", "name": "Posso usare e modificare il codice sorgente?", "acceptedAnswer": {"@type": "Answer", "text": "Sì, con la licenza GPL-3.0: puoi usarlo, studiarlo, modificarlo e condividerlo, purché le versioni distribuite mantengano la nota di copyright e la stessa licenza, con il codice sorgente."}}]}</script>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<symbol id="i-utensils" viewBox="0 0 24 24"><path d="M4 3v7a2 2 0 0 0 2 2 2 2 0 0 0 2-2V3M6 3v18M17 3c-2 1.5-3 4-3 7 0 1.7 1 3 3 3v8"/></symbol>
+<symbol id="i-dumbbell" viewBox="0 0 24 24"><path d="M2 9v6M5 6v12M19 6v12M22 9v6M5 12h14"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18M7 15l4-5 3 3 5-7"/></symbol>
+<symbol id="i-calc" viewBox="0 0 24 24"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></symbol>
+<symbol id="i-bot" viewBox="0 0 24 24"><path d="M12 8V4M8 4h8M5 8h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2zM9 13h.01M15 13h.01M9 17h6"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3zM9 12l2 2 4-4"/></symbol>
+<symbol id="i-watch" viewBox="0 0 24 24"><path d="M9 2h6l1 4H8l1-4zM8 18h8l-1 4H9l-1-4zM6 6h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zM12 10v3l2 1"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM3 12h18M12 3c2.5 2.5 3.5 5.5 3.5 9S14.5 18.5 12 21c-2.5-2.5-3.5-5.5-3.5-9S9.5 5.5 12 3"/></symbol>
+<symbol id="i-ruler" viewBox="0 0 24 24"><path d="M3 17L17 3l4 4L7 21l-4-4zM7 13l2 2M10 10l2 2M13 7l2 2"/></symbol>
+<symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/></symbol>
+<symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5M3 17.5l9 5 9-5"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7L8 5z"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5 9-11"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zM12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+<symbol id="i-gh" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.42-2.7 5.4-5.27 5.68.41.36.78 1.06.78 2.13v3.16c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></symbol>
+</defs></svg>
+<a class="skip" href="#main">Vai al contenuto</a>
+
+<header class="nav"><div class="wrap">
+  <a class="brand" href="#top" aria-label="Plico, torna in alto"><img src="../assets/logo.svg" alt="" width="30" height="30">PLICO</a>
+  <ul>
+    <li><a href="#features">Funzioni</a></li>
+    <li><a href="#screens">Schermate</a></li>
+    <li><a href="#coach">Coach</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#build">Installa</a></li>
+    <li><a href="https://github.com/mariogiordano96/plico">GitHub</a></li>
+    <li><a href="../" hreflang="en" lang="en">English</a></li>
+  </ul>
+  <button class="iconbtn" id="theme" type="button" aria-label="Cambia tema" data-to-light="Passa al tema chiaro" data-to-dark="Passa al tema scuro">
+    <svg class="only-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-moon"/></svg>
+    <svg class="only-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-sun"/></svg>
+  </button>
+</div></header>
+
+<main id="main">
+<div id="top" class="hero"><div class="wrap">
+  <div>
+    <span class="eyebrow"><span class="dot"></span><b>Open source</b> · GPL-3.0 · Android</span>
+    <h1>App Android <span class="hl">open source</span> per allenamento e alimentazione</h1>
+    <p class="tagline">Allenati meglio. Mangia meglio. Tieni i tuoi dati.</p>
+    <p class="lead">Plico è un'app Android gratuita per tracciare gli allenamenti, pianificare i pasti e controllare l'alimentazione. Include il database alimentare italiano CREA, allenamenti guidati con suggerimento del carico e un coach AI opzionale. Nessun account, nessuna pubblicità, nessuna analisi dei dati.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="https://github.com/mariogiordano96/plico/releases/latest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-download"/></svg>Scarica l'APK</a>
+      <a class="btn btn-ghost" href="https://github.com/mariogiordano96/plico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-gh"/></svg>Vedi su GitHub</a>
+    </div>
+    <ul class="badges">
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-shield"/></svg>Dati sul tuo telefono</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg>Android 5.0+</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg>Fatta con Flutter</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg>Non è sul Play Store: compilala o scarica l'APK</li>
+    </ul>
+  </div>
+  <div class="stage">
+    <div class="phone p1"><img class="only-light" src="../screenshots/08-progress-light.webp" alt="Schermata dei progressi con il grafico del peso (chiaro)" width="540" height="1200" loading="lazy"><img class="only-dark" src="../screenshots/08-progress-dark.webp" alt="Schermata dei progressi con il grafico del peso (scuro)" width="540" height="1200" loading="lazy"></div>
+    <div class="phone p2"><img class="only-light" src="../screenshots/04-tdee-light.webp" alt="Schermata TDEE e ripartizione dei macro (chiaro)" width="540" height="1200" loading="eager" fetchpriority="high"><img class="only-dark" src="../screenshots/04-tdee-dark.webp" alt="Schermata TDEE e ripartizione dei macro (scuro)" width="540" height="1200" loading="eager" fetchpriority="high"></div>
+    <div class="phone p3"><img class="only-light" src="../screenshots/07-workout-interactive-light.webp" alt="Schermata dell'allenamento guidato con obiettivi per serie (chiaro)" width="540" height="1200" loading="lazy"><img class="only-dark" src="../screenshots/07-workout-interactive-dark.webp" alt="Schermata dell'allenamento guidato con obiettivi per serie (scuro)" width="540" height="1200" loading="lazy"></div>
+  </div>
+</div></div>
+
+<div class="wrap">
+  <div class="stats rv">
+    <div class="stat"><b>875</b><span>esercizi con immagini</span></div>
+    <div class="stat"><b>645</b><span>alimenti CREA italiani</span></div>
+    <div class="stat"><b>3</b><span>formule per il TDEE</span></div>
+    <div class="stat"><b>0</b><span>account, pubblicità o tracker</span></div>
+  </div>
+</div>
+
+<section id="features"><div class="wrap">
+  <span class="kicker">Funzioni</span>
+  <h2>Tutto per la palestra e la cucina, in un'unica app</h2>
+  <p class="sub">Plico copre le due metà del risultato: cosa mangi e come ti alleni. Tutto funziona sul telefono, con i dati sul telefono.</p>
+  <div class="grid">
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-utensils"/></svg></div><h3>Diario alimentare</h3><p>Registra i pasti con ricerca, scansione del codice a barre o alimenti personalizzati. Vedi calorie e macro rispetto al tuo obiettivo giornaliero, con un segnale quando lo centri.</p><div class="tags"><span class="tag">Open Food Facts</span><span class="tag">Codice a barre</span><span class="tag">Alimenti personalizzati</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-list"/></svg></div><h3>Generatore di piano alimentare</h3><p>Costruisce una giornata di pasti dai tuoi obiettivi di calorie e macro e dalle tue preferenze, con alternative per ogni voce. Quantità a crudo, arrotondate a 5 g.</p><div class="tags"><span class="tag">Questionario preferenze</span><span class="tag">Alternative</span><span class="tag">Esporta in PDF</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-calc"/></svg></div><h3>TDEE e macro</h3><p>BMR e TDEE con Katch-McArdle, Mifflin-St Jeor o Harris-Benedict, il tuo livello di attività e obiettivo, con ripartizione dei macro secondo le linee guida ISSN/ACSM.</p><div class="tags"><span class="tag">Deficit</span><span class="tag">Mantenimento</span><span class="tag">Surplus</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-dumbbell"/></svg></div><h3>Allenamenti su misura</h3><p>Schede, programmi su più giorni, calendario e registro degli esercizi liberi. Esporta ogni scheda in PDF.</p><div class="tags"><span class="tag">Schede</span><span class="tag">Programmi</span><span class="tag">Calendario</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-play"/></svg></div><h3>Modalità guidata</h3><p>Segui ogni esercizio con obiettivi per serie, timer di recupero e un carico suggerito in base al tuo storico, così la progressione non è un tentativo.</p><div class="tags"><span class="tag">Timer di recupero</span><span class="tag">Carico suggerito</span><span class="tag">Sostituisci esercizio</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-layers"/></svg></div><h3>Tecniche avanzate</h3><p>Scegli una tecnica per esercizio: superserie, cluster, piramidale, rest-pause, stripping o super slow, e pianificala nella scheda.</p><div class="tags"><span class="tag">Superserie</span><span class="tag">Rest-pause</span><span class="tag">Piramidale</span><span class="tag">Stripping</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-list"/></svg></div><h3>Catalogo da 875 esercizi</h3><p>Un catalogo offline con immagini, filtrabile per gruppo muscolare. Aggiungi i tuoi esercizi personalizzati.</p><div class="tags"><span class="tag">Offline</span><span class="tag">Immagini</span><span class="tag">Personalizzati</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-chart"/></svg></div><h3>Progressi e record</h3><p>Grafici di peso, calorie, macro e allenamento da 1 mese a sempre, più record personali e volume settimanale per gruppo muscolare.</p><div class="tags"><span class="tag">Grafici</span><span class="tag">Record</span><span class="tag">Volume settimanale</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-trophy"/></svg></div><h3>Serie e traguardi</h3><p>Un riepilogo settimanale, spunti dai tuoi dati, serie di giorni consecutivi e traguardi per restare costante senza pressioni.</p></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-ruler"/></svg></div><h3>Composizione corporea</h3><p>Misure di pliche e circonferenze: metodo US Navy più quattro protocolli plicometrici, con % di grasso, massa grassa e magra e BMI.</p><div class="tags"><span class="tag">Plicometria</span><span class="tag">US Navy</span><span class="tag">BMI</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-watch"/></svg></div><h3>Dati dello smartwatch</h3><p>Importa allenamenti e dati di benessere (frequenza cardiaca, sonno, HRV, passi) tramite Health Connect di Android.</p><div class="tags"><span class="tag">Health Connect</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-bot"/></svg></div><h3>Coach AI (opzionale)</h3><p>Fai domande su allenamento e alimentazione a un assistente basato su Gemini che conosce il tuo piano. Usa la tua chiave API: nessun server Plico e nessun abbonamento.</p><div class="tags"><span class="tag">Con la tua chiave</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-shield"/></svg></div><h3>Privacy per progetto</h3><p>Nessun account, nessuna pubblicità, nessuna analisi. I dati restano in un database locale. Esporta e importa i backup, o sposta tutto su un nuovo telefono via Wi-Fi.</p><div class="tags"><span class="tag">Database locale</span><span class="tag">Backup</span><span class="tag">Trasferimento Wi-Fi</span></div></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-bell"/></svg></div><h3>Promemoria e widget</h3><p>Promemoria dei pasti configurabili e un widget nella schermata Home per avere il prossimo pasto o allenamento a colpo d'occhio.</p></article>
+<article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-globe"/></svg></div><h3>Italiano e inglese</h3><p>Tutta l'interfaccia in due lingue, con i nomi degli alimenti CREA in italiano e le traduzioni in inglese.</p><div class="tags"><span class="tag">IT</span><span class="tag">EN</span></div></article>
+  </div>
+</div></section>
+
+<section id="screens"><div class="wrap">
+  <div class="gal-head">
+    <div>
+      <span class="kicker">Schermate</span>
+      <h2>Chiaro e scuro</h2>
+      <p class="sub" style="margin-bottom:0">Screenshot reali dell'app (interfaccia in inglese). Tocca una schermata per ingrandirla.</p>
+    </div>
+    <div class="seg" role="group" aria-label="Tema degli screenshot">
+      <button type="button" data-theme="light" aria-pressed="false">Chiaro</button>
+      <button type="button" data-theme="dark" aria-pressed="false">Scuro</button>
+    </div>
+  </div>
+  <div class="rail" role="region" aria-label="Screenshot dell'app" tabindex="0">
+<figure class="shot rv" tabindex="0" aria-label="Home: apri ingrandita">
+  <div class="phone"><img class="only-light" src="../screenshots/01-home-light.webp" alt="Home (chiaro)" width="540" height="1200" loading="lazy"><img class="only-dark" src="../screenshots/01-home-dark.webp" alt="Home (scuro)" width="540" height="1200" loading="lazy"></div>
+  <figcaption><b>Home</b>La giornata in un colpo d'occhio: calorie, macro, aderenza al piano, peso e BMI.</figcaption>
+</figure>
+<figure class="shot rv" tabindex="0" aria-label="Piano alimentare: apri ingrandita">
+  <div class="phone"><img class="only-light" src="../screenshots/02-meal-plan-light.webp" alt="Piano alimentare (chiaro)" width="540" height="1200" loading="lazy"><img class="only-dark" src="../screenshots/02-meal-plan-dark.webp" alt="Piano alimentare (scuro)" width="540" height="1200" loading="lazy"></div>
+  <figcaption><b>Piano alimentare</b>Una giornata di pasti dai tuoi macro, con alternative per ogni voce.</figcaption>
+</figure>
+<figure class="shot rv" tabindex="0" aria-label="Diario alimentare: apri ingrandita">
+  <div class="phone"><img class="only-light" src="../screenshots/03-diary-light.webp" alt="Diario alimentare (chiaro)" width="540" height="1200" loading="lazy"><img class="only-dark" src="../screenshots/03-diary-dark.webp" alt="Diario alimentare (scuro)" width="540" height="1200" loading="lazy"></div>
+  <figcaption><b>Diario alimentare</b>Registra i pasti con ricerca, codice a barre o alimento personalizzato, rispetto al tuo obiettivo.</figcaption>
+</figure>
+<figure class="shot rv" tabindex="0" aria-label="TDEE e macro: apri ingrandita">
+  <div class="phone"><img class="only-light" src="../screenshots/04-tdee-light.webp" alt="TDEE e macro (chiaro)" width="540" height="1200" loading="lazy"><img class="only-dark" src="../screenshots/04-tdee-dark.webp" alt="TDEE e macro (scuro)" width="540" height="1200" loading="lazy"></div>
+  <figcaption><b>TDEE e macro</b>BMR, TDEE e obiettivi di macro, con la formula mostrata.</figcaption>
+</figure>
+<figure class="shot rv" tabindex="0" aria-label="Allenamento: apri ingrandita">
+  <div class="phone"><img class="only-light" src="../screenshots/05-workout-empty-light.webp" alt="Allenamento (chiaro)" width="540" height="1200" loading="lazy"><img class="only-dark" src="../screenshots/05-workout-empty-dark.webp" alt="Allenamento (scuro)" width="540" height="1200" loading="lazy"></div>
+  <figcaption><b>Allenamento</b>Parti da una scheda o registra un esercizio libero.</figcaption>
+</figure>
+<figure class="shot rv" tabindex="0" aria-label="Schede: apri ingrandita">
+  <div class="phone"><img class="only-light" src="../screenshots/06-workout-template-light.webp" alt="Schede (chiaro)" width="540" height="1200" loading="lazy"><img class="only-dark" src="../screenshots/06-workout-template-dark.webp" alt="Schede (scuro)" width="540" height="1200" loading="lazy"></div>
+  <figcaption><b>Schede</b>Le tue schede e i tuoi programmi, si avviano con un tocco e si esportano in PDF.</figcaption>
+</figure>
+<figure class="shot rv" tabindex="0" aria-label="Allenamento guidato: apri ingrandita">
+  <div class="phone"><img class="only-light" src="../screenshots/07-workout-interactive-light.webp" alt="Allenamento guidato (chiaro)" width="540" height="1200" loading="lazy"><img class="only-dark" src="../screenshots/07-workout-interactive-dark.webp" alt="Allenamento guidato (scuro)" width="540" height="1200" loading="lazy"></div>
+  <figcaption><b>Allenamento guidato</b>Segui ogni esercizio con obiettivi per serie e carico suggerito.</figcaption>
+</figure>
+<figure class="shot rv" tabindex="0" aria-label="Progressi: apri ingrandita">
+  <div class="phone"><img class="only-light" src="../screenshots/08-progress-light.webp" alt="Progressi (chiaro)" width="540" height="1200" loading="lazy"><img class="only-dark" src="../screenshots/08-progress-dark.webp" alt="Progressi (scuro)" width="540" height="1200" loading="lazy"></div>
+  <figcaption><b>Progressi</b>Peso, dati di salute e andamento degli allenamenti nel tempo.</figcaption>
+</figure>
+<figure class="shot rv" tabindex="0" aria-label="Coach AI: apri ingrandita">
+  <div class="phone"><img class="only-light" src="../screenshots/09-coach-setup-light.webp" alt="Coach AI (chiaro)" width="540" height="1200" loading="lazy"><img class="only-dark" src="../screenshots/09-coach-setup-dark.webp" alt="Coach AI (scuro)" width="540" height="1200" loading="lazy"></div>
+  <figcaption><b>Coach AI</b>Porta la tua chiave Gemini. Le richieste vanno direttamente a Google.</figcaption>
+</figure>
+  </div>
+  <p class="hint">Scorri di lato per vederne altre. Dati di esempio.</p>
+</div></section>
+
+<section id="coach"><div class="wrap split">
+  <div class="phone rv"><img class="only-light" src="../screenshots/09-coach-setup-light.webp" alt="Schermata di configurazione del Coach che chiede una chiave API Gemini (chiaro)" width="540" height="1200" loading="lazy"><img class="only-dark" src="../screenshots/09-coach-setup-dark.webp" alt="Schermata di configurazione del Coach che chiede una chiave API Gemini (scuro)" width="540" height="1200" loading="lazy"></div>
+  <div class="rv">
+    <span class="kicker">Coach AI</span>
+    <h2>Un assistente che lavora per te, non per un server</h2>
+    <p class="sub">Il Coach è opzionale. Risponde a domande su allenamento e alimentazione usando il tuo piano e i dati recenti come contesto, e con dei pulsanti può preparare ricette, un nuovo piano alimentare o un nuovo allenamento.</p>
+    <ul class="checks">
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg><span><b>Porta la tua chiave.</b> Crea una chiave gratuita in Google AI Studio (senza carta) e incollala nell'app.</span></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg><span><b>Nessun server Plico.</b> Le richieste vanno direttamente dal tuo telefono all'API Gemini di Google.</span></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg><span><b>Attento alla quota.</b> Plico limita le richieste per restare nel piano gratuito e mostra un contatore d'uso onesto.</span></li>
+    </ul>
+    <p class="note">Nel piano gratuito Google dichiara che può usare le richieste per migliorare i suoi modelli. Se attivi la fatturazione sulla tua chiave, gli eventuali costi sono tuoi. Senza il Coach tutto il resto funziona allo stesso modo.</p>
+  </div>
+</div></section>
+
+<section id="privacy"><div class="wrap">
+  <span class="kicker">Privacy</span>
+  <h2>I dati del tuo corpo non sono affare di nessuno</h2>
+  <p class="sub">Plico non ha account né backend. Le uniche richieste di rete sono quelle che avvii tu: cercare su Open Food Facts, scansionare un codice a barre o interrogare il Coach.</p>
+  <div class="grid">
+    <article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-shield"/></svg></div><h3>Locale per impostazione</h3><p>Pasti, allenamenti, misure e impostazioni stanno in un database sul dispositivo.</p></article>
+    <article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-download"/></svg></div><h3>Tuoi da spostare</h3><p>Esporta un backup, importalo altrove o invia tutto a un altro telefono via Wi-Fi.</p></article>
+    <article class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check"/></svg></div><h3>Verificabile</h3><p>Tutta l'app è su GitHub con licenza GPL-3.0. Leggila, compilala, modificala.</p></article>
+  </div>
+</div></section>
+
+<section id="faq"><div class="wrap">
+  <span class="kicker">FAQ</span>
+  <h2>Domande frequenti</h2>
+  <div class="faq">
+<details class="qa rv"><summary>Esiste un'app open source per allenamento e dieta insieme?</summary><p>Sì. Plico unisce il tracciamento degli allenamenti (sessioni guidate, programmi, un catalogo da 875 esercizi) e l'alimentazione (diario, piani alimentari, TDEE e macro) in un'unica app Android gratuita con licenza GPL-3.0.</p></details>
+<details class="qa rv"><summary>Serve un account?</summary><p>No. Non c'è nessun account e nessun server Plico. I tuoi dati restano in un database locale sul telefono.</p></details>
+<details class="qa rv"><summary>Plico funziona offline?</summary><p>In gran parte sì. Il catalogo esercizi, il database alimentare CREA, gli allenamenti, il diario e i grafici funzionano offline. La ricerca su Open Food Facts, la consultazione dei prodotti scansionati e il Coach AI richiedono una connessione a internet.</p></details>
+<details class="qa rv"><summary>Plico è sul Google Play Store?</summary><p>Al momento no. Scarica l'APK dalle Release di GitHub oppure compilalo dal sorgente con quattro comandi.</p></details>
+<details class="qa rv"><summary>Funziona su iPhone?</summary><p>No. Plico è solo per Android (Android 5.0 e successivi).</p></details>
+<details class="qa rv"><summary>Che cos'è il Coach AI e costa qualcosa?</summary><p>È un assistente opzionale basato su Google Gemini. Incolli la tua chiave API gratuita, le richieste vanno direttamente dal tuo telefono a Google e Plico non ha un server. Nel piano gratuito di Google non costa nulla; se attivi la fatturazione sulla tua chiave, i costi sono tuoi.</p></details>
+<details class="qa rv"><summary>Quale database alimentare usa Plico?</summary><p>Le tabelle di composizione degli alimenti CREA italiane (645 alimenti), più Open Food Facts per i prodotti confezionati.</p></details>
+<details class="qa rv"><summary>Posso usare e modificare il codice sorgente?</summary><p>Sì, con la licenza GPL-3.0: puoi usarlo, studiarlo, modificarlo e condividerlo, purché le versioni distribuite mantengano la nota di copyright e la stessa licenza, con il codice sorgente.</p></details>
+  </div>
+</div></section>
+
+<section id="build"><div class="wrap split" style="grid-template-columns:1fr 1fr">
+  <div class="rv">
+    <span class="kicker">Installa</span>
+    <h2>Dal clone all'APK in quattro comandi</h2>
+    <p class="sub">Non c'è una scheda su uno store: la compili tu oppure scarichi l'APK dalla pagina delle release. Non servono chiavi di firma né account.</p>
+    <ol class="steps">
+      <li><span>Installa <b>Flutter 3.44.1</b> (stable) e l'Android SDK.</span></li>
+      <li><span>Clona il repository ed esegui i comandi a destra.</span></li>
+      <li><span>Installa <b>app-release.apk</b> su un dispositivo Android 5.0+.</span></li>
+      <li><span>Facoltativo: incolla una chiave Gemini nella scheda Coach.</span></li>
+    </ol>
+  </div>
+  <div class="rv">
+    <div class="code"><button id="copy" type="button" data-copied="Copiato">Copia</button>
+<pre id="build-cmd">git clone https://github.com/mariogiordano96/plico.git
+cd plico
+flutter pub get
+flutter build apk --release
+<span class="c"># build/app/outputs/flutter-apk/app-release.apk</span></pre></div>
+    <p class="hint" style="margin-top:14px">La build di release è firmata con la chiave di debug, a meno che tu aggiunga un tuo <code>key.properties</code>. iOS non è supportato.</p>
+  </div>
+</div></section>
+
+<section id="credits"><div class="wrap">
+  <span class="kicker">Licenza e crediti</span>
+  <h2>Software libero, con i crediti dove dovuti</h2>
+  <p class="sub">Plico è rilasciato con licenza <a href="https://github.com/mariogiordano96/plico/blob/main/LICENSE">GNU GPL v3.0</a>. Copyright © 2026 maxio96 (Mario Giordano). Nome e logo non sono coperti dalla licenza.</p>
+  <div class="credits">
+    <article class="card"><h3>Dati alimentari CREA</h3><p>Tabelle di composizione degli alimenti del CREA – Centro di ricerca Alimenti e Nutrizione. Fonte citata come richiesto; i dati mantengono le loro condizioni.</p></article>
+    <article class="card"><h3>Dati sugli esercizi</h3><p>Catalogo derivato da <a href="https://github.com/yuhonas/free-exercise-db">free-exercise-db</a>, rilasciato nel pubblico dominio.</p></article>
+    <article class="card"><h3>Open Food Facts e font</h3><p>Ricerca dei prodotti confezionati tramite <a href="https://world.openfoodfacts.org">Open Food Facts</a> (ODbL). Carattere Space Grotesk con licenza SIL Open Font License.</p></article>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <span>© 2026 maxio96 (Mario Giordano) · GPL-3.0</span>
+  <nav aria-label="Piè di pagina"><a href="https://github.com/mariogiordano96/plico">Codice</a><a href="https://github.com/mariogiordano96/plico/issues">Segnalazioni</a><a href="https://github.com/mariogiordano96/plico/blob/main/NOTICE.md">Note legali</a><a href="https://github.com/mariogiordano96/plico/blob/main/SECURITY.md">Sicurezza</a></nav>
+</div></footer>
+
+<dialog id="lightbox" aria-label="Anteprima dello screenshot">
+  <button class="iconbtn" type="button" aria-label="Chiudi">✕</button>
+  <div class="phone"><img class="only-light" alt="" src="" width="540" height="1200"><img class="only-dark" alt="" src="" width="540" height="1200"></div>
+</dialog>
+
+<script src="../assets/app.js" defer></script>
+</body>
+</html>
